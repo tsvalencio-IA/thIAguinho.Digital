@@ -6,7 +6,8 @@ import { database, ref, push, set } from './firebase-config.js';
 // COLE AQUI A SUA CHAVE DO GEMINI API
 // Acesse https://aistudio.google.com/app/apikey para criar a sua
 // =========================================================================
-const GEMINI_API_KEY = "COLE_AQUI_A_SUA_CHAVE_DO_GEMINI"; 
+const GEMINI_API_KEY = "AIzaSyAnxgCqAh9xlvDFpWmmNtB4tcAwTpWh6gs"; 
+
 
 const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
