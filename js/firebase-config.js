@@ -9,13 +9,13 @@ import { getDatabase, ref, set, push, onValue, get } from "https://www.gstatic.c
 // Vá em Configurações do Projeto no console do Firebase e copie os dados
 // =========================================================================
 const firebaseConfig = {
-    apiKey: "COLE_SUA_API_KEY_DO_FIREBASE_AQUI",
-    authDomain: "COLE_SEU_AUTH_DOMAIN_AQUI",
-    databaseURL: "COLE_SUA_DATABASE_URL_AQUI", 
-    projectId: "COLE_SEU_PROJECT_ID_AQUI",
-    storageBucket: "COLE_SEU_STORAGE_BUCKET_AQUI",
-    messagingSenderId: "COLE_SEU_MESSAGING_SENDER_ID_AQUI",
-    appId: "COLE_SEU_APP_ID_AQUI"
+  apiKey: "AIzaSyAiykf5IqYbnHglovdxyRzXXmrk-GtHlzQ",
+  authDomain: "thiaguinho-40a14.firebaseapp.com",
+  databaseURL: "https://thiaguinho-40a14-default-rtdb.firebaseio.com",
+  projectId: "thiaguinho-40a14",
+  storageBucket: "thiaguinho-40a14.firebasestorage.app",
+  messagingSenderId: "953851363533",
+  appId: "1:953851363533:web:a912b840e5d268c5d16984"
 };
 
 const app = initializeApp(firebaseConfig);
