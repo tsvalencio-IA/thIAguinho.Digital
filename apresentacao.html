@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mascote thIAguinho - Realidade Aumentada</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: sans-serif; }
+        
+        #ui-layer { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; display: flex; flex-direction: column; justify-content: flex-end; }
+        .pointer-events-auto { pointer-events: auto; }
+        
+        .chat-container { background: rgba(15, 23, 42, 0.95); border-top: 2px solid #dc2626; border-radius: 20px 20px 0 0; padding: 15px; display: flex; flex-direction: column; max-height: 60vh; }
+        .chat-display { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding-right: 5px; }
+        
+        .msg { padding: 10px 15px; border-radius: 15px; font-size: 14px; line-height: 1.4; max-width: 85%; }
+        .msg.bot { background: #1e293b; color: white; border-bottom-left-radius: 2px; align-self: flex-start; border: 1px solid #334155; }
+        .msg.user { background: #dc2626; color: white; border-bottom-right-radius: 2px; align-self: flex-end; }
+        
+        .input-area { display: flex; gap: 10px; align-items: center; }
+        .input-area input { flex: 1; padding: 12px 15px; border-radius: 25px; border: 1px solid #334155; background: #0f172a; color: white; outline: none; }
+        .btn-action { width: 45px; height: 45px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; color: white; transition: 0.3s; }
+        .btn-mic { background: #334155; }
+        .btn-mic.listening { background: #dc2626; transform: scale(1.1); }
+        .btn-send { background: #dc2626; }
+    </style>
+</head>
+<body>
+
+    <!-- MindAR lendo os arquivos da sua pasta assets -->
+    <a-scene mindar-image="imageTargetSrc: ./assets/targets.mind; uiScanning:yes;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+        <a-assets>
+            <video id="vid" src="./assets/mascote.mp4" loop crossorigin="anonymous" playsinline></video>
+        </a-assets>
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+        <a-entity mindar-image-target="targetIndex: 0" id="alvo-ar">
+            <a-video src="#vid" position="0 0 0" height="1" width="1" rotation="0 0 0"></a-video>
+        </a-entity>
+    </a-scene>
+
+    <div id="ui-layer">
+        <div class="pointer-events-auto chat-container w-full max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-700">
+                <div class="flex items-center gap-2">
+                    <i class='bx bx-bot text-red-500 text-2xl'></i>
+                    <span class="font-bold text-white text-sm">thIAguinho Mascote</span>
+                </div>
+                <a href="index.html" class="text-slate-400 hover:text-white"><i class='bx bx-x text-2xl'></i></a>
+            </div>
+            
+            <div class="chat-display" id="chat-display"></div>
+            
+            <div class="input-area">
+                <button id="btn-mic" class="btn-action btn-mic"><i class='bx bxs-microphone'></i></button>
+                <input type="text" id="user-input" placeholder="Digite ou fale com o mascote...">
+                <button id="btn-send" class="btn-action btn-send"><i class='bx bx-send'></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Puxa o arquivo ar-logic.js de dentro da pasta js -->
+    <script type="module" src="./js/ar-logic.js"></script>
+</body>
+</html>
