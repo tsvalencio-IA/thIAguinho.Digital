@@ -1,5 +1,7 @@
+<!-- NOME DO FICHEIRO: admin.html -->
+<!-- LOCALIZAÇÃO: Pasta principal do projeto -->
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,10 +15,7 @@
         
         .modal-overlay { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 1000; }
         .modal-content { animation: slideUp 0.3s ease-out forwards; }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
         
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #1e293b; }
@@ -25,23 +24,23 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- TELA DE LOGIN DO FIREBASE -->
+    <!-- ECRÃ DE LOGIN DA AGÊNCIA -->
     <div id="admin-login" class="flex-1 flex items-center justify-center p-4">
         <div class="bg-slate-800 p-8 rounded-2xl w-full max-w-sm border border-slate-700 shadow-2xl text-center">
             <i class='bx bx-shield-quarter text-5xl text-red-500 mb-2'></i>
             <h2 class="text-xl font-bold text-white mb-6">Acesso da Agência</h2>
             
-            <input type="email" id="email-admin" class="w-full bg-slate-900 text-white border border-slate-600 rounded-xl p-3 mb-3 outline-none focus:border-red-500 transition" placeholder="E-mail do Firebase">
-            <input type="password" id="senha-admin" class="w-full bg-slate-900 text-white border border-slate-600 rounded-xl p-3 mb-4 outline-none focus:border-red-500 transition" placeholder="Senha">
+            <input type="email" id="email-admin" class="w-full bg-slate-900 text-white border border-slate-600 rounded-xl p-3 mb-3 outline-none focus:border-red-500 transition" placeholder="Email do Firebase">
+            <input type="password" id="senha-admin" class="w-full bg-slate-900 text-white border border-slate-600 rounded-xl p-3 mb-4 outline-none focus:border-red-500 transition" placeholder="Palavra-passe">
             
             <button id="btn-login" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl mb-4 transition">Entrar no Painel</button>
             <a href="index.html" class="text-slate-400 text-sm hover:text-white transition">Voltar ao site</a>
             
-            <p id="msg-erro-login" class="text-red-500 text-sm mt-3 oculto font-semibold">Email ou senha incorretos. Verifique o Firebase.</p>
+            <p id="msg-erro-login" class="text-red-500 text-sm mt-3 oculto font-semibold">Email ou palavra-passe incorretos.</p>
         </div>
     </div>
 
-    <!-- TELA DO PAINEL CRM -->
+    <!-- PAINEL CRM COM USABILIDADE ELEVADA -->
     <div id="admin-dashboard" class="oculto flex-1 flex flex-col h-screen overflow-hidden">
         <header class="bg-slate-800 border-b border-slate-700 p-4 md:px-8 flex justify-between items-center shrink-0">
             <div class="flex items-center gap-3">
@@ -60,26 +59,25 @@
         
         <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
             
-            <!-- Coluna Esquerda: Configurações do Mascote e API -->
+            <!-- Coluna Esquerda: Configurações do Backend e IA -->
             <div class="w-full lg:w-1/3 bg-slate-900 border-r border-slate-700 flex flex-col p-6 overflow-y-auto">
                 
-                <!-- Backend: Chave da API -->
+                <!-- Backend: Gestão da Chave da API Gemini -->
                 <div class="mb-6 bg-slate-800 p-4 rounded-xl border border-slate-600">
-                    <h3 class="font-bold text-white mb-2 flex items-center gap-2 text-sm"><i class='bx bx-key text-red-500'></i> Chave API do Gemini (Backend)</h3>
-                    <p class="text-xs text-slate-400 mb-3">Insira a sua chave do Google AI Studio. Ela ficará salva no Firebase de forma dinâmica.</p>
+                    <h3 class="font-bold text-white mb-2 flex items-center gap-2 text-sm"><i class='bx bx-key text-red-500'></i> Chave API do Gemini</h3>
+                    <p class="text-xs text-slate-400 mb-3">Insira a sua chave do Google AI Studio para ativar o Mascote.</p>
                     <div class="flex gap-2">
                         <input type="password" id="api-key-input" class="flex-1 bg-slate-900 border border-slate-600 rounded-lg p-2 text-sm text-white outline-none focus:border-red-500" placeholder="AIzaSy...">
                         <button id="btn-save-key" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-1">
-                            Salvar
+                            Guardar
                         </button>
                     </div>
                 </div>
 
                 <hr class="border-slate-700 mb-6">
 
-                <!-- Cérebro do Mascote -->
                 <h3 class="font-bold text-red-500 mb-2 flex items-center gap-2 text-lg"><i class='bx bx-brain'></i> Cérebro do Arquiteto IA</h3>
-                <p class="text-sm text-slate-400 mb-4">Ajuste como a IA cria os Facilitóides para os clientes em tempo real.</p>
+                <p class="text-sm text-slate-400 mb-4">Instrua a IA sobre como desenhar os Facilitóides para os clientes.</p>
                 
                 <textarea id="prompt-ia" class="flex-1 w-full bg-slate-800 border border-slate-600 rounded-xl p-4 text-sm text-white resize-none outline-none focus:border-red-500 shadow-inner min-h-[300px]"></textarea>
                 
@@ -88,29 +86,28 @@
                 </button>
             </div>
             
-            <!-- Coluna Direita: Leads e Facilitóides -->
+            <!-- Coluna Direita: Cartões de Projetos Capturados -->
             <div class="w-full lg:w-2/3 bg-slate-800 flex flex-col p-6 overflow-hidden">
                 <div class="flex justify-between items-center mb-6 shrink-0">
                     <h3 class="font-bold text-white text-xl flex items-center gap-2">
-                        <i class='bx bxs-inbox text-red-500'></i> Projetos Capturados (Tempo Real)
+                        <i class='bx bxs-inbox text-red-500'></i> Projetos Capturados (Em Tempo Real)
                     </h3>
                     <span class="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/30 flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Firebase Conectado
                     </span>
                 </div>
                 
-                <!-- Grelha de Projetos (Cards) -->
-                <div id="grid-leads" class="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4 pb-10 pr-2">
+                <div id="grid-leads" class="flex-1 overflow-y-auto grid grid-cols-1 xl:grid-cols-2 gap-4 pb-10 pr-2">
                     <div class="col-span-full text-center py-10 text-slate-500">
                         <i class='bx bx-loader-alt bx-spin text-4xl mb-3'></i>
-                        <p>Aguardando dados do banco de dados...</p>
+                        <p>A carregar base de dados...</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE USABILIDADE: Detalhes do Facilitóide -->
+    <!-- JANELA MODAL: Detalhes do Facilitóide Gerado -->
     <div id="modal-projeto" class="fixed inset-0 modal-overlay oculto flex items-center justify-center p-4">
         <div class="modal-content bg-slate-800 border border-slate-600 rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
             
