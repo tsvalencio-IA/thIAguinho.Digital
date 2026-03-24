@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>thIAguinho Soluções Digitais - Plataforma SaaS</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    
+    <!-- WebXR & MindAR -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+
+    <style>
+        body { font-family: 'Montserrat', sans-serif; background-color: #0f172a; color: white; overflow: hidden; }
+        .neon-border { box-shadow: 0 0 10px rgba(220, 38, 38, 0.6), inset 0 0 10px rgba(220, 38, 38, 0.2); }
+        .neon-text { text-shadow: 0 0 8px rgba(220, 38, 38, 0.8); }
+        .hidden-module { display: none !important; }
+        #ar-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background-color: #000; }
+        #ar-ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; display: flex; flex-direction: column; justify-content: flex-end; }
+        .pointer-events-auto { pointer-events: auto; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #dc2626; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <!-- TELA INICIAL -->
+    <div id="view-home" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900 z-50">
+        <div class="text-center mb-10">
+            <div class="w-24 h-24 bg-red-600 rounded-full mx-auto mb-4 flex items-center justify-center neon-border">
+                <i class='bx bx-brain text-5xl text-white'></i>
+            </div>
+            <h1 class="text-4xl font-extrabold text-white tracking-tight">thIAguinho</h1>
+            <p class="text-red-500 font-semibold uppercase tracking-widest text-sm mt-2 neon-text">Soluções Digitais</p>
+        </div>
+
+        <div class="space-y-4 w-full max-w-xs">
+            <button id="btn-go-ar" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3 neon-border">
+                <i class='bx bx-scan text-2xl'></i>
+                Vendedor AR (Cliente)
+            </button>
+            <button id="btn-go-admin" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3">
+                <i class='bx bx-lock-alt text-2xl'></i>
+                Acesso Equipe
+            </button>
+        </div>
+    </div>
+
+    <!-- MÓDULO AR (CLIENTE) -->
+    <div id="view-ar" class="hidden-module w-full h-full relative">
+        <div id="ar-container">
+            <a-scene mindar-image="imageTargetSrc: ./assets/targets.mind; uiScanning:yes;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+                <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+                <a-entity mindar-image-target="targetIndex: 0">
+                    <!-- Substitua o a-box pelo seu mascote 3D ou vídeo depois -->
+                    <a-box color="#dc2626" position="0 0 0" scale="0.5 0.5 0.5" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+                </a-entity>
+            </a-scene>
+        </div>
+
+        <div id="ar-ui-layer" class="pb-4 px-4">
+            <div class="pointer-events-auto bg-slate-900 bg-opacity-95 rounded-2xl shadow-2xl w-full max-w-md mx-auto flex flex-col h-[60vh] max-h-[500px] border border-red-900 neon-border flex-shrink-0">
+                <div class="p-4 bg-red-600 rounded-t-2xl flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <i class='bx bx-bot text-2xl'></i>
+                        <div>
+                            <h3 class="font-bold text-white leading-tight">Mascote thIAguinho</h3>
+                            <p class="text-xs text-red-200">Consultor IA Online</p>
+                        </div>
+                    </div>
+                    <button id="btn-close-ar" class="text-white hover:text-red-200 bg-red-700 p-1 rounded-lg transition"><i class='bx bx-x text-xl'></i></button>
+                </div>
+                
+                <div id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
+                
+                <div class="p-3 border-t border-slate-700 flex gap-2 bg-slate-800 rounded-b-2xl">
+                    <input type="text" id="chat-input" class="flex-1 bg-slate-900 text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-red-600 border border-slate-700" placeholder="Responda aqui...">
+                    <button id="btn-send-chat" class="bg-red-600 text-white px-4 rounded-xl hover:bg-red-700 transition flex items-center justify-center"><i class='bx bx-send text-xl'></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MÓDULO ADMIN (EQUIPE) -->
+    <div id="view-admin" class="hidden-module w-full h-full absolute inset-0 bg-slate-900 z-50 flex flex-col">
+        <!-- Login -->
+        <div id="admin-login" class="flex-1 flex items-center justify-center p-4">
+            <div class="bg-slate-800 p-8 rounded-2xl w-full max-w-sm border border-slate-700 shadow-2xl">
+                <div class="text-center mb-6">
+                    <i class='bx bx-shield-quarter text-5xl text-red-500 mb-2'></i>
+                    <h2 class="text-2xl font-bold text-white">Área Restrita</h2>
+                </div>
+                <input type="password" id="admin-pwd" class="w-full bg-slate-900 text-white border border-slate-600 rounded-xl p-4 mb-4 outline-none focus:border-red-500" placeholder="Senha de Acesso (Ex: admin123)">
+                <button id="btn-login" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl transition neon-border">Entrar no Painel</button>
+                <button id="btn-back-home-admin" class="w-full mt-4 text-slate-400 hover:text-white py-2 text-sm font-semibold transition">Voltar ao Início</button>
+            </div>
+        </div>
+
+        <!-- Dashboard do CRM -->
+        <div id="admin-dashboard" class="hidden-module flex-1 flex flex-col h-full overflow-hidden bg-slate-900">
+            <header class="bg-slate-800 border-b border-slate-700 p-5 flex justify-between items-center shadow-lg">
+                <div class="flex items-center gap-3">
+                    <div class="bg-red-600 p-2 rounded-lg"><i class='bx bx-bar-chart-alt-2 text-white'></i></div>
+                    <h2 class="text-xl font-bold text-white">CRM & Gestão IA</h2>
+                </div>
+                <button id="btn-logout" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2">
+                    <i class='bx bx-log-out'></i> Sair
+                </button>
+            </header>
+            
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col lg:flex-row gap-6">
+                <!-- Painel do Cérebro (Prompt) -->
+                <div class="w-full lg:w-1/3 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col h-[500px]">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class='bx bx-brain text-red-500 text-2xl'></i>
+                        <h3 class="text-lg font-bold text-white">O "Cérebro" da IA</h3>
+                    </div>
+                    <textarea id="system-prompt" class="flex-1 w-full bg-slate-900 text-white border border-slate-600 rounded-xl p-4 outline-none focus:border-red-500 text-sm leading-relaxed resize-none"></textarea>
+                    <div class="mt-4 flex items-center justify-between">
+                        <span id="prompt-status" class="text-xs text-emerald-400 font-semibold opacity-0 transition-opacity">Atualizado!</span>
+                        <button id="btn-save-prompt" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-lg">Gravar Configuração</button>
+                    </div>
+                </div>
+                
+                <!-- Tabela de Leads Capturados -->
+                <div class="w-full lg:w-2/3 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col h-[500px]">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class='bx bxs-contact text-red-500 text-2xl'></i>
+                        <h3 class="text-lg font-bold text-white">Leads Capturados</h3>
+                    </div>
+                    <div class="flex-1 bg-slate-900 rounded-xl border border-slate-700 overflow-hidden flex flex-col">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm text-slate-300">
+                                <thead class="bg-slate-950 text-slate-400 uppercase text-xs font-bold border-b border-slate-700">
+                                    <tr><th class="p-4">Data</th><th class="p-4">Nome / Empresa</th><th class="p-4">Dor</th><th class="p-4">WhatsApp</th></tr>
+                                </thead>
+                                <tbody id="leads-table-body" class="divide-y divide-slate-800">
+                                    <tr><td colspan="4" class="p-8 text-center text-slate-500">Carregando CRM...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script principal como Módulo -->
+    <script type="module" src="./js/main.js"></script>
+</body>
+</html>
