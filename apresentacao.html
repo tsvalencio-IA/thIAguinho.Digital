@@ -1,5 +1,7 @@
+<!-- NOME DO FICHEIRO: apresentacao.html -->
+<!-- LOCALIZAÇÃO: Pasta principal do projeto -->
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -12,7 +14,6 @@
 
     <style>
         body { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: sans-serif; }
-        
         #ui-layer { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; display: flex; flex-direction: column; justify-content: flex-end; }
         .pointer-events-auto { pointer-events: auto; }
         
@@ -33,7 +34,7 @@
 </head>
 <body>
 
-    <!-- MindAR lendo os arquivos da sua pasta assets -->
+    <!-- IMPORTANTE: O ficheiro targets.mind e mascote.mp4 têm de estar na pasta assets -->
     <a-scene mindar-image="imageTargetSrc: ./assets/targets.mind; uiScanning:yes;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
         <a-assets>
             <video id="vid" src="./assets/mascote.mp4" loop crossorigin="anonymous" playsinline></video>
@@ -58,13 +59,13 @@
             
             <div class="input-area">
                 <button id="btn-mic" class="btn-action btn-mic"><i class='bx bxs-microphone'></i></button>
-                <input type="text" id="user-input" placeholder="Digite ou fale com o mascote...">
+                <input type="text" id="user-input" placeholder="Fale com o arquiteto...">
                 <button id="btn-send" class="btn-action btn-send"><i class='bx bx-send'></i></button>
             </div>
         </div>
     </div>
 
-    <!-- Puxa o arquivo ar-logic.js de dentro da pasta js -->
+    <!-- Carrega a lógica do Mascote -->
     <script type="module" src="./js/ar-logic.js"></script>
 </body>
 </html>
