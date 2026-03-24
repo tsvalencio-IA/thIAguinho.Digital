@@ -1,18 +1,22 @@
-// CRIE ESTE ARQUIVO DENTRO DA PASTA js COM O NOME admin-logic.js
 import { auth, database, signInWithEmailAndPassword, signOut, ref, set, onValue, get } from './firebase-config.js';
 import { atualizarPromptMemoria, systemPrompt as promptPadraoDaAPI } from './gemini-api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     
+    // Elementos de Autenticação
     const emailInput = document.getElementById('email-admin');
     const senhaInput = document.getElementById('senha-admin');
     const btnLogin = document.getElementById('btn-login');
     const btnLogout = document.getElementById('btn-logout');
     const erroMsg = document.getElementById('msg-erro-login');
+    
+    // Elementos de Configuração
     const btnSavePrompt = document.getElementById('btn-save-prompt');
+    const btnSaveKey = document.getElementById('btn-save-key');
+    const apiKeyInput = document.getElementById('api-key-input');
     const gridLeads = document.getElementById('grid-leads');
     
-    // Elementos do Modal
+    // Modal
     const modalProjeto = document.getElementById('modal-projeto');
     const btnFecharModal = document.getElementById('btn-fechar-modal');
     const btnFecharModal2 = document.getElementById('btn-fechar-modal-2');
@@ -51,6 +55,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- SALVAR CHAVE DA API NO BACKEND (FIREBASE) ---
+    btnSaveKey.addEventListener('click', () => {
+        if (!usuarioLogado) return;
+        const novaChave = apiKeyInput.value.trim();
+        if(!novaChave) return alert("Por favor, cole a chave da API.");
+        
+        const btn = btnSaveKey;
+        btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
+        
+        set(ref(database, 'configuracoes/gemini_api_key'), novaChave)
+            .then(() => {
+                btn.innerHTML = "<i class='bx bx-check'></i> Salvo";
+                btn.classList.replace('bg-red-600', 'bg-emerald-600');
+                setTimeout(() => {
+                    btn.innerHTML = "Salvar";
+                    btn.classList.replace('bg-emerald-600', 'bg-red-600');
+                }, 2000);
+            })
+            .catch((error) => alert("Erro ao salvar chave: " + error.message));
+    });
+
     // --- SALVAR CÉREBRO DA IA ---
     btnSavePrompt.addEventListener('click', () => {
         if (!usuarioLogado) return;
@@ -62,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         set(ref(database, 'configuracoes/prompt_mascote'), novoPrompt)
             .then(() => {
                 atualizarPromptMemoria(novoPrompt);
-                btn.innerHTML = "<i class='bx bx-check'></i> Salvo!";
+                btn.innerHTML = "<i class='bx bx-check'></i> Salvo com sucesso!";
                 btn.classList.replace('bg-red-600', 'bg-emerald-600');
                 setTimeout(() => {
                     btn.innerHTML = originalText;
@@ -78,7 +103,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- LER BANCO DE DADOS (USABILIDADE DE CARDS) ---
     function iniciarLeituraDoBancoDeDados() {
         
-        // 1. Carrega o Cérebro
+        // Carrega Chave da API
+        get(ref(database, 'configuracoes/gemini_api_key')).then((snapshot) => {
+            if(snapshot.exists()) apiKeyInput.value = snapshot.val();
+        });
+
+        // Carrega o Cérebro
         get(ref(database, 'configuracoes/prompt_mascote')).then((snapshot) => {
             const caixaTexto = document.getElementById('prompt-ia');
             if (snapshot.exists()) {
@@ -90,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // 2. Escuta os Clientes (Leads e Facilitóides)
+        // Escuta os Clientes (Leads e Facilitóides)
         onValue(ref(database, 'leads'), (snapshot) => {
             gridLeads.innerHTML = ''; 
             
@@ -104,14 +134,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 listaDeClientesGlobais.push({ id: filho.key, ...filho.val() });
             });
             
-            // Ordem decrescente (mais recentes primeiro)
             listaDeClientesGlobais.sort((a, b) => new Date(b.data) - new Date(a.data));
 
-            // Gera os Cartões de Usabilidade
             listaDeClientesGlobais.forEach((cliente, index) => {
                 const dataFormatada = new Date(cliente.data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-                
-                // Limpa o número do whatsapp para o link
                 const numeroLimpo = cliente.whatsapp.replace(/\D/g, '');
                 
                 const card = document.createElement('div');
@@ -130,9 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     <div class="border-t border-slate-700 pt-4 mt-auto flex gap-2">
                         <button onclick="window.abrirModalProjeto(${index})" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold py-2 rounded-lg transition border border-slate-600 flex items-center justify-center gap-2">
-                            <i class='bx bx-search-alt-2'></i> Ver Projeto
+                            <i class='bx bx-search-alt-2'></i> Ver Sistema
                         </button>
-                        <a href="https://wa.me/55${numeroLimpo}?text=Olá ${cliente.nome}, sou o Thiago da thIAguinho Soluções. Vi que conversou com nossa IA e ela montou um projeto de Automação/Sistema para a ${cliente.empresa}. Podemos conversar?" target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center transition" title="Mandar WhatsApp">
+                        <a href="https://wa.me/55${numeroLimpo}?text=Olá ${cliente.nome}, sou o Thiago da thIAguinho Soluções. Vi que conversou com nossa IA e ela desenhou um sistema para a ${cliente.empresa}. Podemos conversar?" target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center transition" title="Mandar WhatsApp">
                             <i class='bx bxl-whatsapp text-lg'></i>
                         </a>
                     </div>
@@ -151,11 +177,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('modal-empresa').innerText = cliente.empresa;
         document.getElementById('modal-dores').innerText = cliente.dores;
         
-        // A mágica: Mostrar o facilitóide gerado
-        document.getElementById('modal-facilitoide').innerHTML = cliente.facilitoide ? cliente.facilitoide.replace(/\n/g, '<br>') : "<i>Nenhum facilitóide específico extraído.</i>";
+        document.getElementById('modal-facilitoide').innerHTML = cliente.facilitoide ? cliente.facilitoide.replace(/\n/g, '<br>') : "<i>Nenhum sistema específico desenhado.</i>";
         
         const numLimpo = cliente.whatsapp.replace(/\D/g, '');
-        const txtWhats = encodeURIComponent(`Olá ${cliente.nome}, sou o Thiago da thIAguinho Soluções. Nossa IA estruturou um Facilitóide incrível para a ${cliente.empresa} para resolver a dor de: ${cliente.dores}. Podemos falar sobre o orçamento?`);
+        const txtWhats = encodeURIComponent(`Olá ${cliente.nome}, sou o Thiago da thIAguinho Soluções. Nossa IA estruturou um Sistema/Facilitóide exclusivo para a ${cliente.empresa} para resolver a dor de: ${cliente.dores}. Vamos fechar negócio?`);
         document.getElementById('modal-whatsapp').href = `https://wa.me/55${numLimpo}?text=${txtWhats}`;
 
         modalProjeto.classList.remove('oculto');
