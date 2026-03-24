@@ -1,4 +1,5 @@
-// CRIE ESTE ARQUIVO DENTRO DA PASTA js COM O NOME ar-logic.js
+// NOME DO FICHEIRO: ar-logic.js
+// LOCALIZAÇÃO: Dentro da pasta 'js'
 
 import { askGemini, adicionarAoHistorico } from './gemini-api.js';
 
@@ -14,8 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if(alvoAR && videoMascote) {
         alvoAR.addEventListener("targetFound", () => {
             videoMascote.play();
+            // A IA inicia a conversa de forma inteligente
             if(chatDisplay.children.length === 0) {
-                const msg = "Olá! Eu sou o mascote da thIAguinho Soluções Digitais! Qual é o seu nome e de qual empresa você fala?";
+                const msg = "Olá! Eu sou o mascote e Arquiteto de Software da thIAguinho Soluções Digitais! Qual é o seu nome e de qual empresa fala?";
                 adicionarMensagemUI('bot', msg);
                 adicionarAoHistorico('bot', msg);
                 falarTexto(msg);
@@ -25,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alvoAR.addEventListener("targetLost", () => videoMascote.pause());
     }
 
+    // Funcionalidade de Fala do Mascote
     const synthesis = window.speechSynthesis;
     function falarTexto(texto) {
         if (synthesis.speaking) synthesis.cancel();
@@ -34,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         synthesis.speak(utterance);
     }
 
+    // Funcionalidade de Escuta (Microfone)
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
@@ -45,13 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
             } else { 
                 recognition.start(); 
                 btnMic.classList.add('listening'); 
-                userInput.placeholder = "Ouvindo sua resposta..."; 
+                userInput.placeholder = "A ouvir as suas necessidades..."; 
             }
         });
         recognition.onresult = (e) => {
             userInput.value = e.results[0][0].transcript;
             btnMic.classList.remove('listening');
-            userInput.placeholder = "Digite ou fale...";
+            userInput.placeholder = "Fale com o arquiteto...";
             enviarMensagem(); 
         };
     } else {
@@ -77,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const ind = document.createElement('div');
         ind.className = "text-xs text-slate-400 mt-1 mb-3 text-center";
         ind.id = "digitando"; 
-        ind.innerText = "Mascote analisando e criando solução...";
+        ind.innerText = "Mascote a desenhar o Facilitóide...";
         chatDisplay.appendChild(ind);
         chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
