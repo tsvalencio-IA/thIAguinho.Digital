@@ -10,13 +10,13 @@ import { getDatabase, ref, set, push, onValue, get } from "https://www.gstatic.c
 // Vá a console.firebase.google.com > Definições do Projeto > Geral > Os seus ecrãs Web.
 // =======================================================================================
 const firebaseConfig = {
-    apiKey: "COLE_A_SUA_API_KEY_AQUI",
-    authDomain: "COLE_O_SEU_AUTH_DOMAIN_AQUI",
-    databaseURL: "COLE_A_SUA_DATABASE_URL_AQUI", 
-    projectId: "COLE_O_SEU_PROJECT_ID_AQUI",
-    storageBucket: "COLE_O_SEU_STORAGE_BUCKET_AQUI",
-    messagingSenderId: "COLE_O_SEU_MESSAGING_SENDER_ID_AQUI",
-    appId: "COLE_O_SEU_APP_ID_AQUI"
+  apiKey: "AIzaSyAiykf5IqYbnHglovdxyRzXXmrk-GtHlzQ",
+  authDomain: "thiaguinho-40a14.firebaseapp.com",
+  databaseURL: "https://thiaguinho-40a14-default-rtdb.firebaseio.com",
+  projectId: "thiaguinho-40a14",
+  storageBucket: "thiaguinho-40a14.firebasestorage.app",
+  messagingSenderId: "953851363533",
+  appId: "1:953851363533:web:a912b840e5d268c5d16984"
 };
 
 let app, auth, database;
