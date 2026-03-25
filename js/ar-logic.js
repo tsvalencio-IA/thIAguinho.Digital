@@ -12,14 +12,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const alvoAR = document.getElementById('alvo-ar');
     const videoMascote = document.getElementById('vid');
 
-    // TRAVA ANTI-DUPLICAÇÃO E SPAM
+    // TRAVA ANTI-SPAM E DUPLO CLIQUE BLINDADA
     let isProcessing = false;
 
     if(alvoAR && videoMascote) {
         alvoAR.addEventListener("targetFound", () => {
             videoMascote.play();
             if(chatDisplay.children.length === 0) {
-                const msgInicial = "Olá! Sou o arquiteto inteligente da thIAguinho Soluções! Como posso te chamar? E você busca uma solução para sua Empresa ou para sua Vida Pessoal/Rotina? [OPCOES: Para Empresa | Para Rotina Pessoal]";
+                const msgInicial = "Olá! Sou o arquiteto inteligente da thIAguinho Soluções! Como posso te chamar? E você busca uma solução para sua Empresa ou para sua Vida Pessoal/Rotina? [OPCOES: Para minha Empresa | Para minha Rotina Pessoal]";
                 processarEExibirMensagemBot(msgInicial);
             }
         });
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const recognition = new SpeechRecognition();
         recognition.lang = 'pt-BR';
         btnMic.addEventListener('click', () => {
-            if (isProcessing) return; // Trava ativada
+            if (isProcessing) return; 
             if (btnMic.classList.contains('listening')) { 
                 recognition.stop(); 
                 btnMic.classList.remove('listening'); 
@@ -97,11 +97,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const btn = document.createElement('button');
             btn.className = 'btn-opcao';
             btn.innerText = opcaoText;
-            btn.onclick = () => {
-                if(isProcessing) return; // Se a IA já estiver processando, ignora cliques duplos do cliente afobado
+            btn.onclick = (event) => {
+                // TRAVA ABSOLUTA: Se já clicou, ignora totalmente
+                if(isProcessing) {
+                    event.preventDefault();
+                    return;
+                }
+                isProcessing = true; 
+                
+                // Desativa os cliques visuais e lógicos na hora
                 container.style.opacity = '0.5';
-                container.style.pointerEvents = 'none'; // Desabilita todos os outros botões imediatamente
-                enviarMensagemClicada(opcaoText);
+                container.style.pointerEvents = 'none'; 
+                
+                // Remove os botões da tela e manda a mensagem
+                setTimeout(() => {
+                    enviarMensagemClicada(opcaoText);
+                }, 50); // Delay mínimo para garantir a trava de estado
             };
             container.appendChild(btn);
         });
@@ -111,9 +122,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function enviarMensagemClicada(textoClicado) {
-        if(isProcessing) return;
         const antigasOpcoes = document.getElementById('opcoes-ativas');
-        if(antigasOpcoes) antigasOpcoes.remove(); // Some com os botões
+        if(antigasOpcoes) antigasOpcoes.remove(); 
         
         addMsgVisual('user', textoClicado);
         adicionarAoHistorico('user', textoClicado);
@@ -122,13 +132,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function enviarMensagemDigitada() {
         if(isProcessing) return;
+        
         const msg = userInput.value.trim();
         if (!msg) return;
         
-        userInput.value = '';
+        isProcessing = true;
         
+        userInput.value = '';
         const antigasOpcoes = document.getElementById('opcoes-ativas');
-        if(antigasOpcoes) antigasOpcoes.remove(); // Se ele digitou, os botões somem
+        if(antigasOpcoes) antigasOpcoes.remove(); 
 
         addMsgVisual('user', msg);
         adicionarAoHistorico('user', msg);
@@ -136,8 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function invocarGemini(textoUser) {
-        // LIGA A TRAVA GLOBAL DE SEGURANÇA
-        isProcessing = true;
         btnSend.style.opacity = '0.5';
         btnSend.style.pointerEvents = 'none';
         userInput.disabled = true;
