@@ -7,27 +7,32 @@ let chatHistoryCliente = [];
 let chaveApiArmazenada = null; 
 
 // =========================================================================
-// CÉREBRO 1: A VENDEDORA E ARQUITETA
+// CÉREBRO 1: A VENDEDORA E ARQUITETA (BLINDADA CONTRA VAZAMENTOS)
 // =========================================================================
-export let systemPrompt = `Você é a IA central da 'thIAguinho Soluções Digitais'. Você tem 2 funções invisíveis para o cliente: Vendedora Empática e Arquiteta Sênior.
+export let systemPrompt = `Você é a IA central da 'thIAguinho Soluções Digitais'. Você tem 2 funções: Vendedora Empática e Arquiteta Sênior.
 
-REGRA DE OURO DOS BOTÕES:
-Gere SEMPRE opções de clique com o TEXTO COMPLETO. NUNCA use letras isoladas como "A", "B" ou "C".
-Formato OBRIGATÓRIO: [OPCOES: Texto completo da primeira opção | Texto completo da segunda opção]
+MUITO IMPORTANTE - COMO CONVERSAR COM O CLIENTE:
+- Seja natural, cordial e aja como humano.
+- Faça APENAS UMA PERGUNTA por vez. Converse passo a passo.
+- NUNCA envie códigos, tags ou a palavra [LEAD] para o cliente ler ou preencher. É VOCÊ quem vai gerar a tag secretamente na sua mente no final.
+- Gere SEMPRE botões de opções com o TEXTO COMPLETO (Ex: [OPCOES: Soluções para Empresa | Rotina Pessoal]). NUNCA use "A" ou "B".
 
-PASSO 1: Cumprimente e pergunte se busca soluções para Empresa ou Rotina Pessoal.
-PASSO 2: Investigue PROFUNDAMENTE a dor principal.
-PASSO 3: Quando descobrir "A Verdade" (a dor real), diga: "Vou desenhar o modelo técnico." e PEÇA O WHATSAPP COM DDD (Ex: 11999999999).
-PASSO 4: SÓ DEPOIS de receber o WhatsApp, agradeça e gere a tag abaixo.
+PASSO A PASSO DA CONVERSA:
+1. Pergunte o NOME do cliente e o que ele busca (Empresa ou Pessoal).
+2. Investigue qual a maior DOR ou problema de gestão que ele enfrenta hoje.
+3. Diga que a thIAguinho é especialista nisso, que vai desenhar um modelo técnico (sistema) para resolver isso e peça o número de WhatsApp dele (com DDD).
+4. APENAS quando ele informar o WhatsApp, despeça-se educadamente. 
+5. NESTA ÚLTIMA MENSAGEM DE DESPEDIDA, você OBRIGATORIAMENTE deve adicionar no final do seu texto a TAG SECRETA abaixo.
 
-FORMATO OBRIGATÓRIO DA TAG FINAL (ESCUDO TÉCNICO):
-[LEAD: NOME=... | EMPRESA=... | DORES=... | FACILITOIDE=... | WHATSAPP=...]
+COMO GERAR A TAG (INSTRUÇÃO SECRETA SÓ PARA VOCÊ E PARA O SISTEMA):
+No final da sua última mensagem, cole exatamente esta estrutura preenchida:
+[LEAD: NOME=nome do cliente | EMPRESA=nome da empresa ou pessoal | DORES=resumo detalhado da dor | FACILITOIDE=arquitetura do sistema | WHATSAPP=apenas numeros]
 
-COMO PREENCHER "FACILITOIDE":
-Use a sua mente de Arquiteta Sênior. Estruture em Markdown.
-**Projeto:** [Nome do Sistema]
-**Lógica:** [Como funciona]
-**Stack Técnico:** [Ex: GitHub Pages, Cloudinary, Firebase Realtime Database].`;
+COMO PREENCHER O "FACILITOIDE" DENTRO DA TAG:
+Escreva em Markdown a solução técnica que você pensou. Ex:
+**Projeto:** [Nome do App]
+**Lógica:** [Como funciona na prática]
+**Stack Técnico:** HTML, JS, Tailwind, Firebase.`;
 
 export function atualizarPromptMemoria(novoPrompt) {
     if (novoPrompt && novoPrompt.trim() !== '') {
@@ -67,6 +72,7 @@ export async function askGemini(msgUsuario) {
         
         let botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro.";
         
+        // O código invisível que extrai a tag da mente da IA sem mostrar pro cliente
         const regexLead = /\[LEAD:\s*NOME=([\s\S]*?)\|\s*EMPRESA=([\s\S]*?)\|\s*DORES=([\s\S]*?)\|\s*FACILITOIDE=([\s\S]*?)\|\s*WHATSAPP=([\s\S]*?)\]/i;
         const match = botReply.match(regexLead);
         
@@ -80,6 +86,7 @@ export async function askGemini(msgUsuario) {
                 nome: nome.trim() || "Não informado", empresa: empresa.trim() || "Não informada",
                 dores: dores.trim(), facilitoide: facilitoide.trim(), whatsapp: wppLimpo, data: new Date().toISOString(), devChat: []
             });
+            // Apaga a Tag da mensagem visual para o cliente nunca ver
             botReply = botReply.replace(regexLead, '').trim();
         }
         return botReply;
@@ -91,14 +98,13 @@ export function adicionarAoHistorico(role, texto) {
 }
 
 // =========================================================================
-// CÉREBRO 2: O DESENVOLVEDOR DA FÁBRICA (AGORA ORGANIZE E LÊ ARQUIVOS)
+// CÉREBRO 2: O DESENVOLVEDOR DA FÁBRICA (LÊ SEUS ARQUIVOS)
 // =========================================================================
 export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, historicoSalvo = []) {
     try {
         const apiKey = await obterChaveDaApi();
         if (!apiKey) return "Coloque a chave da API nas configurações do Painel.";
 
-        // MUDANÇA ABSOLUTA AQUI: OBRIGANDO A IA A ORGANIZAR A RESPOSTA E LER ARQUIVOS
         const promptDesenvolvedor = `Você é um Engenheiro de Software Sênior trabalhando para o Thiago (Dono da Agência thIAguinho Soluções).
         Stack oficial: HTML, JS, Tailwind, Firebase e Cloudinary.
         Projeto atual: ${contextoProjeto}
