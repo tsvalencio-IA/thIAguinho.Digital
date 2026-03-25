@@ -15,9 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if(alvoAR && videoMascote) {
         alvoAR.addEventListener("targetFound", () => {
             videoMascote.play();
-            // A IA inicia a conversa de forma inteligente
+            // A IA Inicia a análise como Arquiteto
             if(chatDisplay.children.length === 0) {
-                const msg = "Olá! Eu sou o mascote e Arquiteto de Software da thIAguinho Soluções Digitais! Qual é o seu nome e de qual empresa fala?";
+                const msg = "Olá! Sou o arquiteto de sistemas e mascote da thIAguinho Soluções! Qual é o seu nome e de que empresa fala?";
                 adicionarMensagemUI('bot', msg);
                 adicionarAoHistorico('bot', msg);
                 falarTexto(msg);
@@ -27,21 +27,19 @@ document.addEventListener('DOMContentLoaded', () => {
         alvoAR.addEventListener("targetLost", () => videoMascote.pause());
     }
 
-    // Funcionalidade de Fala do Mascote
     const synthesis = window.speechSynthesis;
     function falarTexto(texto) {
         if (synthesis.speaking) synthesis.cancel();
         let textoLimpo = texto.replace(/\*\*/g, ''); 
         const utterance = new SpeechSynthesisUtterance(textoLimpo);
-        utterance.lang = 'pt-BR';
+        utterance.lang = 'pt-PT'; // Sotaque em Português
         synthesis.speak(utterance);
     }
 
-    // Funcionalidade de Escuta (Microfone)
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
-        recognition.lang = 'pt-BR';
+        recognition.lang = 'pt-BR'; // Ouve em PT-BR para entender melhor os clientes
         btnMic.addEventListener('click', () => {
             if (btnMic.classList.contains('listening')) { 
                 recognition.stop(); 
@@ -49,13 +47,13 @@ document.addEventListener('DOMContentLoaded', () => {
             } else { 
                 recognition.start(); 
                 btnMic.classList.add('listening'); 
-                userInput.placeholder = "A ouvir as suas necessidades..."; 
+                userInput.placeholder = "A escutar o seu problema..."; 
             }
         });
         recognition.onresult = (e) => {
             userInput.value = e.results[0][0].transcript;
             btnMic.classList.remove('listening');
-            userInput.placeholder = "Fale com o arquiteto...";
+            userInput.placeholder = "Fale com o mascote...";
             enviarMensagem(); 
         };
     } else {
@@ -79,9 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
         adicionarAoHistorico('user', msg);
 
         const ind = document.createElement('div');
-        ind.className = "text-xs text-slate-400 mt-1 mb-3 text-center";
+        ind.className = "text-xs text-slate-400 mt-1 mb-3 text-center font-bold";
         ind.id = "digitando"; 
-        ind.innerText = "Mascote a desenhar o Facilitóide...";
+        ind.innerText = "A arquitetar a solução ideal para si...";
         chatDisplay.appendChild(ind);
         chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
