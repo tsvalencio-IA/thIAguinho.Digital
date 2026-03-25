@@ -2,148 +2,112 @@
 // LOCALIZAÇÃO: Dentro da pasta 'js'
 
 import { auth, database, signInWithEmailAndPassword, signOut, ref, set, onValue, get } from './firebase-config.js';
-import { atualizarPromptMemoria, systemPrompt as promptPadraoDaAPI } from './gemini-api.js';
+import { atualizarPromptMemoria, systemPrompt as promptPadrao } from './gemini-api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     
-    const emailInput = document.getElementById('email-admin');
-    const senhaInput = document.getElementById('senha-admin');
     const btnLogin = document.getElementById('btn-login');
     const erroMsg = document.getElementById('msg-erro-login');
-    
-    const btnSavePrompt = document.getElementById('btn-save-prompt');
-    const btnSaveKey = document.getElementById('btn-save-key');
     const apiKeyInput = document.getElementById('api-key-input');
     const gridLeads = document.getElementById('grid-leads');
     
     let usuarioLogado = null;
-    let listaDeClientes = [];
+    let listaProjetos = [];
 
-    // --- LÓGICA DE LOGIN ---
     btnLogin.addEventListener('click', () => {
-        if (!emailInput.value || !senhaInput.value) {
-            erroMsg.innerText = "Por favor, preencha o email e a palavra-passe.";
+        const email = document.getElementById('email-admin').value;
+        const senha = document.getElementById('senha-admin').value;
+        
+        if (!email || !senha) {
+            erroMsg.innerText = "Preencha o e-mail e a palavra-passe.";
             erroMsg.classList.remove('oculto');
             return;
         }
 
-        const textoOriginal = btnLogin.innerHTML;
-        btnLogin.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> A verificar no Firebase...";
-        btnLogin.disabled = true;
+        btnLogin.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> A aceder...";
         
-        signInWithEmailAndPassword(auth, emailInput.value, senhaInput.value)
-            .then((userCredential) => {
-                usuarioLogado = userCredential.user;
-                erroMsg.classList.add('oculto');
+        signInWithEmailAndPassword(auth, email, senha)
+            .then((user) => {
+                usuarioLogado = user.user;
                 document.getElementById('admin-login').classList.add('oculto');
                 document.getElementById('admin-dashboard').classList.remove('oculto');
-                
-                iniciarLeituraDoBanco();
+                iniciarCRM();
             })
-            .catch((error) => {
-                console.error("Falha no Login:", error.code);
-                erroMsg.innerText = "Email ou palavra-passe incorretos.";
+            .catch((err) => {
+                erroMsg.innerText = "Acesso Negado. Verifique no Firebase.";
                 erroMsg.classList.remove('oculto');
-            })
-            .finally(() => {
-                btnLogin.innerHTML = textoOriginal;
-                btnLogin.disabled = false;
+                btnLogin.innerHTML = "Entrar no Painel";
             });
     });
 
     document.getElementById('btn-logout').addEventListener('click', () => {
-        signOut(auth).then(() => {
-            window.location.reload(); 
-        });
+        signOut(auth).then(() => window.location.reload());
     });
 
-    // --- GUARDAR A CHAVE DA API DA INTELIGÊNCIA ARTIFICIAL ---
-    btnSaveKey.addEventListener('click', () => {
-        if (!usuarioLogado) return;
-        const novaChave = apiKeyInput.value.trim();
-        if(!novaChave) return alert("Por favor, cole a chave da API do Gemini no campo.");
+    // SALVAR A CHAVE API NO FIREBASE
+    document.getElementById('btn-save-key').addEventListener('click', () => {
+        const chave = apiKeyInput.value.trim();
+        if(!chave) return alert("Por favor, cole a chave da API do Gemini no campo.");
         
-        const btn = btnSaveKey;
+        const btn = document.getElementById('btn-save-key');
         btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
         
-        // Guarda a chave no Firebase Realtime Database
-        set(ref(database, 'configuracoes/gemini_api_key'), novaChave)
+        set(ref(database, 'admin_config/gemini_api_key'), chave)
             .then(() => {
-                btn.innerHTML = "<i class='bx bx-check'></i> Guardada";
-                btn.classList.replace('bg-red-600', 'bg-emerald-600');
-                setTimeout(() => {
-                    btn.innerHTML = "Guardar";
-                    btn.classList.replace('bg-emerald-600', 'bg-red-600');
-                }, 2000);
+                btn.innerHTML = "Guardado!";
+                setTimeout(() => btn.innerHTML = "Guardar", 2000);
             })
             .catch((error) => alert("Erro ao guardar chave: " + error.message));
     });
 
-    // --- GUARDAR A LÓGICA DO ARQUITETO (CÉREBRO) ---
-    btnSavePrompt.addEventListener('click', () => {
-        if (!usuarioLogado) return;
-        const btn = btnSavePrompt;
-        const originalText = btn.innerHTML;
-        btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> A guardar...";
-        
+    // SALVAR PROMPT DO ARQUITETO
+    document.getElementById('btn-save-prompt').addEventListener('click', () => {
         const novoPrompt = document.getElementById('prompt-ia').value;
-        set(ref(database, 'configuracoes/prompt_mascote'), novoPrompt)
+        const btn = document.getElementById('btn-save-prompt');
+        const txtOriginal = btn.innerHTML;
+        btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> A guardar...";
+
+        set(ref(database, 'admin_config/prompt_mascote'), novoPrompt)
             .then(() => {
                 atualizarPromptMemoria(novoPrompt);
-                btn.innerHTML = "<i class='bx bx-check'></i> Guardado com sucesso!";
-                btn.classList.replace('bg-red-600', 'bg-emerald-600');
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.classList.replace('bg-emerald-600', 'bg-red-600');
-                }, 2000);
-            })
-            .catch((error) => {
-                alert("Erro ao guardar no Firebase: " + error.message);
-                btn.innerHTML = originalText;
+                btn.innerHTML = "Cérebro Atualizado!";
+                setTimeout(() => btn.innerHTML = txtOriginal, 2000);
             });
     });
 
-    // --- LER DADOS DO BACKEND ---
-    function iniciarLeituraDoBanco() {
-        
-        // 1. Carrega a Chave API se já existir na base de dados
-        get(ref(database, 'configuracoes/gemini_api_key')).then((snapshot) => {
-            if(snapshot.exists()) {
-                apiKeyInput.value = snapshot.val();
-            }
+    function iniciarCRM() {
+        // Carrega a Chave da base de dados para o campo de input
+        get(ref(database, 'admin_config/gemini_api_key')).then((snap) => {
+            if(snap.exists()) apiKeyInput.value = snap.val();
         });
 
-        // 2. Carrega o Comportamento da IA
-        get(ref(database, 'configuracoes/prompt_mascote')).then((snapshot) => {
+        // Carrega o Prompt
+        get(ref(database, 'admin_config/prompt_mascote')).then((snap) => {
             const caixaTexto = document.getElementById('prompt-ia');
-            if (snapshot.exists()) {
-                const promptSalvo = snapshot.val();
-                caixaTexto.value = promptSalvo;
-                atualizarPromptMemoria(promptSalvo);
+            if (snap.exists()) {
+                caixaTexto.value = snap.val();
+                atualizarPromptMemoria(snap.val());
             } else {
-                caixaTexto.value = promptPadraoDaAPI;
+                caixaTexto.value = promptPadrao;
             }
         });
 
-        // 3. Escuta os Projetos Criados (CRM)
-        onValue(ref(database, 'leads'), (snapshot) => {
+        // Escuta os Facilitóides Gerados (Projetos)
+        onValue(ref(database, 'projetos_capturados'), (snapshot) => {
             gridLeads.innerHTML = ''; 
             
             if (!snapshot.exists()) {
-                gridLeads.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500"><p>Nenhum Facilitóide desenhado ainda. Partilhe o seu cartão com os clientes!</p></div>';
+                gridLeads.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500"><p>Nenhum Facilitóide desenhado ainda.</p></div>';
                 return;
             }
 
-            listaDeClientes = [];
-            snapshot.forEach((filho) => {
-                listaDeClientes.push({ id: filho.key, ...filho.val() });
-            });
-            
-            listaDeClientes.sort((a, b) => new Date(b.data) - new Date(a.data));
+            listaProjetos = [];
+            snapshot.forEach((child) => listaProjetos.push({ id: child.key, ...child.val() }));
+            listaProjetos.sort((a, b) => new Date(b.data) - new Date(a.data));
 
-            listaDeClientes.forEach((cliente, index) => {
-                const dataStr = new Date(cliente.data).toLocaleDateString('pt-PT');
-                const btnWhats = cliente.whatsapp ? cliente.whatsapp.replace(/\D/g, '') : '';
+            listaProjetos.forEach((proj, i) => {
+                const dataStr = new Date(proj.data).toLocaleDateString('pt-PT');
+                const wppNum = proj.whatsapp.replace(/\D/g, '');
                 
                 const card = document.createElement('div');
                 card.className = "bg-slate-900 border border-slate-700 rounded-xl p-5 hover:border-red-500 transition shadow-lg flex flex-col justify-between";
@@ -151,19 +115,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div>
                         <div class="flex justify-between items-start mb-3">
                             <div>
-                                <h4 class="font-bold text-white text-lg leading-tight">${cliente.nome}</h4>
-                                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">${cliente.empresa}</p>
+                                <h4 class="font-bold text-white text-lg">${proj.nome}</h4>
+                                <p class="text-xs text-slate-400 font-semibold uppercase">${proj.empresa}</p>
                             </div>
                             <span class="text-[10px] text-slate-500 bg-slate-800 px-2 py-1 rounded">${dataStr}</span>
                         </div>
-                        <p class="text-sm text-slate-300 line-clamp-2 mb-4 italic">"${cliente.dores}"</p>
+                        <p class="text-sm text-slate-300 line-clamp-2 mb-4 italic">"${proj.dores}"</p>
                     </div>
-                    
                     <div class="border-t border-slate-700 pt-4 mt-auto flex gap-2">
-                        <button onclick="window.abrirProjeto(${index})" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold py-2 rounded-lg transition border border-slate-600 flex items-center justify-center gap-2">
-                            <i class='bx bx-search-alt-2'></i> Ver Sistema
-                        </button>
-                        <a href="https://wa.me/55${btnWhats}?text=Olá ${cliente.nome}, sou o Thiago da thIAguinho Soluções. Vi que conversou com o nosso arquiteto IA e ele desenhou um Facilitóide para a ${cliente.empresa}. Podemos conversar?" target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center transition">
+                        <button onclick="window.verProjeto(${i})" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold py-2 rounded-lg border border-slate-600">Ver Sistema</button>
+                        <a href="https://wa.me/55${wppNum}?text=Olá ${proj.nome}, sou o Thiago da thIAguinho Soluções. A nossa IA desenhou um projeto incrível para a sua empresa!" target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center">
                             <i class='bx bxl-whatsapp text-lg'></i>
                         </a>
                     </div>
@@ -173,20 +134,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LÓGICA DA JANELA DE USABILIDADE (MODAL) ---
-    window.abrirProjeto = function(index) {
-        const c = listaDeClientes[index];
-        if(!c) return;
-
-        document.getElementById('modal-nome').innerText = c.nome;
-        document.getElementById('modal-empresa').innerText = c.empresa;
-        document.getElementById('modal-dores').innerText = c.dores;
+    // GESTÃO DA JANELA MODAL
+    window.verProjeto = function(i) {
+        const p = listaProjetos[i];
+        document.getElementById('modal-nome').innerText = p.nome;
+        document.getElementById('modal-empresa').innerText = p.empresa;
+        document.getElementById('modal-dores').innerText = p.dores;
+        document.getElementById('modal-facilitoide').innerHTML = p.facilitoide ? p.facilitoide.replace(/\n/g, '<br>') : "Sem dados do sistema.";
         
-        document.getElementById('modal-facilitoide').innerHTML = c.facilitoide ? c.facilitoide.replace(/\n/g, '<br>') : "<i>Nenhum sistema específico desenhado.</i>";
-        
-        const whatsLimpo = c.whatsapp ? c.whatsapp.replace(/\D/g, '') : '';
-        const msgWhats = encodeURIComponent(`Olá ${c.nome}, sou o Thiago da thIAguinho Soluções. O nosso Arquiteto IA construiu um projeto exclusivo para a dor da ${c.empresa}. Vamos agendar uma reunião para fechar este negócio?`);
-        document.getElementById('modal-whatsapp').href = `https://wa.me/55${whatsLimpo}?text=${msgWhats}`;
+        const wppNum = p.whatsapp.replace(/\D/g, '');
+        document.getElementById('modal-whatsapp').href = `https://wa.me/55${wppNum}?text=Olá ${p.nome}, aqui é da thIAguinho Soluções! Vi o projeto do seu Facilitóide. Vamos marcar uma reunião?`;
 
         document.getElementById('modal-projeto').classList.remove('oculto');
     };
