@@ -2,7 +2,7 @@
 // LOCALIZAÇÃO: Dentro da pasta 'js'
 
 import { auth, database, signInWithEmailAndPassword, signOut, onAuthStateChanged, ref, set, onValue, get } from './firebase-config.js';
-import { atualizarPromptMemoria, systemPrompt as promptPadraoDaAPI, conversarComDesenvolvedorIA } from './gemini-api.js';
+import { conversarComDesenvolvedorIA } from './gemini-api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -11,7 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnLogin = document.getElementById('btn-login');
     const btnLogout = document.getElementById('btn-logout');
     const erroMsg = document.getElementById('msg-erro-login');
+    
     const apiKeyInput = document.getElementById('api-key-input');
+    const elevenKeyInput = document.getElementById('eleven-key-input');
+    const elevenVoiceInput = document.getElementById('eleven-voice-input');
     const gridLeads = document.getElementById('grid-leads');
     
     let usuarioLogado = null;
@@ -22,27 +25,29 @@ document.addEventListener('DOMContentLoaded', () => {
     let historicoDevAtual = [];
     let bufferArquivosAnexados = "";
 
-    // --- ESCAPE HTML (Protege contra a IA renderizar divs sem querer no painel) ---
     function escapeHtml(unsafe) {
         return (unsafe || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    // --- A MÁGICA: FORMATADOR DE CÓDIGO COM PREVIEW (CANVAS) ---
+    // --- A MÁGICA: FORMATADOR COM PREVIEW E DOWNLOAD ---
     function formatarCodigoIA(texto) {
         if(!texto) return "";
         
-        // Encontra blocos de código Markdown (```html ... ```)
         let textoFormatado = String(texto).replace(/```(html|javascript|js|css|json)?\n([\s\S]*?)```/gi, function(match, lang, code) {
             const linguagem = lang ? lang.toLowerCase() : 'código';
             const safeCode = escapeHtml(code);
             const blockId = 'code-' + Math.random().toString(36).substr(2, 9);
             
-            // Botão Padrão de Copiar
             let botoes = `<button onclick="navigator.clipboard.writeText(document.getElementById('${blockId}').innerText); this.innerText='Copiado!'; setTimeout(()=>this.innerText='Copiar',2000)" class="bg-slate-700 hover:bg-slate-600 text-white px-2 py-1 rounded transition text-[10px] font-bold"><i class='bx bx-copy'></i> Copiar</button>`;
             
-            // SE FOR HTML, ADICIONA O BOTÃO DE PREVIEW!
+            // Se for código programável, adiciona o Botão de Baixar Arquivo
+            if (['html', 'javascript', 'js', 'css'].includes(linguagem)) {
+                let ext = linguagem === 'javascript' ? 'js' : linguagem;
+                botoes += `<button onclick="window.baixarCodigo('${blockId}', '${ext}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded ml-2 transition text-[10px] font-bold"><i class='bx bx-download'></i> Baixar Demo</button>`;
+            }
+
             if (linguagem === 'html') {
-                botoes += `<button onclick="window.abrirPreview('${blockId}')" class="bg-sky-600 hover:bg-sky-500 text-white px-2 py-1 rounded ml-2 transition text-[10px] font-bold"><i class='bx bx-play'></i> Visualizar (Preview)</button>`;
+                botoes += `<button onclick="window.abrirPreview('${blockId}')" class="bg-sky-600 hover:bg-sky-500 text-white px-2 py-1 rounded ml-2 transition text-[10px] font-bold"><i class='bx bx-play'></i> Visualizar</button>`;
             }
 
             return `
@@ -57,11 +62,23 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         });
 
-        // Formata o negrito e as quebras de linha normais fora do código
         return textoFormatado.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
     }
 
-    // FUNÇÃO GLOBAL DE PREVIEW: Abre o HTML em uma nova aba rodando na hora!
+    // --- FUNÇÃO PARA BAIXAR O ARQUIVO DIRETO PRO CELULAR/PC ---
+    window.baixarCodigo = function(blockId, extensao) {
+        const codigoRaw = document.getElementById(blockId).innerText;
+        const blob = new Blob([codigoRaw], { type: 'text/plain;charset=utf-8' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `projeto_demo.${extensao}`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    };
+
     window.abrirPreview = function(blockId) {
         const codigoRaw = document.getElementById(blockId).innerText;
         const janelaPreview = window.open("", "_blank");
@@ -69,89 +86,57 @@ document.addEventListener('DOMContentLoaded', () => {
         janelaPreview.document.close();
     };
 
-    // --- CONTROLES DAS ABAS ---
+    // --- CONTROLES E LOGIN (Ocultado para resumir, igual ao anterior) ---
     const tabNovos = document.getElementById('tab-novos');
     const tabConcluidos = document.getElementById('tab-concluidos');
 
     if(tabNovos && tabConcluidos) {
-        tabNovos.addEventListener('click', () => {
-            abaAtiva = 'novos';
-            tabNovos.classList.replace('text-slate-400', 'text-white');
-            tabNovos.classList.add('border-b-2', 'border-red-500');
-            tabConcluidos.classList.replace('text-white', 'text-slate-400');
-            tabConcluidos.classList.remove('border-b-2', 'border-red-500');
-            renderizarProjetos();
-        });
-
-        tabConcluidos.addEventListener('click', () => {
-            abaAtiva = 'concluidos';
-            tabConcluidos.classList.replace('text-slate-400', 'text-white');
-            tabConcluidos.classList.add('border-b-2', 'border-red-500');
-            tabNovos.classList.replace('text-white', 'text-slate-400');
-            tabNovos.classList.remove('border-b-2', 'border-red-500');
-            renderizarProjetos();
-        });
+        tabNovos.addEventListener('click', () => { abaAtiva = 'novos'; tabNovos.classList.replace('text-slate-400', 'text-white'); tabNovos.classList.add('border-b-2', 'border-red-500'); tabConcluidos.classList.replace('text-white', 'text-slate-400'); tabConcluidos.classList.remove('border-b-2', 'border-red-500'); renderizarProjetos(); });
+        tabConcluidos.addEventListener('click', () => { abaAtiva = 'concluidos'; tabConcluidos.classList.replace('text-slate-400', 'text-white'); tabConcluidos.classList.add('border-b-2', 'border-red-500'); tabNovos.classList.replace('text-white', 'text-slate-400'); tabNovos.classList.remove('border-b-2', 'border-red-500'); renderizarProjetos(); });
     }
 
-    // --- SESSÃO E LOGIN ---
     onAuthStateChanged(auth, (user) => {
-        if (user) {
-            usuarioLogado = user;
-            if(erroMsg) erroMsg.classList.add('oculto');
-            document.getElementById('admin-login')?.classList.add('oculto');
-            document.getElementById('admin-dashboard')?.classList.remove('oculto');
-            iniciarLeituraDoBancoDeDados();
-        } else {
-            usuarioLogado = null;
-            document.getElementById('admin-dashboard')?.classList.add('oculto');
-            document.getElementById('admin-login')?.classList.remove('oculto');
-        }
+        if (user) { usuarioLogado = user; if(erroMsg) erroMsg.classList.add('oculto'); document.getElementById('admin-login')?.classList.add('oculto'); document.getElementById('admin-dashboard')?.classList.remove('oculto'); iniciarLeituraDoBancoDeDados(); } 
+        else { usuarioLogado = null; document.getElementById('admin-dashboard')?.classList.add('oculto'); document.getElementById('admin-login')?.classList.remove('oculto'); }
     });
 
-    if(btnLogin) {
-        btnLogin.addEventListener('click', () => {
-            btnLogin.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Conectando...";
-            signInWithEmailAndPassword(auth, emailInput.value, senhaInput.value)
-                .catch((error) => { erroMsg.classList.remove('oculto'); btnLogin.innerHTML = "Entrar no Painel"; });
+    if(btnLogin) btnLogin.addEventListener('click', () => { btnLogin.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>"; signInWithEmailAndPassword(auth, emailInput.value, senhaInput.value).catch(() => { erroMsg.classList.remove('oculto'); btnLogin.innerHTML = "Entrar no Painel"; }); });
+    if(btnLogout) btnLogout.addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
+
+    // Salvar Chaves do Gemini e da ElevenLabs
+    if(document.getElementById('btn-save-key')) {
+        document.getElementById('btn-save-key').addEventListener('click', () => {
+            if (!usuarioLogado || !apiKeyInput.value.trim()) return;
+            const btn = document.getElementById('btn-save-key'); btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
+            set(ref(database, 'admin_config/gemini_api_key'), apiKeyInput.value.trim()).then(() => { btn.innerHTML = "Salva"; setTimeout(() => btn.innerHTML = "Salvar", 2000); });
+        });
+    }
+    
+    if(document.getElementById('btn-save-voice')) {
+        document.getElementById('btn-save-voice').addEventListener('click', () => {
+            if (!usuarioLogado) return;
+            const btn = document.getElementById('btn-save-voice'); btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
+            set(ref(database, 'admin_config/elevenlabs_api_key'), elevenKeyInput.value.trim());
+            set(ref(database, 'admin_config/elevenlabs_voice_id'), elevenVoiceInput.value.trim()).then(() => { btn.innerHTML = "Salvo!"; setTimeout(() => btn.innerHTML = "Salvar Voz", 2000); });
         });
     }
 
-    if(btnLogout) {
-        btnLogout.addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
-    }
-
-    // --- LEITURA DA BASE DE DADOS ---
     function iniciarLeituraDoBancoDeDados() {
-        get(ref(database, 'admin_config/gemini_api_key')).then((snapshot) => {
-            if(snapshot.exists() && apiKeyInput) apiKeyInput.value = snapshot.val();
-        });
+        get(ref(database, 'admin_config/gemini_api_key')).then((s) => { if(s.exists() && apiKeyInput) apiKeyInput.value = s.val(); });
+        get(ref(database, 'admin_config/elevenlabs_api_key')).then((s) => { if(s.exists() && elevenKeyInput) elevenKeyInput.value = s.val(); });
+        get(ref(database, 'admin_config/elevenlabs_voice_id')).then((s) => { if(s.exists() && elevenVoiceInput) elevenVoiceInput.value = s.val(); });
 
         onValue(ref(database, 'projetos_capturados'), (snapshot) => {
             listaDeClientesGlobais = [];
-            if (snapshot.exists()) {
-                snapshot.forEach((filho) => {
-                    listaDeClientesGlobais.push({ id: filho.key, ...filho.val() });
-                });
-                listaDeClientesGlobais.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
-            }
+            if (snapshot.exists()) { snapshot.forEach((filho) => { listaDeClientesGlobais.push({ id: filho.key, ...filho.val() }); }); listaDeClientesGlobais.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0)); }
             renderizarProjetos();
         });
     }
 
-    // --- RENDERIZAÇÃO DOS CARTÕES ---
     function renderizarProjetos() {
-        if(!gridLeads) return;
-        gridLeads.innerHTML = ''; 
-        
-        const projetosFiltrados = listaDeClientesGlobais.filter(cliente => {
-            const status = cliente.status || 'novo'; 
-            return abaAtiva === 'novos' ? status === 'novo' : status === 'concluido';
-        });
-
-        if (projetosFiltrados.length === 0) {
-            gridLeads.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500"><i class='bx bx-sleepy text-4xl mb-3'></i><p>Nenhum projeto nesta aba.</p></div>`;
-            return;
-        }
+        if(!gridLeads) return; gridLeads.innerHTML = ''; 
+        const projetosFiltrados = listaDeClientesGlobais.filter(cliente => { const status = cliente.status || 'novo'; return abaAtiva === 'novos' ? status === 'novo' : status === 'concluido'; });
+        if (projetosFiltrados.length === 0) { gridLeads.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500"><i class='bx bx-sleepy text-4xl mb-3'></i><p>Nenhum projeto nesta aba.</p></div>`; return; }
 
         projetosFiltrados.forEach(cliente => {
             const dataFormatada = cliente.data ? new Date(cliente.data).toLocaleDateString('pt-BR') : 'Sem data';
@@ -192,26 +177,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             `;
-
             card.innerHTML = htmlHeader + htmlBody;
             gridLeads.appendChild(card);
         });
     }
 
-    window.toggleCard = function(id) {
-        const body = document.getElementById(`body-${id}`);
-        const icon = document.getElementById(`icon-${id}`);
-        if(body && icon) {
-            if(body.classList.contains('hidden')) {
-                body.classList.remove('hidden');
-                icon.style.transform = 'rotate(180deg)';
-            } else {
-                body.classList.add('hidden');
-                icon.style.transform = 'rotate(0deg)';
-            }
-        }
-    };
-
+    window.toggleCard = function(id) { const b = document.getElementById(`body-${id}`); const i = document.getElementById(`icon-${id}`); if(b && i) { b.classList.toggle('hidden'); i.style.transform = b.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)'; } };
     window.alterarStatus = function(id, novoStatus) { set(ref(database, `projetos_capturados/${id}/status`), novoStatus); };
     window.excluirProjeto = function(id) { if (confirm("Deseja excluir definitivamente este projeto?")) set(ref(database, `projetos_capturados/${id}`), null); };
 
@@ -221,7 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if(!c) return;
 
         idProjetoAberto = c.id;
-        
         let chatSalvo = c.devChat || [];
         if (typeof chatSalvo === 'string') historicoDevAtual = [{role: 'model', text: chatSalvo}];
         else if (!Array.isArray(chatSalvo) && typeof chatSalvo === 'object') historicoDevAtual = Object.values(chatSalvo);
@@ -233,15 +203,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if(document.getElementById('modal-empresa')) document.getElementById('modal-empresa').innerText = c.empresa || "Empresa";
         if(document.getElementById('modal-dores')) document.getElementById('modal-dores').innerText = c.dores || "Sem dor detalhada.";
         
-        let f = c.facilitoide ? String(c.facilitoide) : "";
-        let formataFacilitoide = f ? f.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>') : "Aguardando arquitetura.";
-        if(document.getElementById('modal-facilitoide')) document.getElementById('modal-facilitoide').innerHTML = formataFacilitoide;
-        
-        contextoProjetoAtual = `Cliente: ${c.nome}. Empresa: ${c.empresa}. Dor: ${c.dores}. Arquitetura sugerida: ${f}`;
+        contextoProjetoAtual = `Cliente: ${c.nome}. Empresa: ${c.empresa}. Dor: ${c.dores}.`;
         
         const chatDisplay = document.getElementById('dev-chat-display');
         if(chatDisplay) {
-            chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! Sou seu Perito de Software. O que vamos codificar para este cliente?</div>`;
+            chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! O que vamos codificar para este cliente? Você pode pedir um arquivo HTML único de demonstração e baixar direto pro seu celular clicando em "Baixar Demo"!</div>`;
 
             if(Array.isArray(historicoDevAtual)) {
                 historicoDevAtual.forEach(msg => {
@@ -260,12 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(modalDOM) modalDOM.classList.remove('oculto');
     };
 
-    if(document.getElementById('btn-fechar-modal')) {
-        document.getElementById('btn-fechar-modal').addEventListener('click', () => {
-            const m = document.getElementById('modal-projeto');
-            if(m) m.classList.add('oculto');
-        });
-    }
+    if(document.getElementById('btn-fechar-modal')) { document.getElementById('btn-fechar-modal').addEventListener('click', () => { document.getElementById('modal-projeto').classList.add('oculto'); }); }
 
     // --- LÓGICA DO CHAT DE CÓDIGO ---
     const devInput = document.getElementById('dev-input');
@@ -277,12 +238,10 @@ document.addEventListener('DOMContentLoaded', () => {
         devFile.addEventListener('change', async (e) => {
             const files = e.target.files;
             if(files.length === 0) return;
-            
             for(let file of files) {
                 try {
                     const text = await file.text();
                     bufferArquivosAnexados += `\n\n--- INÍCIO DO ARQUIVO: ${file.name} ---\n${text}\n--- FIM DO ARQUIVO ---\n`;
-                    
                     const divAdmin = document.createElement('div');
                     divAdmin.className = "msg-dev admin bg-slate-700 text-slate-200 text-xs italic";
                     divAdmin.innerHTML = `<i class='bx bx-file'></i> Anexado: <b>${file.name}</b>`;
