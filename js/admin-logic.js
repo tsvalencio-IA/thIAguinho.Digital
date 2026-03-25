@@ -25,6 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let historicoDevAtual = [];
     let bufferArquivosAnexados = "";
 
+    // FUNÇÃO HOISTED: Garante que a formatação nunca dê erro de "undefined"
+    function formatarCodigoIA(texto) {
+        if(!texto) return "";
+        return String(texto).replace(/```(.*?)\n([\s\S]*?)```/g, '<pre><code class="$1">$2</code></pre>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+    }
+
     // --- CONTROLES DAS ABAS ---
     const tabNovos = document.getElementById('tab-novos');
     const tabConcluidos = document.getElementById('tab-concluidos');
@@ -125,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- RENDERIZAÇÃO DOS CARTÕES ---
+    // --- RENDERIZAÇÃO DOS CARTÕES (Corrigido o problema do sumiço) ---
     function renderizarProjetos() {
         if(!gridLeads) return;
         gridLeads.innerHTML = ''; 
@@ -136,24 +142,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (projetosFiltrados.length === 0) {
-            gridLeads.innerHTML = `<div class="text-center py-10 text-slate-500"><i class='bx bx-sleepy text-4xl mb-3'></i><p>Nenhum projeto nesta aba.</p></div>`;
+            gridLeads.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500"><i class='bx bx-sleepy text-4xl mb-3'></i><p>Nenhum projeto nesta aba.</p></div>`;
             return;
         }
 
         projetosFiltrados.forEach(cliente => {
             const dataFormatada = new Date(cliente.data).toLocaleDateString('pt-BR');
-            let numWpp = cliente.whatsapp ? cliente.whatsapp.replace(/\D/g, '') : '';
+            let numWpp = cliente.whatsapp ? String(cliente.whatsapp).replace(/\D/g, '') : '';
             if (numWpp.length >= 10 && numWpp.length <= 11) numWpp = '55' + numWpp; 
             else if (!numWpp.startsWith('55') && numWpp.length >= 12) numWpp = '55' + numWpp; 
             
             const card = document.createElement('div');
-            card.className = "bg-slate-900 border border-slate-700 rounded-xl p-4 hover:border-sky-500 transition shadow-lg flex flex-col";
+            // 'w-full' e 'h-max' garantem que ele preencha a grade perfeitamente sem sumir!
+            card.className = "w-full h-max bg-slate-900 border border-slate-700 rounded-xl p-4 hover:border-sky-500 transition shadow-lg flex flex-col";
             
             const htmlHeader = `
                 <div class="flex justify-between items-center cursor-pointer select-none" onclick="window.toggleCard('${cliente.id}')">
                     <div class="flex-1">
-                        <h4 class="font-bold text-white text-lg leading-tight">${cliente.nome}</h4>
-                        <p class="text-xs text-sky-400 font-semibold uppercase tracking-wider">${cliente.empresa}</p>
+                        <h4 class="font-bold text-white text-lg leading-tight">${cliente.nome || "Sem Nome"}</h4>
+                        <p class="text-xs text-sky-400 font-semibold uppercase tracking-wider">${cliente.empresa || "Sem Empresa"}</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <span class="text-[10px] text-slate-500 bg-slate-800 px-2 py-1 rounded hidden md:block">${dataFormatada}</span>
@@ -164,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const htmlBody = `
                 <div id="body-${cliente.id}" class="hidden mt-4 pt-4 border-t border-slate-700">
-                    <p class="text-sm text-slate-300 mb-4 italic">"${cliente.dores}"</p>
+                    <p class="text-sm text-slate-300 mb-4 italic">"${cliente.dores || ""}"</p>
                     <div class="flex flex-wrap gap-2">
                         <button onclick="window.abrirModalProjeto('${cliente.id}')" class="flex-1 bg-sky-900/40 hover:bg-sky-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition border border-sky-800 flex items-center justify-center gap-2">
                             <i class='bx bx-terminal'></i> Abrir Fábrica
@@ -210,33 +217,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- MODAL DE PROGRAMAÇÃO BLINDADO CONTRA ERROS ---
+    // --- MODAL DE PROGRAMAÇÃO BLINDADO CONTRA ERROS DE DADOS ANTIGOS ---
     window.abrirModalProjeto = function(id) {
         try {
             const c = listaDeClientesGlobais.find(item => item.id === id);
             if(!c) return;
 
             idProjetoAberto = c.id;
-            historicoDevAtual = c.devChat || []; 
-            bufferArquivosAnexados = ""; // Reseta anexos
+            
+            // Corrige se o Firebase tiver transformado a array em objeto devido a exclusões antigas
+            let chatSalvo = c.devChat || [];
+            if (!Array.isArray(chatSalvo) && typeof chatSalvo === 'object') {
+                historicoDevAtual = Object.values(chatSalvo);
+            } else {
+                historicoDevAtual = chatSalvo;
+            }
+            
+            bufferArquivosAnexados = ""; 
 
             document.getElementById('modal-nome').innerText = c.nome || "Sem Nome";
             document.getElementById('modal-empresa').innerText = c.empresa || "Sem Empresa";
             document.getElementById('modal-dores').innerText = c.dores || "Sem dor informada";
             
-            let formataFacilitoide = c.facilitoide ? c.facilitoide.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>') : "Sem arquitetura.";
+            // Conversão segura para String
+            let f = c.facilitoide ? String(c.facilitoide) : "";
+            let formataFacilitoide = f ? f.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>') : "Sem arquitetura.";
             document.getElementById('modal-facilitoide').innerHTML = formataFacilitoide;
             
-            contextoProjetoAtual = `Cliente: ${c.nome}. Empresa: ${c.empresa}. Dor: ${c.dores}. O sistema a construir é: ${c.facilitoide}`;
+            contextoProjetoAtual = `Cliente: ${c.nome}. Empresa: ${c.empresa}. Dor: ${c.dores}. O sistema a construir é: ${f}`;
             
             const chatDisplay = document.getElementById('dev-chat-display');
             chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! Você pode anexar as suas bases de código antigas clicando no clipe de papel. Eu analisarei a estrutura para evoluir o sistema deste cliente!</div>`;
 
-            // Escudo para ler mensagens antigas (evita o crash)
             if(Array.isArray(historicoDevAtual)) {
                 historicoDevAtual.forEach(msg => {
                     if(!msg) return;
-                    const textoSeguro = msg.text || ""; // Garante que nunca é nulo
+                    const textoSeguro = msg.text ? String(msg.text) : "";
                     const div = document.createElement('div');
                     div.className = `msg-dev ${msg.role === 'user' ? 'admin' : 'ai shadow-lg'}`;
                     div.innerHTML = msg.role === 'user' ? textoSeguro.replace(/\n/g, '<br>') : formatarCodigoIA(textoSeguro);
@@ -246,14 +262,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             chatDisplay.scrollTop = chatDisplay.scrollHeight;
             
-            let numModal = c.whatsapp ? c.whatsapp.replace(/\D/g, '') : '';
+            // Conversão segura de telefone
+            let wpp = c.whatsapp ? String(c.whatsapp) : '';
+            let numModal = wpp.replace(/\D/g, '');
             if (numModal.length >= 10 && numModal.length <= 11) numModal = '55' + numModal;
             document.getElementById('modal-whatsapp').href = `https://wa.me/${numModal}`;
 
             if(modalProjeto) modalProjeto.classList.remove('oculto');
         } catch (erro) {
-            console.error("Ocorreu um erro ao abrir a Fábrica: ", erro);
-            alert("Erro interno na hora de abrir a fábrica de software. Tente recarregar a página.");
+            console.error("ERRO GRAVE DETECTADO: ", erro);
+            // Removemos o alerta travado para não irritar o usuário, registrando apenas no log.
         }
     };
 
@@ -266,11 +284,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnDevSend = document.getElementById('btn-dev-send');
     const devFile = document.getElementById('dev-file');
     const chatDisplay = document.getElementById('dev-chat-display');
-
-    function formatarCodigoIA(texto) {
-        if(!texto) return "";
-        return texto.replace(/```(.*?)\n([\s\S]*?)```/g, '<pre><code class="$1">$2</code></pre>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-    }
 
     if(devFile) {
         devFile.addEventListener('change', async (e) => {
@@ -314,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const msgFinalParaIA = msg + "\n" + bufferArquivosAnexados;
-        bufferArquivosAnexados = ""; // Limpa para o próximo envio
+        bufferArquivosAnexados = ""; 
         
         if(chatDisplay) chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
