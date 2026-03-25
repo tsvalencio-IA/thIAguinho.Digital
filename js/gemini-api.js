@@ -4,7 +4,6 @@
 import { database, ref, push, set, get } from './firebase-config.js';
 
 let chatHistoryCliente = [];
-let chatHistoryAdmin = []; 
 let chaveApiArmazenada = null; 
 
 // =========================================================================
@@ -88,8 +87,13 @@ export async function askGemini(msgUsuario) {
 
             const novoLeadRef = push(ref(database, 'projetos_capturados'));
             set(novoLeadRef, {
-                nome: nome.trim() || "Não informado", empresa: empresa.trim() || "Não informada",
-                dores: dores.trim(), facilitoide: facilitoide.trim(), whatsapp: wppLimpo, data: new Date().toISOString()
+                nome: nome.trim() || "Não informado", 
+                empresa: empresa.trim() || "Não informada",
+                dores: dores.trim(), 
+                facilitoide: facilitoide.trim(), 
+                whatsapp: wppLimpo, 
+                data: new Date().toISOString(),
+                devChat: [] // Cria o espaço para salvar a conversa do programador no Firebase
             });
             botReply = botReply.replace(regexLead, '').trim();
         }
@@ -104,7 +108,7 @@ export function adicionarAoHistorico(role, texto) {
 // =========================================================================
 // CÉREBRO 2: O DESENVOLVEDOR DA FÁBRICA (EXCLUSIVO PARA O THIAGO/ADMIN)
 // =========================================================================
-export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto) {
+export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, historicoSalvo = []) {
     try {
         const apiKey = await obterChaveDaApi();
         if (!apiKey) return "Coloque a chave da API nas configurações do Painel.";
@@ -116,7 +120,8 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto) {
 
         const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-        const contents = chatHistoryAdmin.map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
+        // Carrega o histórico salvo do Firebase para a IA lembrar da conversa!
+        const contents = historicoSalvo.map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
         contents.push({ role: 'user', parts: [{ text: msgAdmin }] });
 
         const res = await fetch(MODEL_URL, {
@@ -127,17 +132,9 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto) {
         const data = await res.json();
         if (data.error) throw new Error(data.error.message);
         
-        const respostaDev = data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro.";
-        
-        chatHistoryAdmin.push({ role: 'user', text: msgAdmin });
-        chatHistoryAdmin.push({ role: 'model', text: respostaDev });
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro de processamento.";
 
-        return respostaDev;
     } catch(e) {
         return "Erro de compilação na IA: " + e.message;
     }
-}
-
-export function resetarChatAdmin() {
-    chatHistoryAdmin = [];
 }
