@@ -1,8 +1,8 @@
-// NOME DO FICHEIRO: admin-logic.js
-// LOCALIZAÇÃO: Fica OBRIGATORIAMENTE dentro da pasta 'js' (Substitua tudo o que lá estiver)
+// NOME DO ARQUIVO: admin-logic.js
+// LOCALIZAÇÃO: Dentro da pasta 'js'
 
 import { auth, database, signInWithEmailAndPassword, signOut, onAuthStateChanged, ref, set, onValue, get } from './firebase-config.js';
-import { atualizarPromptMemoria, systemPrompt as promptPadraoDaAPI, conversarComDesenvolvedorIA, resetarChatAdmin } from './gemini-api.js';
+import { atualizarPromptMemoria, systemPrompt as promptPadraoDaAPI, conversarComDesenvolvedorIA } from './gemini-api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -18,7 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let usuarioLogado = null;
     let listaDeClientesGlobais = [];
-    let contextoProjetoAtual = ""; // Guarda o texto do projeto aberto para a IA saber sobre o que programar
+    
+    // Variáveis cruciais para a Fábrica lembrar do projeto
+    let contextoProjetoAtual = ""; 
+    let idProjetoAberto = null;
+    let historicoDevAtual = [];
 
     // --- SESSÃO E LOGIN ---
     onAuthStateChanged(auth, (user) => {
@@ -37,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if(btnLogin) {
         btnLogin.addEventListener('click', () => {
-            btnLogin.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> A ligar...";
+            btnLogin.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Conectando...";
             signInWithEmailAndPassword(auth, emailInput.value, senhaInput.value)
                 .catch((error) => { erroMsg.classList.remove('oculto'); btnLogin.innerHTML = "Entrar no Painel"; });
         });
@@ -99,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             listaDeClientesGlobais.sort((a, b) => new Date(b.data) - new Date(a.data));
 
             listaDeClientesGlobais.forEach((cliente, index) => {
-                const dataFormatada = new Date(cliente.data).toLocaleDateString('pt-PT');
+                const dataFormatada = new Date(cliente.data).toLocaleDateString('pt-BR');
                 let numWpp = cliente.whatsapp ? cliente.whatsapp.replace(/\D/g, '') : '';
                 if (numWpp.length >= 10 && numWpp.length <= 11) numWpp = '55' + numWpp; 
                 else if (!numWpp.startsWith('55') && numWpp.length >= 12) numWpp = '55' + numWpp; 
@@ -127,13 +131,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.excluirProjeto = function(idProjeto) {
-        if (confirm("Deseja eliminar este projeto da fábrica?")) set(ref(database, `projetos_capturados/${idProjeto}`), null);
+        if (confirm("Deseja excluir este projeto da fábrica?")) set(ref(database, `projetos_capturados/${idProjeto}`), null);
     };
 
-    // --- O ESTÚDIO DO ARQUITETO (MODAL + CHAT DEV) ---
+    // --- O ESTÚDIO DO ARQUITETO (MODAL + CHAT DEV PERSISTENTE) ---
     window.abrirModalProjeto = function(index) {
         const c = listaDeClientesGlobais[index];
         if(!c) return;
+
+        // Guarda os dados para usar no chat
+        idProjetoAberto = c.id;
+        historicoDevAtual = c.devChat || []; // Carrega o histórico salvo no Firebase!
 
         document.getElementById('modal-nome').innerText = c.nome;
         document.getElementById('modal-empresa').innerText = c.empresa;
@@ -142,12 +150,20 @@ document.addEventListener('DOMContentLoaded', () => {
         let formataFacilitoide = c.facilitoide ? c.facilitoide.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>') : "Sem arquitetura.";
         document.getElementById('modal-facilitoide').innerHTML = formataFacilitoide;
         
-        // Define o contexto que a IA vai ler para ajudar a programar
         contextoProjetoAtual = `Cliente: ${c.nome}. Empresa: ${c.empresa}. Dor: ${c.dores}. A ideia do sistema a construir é: ${c.facilitoide}`;
         
-        resetarChatAdmin();
         const chatDisplay = document.getElementById('dev-chat-display');
-        chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! Sou a sua IA Desenvolvedora. Analisei a arquitetura deste projeto. Pode pedir-me o código HTML, a lógica JS, ou as configurações de Firebase e Cloudinary que precisa.</div>`;
+        chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! Sou a sua IA Desenvolvedora. Analisei a arquitetura deste projeto. Pode pedir os códigos e regras que precisa!</div>`;
+
+        // Imprime na tela todo o histórico que veio salvo do Firebase
+        historicoDevAtual.forEach(msg => {
+            const div = document.createElement('div');
+            div.className = `msg-dev ${msg.role === 'user' ? 'admin' : 'ai shadow-lg'}`;
+            div.innerHTML = msg.role === 'user' ? msg.text : formatarCodigoIA(msg.text);
+            chatDisplay.appendChild(div);
+        });
+
+        chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
         let numModal = c.whatsapp ? c.whatsapp.replace(/\D/g, '') : '';
         if (numModal.length >= 10 && numModal.length <= 11) numModal = '55' + numModal;
@@ -158,19 +174,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-fechar-modal').addEventListener('click', () => modalProjeto.classList.add('oculto'));
 
-    // --- LÓGICA DO CHAT DE PROGRAMAÇÃO (CANVAS ADMIN) ---
+    // --- LÓGICA DO CHAT DE PROGRAMAÇÃO (SALVANDO NO FIREBASE) ---
     const devInput = document.getElementById('dev-input');
     const btnDevSend = document.getElementById('btn-dev-send');
     const chatDisplay = document.getElementById('dev-chat-display');
 
     function formatarCodigoIA(texto) {
-        // Formata os blocos de código Markdown para exibição bonita no ecrã
         return texto.replace(/```(.*?)\n([\s\S]*?)```/g, '<pre><code class="$1">$2</code></pre>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
     }
 
     async function enviarMsgDev() {
         const msg = devInput.value.trim();
-        if(!msg) return;
+        if(!msg || !idProjetoAberto) return;
 
         devInput.value = '';
         devInput.disabled = true;
@@ -182,14 +197,21 @@ document.addEventListener('DOMContentLoaded', () => {
         chatDisplay.appendChild(divAdmin);
         chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
-        // Chama a 2ª Mente da IA (A Desenvolvedora de Código)
-        const respostaDaIA = await conversarComDesenvolvedorIA(msg, contextoProjetoAtual);
+        // Chama a IA e passa o histórico que estava salvo
+        const respostaDaIA = await conversarComDesenvolvedorIA(msg, contextoProjetoAtual, historicoDevAtual);
 
         const divAI = document.createElement('div');
         divAI.className = "msg-dev ai shadow-lg";
         divAI.innerHTML = formatarCodigoIA(respostaDaIA);
         chatDisplay.appendChild(divAI);
         chatDisplay.scrollTop = chatDisplay.scrollHeight;
+
+        // Atualiza a memória local
+        historicoDevAtual.push({ role: 'user', text: msg });
+        historicoDevAtual.push({ role: 'model', text: respostaDaIA });
+
+        // SALVA TUDO NO FIREBASE (Atrelado ao ID do cliente)
+        set(ref(database, `projetos_capturados/${idProjetoAberto}/devChat`), historicoDevAtual);
 
         devInput.disabled = false;
         devInput.focus();
