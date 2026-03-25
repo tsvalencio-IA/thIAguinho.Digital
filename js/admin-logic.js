@@ -11,23 +11,63 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnLogin = document.getElementById('btn-login');
     const btnLogout = document.getElementById('btn-logout');
     const erroMsg = document.getElementById('msg-erro-login');
-    
     const apiKeyInput = document.getElementById('api-key-input');
     const gridLeads = document.getElementById('grid-leads');
     
     let usuarioLogado = null;
     let listaDeClientesGlobais = [];
     let abaAtiva = 'novos'; 
-    
     let contextoProjetoAtual = ""; 
     let idProjetoAberto = null;
     let historicoDevAtual = [];
     let bufferArquivosAnexados = "";
 
+    // --- ESCAPE HTML (Protege contra a IA renderizar divs sem querer no painel) ---
+    function escapeHtml(unsafe) {
+        return (unsafe || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // --- A MÁGICA: FORMATADOR DE CÓDIGO COM PREVIEW (CANVAS) ---
     function formatarCodigoIA(texto) {
         if(!texto) return "";
-        return String(texto).replace(/```(.*?)\n([\s\S]*?)```/g, '<pre><code class="$1">$2</code></pre>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+        
+        // Encontra blocos de código Markdown (```html ... ```)
+        let textoFormatado = String(texto).replace(/```(html|javascript|js|css|json)?\n([\s\S]*?)```/gi, function(match, lang, code) {
+            const linguagem = lang ? lang.toLowerCase() : 'código';
+            const safeCode = escapeHtml(code);
+            const blockId = 'code-' + Math.random().toString(36).substr(2, 9);
+            
+            // Botão Padrão de Copiar
+            let botoes = `<button onclick="navigator.clipboard.writeText(document.getElementById('${blockId}').innerText); this.innerText='Copiado!'; setTimeout(()=>this.innerText='Copiar',2000)" class="bg-slate-700 hover:bg-slate-600 text-white px-2 py-1 rounded transition text-[10px] font-bold"><i class='bx bx-copy'></i> Copiar</button>`;
+            
+            // SE FOR HTML, ADICIONA O BOTÃO DE PREVIEW!
+            if (linguagem === 'html') {
+                botoes += `<button onclick="window.abrirPreview('${blockId}')" class="bg-sky-600 hover:bg-sky-500 text-white px-2 py-1 rounded ml-2 transition text-[10px] font-bold"><i class='bx bx-play'></i> Visualizar (Preview)</button>`;
+            }
+
+            return `
+            <div class="code-container">
+                <div class="code-header">
+                    <span class="uppercase font-bold">${linguagem}</span>
+                    <div class="flex gap-2">${botoes}</div>
+                </div>
+                <div class="code-content">
+                    <code id="${blockId}">${safeCode}</code>
+                </div>
+            </div>`;
+        });
+
+        // Formata o negrito e as quebras de linha normais fora do código
+        return textoFormatado.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
     }
+
+    // FUNÇÃO GLOBAL DE PREVIEW: Abre o HTML em uma nova aba rodando na hora!
+    window.abrirPreview = function(blockId) {
+        const codigoRaw = document.getElementById(blockId).innerText;
+        const janelaPreview = window.open("", "_blank");
+        janelaPreview.document.write(codigoRaw);
+        janelaPreview.document.close();
+    };
 
     // --- CONTROLES DAS ABAS ---
     const tabNovos = document.getElementById('tab-novos');
@@ -80,60 +120,25 @@ document.addEventListener('DOMContentLoaded', () => {
         btnLogout.addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
     }
 
-    if(document.getElementById('btn-save-key')) {
-        document.getElementById('btn-save-key').addEventListener('click', () => {
-            if (!usuarioLogado) return;
-            const novaChave = apiKeyInput.value.trim();
-            if(!novaChave) return;
-            const btn = document.getElementById('btn-save-key');
-            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
-            set(ref(database, 'admin_config/gemini_api_key'), novaChave)
-                .then(() => { btn.innerHTML = "Salva"; setTimeout(() => btn.innerHTML = "Salvar", 2000); });
-        });
-    }
-
-    if(document.getElementById('btn-save-prompt')) {
-        document.getElementById('btn-save-prompt').addEventListener('click', () => {
-            if (!usuarioLogado) return;
-            const btn = document.getElementById('btn-save-prompt');
-            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>...";
-            const novoPrompt = document.getElementById('prompt-ia').value;
-            set(ref(database, 'admin_config/prompt_mascote'), novoPrompt)
-                .then(() => { atualizarPromptMemoria(novoPrompt); btn.innerHTML = "Atualizado!"; setTimeout(() => btn.innerHTML = "Atualizar Cérebro", 2000); });
-        });
-    }
-
-    // --- A CORREÇÃO MESTRE: LEITURA BLINDADA DO FIREBASE ---
+    // --- LEITURA DA BASE DE DADOS ---
     function iniciarLeituraDoBancoDeDados() {
         get(ref(database, 'admin_config/gemini_api_key')).then((snapshot) => {
             if(snapshot.exists() && apiKeyInput) apiKeyInput.value = snapshot.val();
         });
 
-        get(ref(database, 'admin_config/prompt_mascote')).then((snapshot) => {
-            const caixaTexto = document.getElementById('prompt-ia');
-            if (snapshot.exists() && caixaTexto) {
-                caixaTexto.value = snapshot.val();
-                atualizarPromptMemoria(snapshot.val());
-            } else if(caixaTexto) {
-                caixaTexto.value = promptPadraoDaAPI;
-            }
-        });
-
         onValue(ref(database, 'projetos_capturados'), (snapshot) => {
             listaDeClientesGlobais = [];
             if (snapshot.exists()) {
-                // O SEGREDO: Uso das chaves {} garante que o Firebase NÃO cancele o loop após ler 1 item.
                 snapshot.forEach((filho) => {
                     listaDeClientesGlobais.push({ id: filho.key, ...filho.val() });
                 });
-                
                 listaDeClientesGlobais.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
             }
             renderizarProjetos();
         });
     }
 
-    // --- RENDERIZAÇÃO DOS CARTÕES (Todos aparecem) ---
+    // --- RENDERIZAÇÃO DOS CARTÕES ---
     function renderizarProjetos() {
         if(!gridLeads) return;
         gridLeads.innerHTML = ''; 
@@ -154,16 +159,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (numWpp.length >= 10 && numWpp.length <= 11) numWpp = '55' + numWpp; 
             
             const card = document.createElement('div');
-            // 'w-full shrink-0' garante que o layout não esmague os cartões invisivelmente
-            card.className = "w-full shrink-0 bg-slate-900 border border-slate-700 rounded-xl p-4 hover:border-sky-500 transition shadow-lg flex flex-col mb-4";
+            card.className = "w-full shrink-0 bg-slate-900 border border-slate-700 rounded-xl p-4 hover:border-sky-500 transition shadow-lg flex flex-col mb-2";
             
             const htmlHeader = `
                 <div class="flex justify-between items-center cursor-pointer select-none" onclick="window.toggleCard('${cliente.id}')">
-                    <div class="flex-1">
-                        <h4 class="font-bold text-white text-lg leading-tight">${cliente.nome || "Cliente Indefinido"}</h4>
-                        <p class="text-xs text-sky-400 font-semibold uppercase tracking-wider">${cliente.empresa || "Sem Empresa"}</p>
+                    <div class="flex-1 overflow-hidden">
+                        <h4 class="font-bold text-white text-lg leading-tight truncate">${cliente.nome || "Cliente Indefinido"}</h4>
+                        <p class="text-xs text-sky-400 font-semibold uppercase tracking-wider truncate">${cliente.empresa || "Sem Empresa"}</p>
                     </div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 shrink-0">
                         <span class="text-[10px] text-slate-500 bg-slate-800 px-2 py-1 rounded hidden md:block">${dataFormatada}</span>
                         <i id="icon-${cliente.id}" class='bx bx-chevron-down text-2xl text-slate-400 transition-transform duration-300'></i>
                     </div>
@@ -172,19 +176,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const htmlBody = `
                 <div id="body-${cliente.id}" class="hidden mt-4 pt-4 border-t border-slate-700">
-                    <p class="text-sm text-slate-300 mb-4 italic">"${cliente.dores || "Não informou dores específicas."}"</p>
+                    <p class="text-xs md:text-sm text-slate-300 mb-4 italic">"${cliente.dores || "Não informou dores específicas."}"</p>
                     <div class="flex flex-wrap gap-2">
-                        <button onclick="window.abrirModalProjeto('${cliente.id}')" class="flex-1 bg-sky-900/40 hover:bg-sky-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition border border-sky-800 flex items-center justify-center gap-2">
+                        <button onclick="window.abrirModalProjeto('${cliente.id}')" class="flex-1 bg-sky-900/40 hover:bg-sky-600 text-white text-xs md:text-sm font-semibold py-2 px-3 rounded-lg transition border border-sky-800 flex items-center justify-center gap-2 min-w-[120px]">
                             <i class='bx bx-terminal'></i> Abrir Fábrica
                         </button>
-                        <a href="https://wa.me/${numWpp}" target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center" title="Conversar no WhatsApp"><i class='bx bxl-whatsapp text-lg'></i></a>
+                        <a href="https://wa.me/${numWpp}" target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center shrink-0" title="Conversar no WhatsApp"><i class='bx bxl-whatsapp text-lg'></i></a>
                         
                         ${abaAtiva === 'novos' 
-                            ? `<button onclick="window.alterarStatus('${cliente.id}', 'concluido')" class="w-10 bg-emerald-900/50 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-lg flex items-center justify-center transition border border-emerald-800" title="Marcar como Sistema Gerado"><i class='bx bx-check-double text-lg'></i></button>`
-                            : `<button onclick="window.alterarStatus('${cliente.id}', 'novo')" class="w-10 bg-orange-900/50 hover:bg-orange-600 text-orange-400 hover:text-white rounded-lg flex items-center justify-center transition border border-orange-800" title="Voltar para Novos Projetos"><i class='bx bx-undo text-lg'></i></button>`
+                            ? `<button onclick="window.alterarStatus('${cliente.id}', 'concluido')" class="w-10 bg-emerald-900/50 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-lg flex items-center justify-center transition border border-emerald-800 shrink-0" title="Marcar como Sistema Gerado"><i class='bx bx-check-double text-lg'></i></button>`
+                            : `<button onclick="window.alterarStatus('${cliente.id}', 'novo')" class="w-10 bg-orange-900/50 hover:bg-orange-600 text-orange-400 hover:text-white rounded-lg flex items-center justify-center transition border border-orange-800 shrink-0" title="Voltar para Novos Projetos"><i class='bx bx-undo text-lg'></i></button>`
                         }
                         
-                        <button onclick="window.excluirProjeto('${cliente.id}')" class="w-10 bg-slate-800 hover:bg-red-700 text-slate-400 hover:text-white rounded-lg flex items-center justify-center transition"><i class='bx bx-trash text-lg'></i></button>
+                        <button onclick="window.excluirProjeto('${cliente.id}')" class="w-10 bg-slate-800 hover:bg-red-700 text-slate-400 hover:text-white rounded-lg flex items-center justify-center transition shrink-0"><i class='bx bx-trash text-lg'></i></button>
                     </div>
                 </div>
             `;
@@ -208,79 +212,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    window.alterarStatus = function(id, novoStatus) {
-        set(ref(database, `projetos_capturados/${id}/status`), novoStatus);
-    };
+    window.alterarStatus = function(id, novoStatus) { set(ref(database, `projetos_capturados/${id}/status`), novoStatus); };
+    window.excluirProjeto = function(id) { if (confirm("Deseja excluir definitivamente este projeto?")) set(ref(database, `projetos_capturados/${id}`), null); };
 
-    window.excluirProjeto = function(id) {
-        if (confirm("Deseja excluir definitivamente este projeto?")) {
-            set(ref(database, `projetos_capturados/${id}`), null);
-        }
-    };
-
-    // --- MODAL DE PROGRAMAÇÃO BLINDADO (Abre mesmo com dados incompletos) ---
+    // --- MODAL DE PROGRAMAÇÃO DA FÁBRICA ---
     window.abrirModalProjeto = function(id) {
-        try {
-            const c = listaDeClientesGlobais.find(item => item.id === id);
-            if(!c) {
-                console.error("Erro: Cliente não localizado.");
-                return;
+        const c = listaDeClientesGlobais.find(item => item.id === id);
+        if(!c) return;
+
+        idProjetoAberto = c.id;
+        
+        let chatSalvo = c.devChat || [];
+        if (typeof chatSalvo === 'string') historicoDevAtual = [{role: 'model', text: chatSalvo}];
+        else if (!Array.isArray(chatSalvo) && typeof chatSalvo === 'object') historicoDevAtual = Object.values(chatSalvo);
+        else historicoDevAtual = chatSalvo;
+        
+        bufferArquivosAnexados = ""; 
+
+        if(document.getElementById('modal-nome')) document.getElementById('modal-nome').innerText = c.nome || "Cliente";
+        if(document.getElementById('modal-empresa')) document.getElementById('modal-empresa').innerText = c.empresa || "Empresa";
+        if(document.getElementById('modal-dores')) document.getElementById('modal-dores').innerText = c.dores || "Sem dor detalhada.";
+        
+        let f = c.facilitoide ? String(c.facilitoide) : "";
+        let formataFacilitoide = f ? f.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>') : "Aguardando arquitetura.";
+        if(document.getElementById('modal-facilitoide')) document.getElementById('modal-facilitoide').innerHTML = formataFacilitoide;
+        
+        contextoProjetoAtual = `Cliente: ${c.nome}. Empresa: ${c.empresa}. Dor: ${c.dores}. Arquitetura sugerida: ${f}`;
+        
+        const chatDisplay = document.getElementById('dev-chat-display');
+        if(chatDisplay) {
+            chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! Sou seu Perito de Software. O que vamos codificar para este cliente?</div>`;
+
+            if(Array.isArray(historicoDevAtual)) {
+                historicoDevAtual.forEach(msg => {
+                    if(!msg || !msg.text) return;
+                    const textoSeguro = String(msg.text);
+                    const div = document.createElement('div');
+                    div.className = `msg-dev ${msg.role === 'user' ? 'admin' : 'ai shadow-lg w-full'}`;
+                    div.innerHTML = msg.role === 'user' ? textoSeguro.replace(/\n/g, '<br>') : formatarCodigoIA(textoSeguro);
+                    chatDisplay.appendChild(div);
+                });
             }
-
-            idProjetoAberto = c.id;
-            
-            // Corrige se a nuvem bagunçou a array de mensagens
-            let chatSalvo = c.devChat || [];
-            if (typeof chatSalvo === 'string') {
-                historicoDevAtual = [{role: 'model', text: chatSalvo}];
-            } else if (!Array.isArray(chatSalvo) && typeof chatSalvo === 'object') {
-                historicoDevAtual = Object.values(chatSalvo);
-            } else {
-                historicoDevAtual = chatSalvo;
-            }
-            
-            bufferArquivosAnexados = ""; 
-
-            // Validações defensivas do DOM
-            if(document.getElementById('modal-nome')) document.getElementById('modal-nome').innerText = c.nome || "Cliente";
-            if(document.getElementById('modal-empresa')) document.getElementById('modal-empresa').innerText = c.empresa || "Empresa";
-            if(document.getElementById('modal-dores')) document.getElementById('modal-dores').innerText = c.dores || "Sem dor detalhada.";
-            
-            let f = c.facilitoide ? String(c.facilitoide) : "";
-            let formataFacilitoide = f ? f.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>') : "Aguardando arquitetura.";
-            if(document.getElementById('modal-facilitoide')) document.getElementById('modal-facilitoide').innerHTML = formataFacilitoide;
-            
-            contextoProjetoAtual = `Cliente: ${c.nome}. Empresa: ${c.empresa}. Dor: ${c.dores}. Arquitetura sugerida: ${f}`;
-            
-            const chatDisplay = document.getElementById('dev-chat-display');
-            if(chatDisplay) {
-                chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! Você pode anexar as suas bases de código antigas clicando no clipe de papel. Eu analisarei a estrutura para evoluir o sistema deste cliente!</div>`;
-
-                if(Array.isArray(historicoDevAtual)) {
-                    historicoDevAtual.forEach(msg => {
-                        if(!msg || !msg.text) return;
-                        const textoSeguro = String(msg.text);
-                        const div = document.createElement('div');
-                        div.className = `msg-dev ${msg.role === 'user' ? 'admin' : 'ai shadow-lg'}`;
-                        div.innerHTML = msg.role === 'user' ? textoSeguro.replace(/\n/g, '<br>') : formatarCodigoIA(textoSeguro);
-                        chatDisplay.appendChild(div);
-                    });
-                }
-                chatDisplay.scrollTop = chatDisplay.scrollHeight;
-            }
-            
-            let wpp = c.whatsapp ? String(c.whatsapp) : '';
-            let numModal = wpp.replace(/\D/g, '');
-            if (numModal.length >= 10 && numModal.length <= 11) numModal = '55' + numModal;
-            if(document.getElementById('modal-whatsapp')) document.getElementById('modal-whatsapp').href = `https://wa.me/${numModal}`;
-
-            // Abre o Modal com segurança absoluta
-            const modalDOM = document.getElementById('modal-projeto');
-            if(modalDOM) modalDOM.classList.remove('oculto');
-            
-        } catch (erro) {
-            console.error("Falha ao abrir a Fábrica (Erro Contido): ", erro);
+            chatDisplay.scrollTop = chatDisplay.scrollHeight;
         }
+        
+        const modalDOM = document.getElementById('modal-projeto');
+        if(modalDOM) modalDOM.classList.remove('oculto');
     };
 
     if(document.getElementById('btn-fechar-modal')) {
@@ -290,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LÓGICA DO CHAT E LEITURA DE ARQUIVOS ---
+    // --- LÓGICA DO CHAT DE CÓDIGO ---
     const devInput = document.getElementById('dev-input');
     const btnDevSend = document.getElementById('btn-dev-send');
     const devFile = document.getElementById('dev-file');
@@ -308,14 +285,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     const divAdmin = document.createElement('div');
                     divAdmin.className = "msg-dev admin bg-slate-700 text-slate-200 text-xs italic";
-                    divAdmin.innerHTML = `<i class='bx bx-file'></i> Arquivo anexado na memória: <b>${file.name}</b>`;
-                    if(chatDisplay) {
-                        chatDisplay.appendChild(divAdmin);
-                        chatDisplay.scrollTop = chatDisplay.scrollHeight;
-                    }
-                } catch(err) {
-                    console.error("Erro ao ler o arquivo", err);
-                }
+                    divAdmin.innerHTML = `<i class='bx bx-file'></i> Anexado: <b>${file.name}</b>`;
+                    if(chatDisplay) { chatDisplay.appendChild(divAdmin); chatDisplay.scrollTop = chatDisplay.scrollHeight; }
+                } catch(err) { console.error(err); }
             }
             devFile.value = ''; 
         });
@@ -323,7 +295,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function enviarMsgDev() {
         let msg = devInput ? devInput.value.trim() : "";
-        
         if(!msg && !bufferArquivosAnexados) return; 
 
         if(devInput) devInput.value = '';
@@ -339,27 +310,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const msgFinalParaIA = msg + "\n" + bufferArquivosAnexados;
         bufferArquivosAnexados = ""; 
-        
         if(chatDisplay) chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
         const respostaDaIA = await conversarComDesenvolvedorIA(msgFinalParaIA, contextoProjetoAtual, historicoDevAtual);
 
         if(chatDisplay) {
             const divAI = document.createElement('div');
-            divAI.className = "msg-dev ai shadow-lg";
+            divAI.className = "msg-dev ai shadow-lg w-full overflow-hidden";
             divAI.innerHTML = formatarCodigoIA(respostaDaIA);
             chatDisplay.appendChild(divAI);
             chatDisplay.scrollTop = chatDisplay.scrollHeight;
         }
 
-        historicoDevAtual.push({ role: 'user', text: msg ? msg : "Envio de arquivos anexos para análise." });
+        historicoDevAtual.push({ role: 'user', text: msg ? msg : "Envio de arquivos." });
         historicoDevAtual.push({ role: 'model', text: respostaDaIA });
-
         set(ref(database, `projetos_capturados/${idProjetoAberto}/devChat`), historicoDevAtual);
 
         if(devInput) devInput.disabled = false;
         if(devInput) devInput.focus();
-        if(btnDevSend) btnDevSend.innerHTML = "<i class='bx bx-send text-xl'></i>";
+        if(btnDevSend) btnDevSend.innerHTML = "<i class='bx bx-send text-lg md:text-xl'></i>";
     }
 
     if(btnDevSend) btnDevSend.addEventListener('click', enviarMsgDev);
