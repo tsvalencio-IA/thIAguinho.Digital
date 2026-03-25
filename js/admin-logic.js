@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const apiKeyInput = document.getElementById('api-key-input');
     const gridLeads = document.getElementById('grid-leads');
-    const modalProjeto = document.getElementById('modal-projeto');
     
     let usuarioLogado = null;
     let listaDeClientesGlobais = [];
@@ -25,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let historicoDevAtual = [];
     let bufferArquivosAnexados = "";
 
-    // FUNÇÃO HOISTED: Garante que a formatação nunca dê erro de "undefined"
+    // FUNÇÃO HOISTED: Protege contra erros de código nulo
     function formatarCodigoIA(texto) {
         if(!texto) return "";
         return String(texto).replace(/```(.*?)\n([\s\S]*?)```/g, '<pre><code class="$1">$2</code></pre>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
@@ -131,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- RENDERIZAÇÃO DOS CARTÕES (Corrigido o problema do sumiço) ---
+    // --- RENDERIZAÇÃO DOS CARTÕES (BLINDADA CONTRA O SUMIÇO) ---
     function renderizarProjetos() {
         if(!gridLeads) return;
         gridLeads.innerHTML = ''; 
@@ -142,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (projetosFiltrados.length === 0) {
-            gridLeads.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500"><i class='bx bx-sleepy text-4xl mb-3'></i><p>Nenhum projeto nesta aba.</p></div>`;
+            gridLeads.innerHTML = `<div class="text-center py-10 text-slate-500"><i class='bx bx-sleepy text-4xl mb-3'></i><p>Nenhum projeto nesta aba.</p></div>`;
             return;
         }
 
@@ -153,8 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (!numWpp.startsWith('55') && numWpp.length >= 12) numWpp = '55' + numWpp; 
             
             const card = document.createElement('div');
-            // 'w-full' e 'h-max' garantem que ele preencha a grade perfeitamente sem sumir!
-            card.className = "w-full h-max bg-slate-900 border border-slate-700 rounded-xl p-4 hover:border-sky-500 transition shadow-lg flex flex-col";
+            // A CLASSE "shrink-0" AQUI É O QUE IMPEDE OS CARTÕES DE SUMIREM QUANDO HÁ MUITOS!
+            card.className = "w-full shrink-0 bg-slate-900 border border-slate-700 rounded-xl p-4 hover:border-sky-500 transition shadow-lg flex flex-col";
             
             const htmlHeader = `
                 <div class="flex justify-between items-center cursor-pointer select-none" onclick="window.toggleCard('${cliente.id}')">
@@ -193,6 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Define as funções globalmente para funcionarem nos botões HTML gerados
     window.toggleCard = function(id) {
         const body = document.getElementById(`body-${id}`);
         const icon = document.getElementById(`icon-${id}`);
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- MODAL DE PROGRAMAÇÃO BLINDADO CONTRA ERROS DE DADOS ANTIGOS ---
+    // --- MODAL DE PROGRAMAÇÃO BLINDADO CONTRA ERROS QUE IMPEDIAM A ABERTURA ---
     window.abrirModalProjeto = function(id) {
         try {
             const c = listaDeClientesGlobais.find(item => item.id === id);
@@ -225,9 +225,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             idProjetoAberto = c.id;
             
-            // Corrige se o Firebase tiver transformado a array em objeto devido a exclusões antigas
+            // TRATAMENTO BLINDADO DO HISTÓRICO PARA NUNCA TRAVAR O BOTÃO
             let chatSalvo = c.devChat || [];
-            if (!Array.isArray(chatSalvo) && typeof chatSalvo === 'object') {
+            if (typeof chatSalvo === 'string') {
+                historicoDevAtual = [{role: 'model', text: chatSalvo}];
+            } else if (!Array.isArray(chatSalvo) && typeof chatSalvo === 'object') {
                 historicoDevAtual = Object.values(chatSalvo);
             } else {
                 historicoDevAtual = chatSalvo;
@@ -235,13 +237,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             bufferArquivosAnexados = ""; 
 
-            document.getElementById('modal-nome').innerText = c.nome || "Sem Nome";
-            document.getElementById('modal-empresa').innerText = c.empresa || "Sem Empresa";
-            document.getElementById('modal-dores').innerText = c.dores || "Sem dor informada";
+            // Trata todos os campos HTML de forma segura
+            document.getElementById('modal-nome').innerText = c.nome || "Cliente";
+            document.getElementById('modal-empresa').innerText = c.empresa || "Empresa";
+            document.getElementById('modal-dores').innerText = c.dores || "Sem detalhes.";
             
-            // Conversão segura para String
             let f = c.facilitoide ? String(c.facilitoide) : "";
-            let formataFacilitoide = f ? f.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>') : "Sem arquitetura.";
+            let formataFacilitoide = f ? f.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>') : "Sem arquitetura documentada.";
             document.getElementById('modal-facilitoide').innerHTML = formataFacilitoide;
             
             contextoProjetoAtual = `Cliente: ${c.nome}. Empresa: ${c.empresa}. Dor: ${c.dores}. O sistema a construir é: ${f}`;
@@ -262,24 +264,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
             chatDisplay.scrollTop = chatDisplay.scrollHeight;
             
-            // Conversão segura de telefone
             let wpp = c.whatsapp ? String(c.whatsapp) : '';
             let numModal = wpp.replace(/\D/g, '');
             if (numModal.length >= 10 && numModal.length <= 11) numModal = '55' + numModal;
             document.getElementById('modal-whatsapp').href = `https://wa.me/${numModal}`;
 
-            if(modalProjeto) modalProjeto.classList.remove('oculto');
+            // Abre o modal de forma direta, sem depender de escopo de variável
+            const modalDOM = document.getElementById('modal-projeto');
+            if(modalDOM) modalDOM.classList.remove('oculto');
+            
         } catch (erro) {
-            console.error("ERRO GRAVE DETECTADO: ", erro);
-            // Removemos o alerta travado para não irritar o usuário, registrando apenas no log.
+            console.error("ERRO INTERNO EVITADO: ", erro);
         }
     };
 
     if(document.getElementById('btn-fechar-modal')) {
-        document.getElementById('btn-fechar-modal').addEventListener('click', () => modalProjeto.classList.add('oculto'));
+        document.getElementById('btn-fechar-modal').addEventListener('click', () => {
+            document.getElementById('modal-projeto').classList.add('oculto');
+        });
     }
 
-    // --- LÓGICA DO CHAT E LEITURA DE ARQUIVOS ---
+    // --- LÓGICA DO CHAT DA FÁBRICA DE SOFTWARE ---
     const devInput = document.getElementById('dev-input');
     const btnDevSend = document.getElementById('btn-dev-send');
     const devFile = document.getElementById('dev-file');
