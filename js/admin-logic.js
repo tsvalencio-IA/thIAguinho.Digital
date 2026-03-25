@@ -16,16 +16,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const gridLeads = document.getElementById('grid-leads');
     const modalProjeto = document.getElementById('modal-projeto');
     
-    // Controles de Estado do CRM
     let usuarioLogado = null;
     let listaDeClientesGlobais = [];
-    let abaAtiva = 'novos'; // Pode ser 'novos' ou 'concluidos'
+    let abaAtiva = 'novos'; 
     
     let contextoProjetoAtual = ""; 
     let idProjetoAberto = null;
     let historicoDevAtual = [];
+    
+    // Variável para armazenar os arquivos anexados pelo Thiago
+    let bufferArquivosAnexados = "";
 
-    // --- CONTROLE DAS ABAS ---
+    // --- CONTROLES DAS ABAS ---
     const tabNovos = document.getElementById('tab-novos');
     const tabConcluidos = document.getElementById('tab-concluidos');
 
@@ -74,7 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btnLogout.addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
     }
 
-    // Configurações do Firebase
     if(document.getElementById('btn-save-key')) {
         document.getElementById('btn-save-key').addEventListener('click', () => {
             if (!usuarioLogado) return;
@@ -118,21 +119,19 @@ document.addEventListener('DOMContentLoaded', () => {
             listaDeClientesGlobais = [];
             if (snapshot.exists()) {
                 snapshot.forEach((filho) => listaDeClientesGlobais.push({ id: filho.key, ...filho.val() }));
-                // Ordena do mais novo para o mais velho
                 listaDeClientesGlobais.sort((a, b) => new Date(b.data) - new Date(a.data));
             }
             renderizarProjetos();
         });
     }
 
-    // --- RENDERIZAÇÃO INTELIGENTE (MINIMIZAR/MAXIMIZAR E ABAS) ---
+    // --- RENDERIZAÇÃO DOS CARTÕES DO CRM ---
     function renderizarProjetos() {
         if(!gridLeads) return;
         gridLeads.innerHTML = ''; 
         
-        // Filtra pela aba ativa
         const projetosFiltrados = listaDeClientesGlobais.filter(cliente => {
-            const status = cliente.status || 'novo'; // Se não tiver status no banco, é novo
+            const status = cliente.status || 'novo'; 
             return abaAtiva === 'novos' ? status === 'novo' : status === 'concluido';
         });
 
@@ -150,7 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             card.className = "bg-slate-900 border border-slate-700 rounded-xl p-4 hover:border-sky-500 transition shadow-lg flex flex-col";
             
-            // CABEÇALHO (Sempre visível - Clicável para Minimizar/Maximizar)
             const htmlHeader = `
                 <div class="flex justify-between items-center cursor-pointer select-none" onclick="window.toggleCard('${cliente.id}')">
                     <div class="flex-1">
@@ -164,7 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
-            // CORPO (Escondido por padrão)
             const htmlBody = `
                 <div id="body-${cliente.id}" class="hidden mt-4 pt-4 border-t border-slate-700">
                     <p class="text-sm text-slate-300 mb-4 italic">"${cliente.dores}"</p>
@@ -189,7 +186,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- FUNÇÕES DE AÇÃO DOS CARTÕES ---
     window.toggleCard = function(id) {
         const body = document.getElementById(`body-${id}`);
         const icon = document.getElementById(`icon-${id}`);
@@ -207,19 +203,19 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.excluirProjeto = function(id) {
-        if (confirm("Deseja excluir definitivamente este projeto? A conversa com a IA também será apagada.")) {
+        if (confirm("Deseja excluir definitivamente este projeto?")) {
             set(ref(database, `projetos_capturados/${id}`), null);
         }
     };
 
-    // --- O ESTÚDIO DO ARQUITETO (MODAL + CHAT DEV) ---
+    // --- MODAL DE PROGRAMAÇÃO ---
     window.abrirModalProjeto = function(id) {
-        // Encontra o cliente pelo ID e não mais pelo index (porque o filtro bagunça as posições)
         const c = listaDeClientesGlobais.find(item => item.id === id);
         if(!c) return;
 
         idProjetoAberto = c.id;
         historicoDevAtual = c.devChat || []; 
+        bufferArquivosAnexados = ""; // Reseta anexos ao abrir outro projeto
 
         document.getElementById('modal-nome').innerText = c.nome;
         document.getElementById('modal-empresa').innerText = c.empresa;
@@ -228,20 +224,20 @@ document.addEventListener('DOMContentLoaded', () => {
         let formataFacilitoide = c.facilitoide ? c.facilitoide.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>') : "Sem arquitetura.";
         document.getElementById('modal-facilitoide').innerHTML = formataFacilitoide;
         
-        contextoProjetoAtual = `Cliente: ${c.nome}. Empresa: ${c.empresa}. Dor: ${c.dores}. A ideia do sistema a construir é: ${c.facilitoide}`;
+        contextoProjetoAtual = `Cliente: ${c.nome}. Empresa: ${c.empresa}. Dor: ${c.dores}. O sistema a construir é: ${c.facilitoide}`;
         
         const chatDisplay = document.getElementById('dev-chat-display');
-        chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! Sou a sua IA Desenvolvedora. Analisei a arquitetura deste projeto. Pode pedir os códigos e regras que precisa!</div>`;
+        chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! Você pode anexar as suas bases de código antigas clicando no clipe de papel. Eu analisarei a estrutura para evoluir o sistema deste cliente!</div>`;
 
         historicoDevAtual.forEach(msg => {
             const div = document.createElement('div');
             div.className = `msg-dev ${msg.role === 'user' ? 'admin' : 'ai shadow-lg'}`;
-            div.innerHTML = msg.role === 'user' ? msg.text : formatarCodigoIA(msg.text);
+            div.innerHTML = msg.role === 'user' ? msg.text.replace(/\n/g, '<br>') : formatarCodigoIA(msg.text);
             chatDisplay.appendChild(div);
         });
 
         chatDisplay.scrollTop = chatDisplay.scrollHeight;
-
+        
         let numModal = c.whatsapp ? c.whatsapp.replace(/\D/g, '') : '';
         if (numModal.length >= 10 && numModal.length <= 11) numModal = '55' + numModal;
         document.getElementById('modal-whatsapp').href = `https://wa.me/${numModal}`;
@@ -251,30 +247,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-fechar-modal').addEventListener('click', () => modalProjeto.classList.add('oculto'));
 
-    // --- LÓGICA DO CHAT DE PROGRAMAÇÃO ---
+    // --- LÓGICA DO CHAT E LEITURA DE ARQUIVOS ---
     const devInput = document.getElementById('dev-input');
     const btnDevSend = document.getElementById('btn-dev-send');
+    const devFile = document.getElementById('dev-file');
     const chatDisplay = document.getElementById('dev-chat-display');
 
     function formatarCodigoIA(texto) {
         return texto.replace(/```(.*?)\n([\s\S]*?)```/g, '<pre><code class="$1">$2</code></pre>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
     }
 
+    // MÁGICA 1: Lendo os arquivos que o Thiago anexar
+    if(devFile) {
+        devFile.addEventListener('change', async (e) => {
+            const files = e.target.files;
+            if(files.length === 0) return;
+            
+            for(let file of files) {
+                const text = await file.text();
+                // Monta a string gigante invisível que a IA vai ler
+                bufferArquivosAnexados += `\n\n--- INÍCIO DO ARQUIVO: ${file.name} ---\n${text}\n--- FIM DO ARQUIVO ---\n`;
+                
+                // Mostra um balãozinho visual avisando que o arquivo foi anexado com sucesso
+                const divAdmin = document.createElement('div');
+                divAdmin.className = "msg-dev admin bg-slate-700 text-slate-200 text-xs italic";
+                divAdmin.innerHTML = `<i class='bx bx-file'></i> Arquivo anexado na memória: <b>${file.name}</b>`;
+                chatDisplay.appendChild(divAdmin);
+                chatDisplay.scrollTop = chatDisplay.scrollHeight;
+            }
+            devFile.value = ''; // Reseta o botão de anexo
+        });
+    }
+
+    // MÁGICA 2: Enviando o pedido + os arquivos anexados
     async function enviarMsgDev() {
-        const msg = devInput.value.trim();
-        if(!msg || !idProjetoAberto) return;
+        let msg = devInput.value.trim();
+        
+        // Se não escreveu nada e não anexou nada, não faz nada
+        if(!msg && !bufferArquivosAnexados) return; 
 
         devInput.value = '';
         devInput.disabled = true;
-        btnDevSend.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
+        btnDevSend.innerHTML = "<i class='bx bx-loader-alt bx-spin text-xl'></i>";
 
-        const divAdmin = document.createElement('div');
-        divAdmin.className = "msg-dev admin";
-        divAdmin.innerText = msg;
-        chatDisplay.appendChild(divAdmin);
+        // Se ele escreveu algo, mostra o balão com o texto
+        if(msg) {
+            const divAdmin = document.createElement('div');
+            divAdmin.className = "msg-dev admin";
+            divAdmin.innerText = msg;
+            chatDisplay.appendChild(divAdmin);
+        }
+
+        // Junta a pergunta do Thiago com os códigos dos arquivos que ele anexou
+        const msgFinalParaIA = msg + "\n" + bufferArquivosAnexados;
+        
+        // Limpa o buffer para o próximo envio
+        bufferArquivosAnexados = "";
+        
         chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
-        const respostaDaIA = await conversarComDesenvolvedorIA(msg, contextoProjetoAtual, historicoDevAtual);
+        // Manda tudo pra IA
+        const respostaDaIA = await conversarComDesenvolvedorIA(msgFinalParaIA, contextoProjetoAtual, historicoDevAtual);
 
         const divAI = document.createElement('div');
         divAI.className = "msg-dev ai shadow-lg";
@@ -282,14 +315,15 @@ document.addEventListener('DOMContentLoaded', () => {
         chatDisplay.appendChild(divAI);
         chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
-        historicoDevAtual.push({ role: 'user', text: msg });
+        // Salva a mensagem VISÍVEL no Firebase (sem poluir o banco com os códigos que você anexou)
+        historicoDevAtual.push({ role: 'user', text: msg ? msg : "Envio de arquivos para análise." });
         historicoDevAtual.push({ role: 'model', text: respostaDaIA });
 
         set(ref(database, `projetos_capturados/${idProjetoAberto}/devChat`), historicoDevAtual);
 
         devInput.disabled = false;
         devInput.focus();
-        btnDevSend.innerHTML = "<i class='bx bx-send'></i>";
+        btnDevSend.innerHTML = "<i class='bx bx-send text-xl'></i>";
     }
 
     if(btnDevSend) btnDevSend.addEventListener('click', enviarMsgDev);
