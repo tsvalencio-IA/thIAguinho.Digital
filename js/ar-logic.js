@@ -12,15 +12,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const alvoAR = document.getElementById('alvo-ar');
     const videoMascote = document.getElementById('vid');
 
-    // TRAVA ANTI-DUPLICAÇÃO E ANTI-SPAM
+    // TRAVA ANTI-DUPLICAÇÃO E SPAM
     let isProcessing = false;
 
     if(alvoAR && videoMascote) {
         alvoAR.addEventListener("targetFound", () => {
             videoMascote.play();
             if(chatDisplay.children.length === 0) {
-                // Inicia a conversa entregando botões lógicos
-                const msgInicial = "Olá! Sou o arquiteto de sistemas e Inteligência Artificial da thIAguinho Soluções! Qual é o setor da sua empresa? [OPCOES: Lojas e Comércio | Clínica e Serviços | Indústria | Outros]";
+                const msgInicial = "Olá! Sou o arquiteto inteligente da thIAguinho Soluções! Como posso te chamar? E você busca uma solução para sua Empresa ou para sua Vida Pessoal/Rotina? [OPCOES: Para Empresa | Para Rotina Pessoal]";
                 processarEExibirMensagemBot(msgInicial);
             }
         });
@@ -41,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const recognition = new SpeechRecognition();
         recognition.lang = 'pt-BR';
         btnMic.addEventListener('click', () => {
-            if (isProcessing) return; // Bloqueia o mic se a IA estiver pensando
+            if (isProcessing) return; // Trava ativada
             if (btnMic.classList.contains('listening')) { 
                 recognition.stop(); 
                 btnMic.classList.remove('listening'); 
@@ -99,8 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.className = 'btn-opcao';
             btn.innerText = opcaoText;
             btn.onclick = () => {
-                if(isProcessing) return; // Trava contra cliques duplos rápidos
-                container.remove(); 
+                if(isProcessing) return; // Se a IA já estiver processando, ignora cliques duplos do cliente afobado
+                container.style.opacity = '0.5';
+                container.style.pointerEvents = 'none'; // Desabilita todos os outros botões imediatamente
                 enviarMensagemClicada(opcaoText);
             };
             container.appendChild(btn);
@@ -112,6 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function enviarMensagemClicada(textoClicado) {
         if(isProcessing) return;
+        const antigasOpcoes = document.getElementById('opcoes-ativas');
+        if(antigasOpcoes) antigasOpcoes.remove(); // Some com os botões
+        
         addMsgVisual('user', textoClicado);
         adicionarAoHistorico('user', textoClicado);
         await invocarGemini(textoClicado);
@@ -119,14 +122,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function enviarMensagemDigitada() {
         if(isProcessing) return;
-        
         const msg = userInput.value.trim();
         if (!msg) return;
         
         userInput.value = '';
         
         const antigasOpcoes = document.getElementById('opcoes-ativas');
-        if(antigasOpcoes) antigasOpcoes.remove();
+        if(antigasOpcoes) antigasOpcoes.remove(); // Se ele digitou, os botões somem
 
         addMsgVisual('user', msg);
         adicionarAoHistorico('user', msg);
@@ -134,16 +136,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function invocarGemini(textoUser) {
-        isProcessing = true; // TRAVA DE SEGURANÇA ATIVADA
-        
-        // Efeito de carregamento e desativação visual dos botões
+        // LIGA A TRAVA GLOBAL DE SEGURANÇA
+        isProcessing = true;
         btnSend.style.opacity = '0.5';
-        btnMic.style.opacity = '0.5';
+        btnSend.style.pointerEvents = 'none';
+        userInput.disabled = true;
 
         const ind = document.createElement('div');
         ind.className = "text-xs text-slate-400 mt-1 mb-3 text-center font-bold";
         ind.id = "digitando"; 
-        ind.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Construindo arquitetura...";
+        ind.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Construindo a arquitetura técnica...";
         chatDisplay.appendChild(ind);
         chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
@@ -152,10 +154,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('digitando')?.remove();
         processarEExibirMensagemBot(resp); 
 
-        // Libera a trava de segurança
+        // DESLIGA A TRAVA GLOBAL DE SEGURANÇA
         isProcessing = false;
         btnSend.style.opacity = '1';
-        btnMic.style.opacity = '1';
+        btnSend.style.pointerEvents = 'auto';
+        userInput.disabled = false;
+        userInput.focus();
     }
 
     btnSend.addEventListener('click', enviarMensagemDigitada);
