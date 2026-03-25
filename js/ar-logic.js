@@ -1,6 +1,3 @@
-// NOME DO FICHEIRO: ar-logic.js
-// LOCALIZAÇÃO: Dentro da pasta 'js'
-
 import { askGemini, adicionarAoHistorico } from './gemini-api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,31 +12,28 @@ document.addEventListener('DOMContentLoaded', () => {
     if(alvoAR && videoMascote) {
         alvoAR.addEventListener("targetFound", () => {
             videoMascote.play();
-            // A IA Inicia a análise como Arquiteto
             if(chatDisplay.children.length === 0) {
-                const msg = "Olá! Sou o arquiteto de sistemas e mascote da thIAguinho Soluções! Qual é o seu nome e de que empresa fala?";
-                adicionarMensagemUI('bot', msg);
+                const msg = "Olá! Sou o arquiteto de sistemas e mascote da thIAguinho Soluções! Qual é o seu nome e de qual empresa você fala?";
+                addMsg('bot', msg);
                 adicionarAoHistorico('bot', msg);
-                falarTexto(msg);
+                falar(msg);
             }
         });
-        
         alvoAR.addEventListener("targetLost", () => videoMascote.pause());
     }
 
     const synthesis = window.speechSynthesis;
-    function falarTexto(texto) {
+    function falar(texto) {
         if (synthesis.speaking) synthesis.cancel();
-        let textoLimpo = texto.replace(/\*\*/g, ''); 
-        const utterance = new SpeechSynthesisUtterance(textoLimpo);
-        utterance.lang = 'pt-PT'; // Sotaque em Português
+        const utterance = new SpeechSynthesisUtterance(texto.replace(/\*\*/g, ''));
+        utterance.lang = 'pt-BR';
         synthesis.speak(utterance);
     }
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
-        recognition.lang = 'pt-BR'; // Ouve em PT-BR para entender melhor os clientes
+        recognition.lang = 'pt-BR';
         btnMic.addEventListener('click', () => {
             if (btnMic.classList.contains('listening')) { 
                 recognition.stop(); 
@@ -47,20 +41,19 @@ document.addEventListener('DOMContentLoaded', () => {
             } else { 
                 recognition.start(); 
                 btnMic.classList.add('listening'); 
-                userInput.placeholder = "A escutar o seu problema..."; 
+                userInput.placeholder = "Ouvindo sua dor..."; 
             }
         });
         recognition.onresult = (e) => {
             userInput.value = e.results[0][0].transcript;
             btnMic.classList.remove('listening');
-            userInput.placeholder = "Fale com o mascote...";
             enviarMensagem(); 
         };
     } else {
         btnMic.style.display = 'none'; 
     }
 
-    function adicionarMensagemUI(sender, text) {
+    function addMsg(sender, text) {
         const div = document.createElement('div');
         div.className = `msg ${sender}`;
         div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -73,22 +66,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!msg) return;
         
         userInput.value = '';
-        adicionarMensagemUI('user', msg);
+        addMsg('user', msg);
         adicionarAoHistorico('user', msg);
 
         const ind = document.createElement('div');
         ind.className = "text-xs text-slate-400 mt-1 mb-3 text-center font-bold";
         ind.id = "digitando"; 
-        ind.innerText = "A arquitetar a solução ideal para si...";
+        ind.innerText = "Desenhando o Facilitóide...";
         chatDisplay.appendChild(ind);
         chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
-        const respostaBot = await askGemini(msg);
+        const resp = await askGemini(msg);
 
         document.getElementById('digitando')?.remove();
-        adicionarMensagemUI('bot', respostaBot);
-        adicionarAoHistorico('bot', respostaBot);
-        falarTexto(respostaBot);
+        addMsg('bot', resp);
+        adicionarAoHistorico('bot', resp);
+        falar(resp);
     }
 
     btnSend.addEventListener('click', enviarMensagem);
