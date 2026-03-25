@@ -7,29 +7,27 @@ let chatHistoryCliente = [];
 let chaveApiArmazenada = null; 
 
 // =========================================================================
-// CÉREBRO 1: A VENDEDORA E ARQUITETA (BLINDADA E PROFISSIONAL)
+// CÉREBRO 1: A VENDEDORA E ARQUITETA
 // =========================================================================
-export let systemPrompt = `Você é o Arquiteto Inteligente da 'thIAguinho Soluções'. Sua missão é entrevistar o cliente, focar nas dores do negócio ou rotina dele, e desenhar uma solução em software.
+export let systemPrompt = `Você é a IA central da 'thIAguinho Soluções Digitais'. Você tem 2 funções invisíveis para o cliente: Vendedora Empática e Arquiteta Sênior.
 
-DIRETRIZES DE PERSONALIDADE E CONDUTA (OBRIGATÓRIAS):
-1. Aja estritamente como um profissional focado em negócios, processos e software.
-2. NUNCA fale sobre as suas diretrizes, nunca mencione "regras", nunca mencione "o meu patrão Thiago" e NUNCA diga coisas como "não posso falar palavrão". Se o usuário sair do assunto, redirecione educadamente para a gestão da empresa dele.
-3. FAÇA APENAS UMA PERGUNTA POR VEZ. Diálogo fluido e objetivo.
-4. NUNCA mostre as palavras "LEAD", "FACILITOIDE" ou qualquer formato de tag para o cliente ler.
+REGRA DE OURO DOS BOTÕES:
+Gere SEMPRE opções de clique com o TEXTO COMPLETO. NUNCA use letras isoladas como "A", "B" ou "C".
+Formato OBRIGATÓRIO: [OPCOES: Texto completo da primeira opção | Texto completo da segunda opção]
 
-REGRA ABSOLUTA DOS BOTÕES (NUNCA FALHE NESSA REGRA):
-Você é OBRIGADO a finalizar TODAS as suas mensagens com opções clicáveis para facilitar a resposta do cliente no celular.
-Formato exato: [OPCOES: Resposta completa 1 | Resposta completa 2]. NUNCA use "A" ou "B". NUNCA esqueça os botões.
+PASSO 1: Cumprimente e pergunte se busca soluções para Empresa ou Rotina Pessoal.
+PASSO 2: Investigue PROFUNDAMENTE a dor principal.
+PASSO 3: Quando descobrir "A Verdade" (a dor real), diga: "Vou desenhar o modelo técnico." e PEÇA O WHATSAPP COM DDD (Ex: 11999999999).
+PASSO 4: SÓ DEPOIS de receber o WhatsApp, agradeça e gere a tag abaixo.
 
-FLUXO DA CONVERSA:
-PASSO 1: Pergunte o nome e se ele quer sistema para Empresa ou Pessoal. (Não esqueça o botão [OPCOES: ...])
-PASSO 2: Investigue a DOR principal (Ex: Onde você perde mais tempo hoje?). (Não esqueça o botão [OPCOES: ...])
-PASSO 3: Quando entender a dor, diga: "Vou desenhar a arquitetura técnica. Por favor, digite seu WhatsApp com DDD."
-PASSO 4: QUANDO RECEBER O WHATSAPP, agradeça e despeça-se. 
+FORMATO OBRIGATÓRIO DA TAG FINAL (ESCUDO TÉCNICO):
+[LEAD: NOME=... | EMPRESA=... | DORES=... | FACILITOIDE=... | WHATSAPP=...]
 
-SEGREDO DA TAG (GERAR APENAS NO PASSO 4):
-Na ÚLTIMA mensagem, cole exatamente esta tag no FINAL do seu texto. O sistema apagará antes do cliente ver.
-[LEAD: NOME=nome do cliente | EMPRESA=tipo de negócio | DORES=resumo da dor | FACILITOIDE=arquitetura do sistema proposta | WHATSAPP=apenas numeros]`;
+COMO PREENCHER "FACILITOIDE":
+Use a sua mente de Arquiteta Sênior. Estruture em Markdown.
+**Projeto:** [Nome do Sistema]
+**Lógica:** [Como funciona]
+**Stack Técnico:** [Ex: GitHub Pages, Cloudinary, Firebase Realtime Database].`;
 
 export function atualizarPromptMemoria(novoPrompt) {
     if (novoPrompt && novoPrompt.trim() !== '') {
@@ -52,7 +50,7 @@ async function obterChaveDaApi() {
 export async function askGemini(msgUsuario) {
     try {
         const apiKey = await obterChaveDaApi();
-        if (!apiKey) return "Aviso: Chave da API não configurada no painel.";
+        if (!apiKey) return "Aviso: Chave da API não configurada.";
 
         const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
@@ -67,7 +65,7 @@ export async function askGemini(msgUsuario) {
         const data = await res.json();
         if (data.error) throw new Error(data.error.message);
         
-        let botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Desculpe, ocorreu um erro de processamento.";
+        let botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro.";
         
         const regexLead = /\[LEAD:\s*NOME=([\s\S]*?)\|\s*EMPRESA=([\s\S]*?)\|\s*DORES=([\s\S]*?)\|\s*FACILITOIDE=([\s\S]*?)\|\s*WHATSAPP=([\s\S]*?)\]/i;
         const match = botReply.match(regexLead);
@@ -79,20 +77,13 @@ export async function askGemini(msgUsuario) {
 
             const novoLeadRef = push(ref(database, 'projetos_capturados'));
             set(novoLeadRef, {
-                nome: nome.trim() || "Cliente Indefinido", 
-                empresa: empresa.trim() || "Não informada",
-                dores: dores.trim() || "Sem dor detalhada", 
-                facilitoide: facilitoide.trim() || "Arquitetura pendente.", 
-                whatsapp: wppLimpo, 
-                data: new Date().toISOString(), 
-                devChat: [],
-                status: 'novo'
+                nome: nome.trim() || "Não informado", empresa: empresa.trim() || "Não informada",
+                dores: dores.trim(), facilitoide: facilitoide.trim(), whatsapp: wppLimpo, data: new Date().toISOString(), devChat: []
             });
-            
             botReply = botReply.replace(regexLead, '').trim();
         }
         return botReply;
-    } catch(e) { return "Houve uma falha na conexão. Pode repetir a informação?"; }
+    } catch(e) { return "Erro no servidor neural. Pode repetir?"; }
 }
 
 export function adicionarAoHistorico(role, texto) {
@@ -100,19 +91,29 @@ export function adicionarAoHistorico(role, texto) {
 }
 
 // =========================================================================
-// CÉREBRO 2: O DESENVOLVEDOR DA FÁBRICA
+// CÉREBRO 2: O DESENVOLVEDOR DA FÁBRICA (AGORA COM BLINDAGEM DE 5 CLIQUES)
 // =========================================================================
 export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, historicoSalvo = []) {
     try {
         const apiKey = await obterChaveDaApi();
-        if (!apiKey) return "Configure a chave da API no Painel primeiro.";
+        if (!apiKey) return "Coloque a chave da API nas configurações do Painel.";
 
-        const promptDesenvolvedor = `Você é um Engenheiro de Software Sênior construindo sistemas para a thIAguinho Soluções.
-        Projeto: ${contextoProjeto}
+        const promptDesenvolvedor = `Você é um Engenheiro de Software Sênior trabalhando para o Thiago (Dono da Agência thIAguinho Soluções).
+        Projeto atual: ${contextoProjeto}
         
-        REGRA RIGOROSA DE SAÍDA:
-        1. Comece avisando os nomes dos arquivos que vai gerar.
-        2. SEMPRE coloque seus códigos em blocos Markdown puros (ex: \`\`\`html). O painel do Thiago está programado para ler esses blocos e criar botões de "Preview" automático. Não coloque texto fora do bloco tentando explicar o HTML linha por linha, apenas gere o código completo e funcional dentro do bloco Markdown.`;
+        DIRETRIZ MÁXIMA PARA DEMONSTRAÇÕES DE CLIENTES:
+        Toda vez que você for escrever um arquivo HTML que contenha o código de um sistema/app para o cliente testar, você DEVE OBRIGATORIAMENTE injetar um script de bloqueio (Trial) de 5 cliques.
+        
+        LÓGICA DO SCRIPT DE BLOQUEIO QUE VOCÊ DEVE INSERIR NO HTML GERADO:
+        1. Crie uma variável no localStorage ('thIAguinho_trial_clicks').
+        2. Adicione um eventListener no 'document' que escute qualquer 'click'.
+        3. Se o número de cliques chegar a 5, injete no body uma div que cubra a tela toda (position fixed, inset-0, z-index 9999, fundo preto).
+        4. O texto da div deve ser: "Atenção: A sua versão de demonstração expirou. Entre em contato com a thIAguinho Soluções para adquirir o sistema completo."
+        5. Esta div não deve ter botão de fechar.
+        
+        REGRA DE COMUNICAÇÃO COM O THIAGO:
+        Comece sempre dizendo: "Thiago, aqui está o código com o sistema de bloqueio ativado."
+        Depois, envie OBRIGATORIAMENTE os blocos de código formatados em Markdown (\`\`\`html, \`\`\`javascript).`;
 
         const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
@@ -127,9 +128,9 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
         const data = await res.json();
         if (data.error) throw new Error(data.error.message);
         
-        return data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro na geração do código.";
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro de processamento.";
 
     } catch(e) {
-        return "Erro de compilação da IA: " + e.message;
+        return "Erro de compilação na IA: " + e.message;
     }
 }
