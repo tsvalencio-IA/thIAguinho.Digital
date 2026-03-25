@@ -16,13 +16,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const gridLeads = document.getElementById('grid-leads');
     const modalProjeto = document.getElementById('modal-projeto');
     
+    // Controles de Estado do CRM
     let usuarioLogado = null;
     let listaDeClientesGlobais = [];
+    let abaAtiva = 'novos'; // Pode ser 'novos' ou 'concluidos'
     
-    // Variáveis cruciais para a Fábrica lembrar do projeto
     let contextoProjetoAtual = ""; 
     let idProjetoAberto = null;
     let historicoDevAtual = [];
+
+    // --- CONTROLE DAS ABAS ---
+    const tabNovos = document.getElementById('tab-novos');
+    const tabConcluidos = document.getElementById('tab-concluidos');
+
+    tabNovos.addEventListener('click', () => {
+        abaAtiva = 'novos';
+        tabNovos.classList.replace('text-slate-400', 'text-white');
+        tabNovos.classList.add('border-b-2', 'border-red-500');
+        tabConcluidos.classList.replace('text-white', 'text-slate-400');
+        tabConcluidos.classList.remove('border-b-2', 'border-red-500');
+        renderizarProjetos();
+    });
+
+    tabConcluidos.addEventListener('click', () => {
+        abaAtiva = 'concluidos';
+        tabConcluidos.classList.replace('text-slate-400', 'text-white');
+        tabConcluidos.classList.add('border-b-2', 'border-red-500');
+        tabNovos.classList.replace('text-white', 'text-slate-400');
+        tabNovos.classList.remove('border-b-2', 'border-red-500');
+        renderizarProjetos();
+    });
 
     // --- SESSÃO E LOGIN ---
     onAuthStateChanged(auth, (user) => {
@@ -51,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnLogout.addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
     }
 
+    // Configurações do Firebase
     if(document.getElementById('btn-save-key')) {
         document.getElementById('btn-save-key').addEventListener('click', () => {
             if (!usuarioLogado) return;
@@ -59,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const btn = document.getElementById('btn-save-key');
             btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
             set(ref(database, 'admin_config/gemini_api_key'), novaChave)
-                .then(() => { btn.innerHTML = "Guardada"; setTimeout(() => btn.innerHTML = "Guardar", 2000); });
+                .then(() => { btn.innerHTML = "Salva"; setTimeout(() => btn.innerHTML = "Salvar", 2000); });
         });
     }
 
@@ -74,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LEITURA DA BASE DE DADOS CRM ---
+    // --- LEITURA DA BASE DE DADOS ---
     function iniciarLeituraDoBancoDeDados() {
         get(ref(database, 'admin_config/gemini_api_key')).then((snapshot) => {
             if(snapshot.exists() && apiKeyInput) apiKeyInput.value = snapshot.val();
@@ -91,57 +115,111 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         onValue(ref(database, 'projetos_capturados'), (snapshot) => {
-            if(!gridLeads) return;
-            gridLeads.innerHTML = ''; 
-            if (!snapshot.exists()) {
-                gridLeads.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500"><p>Nenhum projeto desenhado ainda.</p></div>';
-                return;
-            }
-
             listaDeClientesGlobais = [];
-            snapshot.forEach((filho) => listaDeClientesGlobais.push({ id: filho.key, ...filho.val() }));
-            listaDeClientesGlobais.sort((a, b) => new Date(b.data) - new Date(a.data));
-
-            listaDeClientesGlobais.forEach((cliente, index) => {
-                const dataFormatada = new Date(cliente.data).toLocaleDateString('pt-BR');
-                let numWpp = cliente.whatsapp ? cliente.whatsapp.replace(/\D/g, '') : '';
-                if (numWpp.length >= 10 && numWpp.length <= 11) numWpp = '55' + numWpp; 
-                else if (!numWpp.startsWith('55') && numWpp.length >= 12) numWpp = '55' + numWpp; 
-                
-                const card = document.createElement('div');
-                card.className = "bg-slate-900 border border-slate-700 rounded-xl p-5 hover:border-sky-500 transition shadow-lg flex flex-col justify-between cursor-pointer group";
-                card.onclick = (e) => { if(!e.target.closest('a') && !e.target.closest('button.btn-trash')) window.abrirModalProjeto(index); };
-                card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-3">
-                            <div><h4 class="font-bold text-white text-lg">${cliente.nome}</h4><p class="text-xs text-sky-400 font-semibold uppercase">${cliente.empresa}</p></div>
-                            <span class="text-[10px] text-slate-500 bg-slate-800 px-2 py-1 rounded">${dataFormatada}</span>
-                        </div>
-                        <p class="text-sm text-slate-300 line-clamp-2 mb-4 italic">"${cliente.dores}"</p>
-                    </div>
-                    <div class="border-t border-slate-700 pt-4 mt-auto flex gap-2">
-                        <button class="flex-1 bg-sky-900/40 group-hover:bg-sky-600 text-white text-sm font-semibold py-2 rounded-lg transition border border-sky-800 flex items-center justify-center gap-2"><i class='bx bx-terminal'></i> Abrir Fábrica</button>
-                        <a href="https://wa.me/${numWpp}?text=Olá ${cliente.nome}, sou o Thiago..." target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center"><i class='bx bxl-whatsapp text-lg'></i></a>
-                        <button onclick="window.excluirProjeto('${cliente.id}')" class="btn-trash w-10 bg-slate-800 hover:bg-red-700 text-slate-400 hover:text-white rounded-lg flex items-center justify-center"><i class='bx bx-trash text-lg'></i></button>
-                    </div>
-                `;
-                gridLeads.appendChild(card);
-            });
+            if (snapshot.exists()) {
+                snapshot.forEach((filho) => listaDeClientesGlobais.push({ id: filho.key, ...filho.val() }));
+                // Ordena do mais novo para o mais velho
+                listaDeClientesGlobais.sort((a, b) => new Date(b.data) - new Date(a.data));
+            }
+            renderizarProjetos();
         });
     }
 
-    window.excluirProjeto = function(idProjeto) {
-        if (confirm("Deseja excluir este projeto da fábrica?")) set(ref(database, `projetos_capturados/${idProjeto}`), null);
+    // --- RENDERIZAÇÃO INTELIGENTE (MINIMIZAR/MAXIMIZAR E ABAS) ---
+    function renderizarProjetos() {
+        if(!gridLeads) return;
+        gridLeads.innerHTML = ''; 
+        
+        // Filtra pela aba ativa
+        const projetosFiltrados = listaDeClientesGlobais.filter(cliente => {
+            const status = cliente.status || 'novo'; // Se não tiver status no banco, é novo
+            return abaAtiva === 'novos' ? status === 'novo' : status === 'concluido';
+        });
+
+        if (projetosFiltrados.length === 0) {
+            gridLeads.innerHTML = `<div class="text-center py-10 text-slate-500"><i class='bx bx-sleepy text-4xl mb-3'></i><p>Nenhum projeto nesta aba.</p></div>`;
+            return;
+        }
+
+        projetosFiltrados.forEach(cliente => {
+            const dataFormatada = new Date(cliente.data).toLocaleDateString('pt-BR');
+            let numWpp = cliente.whatsapp ? cliente.whatsapp.replace(/\D/g, '') : '';
+            if (numWpp.length >= 10 && numWpp.length <= 11) numWpp = '55' + numWpp; 
+            else if (!numWpp.startsWith('55') && numWpp.length >= 12) numWpp = '55' + numWpp; 
+            
+            const card = document.createElement('div');
+            card.className = "bg-slate-900 border border-slate-700 rounded-xl p-4 hover:border-sky-500 transition shadow-lg flex flex-col";
+            
+            // CABEÇALHO (Sempre visível - Clicável para Minimizar/Maximizar)
+            const htmlHeader = `
+                <div class="flex justify-between items-center cursor-pointer select-none" onclick="window.toggleCard('${cliente.id}')">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-white text-lg leading-tight">${cliente.nome}</h4>
+                        <p class="text-xs text-sky-400 font-semibold uppercase tracking-wider">${cliente.empresa}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-[10px] text-slate-500 bg-slate-800 px-2 py-1 rounded hidden md:block">${dataFormatada}</span>
+                        <i id="icon-${cliente.id}" class='bx bx-chevron-down text-2xl text-slate-400 transition-transform duration-300'></i>
+                    </div>
+                </div>
+            `;
+
+            // CORPO (Escondido por padrão)
+            const htmlBody = `
+                <div id="body-${cliente.id}" class="hidden mt-4 pt-4 border-t border-slate-700">
+                    <p class="text-sm text-slate-300 mb-4 italic">"${cliente.dores}"</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="window.abrirModalProjeto('${cliente.id}')" class="flex-1 bg-sky-900/40 hover:bg-sky-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition border border-sky-800 flex items-center justify-center gap-2">
+                            <i class='bx bx-terminal'></i> Abrir Fábrica
+                        </button>
+                        <a href="https://wa.me/${numWpp}" target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center" title="Conversar"><i class='bx bxl-whatsapp text-lg'></i></a>
+                        
+                        ${abaAtiva === 'novos' 
+                            ? `<button onclick="window.alterarStatus('${cliente.id}', 'concluido')" class="w-10 bg-emerald-900/50 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-lg flex items-center justify-center transition border border-emerald-800" title="Marcar como Sistema Gerado"><i class='bx bx-check-double text-lg'></i></button>`
+                            : `<button onclick="window.alterarStatus('${cliente.id}', 'novo')" class="w-10 bg-orange-900/50 hover:bg-orange-600 text-orange-400 hover:text-white rounded-lg flex items-center justify-center transition border border-orange-800" title="Voltar para Novos Projetos"><i class='bx bx-undo text-lg'></i></button>`
+                        }
+                        
+                        <button onclick="window.excluirProjeto('${cliente.id}')" class="w-10 bg-slate-800 hover:bg-red-700 text-slate-400 hover:text-white rounded-lg flex items-center justify-center transition"><i class='bx bx-trash text-lg'></i></button>
+                    </div>
+                </div>
+            `;
+
+            card.innerHTML = htmlHeader + htmlBody;
+            gridLeads.appendChild(card);
+        });
+    }
+
+    // --- FUNÇÕES DE AÇÃO DOS CARTÕES ---
+    window.toggleCard = function(id) {
+        const body = document.getElementById(`body-${id}`);
+        const icon = document.getElementById(`icon-${id}`);
+        if(body.classList.contains('hidden')) {
+            body.classList.remove('hidden');
+            icon.style.transform = 'rotate(180deg)';
+        } else {
+            body.classList.add('hidden');
+            icon.style.transform = 'rotate(0deg)';
+        }
     };
 
-    // --- O ESTÚDIO DO ARQUITETO (MODAL + CHAT DEV PERSISTENTE) ---
-    window.abrirModalProjeto = function(index) {
-        const c = listaDeClientesGlobais[index];
+    window.alterarStatus = function(id, novoStatus) {
+        set(ref(database, `projetos_capturados/${id}/status`), novoStatus);
+    };
+
+    window.excluirProjeto = function(id) {
+        if (confirm("Deseja excluir definitivamente este projeto? A conversa com a IA também será apagada.")) {
+            set(ref(database, `projetos_capturados/${id}`), null);
+        }
+    };
+
+    // --- O ESTÚDIO DO ARQUITETO (MODAL + CHAT DEV) ---
+    window.abrirModalProjeto = function(id) {
+        // Encontra o cliente pelo ID e não mais pelo index (porque o filtro bagunça as posições)
+        const c = listaDeClientesGlobais.find(item => item.id === id);
         if(!c) return;
 
-        // Guarda os dados para usar no chat
         idProjetoAberto = c.id;
-        historicoDevAtual = c.devChat || []; // Carrega o histórico salvo no Firebase!
+        historicoDevAtual = c.devChat || []; 
 
         document.getElementById('modal-nome').innerText = c.nome;
         document.getElementById('modal-empresa').innerText = c.empresa;
@@ -155,7 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const chatDisplay = document.getElementById('dev-chat-display');
         chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! Sou a sua IA Desenvolvedora. Analisei a arquitetura deste projeto. Pode pedir os códigos e regras que precisa!</div>`;
 
-        // Imprime na tela todo o histórico que veio salvo do Firebase
         historicoDevAtual.forEach(msg => {
             const div = document.createElement('div');
             div.className = `msg-dev ${msg.role === 'user' ? 'admin' : 'ai shadow-lg'}`;
@@ -174,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-fechar-modal').addEventListener('click', () => modalProjeto.classList.add('oculto'));
 
-    // --- LÓGICA DO CHAT DE PROGRAMAÇÃO (SALVANDO NO FIREBASE) ---
+    // --- LÓGICA DO CHAT DE PROGRAMAÇÃO ---
     const devInput = document.getElementById('dev-input');
     const btnDevSend = document.getElementById('btn-dev-send');
     const chatDisplay = document.getElementById('dev-chat-display');
@@ -197,7 +274,6 @@ document.addEventListener('DOMContentLoaded', () => {
         chatDisplay.appendChild(divAdmin);
         chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
-        // Chama a IA e passa o histórico que estava salvo
         const respostaDaIA = await conversarComDesenvolvedorIA(msg, contextoProjetoAtual, historicoDevAtual);
 
         const divAI = document.createElement('div');
@@ -206,11 +282,9 @@ document.addEventListener('DOMContentLoaded', () => {
         chatDisplay.appendChild(divAI);
         chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
-        // Atualiza a memória local
         historicoDevAtual.push({ role: 'user', text: msg });
         historicoDevAtual.push({ role: 'model', text: respostaDaIA });
 
-        // SALVA TUDO NO FIREBASE (Atrelado ao ID do cliente)
         set(ref(database, `projetos_capturados/${idProjetoAberto}/devChat`), historicoDevAtual);
 
         devInput.disabled = false;
