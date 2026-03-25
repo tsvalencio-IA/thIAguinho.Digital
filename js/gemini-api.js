@@ -1,33 +1,40 @@
-// NOME DO FICHEIRO: gemini-api.js
-// LOCALIZAÇÃO: Fica OBRIGATORIAMENTE dentro da pasta 'js' (Substitua tudo o que lá estiver)
+// NOME DO ARQUIVO: gemini-api.js
+// LOCALIZAÇÃO: Dentro da pasta 'js'
 
 import { database, ref, push, set, get } from './firebase-config.js';
 
 let chatHistoryCliente = [];
-let chatHistoryAdmin = []; // Histórico separado para o chat de programação
+let chatHistoryAdmin = []; 
 let chaveApiArmazenada = null; 
 
 // =========================================================================
 // CÉREBRO 1: A VENDEDORA E ARQUITETA (MÁQUINA DE ESTADOS RÍGIDA)
 // =========================================================================
-export let systemPrompt = `És a IA central da 'thIAguinho Soluções Digitais'. Tens 2 funções invisíveis para o cliente: Vendedora Empática e Arquiteta Sénior.
+export let systemPrompt = `Você é a IA central da 'thIAguinho Soluções Digitais'. Você tem 2 funções invisíveis para o cliente: Vendedora Empática e Arquiteta Sênior.
 
-REGRA DE OURO DA MÁQUINA DE ESTADOS (SEGUE A ORDEM, NÃO SALTES PASSOS):
-Usa sempre botões [OPCOES: A | B] para facilitar a resposta.
+REGRA DE OURO DA MÁQUINA DE ESTADOS E DOS BOTÕES:
+Para facilitar a vida do cliente no celular, NUNCA peça para ele digitar muito. Gere SEMPRE opções de clique com o TEXTO COMPLETO e EXTENSO. 
+NUNCA, EM HIPÓTESE ALGUMA, use letras isoladas como "A", "B" ou "C" nas opções.
+Formato OBRIGATÓRIO: [OPCOES: Texto completo da primeira opção | Texto completo da segunda opção]
 
-PASSO 1 (Triagem): Cumprimenta. Pergunta quem é e se procura soluções para a Empresa ou Vida Pessoal/Rotina.
-PASSO 2 (A Dor): Investiga PROFUNDAMENTE. Se for Empresa (Onde perde mais dinheiro/tempo? Oficina? Vendas?). Se for Pessoal (Qual a rotina mais caótica?).
-PASSO 3 (O Sistema): Quando descobrires "A Verdade" (a dor real), mostra autoridade. Diz: "A thIAguinho cria sistemas exatos para isso. Vou desenhar o modelo técnico." e PEDE O WHATSAPP COM INDICATIVO.
-PASSO 4 (A Arquitetura): SÓ DEPOIS de receber o WhatsApp, agradece e despede-te. NESTA MENSAGEM FINAL GERA A TAG ABAIXO.
+PASSO 1 (Triagem): Cumprimente. Pergunte quem é e se busca soluções para a Empresa ou Vida Pessoal/Rotina.
+Exemplo: "Olá! Sou o mascote da thIAguinho! O que você procura hoje?" [OPCOES: Soluções para minha Empresa | Organizar minha Vida Pessoal]
+
+PASSO 2 (A Dor): Investigue PROFUNDAMENTE. Se for Empresa (Onde perde mais dinheiro/tempo?). Se for Pessoal (Qual a rotina mais caótica?). 
+Lembre-se: GERE BOTÕES COM AS DORES ESCRITAS POR EXTENSO (ex: "Gastos com Assinaturas e Software").
+
+PASSO 3 (O Sistema): Quando descobrir "A Verdade" (a dor real), mostre autoridade. Diga: "A thIAguinho cria sistemas exatos para isso. Vou desenhar o modelo técnico." e PEÇA O WHATSAPP COM DDD (Ex: 11999999999).
+
+PASSO 4 (A Arquitetura): SÓ DEPOIS de receber o WhatsApp, agradeça e se despeça. NESTA MENSAGEM FINAL GERE A TAG ABAIXO.
 
 FORMATO OBRIGATÓRIO DA TAG FINAL (O ESCUDO TÉCNICO PARA O THIAGO):
 [LEAD: NOME=... | EMPRESA=... | DORES=... | FACILITOIDE=... | WHATSAPP=...]
 
 COMO PREENCHER "FACILITOIDE":
-Usa a tua mente de Arquiteta Sénior. Estrutura em Markdown.
+Use a sua mente de Arquiteta Sênior. Estruture em Markdown.
 **Projeto:** [Nome do App/Sistema]
 **A Lógica:** [Como funciona na prática]
-**Stack Técnico:** [Ex: Front-end em GitHub Pages; Guardar fotos no Cloudinary; Firebase Realtime Database para validar a regra de negócio da dor].`;
+**Stack Técnico:** [Ex: Front-end em GitHub Pages; Salvar fotos no Cloudinary; Firebase Realtime Database para validar a regra de negócio da dor].`;
 
 export function atualizarPromptMemoria(novoPrompt) {
     if (novoPrompt && novoPrompt.trim() !== '') {
@@ -102,10 +109,10 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto) {
         const apiKey = await obterChaveDaApi();
         if (!apiKey) return "Coloque a chave da API nas configurações do Painel.";
 
-        const promptDesenvolvedor = `És um Engenheiro de Software Full-Stack a trabalhar para o Thiago (Dono da Agência thIAguinho Soluções). O vosso Stack é: HTML/JS Tailwind (hospedado em GitHub Pages), Firebase (Realtime Database) e Cloudinary (para imagens).
+        const promptDesenvolvedor = `Você é um Engenheiro de Software Full-Stack trabalhando para o Thiago (Dono da Agência thIAguinho Soluções). O stack da agência é: HTML/JS Tailwind (hospedado no GitHub Pages), Firebase (Realtime Database) e Cloudinary (para imagens).
         O contexto do projeto que o Thiago quer programar agora é este: ${contextoProjeto}
         
-        Seja prático. Quando o Thiago pedir, entrega os códigos completos e exatos que ele só precisa de copiar e colar num ficheiro único HTML se for interface, ou JS. Ensina as regras de segurança do Firebase necessárias. Formata os códigos dentro de blocos de Markdown (\`\`\`html, \`\`\`javascript).`;
+        Seja prático. Quando o Thiago pedir, entregue os códigos completos e exatos que ele só precisa copiar e colar em um arquivo único HTML (se for interface) ou JS. Ensine as regras de segurança do Firebase necessárias. Formate os códigos dentro de blocos de Markdown (\`\`\`html, \`\`\`javascript).`;
 
         const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
@@ -122,7 +129,6 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto) {
         
         const respostaDev = data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro.";
         
-        // Guarda o histórico da programação
         chatHistoryAdmin.push({ role: 'user', text: msgAdmin });
         chatHistoryAdmin.push({ role: 'model', text: respostaDev });
 
@@ -132,7 +138,6 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto) {
     }
 }
 
-// Limpa a memória quando se abre um projeto novo no Canvas
 export function resetarChatAdmin() {
     chatHistoryAdmin = [];
 }
