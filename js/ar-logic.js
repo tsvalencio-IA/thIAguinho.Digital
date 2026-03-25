@@ -1,5 +1,6 @@
 // NOME DO ARQUIVO: ar-logic.js
 // LOCALIZAÇÃO: Dentro da pasta 'js'
+// NOTA: Mantivemos o nome do arquivo para não quebrar nenhuma estrutura, mas a lógica agora é de um WebApp de Vídeo.
 
 import { askGemini, adicionarAoHistorico } from './gemini-api.js';
 
@@ -8,33 +9,44 @@ document.addEventListener('DOMContentLoaded', () => {
     const userInput = document.getElementById('user-input');
     const btnSend = document.getElementById('btn-send');
     const btnMic = document.getElementById('btn-mic');
-    
-    const alvoAR = document.getElementById('alvo-ar');
     const videoMascote = document.getElementById('vid');
+    
+    // Telas do sistema
+    const startScreen = document.getElementById('start-screen');
+    const uiLayer = document.getElementById('ui-layer');
 
-    // TRAVA ANTI-SPAM E DUPLO CLIQUE BLINDADA
     let isProcessing = false;
 
-    if(alvoAR && videoMascote) {
-        alvoAR.addEventListener("targetFound", () => {
-            videoMascote.play();
-            if(chatDisplay.children.length === 0) {
-                const msgInicial = "Olá! Sou o arquiteto inteligente da thIAguinho Soluções! Como posso te chamar? E você busca uma solução para sua Empresa ou para sua Vida Pessoal/Rotina? [OPCOES: Para minha Empresa | Para minha Rotina Pessoal]";
-                processarEExibirMensagemBot(msgInicial);
-            }
-        });
-        alvoAR.addEventListener("targetLost", () => videoMascote.pause());
-    }
+    // A MÁGICA: O botão Iniciar libera o áudio e a entrevista na hora!
+    document.getElementById('btn-start').addEventListener('click', () => {
+        // Esconde a tela de início e mostra o Chat
+        startScreen.classList.add('hidden');
+        uiLayer.classList.remove('hidden');
+        
+        // Garante que o vídeo do mascote no fundo está rodando
+        if(videoMascote) {
+            videoMascote.play().catch(e => console.log("Vídeo auto-play bloqueado, mas a tela abriu."));
+        }
 
+        // A IA começa a falar instantaneamente
+        if(chatDisplay.children.length === 0) {
+            const msgInicial = "Olá! Sou o arquiteto inteligente da thIAguinho Soluções! Como posso te chamar? E você busca uma solução para sua Empresa ou para sua Vida Pessoal/Rotina? [OPCOES: Para minha Empresa | Para minha Rotina Pessoal]";
+            processarEExibirMensagemBot(msgInicial);
+        }
+    });
+
+    // --- SÍNTESE DE VOZ ---
     const synthesis = window.speechSynthesis;
     function falar(texto) {
         if (synthesis.speaking) synthesis.cancel();
+        // Remove as tags e formatações para o robô ler limpo
         let textoVoz = texto.replace(/\[OPCOES:.*?\]/i, '').replace(/\*\*/g, '');
         const utterance = new SpeechSynthesisUtterance(textoVoz);
         utterance.lang = 'pt-BR';
         synthesis.speak(utterance);
     }
 
+    // --- LÓGICA DO MICROFONE ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
@@ -98,21 +110,18 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.className = 'btn-opcao';
             btn.innerText = opcaoText;
             btn.onclick = (event) => {
-                // TRAVA ABSOLUTA: Se já clicou, ignora totalmente
                 if(isProcessing) {
                     event.preventDefault();
                     return;
                 }
                 isProcessing = true; 
                 
-                // Desativa os cliques visuais e lógicos na hora
                 container.style.opacity = '0.5';
                 container.style.pointerEvents = 'none'; 
                 
-                // Remove os botões da tela e manda a mensagem
                 setTimeout(() => {
                     enviarMensagemClicada(opcaoText);
-                }, 50); // Delay mínimo para garantir a trava de estado
+                }, 50); 
             };
             container.appendChild(btn);
         });
@@ -164,7 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('digitando')?.remove();
         processarEExibirMensagemBot(resp); 
 
-        // DESLIGA A TRAVA GLOBAL DE SEGURANÇA
         isProcessing = false;
         btnSend.style.opacity = '1';
         btnSend.style.pointerEvents = 'auto';
