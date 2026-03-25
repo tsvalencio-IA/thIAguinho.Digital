@@ -11,19 +11,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnLogin = document.getElementById('btn-login');
     const erroMsg = document.getElementById('msg-erro-login');
     
+    const btnSavePrompt = document.getElementById('btn-save-prompt');
+    const btnSaveKey = document.getElementById('btn-save-key');
+    const apiKeyInput = document.getElementById('api-key-input');
+    const gridLeads = document.getElementById('grid-leads');
+    
     let usuarioLogado = null;
     let listaDeClientes = [];
 
-    // --- PROTEÇÃO DO BOTÃO DE LOGIN ---
+    // --- LÓGICA DE LOGIN ---
     btnLogin.addEventListener('click', () => {
         if (!emailInput.value || !senhaInput.value) {
             erroMsg.innerText = "Por favor, preencha o email e a palavra-passe.";
-            erroMsg.classList.remove('oculto');
-            return;
-        }
-
-        if (!auth) {
-            erroMsg.innerText = "O Firebase não está ligado. As chaves em firebase-config.js estão corretas?";
             erroMsg.classList.remove('oculto');
             return;
         }
@@ -54,30 +53,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-logout').addEventListener('click', () => {
         signOut(auth).then(() => {
-            window.location.reload(); // Recarrega a página ao sair
+            window.location.reload(); 
         });
     });
 
-    // --- GUARDAR AS REGRAS DO ARQUITETO IA ---
-    document.getElementById('btn-save-prompt').addEventListener('click', () => {
+    // --- GUARDAR A CHAVE DA API DA INTELIGÊNCIA ARTIFICIAL ---
+    btnSaveKey.addEventListener('click', () => {
         if (!usuarioLogado) return;
-        const btn = document.getElementById('btn-save-prompt');
-        const txtOriginal = btn.innerHTML;
+        const novaChave = apiKeyInput.value.trim();
+        if(!novaChave) return alert("Por favor, cole a chave da API do Gemini no campo.");
+        
+        const btn = btnSaveKey;
+        btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
+        
+        // Guarda a chave no Firebase Realtime Database
+        set(ref(database, 'configuracoes/gemini_api_key'), novaChave)
+            .then(() => {
+                btn.innerHTML = "<i class='bx bx-check'></i> Guardada";
+                btn.classList.replace('bg-red-600', 'bg-emerald-600');
+                setTimeout(() => {
+                    btn.innerHTML = "Guardar";
+                    btn.classList.replace('bg-emerald-600', 'bg-red-600');
+                }, 2000);
+            })
+            .catch((error) => alert("Erro ao guardar chave: " + error.message));
+    });
+
+    // --- GUARDAR A LÓGICA DO ARQUITETO (CÉREBRO) ---
+    btnSavePrompt.addEventListener('click', () => {
+        if (!usuarioLogado) return;
+        const btn = btnSavePrompt;
+        const originalText = btn.innerHTML;
         btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> A guardar...";
         
         const novoPrompt = document.getElementById('prompt-ia').value;
         set(ref(database, 'configuracoes/prompt_mascote'), novoPrompt)
             .then(() => {
                 atualizarPromptMemoria(novoPrompt);
-                btn.innerHTML = "<i class='bx bx-check'></i> Sistema Atualizado!";
-                setTimeout(() => btn.innerHTML = txtOriginal, 2000);
+                btn.innerHTML = "<i class='bx bx-check'></i> Guardado com sucesso!";
+                btn.classList.replace('bg-red-600', 'bg-emerald-600');
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.replace('bg-emerald-600', 'bg-red-600');
+                }, 2000);
             })
-            .catch(err => alert("Erro ao guardar: " + err.message));
+            .catch((error) => {
+                alert("Erro ao guardar no Firebase: " + error.message);
+                btn.innerHTML = originalText;
+            });
     });
 
-    // --- LER PROJETOS (FACILITÓIDES) E RENDERIZAR CARTÕES ---
+    // --- LER DADOS DO BACKEND ---
     function iniciarLeituraDoBanco() {
         
+        // 1. Carrega a Chave API se já existir na base de dados
+        get(ref(database, 'configuracoes/gemini_api_key')).then((snapshot) => {
+            if(snapshot.exists()) {
+                apiKeyInput.value = snapshot.val();
+            }
+        });
+
+        // 2. Carrega o Comportamento da IA
         get(ref(database, 'configuracoes/prompt_mascote')).then((snapshot) => {
             const caixaTexto = document.getElementById('prompt-ia');
             if (snapshot.exists()) {
@@ -89,17 +125,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // 3. Escuta os Projetos Criados (CRM)
         onValue(ref(database, 'leads'), (snapshot) => {
-            const gridLeads = document.getElementById('grid-leads');
             gridLeads.innerHTML = ''; 
             
             if (!snapshot.exists()) {
-                gridLeads.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500"><p>Nenhum Facilitóide desenhado ainda.</p></div>';
+                gridLeads.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500"><p>Nenhum Facilitóide desenhado ainda. Partilhe o seu cartão com os clientes!</p></div>';
                 return;
             }
 
             listaDeClientes = [];
-            snapshot.forEach((filho) => listaDeClientes.push({ id: filho.key, ...filho.val() }));
+            snapshot.forEach((filho) => {
+                listaDeClientes.push({ id: filho.key, ...filho.val() });
+            });
+            
             listaDeClientes.sort((a, b) => new Date(b.data) - new Date(a.data));
 
             listaDeClientes.forEach((cliente, index) => {
@@ -124,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button onclick="window.abrirProjeto(${index})" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold py-2 rounded-lg transition border border-slate-600 flex items-center justify-center gap-2">
                             <i class='bx bx-search-alt-2'></i> Ver Sistema
                         </button>
-                        <a href="https://wa.me/55${btnWhats}?text=Olá ${cliente.nome}, sou o Thiago. A nossa IA desenhou um Facilitóide para a ${cliente.empresa}. Podemos falar?" target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center transition">
+                        <a href="https://wa.me/55${btnWhats}?text=Olá ${cliente.nome}, sou o Thiago da thIAguinho Soluções. Vi que conversou com o nosso arquiteto IA e ele desenhou um Facilitóide para a ${cliente.empresa}. Podemos conversar?" target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center transition">
                             <i class='bx bxl-whatsapp text-lg'></i>
                         </a>
                     </div>
@@ -134,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LÓGICA DO MODAL (USABILIDADE) ---
+    // --- LÓGICA DA JANELA DE USABILIDADE (MODAL) ---
     window.abrirProjeto = function(index) {
         const c = listaDeClientes[index];
         if(!c) return;
@@ -142,10 +181,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('modal-nome').innerText = c.nome;
         document.getElementById('modal-empresa').innerText = c.empresa;
         document.getElementById('modal-dores').innerText = c.dores;
-        document.getElementById('modal-facilitoide').innerHTML = c.facilitoide ? c.facilitoide.replace(/\n/g, '<br>') : "<i>Sem sistema desenhado.</i>";
+        
+        document.getElementById('modal-facilitoide').innerHTML = c.facilitoide ? c.facilitoide.replace(/\n/g, '<br>') : "<i>Nenhum sistema específico desenhado.</i>";
         
         const whatsLimpo = c.whatsapp ? c.whatsapp.replace(/\D/g, '') : '';
-        const msgWhats = encodeURIComponent(`Olá ${c.nome}, sou o Thiago da thIAguinho Soluções. O nosso Arquiteto IA construiu um projeto exclusivo para a dor da ${c.empresa}. Vamos agendar uma reunião?`);
+        const msgWhats = encodeURIComponent(`Olá ${c.nome}, sou o Thiago da thIAguinho Soluções. O nosso Arquiteto IA construiu um projeto exclusivo para a dor da ${c.empresa}. Vamos agendar uma reunião para fechar este negócio?`);
         document.getElementById('modal-whatsapp').href = `https://wa.me/55${whatsLimpo}?text=${msgWhats}`;
 
         document.getElementById('modal-projeto').classList.remove('oculto');
