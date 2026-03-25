@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let historicoDevAtual = [];
     let bufferArquivosAnexados = "";
 
-    // FUNÇÃO HOISTED: Protege contra erros de código nulo
     function formatarCodigoIA(texto) {
         if(!texto) return "";
         return String(texto).replace(/```(.*?)\n([\s\S]*?)```/g, '<pre><code class="$1">$2</code></pre>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
@@ -59,13 +58,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             usuarioLogado = user;
             if(erroMsg) erroMsg.classList.add('oculto');
-            document.getElementById('admin-login').classList.add('oculto');
-            document.getElementById('admin-dashboard').classList.remove('oculto');
+            document.getElementById('admin-login')?.classList.add('oculto');
+            document.getElementById('admin-dashboard')?.classList.remove('oculto');
             iniciarLeituraDoBancoDeDados();
         } else {
             usuarioLogado = null;
-            document.getElementById('admin-dashboard').classList.add('oculto');
-            document.getElementById('admin-login').classList.remove('oculto');
+            document.getElementById('admin-dashboard')?.classList.add('oculto');
+            document.getElementById('admin-login')?.classList.remove('oculto');
         }
     });
 
@@ -104,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LEITURA DA BASE DE DADOS ---
+    // --- A CORREÇÃO MESTRE: LEITURA BLINDADA DO FIREBASE ---
     function iniciarLeituraDoBancoDeDados() {
         get(ref(database, 'admin_config/gemini_api_key')).then((snapshot) => {
             if(snapshot.exists() && apiKeyInput) apiKeyInput.value = snapshot.val();
@@ -123,14 +122,18 @@ document.addEventListener('DOMContentLoaded', () => {
         onValue(ref(database, 'projetos_capturados'), (snapshot) => {
             listaDeClientesGlobais = [];
             if (snapshot.exists()) {
-                snapshot.forEach((filho) => listaDeClientesGlobais.push({ id: filho.key, ...filho.val() }));
-                listaDeClientesGlobais.sort((a, b) => new Date(b.data) - new Date(a.data));
+                // O SEGREDO: Uso das chaves {} garante que o Firebase NÃO cancele o loop após ler 1 item.
+                snapshot.forEach((filho) => {
+                    listaDeClientesGlobais.push({ id: filho.key, ...filho.val() });
+                });
+                
+                listaDeClientesGlobais.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
             }
             renderizarProjetos();
         });
     }
 
-    // --- RENDERIZAÇÃO DOS CARTÕES (BLINDADA CONTRA O SUMIÇO) ---
+    // --- RENDERIZAÇÃO DOS CARTÕES (Todos aparecem) ---
     function renderizarProjetos() {
         if(!gridLeads) return;
         gridLeads.innerHTML = ''; 
@@ -141,24 +144,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (projetosFiltrados.length === 0) {
-            gridLeads.innerHTML = `<div class="text-center py-10 text-slate-500"><i class='bx bx-sleepy text-4xl mb-3'></i><p>Nenhum projeto nesta aba.</p></div>`;
+            gridLeads.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500"><i class='bx bx-sleepy text-4xl mb-3'></i><p>Nenhum projeto nesta aba.</p></div>`;
             return;
         }
 
         projetosFiltrados.forEach(cliente => {
-            const dataFormatada = new Date(cliente.data).toLocaleDateString('pt-BR');
+            const dataFormatada = cliente.data ? new Date(cliente.data).toLocaleDateString('pt-BR') : 'Sem data';
             let numWpp = cliente.whatsapp ? String(cliente.whatsapp).replace(/\D/g, '') : '';
             if (numWpp.length >= 10 && numWpp.length <= 11) numWpp = '55' + numWpp; 
-            else if (!numWpp.startsWith('55') && numWpp.length >= 12) numWpp = '55' + numWpp; 
             
             const card = document.createElement('div');
-            // A CLASSE "shrink-0" AQUI É O QUE IMPEDE OS CARTÕES DE SUMIREM QUANDO HÁ MUITOS!
-            card.className = "w-full shrink-0 bg-slate-900 border border-slate-700 rounded-xl p-4 hover:border-sky-500 transition shadow-lg flex flex-col";
+            // 'w-full shrink-0' garante que o layout não esmague os cartões invisivelmente
+            card.className = "w-full shrink-0 bg-slate-900 border border-slate-700 rounded-xl p-4 hover:border-sky-500 transition shadow-lg flex flex-col mb-4";
             
             const htmlHeader = `
                 <div class="flex justify-between items-center cursor-pointer select-none" onclick="window.toggleCard('${cliente.id}')">
                     <div class="flex-1">
-                        <h4 class="font-bold text-white text-lg leading-tight">${cliente.nome || "Sem Nome"}</h4>
+                        <h4 class="font-bold text-white text-lg leading-tight">${cliente.nome || "Cliente Indefinido"}</h4>
                         <p class="text-xs text-sky-400 font-semibold uppercase tracking-wider">${cliente.empresa || "Sem Empresa"}</p>
                     </div>
                     <div class="flex items-center gap-3">
@@ -170,12 +172,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const htmlBody = `
                 <div id="body-${cliente.id}" class="hidden mt-4 pt-4 border-t border-slate-700">
-                    <p class="text-sm text-slate-300 mb-4 italic">"${cliente.dores || ""}"</p>
+                    <p class="text-sm text-slate-300 mb-4 italic">"${cliente.dores || "Não informou dores específicas."}"</p>
                     <div class="flex flex-wrap gap-2">
                         <button onclick="window.abrirModalProjeto('${cliente.id}')" class="flex-1 bg-sky-900/40 hover:bg-sky-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition border border-sky-800 flex items-center justify-center gap-2">
                             <i class='bx bx-terminal'></i> Abrir Fábrica
                         </button>
-                        <a href="https://wa.me/${numWpp}" target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center" title="Conversar"><i class='bx bxl-whatsapp text-lg'></i></a>
+                        <a href="https://wa.me/${numWpp}" target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center" title="Conversar no WhatsApp"><i class='bx bxl-whatsapp text-lg'></i></a>
                         
                         ${abaAtiva === 'novos' 
                             ? `<button onclick="window.alterarStatus('${cliente.id}', 'concluido')" class="w-10 bg-emerald-900/50 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-lg flex items-center justify-center transition border border-emerald-800" title="Marcar como Sistema Gerado"><i class='bx bx-check-double text-lg'></i></button>`
@@ -192,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Define as funções globalmente para funcionarem nos botões HTML gerados
     window.toggleCard = function(id) {
         const body = document.getElementById(`body-${id}`);
         const icon = document.getElementById(`icon-${id}`);
@@ -217,15 +218,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- MODAL DE PROGRAMAÇÃO BLINDADO CONTRA ERROS QUE IMPEDIAM A ABERTURA ---
+    // --- MODAL DE PROGRAMAÇÃO BLINDADO (Abre mesmo com dados incompletos) ---
     window.abrirModalProjeto = function(id) {
         try {
             const c = listaDeClientesGlobais.find(item => item.id === id);
-            if(!c) return;
+            if(!c) {
+                console.error("Erro: Cliente não localizado.");
+                return;
+            }
 
             idProjetoAberto = c.id;
             
-            // TRATAMENTO BLINDADO DO HISTÓRICO PARA NUNCA TRAVAR O BOTÃO
+            // Corrige se a nuvem bagunçou a array de mensagens
             let chatSalvo = c.devChat || [];
             if (typeof chatSalvo === 'string') {
                 historicoDevAtual = [{role: 'model', text: chatSalvo}];
@@ -237,54 +241,56 @@ document.addEventListener('DOMContentLoaded', () => {
             
             bufferArquivosAnexados = ""; 
 
-            // Trata todos os campos HTML de forma segura
-            document.getElementById('modal-nome').innerText = c.nome || "Cliente";
-            document.getElementById('modal-empresa').innerText = c.empresa || "Empresa";
-            document.getElementById('modal-dores').innerText = c.dores || "Sem detalhes.";
+            // Validações defensivas do DOM
+            if(document.getElementById('modal-nome')) document.getElementById('modal-nome').innerText = c.nome || "Cliente";
+            if(document.getElementById('modal-empresa')) document.getElementById('modal-empresa').innerText = c.empresa || "Empresa";
+            if(document.getElementById('modal-dores')) document.getElementById('modal-dores').innerText = c.dores || "Sem dor detalhada.";
             
             let f = c.facilitoide ? String(c.facilitoide) : "";
-            let formataFacilitoide = f ? f.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>') : "Sem arquitetura documentada.";
-            document.getElementById('modal-facilitoide').innerHTML = formataFacilitoide;
+            let formataFacilitoide = f ? f.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>') : "Aguardando arquitetura.";
+            if(document.getElementById('modal-facilitoide')) document.getElementById('modal-facilitoide').innerHTML = formataFacilitoide;
             
-            contextoProjetoAtual = `Cliente: ${c.nome}. Empresa: ${c.empresa}. Dor: ${c.dores}. O sistema a construir é: ${f}`;
+            contextoProjetoAtual = `Cliente: ${c.nome}. Empresa: ${c.empresa}. Dor: ${c.dores}. Arquitetura sugerida: ${f}`;
             
             const chatDisplay = document.getElementById('dev-chat-display');
-            chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! Você pode anexar as suas bases de código antigas clicando no clipe de papel. Eu analisarei a estrutura para evoluir o sistema deste cliente!</div>`;
+            if(chatDisplay) {
+                chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! Você pode anexar as suas bases de código antigas clicando no clipe de papel. Eu analisarei a estrutura para evoluir o sistema deste cliente!</div>`;
 
-            if(Array.isArray(historicoDevAtual)) {
-                historicoDevAtual.forEach(msg => {
-                    if(!msg) return;
-                    const textoSeguro = msg.text ? String(msg.text) : "";
-                    const div = document.createElement('div');
-                    div.className = `msg-dev ${msg.role === 'user' ? 'admin' : 'ai shadow-lg'}`;
-                    div.innerHTML = msg.role === 'user' ? textoSeguro.replace(/\n/g, '<br>') : formatarCodigoIA(textoSeguro);
-                    chatDisplay.appendChild(div);
-                });
+                if(Array.isArray(historicoDevAtual)) {
+                    historicoDevAtual.forEach(msg => {
+                        if(!msg || !msg.text) return;
+                        const textoSeguro = String(msg.text);
+                        const div = document.createElement('div');
+                        div.className = `msg-dev ${msg.role === 'user' ? 'admin' : 'ai shadow-lg'}`;
+                        div.innerHTML = msg.role === 'user' ? textoSeguro.replace(/\n/g, '<br>') : formatarCodigoIA(textoSeguro);
+                        chatDisplay.appendChild(div);
+                    });
+                }
+                chatDisplay.scrollTop = chatDisplay.scrollHeight;
             }
-
-            chatDisplay.scrollTop = chatDisplay.scrollHeight;
             
             let wpp = c.whatsapp ? String(c.whatsapp) : '';
             let numModal = wpp.replace(/\D/g, '');
             if (numModal.length >= 10 && numModal.length <= 11) numModal = '55' + numModal;
-            document.getElementById('modal-whatsapp').href = `https://wa.me/${numModal}`;
+            if(document.getElementById('modal-whatsapp')) document.getElementById('modal-whatsapp').href = `https://wa.me/${numModal}`;
 
-            // Abre o modal de forma direta, sem depender de escopo de variável
+            // Abre o Modal com segurança absoluta
             const modalDOM = document.getElementById('modal-projeto');
             if(modalDOM) modalDOM.classList.remove('oculto');
             
         } catch (erro) {
-            console.error("ERRO INTERNO EVITADO: ", erro);
+            console.error("Falha ao abrir a Fábrica (Erro Contido): ", erro);
         }
     };
 
     if(document.getElementById('btn-fechar-modal')) {
         document.getElementById('btn-fechar-modal').addEventListener('click', () => {
-            document.getElementById('modal-projeto').classList.add('oculto');
+            const m = document.getElementById('modal-projeto');
+            if(m) m.classList.add('oculto');
         });
     }
 
-    // --- LÓGICA DO CHAT DA FÁBRICA DE SOFTWARE ---
+    // --- LÓGICA DO CHAT E LEITURA DE ARQUIVOS ---
     const devInput = document.getElementById('dev-input');
     const btnDevSend = document.getElementById('btn-dev-send');
     const devFile = document.getElementById('dev-file');
