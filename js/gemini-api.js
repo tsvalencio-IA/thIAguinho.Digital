@@ -7,32 +7,24 @@ let chatHistoryCliente = [];
 let chaveApiArmazenada = null; 
 
 // =========================================================================
-// CÉREBRO 1: A VENDEDORA E ARQUITETA (BLINDADA CONTRA VAZAMENTOS)
+// CÉREBRO 1: A VENDEDORA E ARQUITETA (BLINDADA)
 // =========================================================================
-export let systemPrompt = `Você é a IA central da 'thIAguinho Soluções Digitais'. Você tem 2 funções: Vendedora Empática e Arquiteta Sênior.
+export let systemPrompt = `Você é o Mascote Arquiteto da 'thIAguinho Soluções'. Sua missão é entrevistar o cliente de forma amigável, natural e altamente conversacional.
 
-MUITO IMPORTANTE - COMO CONVERSAR COM O CLIENTE:
-- Seja natural, cordial e aja como humano.
-- Faça APENAS UMA PERGUNTA por vez. Converse passo a passo.
-- NUNCA envie códigos, tags ou a palavra [LEAD] para o cliente ler ou preencher. É VOCÊ quem vai gerar a tag secretamente na sua mente no final.
-- Gere SEMPRE botões de opções com o TEXTO COMPLETO (Ex: [OPCOES: Soluções para Empresa | Rotina Pessoal]). NUNCA use "A" ou "B".
+REGRAS ESTritas DE CONDUTA (NUNCA QUEBRE):
+1. FAÇA APENAS UMA PERGUNTA POR VEZ. Nunca envie uma lista de perguntas ou jogue um questionário inteiro na cara do cliente.
+2. NUNCA, SOB NENHUMA HIPÓTESE, mostre as palavras "LEAD", "FACILITOIDE" ou qualquer formato de tag para o cliente.
+3. SEMPRE gere botões de resposta no formato OBRIGATÓRIO: [OPCOES: Texto 1 | Texto 2]. Nunca use "Opção A" ou "Opção B".
 
-PASSO A PASSO DA CONVERSA:
-1. Pergunte o NOME do cliente e o que ele busca (Empresa ou Pessoal).
-2. Investigue qual a maior DOR ou problema de gestão que ele enfrenta hoje.
-3. Diga que a thIAguinho é especialista nisso, que vai desenhar um modelo técnico (sistema) para resolver isso e peça o número de WhatsApp dele (com DDD).
-4. APENAS quando ele informar o WhatsApp, despeça-se educadamente. 
-5. NESTA ÚLTIMA MENSAGEM DE DESPEDIDA, você OBRIGATORIAMENTE deve adicionar no final do seu texto a TAG SECRETA abaixo.
+FLUXO DA CONVERSA (Siga os Passos):
+PASSO 1: Cumprimente. Pergunte o nome do cliente e se ele busca soluções para a Empresa ou para a Rotina Pessoal.
+PASSO 2: Investigue qual a maior DOR ou problema que ele quer resolver. (Ex: O que mais toma seu tempo hoje?).
+PASSO 3: Quando entender a dor, diga: "Vou desenhar a arquitetura técnica ideal para você. Por favor, digite seu WhatsApp com DDD."
+PASSO 4: QUANDO O CLIENTE FORNECER O WHATSAPP, você deve agradecer e encerrar a conversa. 
 
-COMO GERAR A TAG (INSTRUÇÃO SECRETA SÓ PARA VOCÊ E PARA O SISTEMA):
-No final da sua última mensagem, cole exatamente esta estrutura preenchida:
-[LEAD: NOME=nome do cliente | EMPRESA=nome da empresa ou pessoal | DORES=resumo detalhado da dor | FACILITOIDE=arquitetura do sistema | WHATSAPP=apenas numeros]
-
-COMO PREENCHER O "FACILITOIDE" DENTRO DA TAG:
-Escreva em Markdown a solução técnica que você pensou. Ex:
-**Projeto:** [Nome do App]
-**Lógica:** [Como funciona na prática]
-**Stack Técnico:** HTML, JS, Tailwind, Firebase.`;
+O SEGREDO DA TAG (GERAR APENAS NO PASSO 4):
+Na sua ÚLTIMA mensagem (e somente nela), você deve gerar a tag abaixo NO FINAL do seu texto. O sistema vai apagar isso antes do cliente ler, então preencha com o que você descobriu:
+[LEAD: NOME=nome do cliente | EMPRESA=tipo de negócio | DORES=resumo da dor | FACILITOIDE=sua sugestão de sistema em markdown | WHATSAPP=apenas numeros]`;
 
 export function atualizarPromptMemoria(novoPrompt) {
     if (novoPrompt && novoPrompt.trim() !== '') {
@@ -70,9 +62,9 @@ export async function askGemini(msgUsuario) {
         const data = await res.json();
         if (data.error) throw new Error(data.error.message);
         
-        let botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro.";
+        let botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro interno da IA.";
         
-        // O código invisível que extrai a tag da mente da IA sem mostrar pro cliente
+        // O CÓDIGO CAÇADOR: Procura a Tag na mensagem e tira ela antes de mostrar pro cliente
         const regexLead = /\[LEAD:\s*NOME=([\s\S]*?)\|\s*EMPRESA=([\s\S]*?)\|\s*DORES=([\s\S]*?)\|\s*FACILITOIDE=([\s\S]*?)\|\s*WHATSAPP=([\s\S]*?)\]/i;
         const match = botReply.match(regexLead);
         
@@ -83,14 +75,21 @@ export async function askGemini(msgUsuario) {
 
             const novoLeadRef = push(ref(database, 'projetos_capturados'));
             set(novoLeadRef, {
-                nome: nome.trim() || "Não informado", empresa: empresa.trim() || "Não informada",
-                dores: dores.trim(), facilitoide: facilitoide.trim(), whatsapp: wppLimpo, data: new Date().toISOString(), devChat: []
+                nome: nome.trim() || "Cliente Indefinido", 
+                empresa: empresa.trim() || "Não informada",
+                dores: dores.trim() || "Sem dor informada", 
+                facilitoide: facilitoide.trim() || "Aguardando arquitetura.", 
+                whatsapp: wppLimpo, 
+                data: new Date().toISOString(), 
+                devChat: [],
+                status: 'novo'
             });
-            // Apaga a Tag da mensagem visual para o cliente nunca ver
+            
+            // Apaga a Tag da mensagem visual
             botReply = botReply.replace(regexLead, '').trim();
         }
         return botReply;
-    } catch(e) { return "Erro no servidor neural. Pode repetir?"; }
+    } catch(e) { return "Houve uma falha na minha rede neural. Poderia repetir?"; }
 }
 
 export function adicionarAoHistorico(role, texto) {
@@ -98,7 +97,7 @@ export function adicionarAoHistorico(role, texto) {
 }
 
 // =========================================================================
-// CÉREBRO 2: O DESENVOLVEDOR DA FÁBRICA (LÊ SEUS ARQUIVOS)
+// CÉREBRO 2: O DESENVOLVEDOR DA FÁBRICA
 // =========================================================================
 export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, historicoSalvo = []) {
     try {
@@ -106,17 +105,13 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
         if (!apiKey) return "Coloque a chave da API nas configurações do Painel.";
 
         const promptDesenvolvedor = `Você é um Engenheiro de Software Sênior trabalhando para o Thiago (Dono da Agência thIAguinho Soluções).
-        Stack oficial: HTML, JS, Tailwind, Firebase e Cloudinary.
-        Projeto atual: ${contextoProjeto}
+        Projeto atual do cliente: ${contextoProjeto}
         
         REGRA MÁXIMA DE COMUNICAÇÃO:
-        A tela do painel do Thiago é limitada. Portanto, SEMPRE que você for gerar os códigos e a resposta, siga ESTA ESTRUTURA RIGOROSA:
-        1. Comece a sua resposta conversando com o Thiago de forma direta.
-        2. Diga EXATAMENTE os nomes dos arquivos que você está gerando (Ex: "Thiago, estou te enviando estes 2 arquivos: index.html e script.js").
-        3. Só depois envie os blocos de código formatados em Markdown (\`\`\`html, \`\`\`javascript).
-        
-        ANÁLISE DE ARQUIVOS (MUITO IMPORTANTE):
-        Se o Thiago enviar o conteúdo de códigos fontes antigos (ex: um sistema de oficina), leia a estrutura dele, mantenha o que for bom, e evolua o código para resolver a "Dor Real" do novo cliente. Entregue a solução completa.`;
+        A tela do Thiago é limitada. SEMPRE siga esta ordem:
+        1. Comece dizendo exatamente os nomes dos arquivos que gerou (Ex: "Thiago, estou enviando estes 2 arquivos: index.html e app.js").
+        2. Entregue os blocos de código completos e formatados em Markdown (\`\`\`html, \`\`\`javascript).
+        3. Se o Thiago enviar conteúdo de códigos base dele, adapte-os e evolua para este cliente específico.`;
 
         const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
@@ -131,9 +126,9 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
         const data = await res.json();
         if (data.error) throw new Error(data.error.message);
         
-        return data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro de processamento.";
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro de processamento da IA.";
 
     } catch(e) {
-        return "Erro de compilação na IA: " + e.message;
+        return "Erro de compilação: " + e.message;
     }
 }
