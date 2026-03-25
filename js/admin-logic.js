@@ -1,4 +1,4 @@
-// NOME DO ARQUIVO: admin-logic.js
+// NOME DO FICHEIRO: admin-logic.js
 // LOCALIZAÇÃO: Dentro da pasta 'js'
 
 import { auth, database, signInWithEmailAndPassword, signOut, onAuthStateChanged, ref, set, onValue, get } from './firebase-config.js';
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiKeyInput = document.getElementById('api-key-input');
     const gridLeads = document.getElementById('grid-leads');
     
-    // Elementos do Modal
+    // Elementos do Modal de Usabilidade
     const modalProjeto = document.getElementById('modal-projeto');
     const btnFecharModal = document.getElementById('btn-fechar-modal');
     const btnFecharModal2 = document.getElementById('btn-fechar-modal-2');
@@ -27,32 +27,26 @@ document.addEventListener('DOMContentLoaded', () => {
     let usuarioLogado = null;
     let listaDeClientesGlobais = [];
 
-    // --- 1. MANTER SESSÃO SALVA (LOGIN AUTOMÁTICO) ---
+    // --- SESSÃO E LOGIN ---
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // O usuário já tem sessão ativa, salta a tela de login!
             usuarioLogado = user;
             if(erroMsg) erroMsg.classList.add('oculto');
             document.getElementById('admin-login').classList.add('oculto');
             document.getElementById('admin-dashboard').classList.remove('oculto');
             iniciarLeituraDoBancoDeDados();
         } else {
-            // Sessão expirada ou usuário saiu
             usuarioLogado = null;
             document.getElementById('admin-dashboard').classList.add('oculto');
             document.getElementById('admin-login').classList.remove('oculto');
         }
     });
 
-    // --- 2. LOGIN MANUAL ---
     if(btnLogin) {
         btnLogin.addEventListener('click', () => {
-            btnLogin.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Conectando...";
+            btnLogin.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> A ligar...";
             
             signInWithEmailAndPassword(auth, emailInput.value, senhaInput.value)
-                .then((userCredential) => {
-                    // A transição de tela será feita pelo onAuthStateChanged acima
-                })
                 .catch((error) => {
                     console.error("Erro Auth Firebase:", error);
                     erroMsg.classList.remove('oculto');
@@ -61,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 3. SAIR DO PAINEL ---
     if(btnLogout) {
         btnLogout.addEventListener('click', () => {
             signOut(auth).then(() => {
@@ -72,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 4. GUARDAR A CHAVE DA API ---
+    // --- GUARDAR CREDENCIAIS DA IA ---
     if(btnSaveKey) {
         btnSaveKey.addEventListener('click', () => {
             if (!usuarioLogado) return;
@@ -95,19 +88,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 5. GUARDAR A LÓGICA DO ARQUITETO (CÉREBRO) ---
     if(btnSavePrompt) {
         btnSavePrompt.addEventListener('click', () => {
             if (!usuarioLogado) return;
             const btn = btnSavePrompt;
             const originalText = btn.innerHTML;
-            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Salvando...";
+            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> A guardar...";
             
             const novoPrompt = document.getElementById('prompt-ia').value;
             set(ref(database, 'admin_config/prompt_mascote'), novoPrompt)
                 .then(() => {
                     atualizarPromptMemoria(novoPrompt);
-                    btn.innerHTML = "<i class='bx bx-check'></i> Atualizado com sucesso!";
+                    btn.innerHTML = "<i class='bx bx-check'></i> Lógica Atualizada!";
                     btn.classList.replace('bg-red-600', 'bg-emerald-600');
                     setTimeout(() => {
                         btn.innerHTML = originalText;
@@ -121,33 +113,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 6. LER DADOS DO BACKEND E RENDERIZAR OS PROJETOS ---
+    // --- LEITURA DE DADOS E GERAÇÃO DA INTERFACE ---
     function iniciarLeituraDoBancoDeDados() {
         
-        // Carrega a Chave API se existir
         get(ref(database, 'admin_config/gemini_api_key')).then((snapshot) => {
             if(snapshot.exists() && apiKeyInput) apiKeyInput.value = snapshot.val();
         });
 
-        // Carrega o Comportamento da IA
         get(ref(database, 'admin_config/prompt_mascote')).then((snapshot) => {
             const caixaTexto = document.getElementById('prompt-ia');
             if (snapshot.exists()) {
-                const promptSalvoNoFirebase = snapshot.val();
-                if(caixaTexto) caixaTexto.value = promptSalvoNoFirebase;
-                atualizarPromptMemoria(promptSalvoNoFirebase);
+                const promptSalvo = snapshot.val();
+                if(caixaTexto) caixaTexto.value = promptSalvo;
+                atualizarPromptMemoria(promptSalvo);
             } else {
                 if(caixaTexto) caixaTexto.value = promptPadraoDaAPI;
             }
         });
 
-        // Escuta os Novos Facilitóides (CRM)
+        // Escuta as Arquiteturas Geradas em Tempo Real
         onValue(ref(database, 'projetos_capturados'), (snapshot) => {
             if(!gridLeads) return;
             gridLeads.innerHTML = ''; 
             
             if (!snapshot.exists()) {
-                gridLeads.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500"><i class="bx bx-sleepy text-4xl mb-3"></i><p>Nenhum Facilitóide desenhado ainda.</p></div>';
+                gridLeads.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500"><i class="bx bx-sleepy text-4xl mb-3"></i><p>Nenhum Facilitóide desenhado ainda. Partilhe o seu cartão AR!</p></div>';
                 return;
             }
 
@@ -159,10 +149,16 @@ document.addEventListener('DOMContentLoaded', () => {
             listaDeClientesGlobais.sort((a, b) => new Date(b.data) - new Date(a.data));
 
             listaDeClientesGlobais.forEach((cliente, index) => {
-                const dataFormatada = new Date(cliente.data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-                const numeroLimpo = cliente.whatsapp ? cliente.whatsapp.replace(/\D/g, '') : '';
+                const dataFormatada = new Date(cliente.data).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
                 
-                // Construção do Cartão de Usabilidade com NOVO BOTÃO DE EXCLUIR
+                // LÓGICA INFALÍVEL DO WHATSAPP (Evita duplicações do código de país)
+                let numeroLimpo = cliente.whatsapp ? cliente.whatsapp.replace(/\D/g, '') : '';
+                if (numeroLimpo.length >= 10 && numeroLimpo.length <= 11) {
+                    numeroLimpo = '55' + numeroLimpo; // Aplica o 55 apenas se for estritamente um número local com DDD
+                } else if (numeroLimpo.startsWith('55') && numeroLimpo.length >= 12) {
+                    // Mantém o número intacto pois já está perfeitamente formatado
+                }
+                
                 const card = document.createElement('div');
                 card.className = "bg-slate-900 border border-slate-700 rounded-xl p-5 hover:border-red-500 transition shadow-lg flex flex-col justify-between";
                 card.innerHTML = `
@@ -179,12 +175,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     <div class="border-t border-slate-700 pt-4 mt-auto flex gap-2">
                         <button onclick="window.abrirModalProjeto(${index})" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold py-2 rounded-lg transition border border-slate-600 flex items-center justify-center gap-2">
-                            <i class='bx bx-search-alt-2'></i> Ver Sistema
+                            <i class='bx bx-search-alt-2'></i> Ver Arquitetura
                         </button>
-                        <a href="https://wa.me/55${numeroLimpo}?text=${encodeURIComponent(`Olá ${cliente.nome}, sou o Thiago da thIAguinho Soluções. Vi que conversou com o nosso arquiteto IA e ele desenhou um Facilitóide incrível para a ${cliente.empresa}. Podemos conversar?`)}" target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center transition" title="Iniciar Venda">
+                        <a href="https://wa.me/${numeroLimpo}?text=${encodeURIComponent(`Olá ${cliente.nome}, sou o Thiago da thIAguinho Soluções. Vi que o nosso arquiteto IA desenhou a estrutura de um sistema exclusivo para a ${cliente.empresa}. Podemos conversar para avaliar o modelo?`)}" target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center transition" title="Enviar Proposta">
                             <i class='bx bxl-whatsapp text-lg'></i>
                         </a>
-                        <button onclick="window.excluirProjeto('${cliente.id}')" class="w-10 bg-red-900 hover:bg-red-700 text-white rounded-lg flex items-center justify-center transition" title="Excluir Projeto">
+                        <button onclick="window.excluirProjeto('${cliente.id}')" class="w-10 bg-red-900 hover:bg-red-700 text-white rounded-lg flex items-center justify-center transition" title="Eliminar Relatório">
                             <i class='bx bx-trash text-lg'></i>
                         </button>
                     </div>
@@ -194,10 +190,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 7. FUNÇÃO PARA EXCLUIR PROJETO DO BANCO ---
+    // --- FUNÇÃO PARA ELIMINAR PROJETOS ---
     window.excluirProjeto = function(idProjeto) {
-        if (confirm("Tem certeza que deseja excluir este projeto definitivamente? Esta ação não poderá ser desfeita.")) {
-            // O Firebase exclui o item quando definimos seu valor como null
+        if (confirm("Tem certeza que deseja eliminar o registo deste projeto?")) {
             set(ref(database, `projetos_capturados/${idProjeto}`), null)
                 .catch((error) => {
                     alert("Erro ao excluir o projeto: " + error.message);
@@ -205,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- 8. LÓGICA DA JANELA DE USABILIDADE (MODAL) ---
+    // --- APRESENTAÇÃO DO FACILITÓIDE (MODAL) ---
     window.abrirModalProjeto = function(index) {
         const c = listaDeClientesGlobais[index];
         if(!c) return;
@@ -214,11 +209,20 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('modal-empresa').innerText = c.empresa;
         document.getElementById('modal-dores').innerText = c.dores;
         
-        document.getElementById('modal-facilitoide').innerHTML = c.facilitoide ? c.facilitoide.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') : "<i>A IA não gerou uma arquitetura específica para este caso.</i>";
+        // MANTÉM OS NEGRITOS, TÓPICOS E QUEBRAS DE LINHA DA ENGENHARIA DA IA
+        let arquiteturaFormatada = c.facilitoide ? c.facilitoide.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>') : "<i>O Arquiteto IA não entregou um escopo para este projeto.</i>";
+        document.getElementById('modal-facilitoide').innerHTML = arquiteturaFormatada;
         
-        const whatsLimpo = c.whatsapp ? c.whatsapp.replace(/\D/g, '') : '';
-        const msgWhats = encodeURIComponent(`Olá ${c.nome}, sou o Thiago da thIAguinho Soluções. O nosso Arquiteto IA construiu um projeto exclusivo para a dor da ${c.empresa}. Vamos agendar uma reunião para fechar este negócio?`);
-        document.getElementById('modal-whatsapp').href = `https://wa.me/55${whatsLimpo}?text=${msgWhats}`;
+        // Formatação garantida do botão de WhatsApp dentro do Modal
+        let numeroLimpoModal = c.whatsapp ? c.whatsapp.replace(/\D/g, '') : '';
+        if (numeroLimpoModal.length >= 10 && numeroLimpoModal.length <= 11) {
+            numeroLimpoModal = '55' + numeroLimpoModal;
+        } else if (!numeroLimpoModal.startsWith('55') && numeroLimpoModal.length >= 12) {
+             numeroLimpoModal = '55' + numeroLimpoModal; // Segurança extra para números internacionais inseridos incorretamente
+        }
+
+        const msgWhats = encodeURIComponent(`Olá ${c.nome}, sou o Thiago da thIAguinho Soluções. O nosso Arquiteto IA construiu um projeto exclusivo para a dor da ${c.empresa}. Vamos agendar uma reunião para afinar os detalhes deste negócio?`);
+        document.getElementById('modal-whatsapp').href = `https://wa.me/${numeroLimpoModal}?text=${msgWhats}`;
 
         if(modalProjeto) modalProjeto.classList.remove('oculto');
     };
