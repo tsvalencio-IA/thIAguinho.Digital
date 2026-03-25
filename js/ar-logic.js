@@ -1,52 +1,94 @@
 // NOME DO ARQUIVO: ar-logic.js
 // LOCALIZAÇÃO: Dentro da pasta 'js'
-// NOTA: Mantivemos o nome do arquivo para não quebrar nenhuma estrutura, mas a lógica agora é de um WebApp de Vídeo.
 
 import { askGemini, adicionarAoHistorico } from './gemini-api.js';
+import { database, ref, get } from './firebase-config.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const chatDisplay = document.getElementById('chat-display');
     const userInput = document.getElementById('user-input');
     const btnSend = document.getElementById('btn-send');
     const btnMic = document.getElementById('btn-mic');
     const videoMascote = document.getElementById('vid');
     
-    // Telas do sistema
     const startScreen = document.getElementById('start-screen');
     const uiLayer = document.getElementById('ui-layer');
 
     let isProcessing = false;
+    let audioAtual = null;
 
-    // A MÁGICA: O botão Iniciar libera o áudio e a entrevista na hora!
+    // --- CARREGA AS CHAVES DE VOZ DO FIREBASE ---
+    let elevenLabsKey = "";
+    let elevenLabsVoiceId = "";
+
+    try {
+        const snapKey = await get(ref(database, 'admin_config/elevenlabs_api_key'));
+        if(snapKey.exists()) elevenLabsKey = snapKey.val();
+        
+        const snapVoice = await get(ref(database, 'admin_config/elevenlabs_voice_id'));
+        if(snapVoice.exists()) elevenLabsVoiceId = snapVoice.val();
+    } catch(e) { console.error("Erro ao carregar configurações de voz."); }
+
     document.getElementById('btn-start').addEventListener('click', () => {
-        // Esconde a tela de início e mostra o Chat
         startScreen.classList.add('hidden');
         uiLayer.classList.remove('hidden');
         
-        // Garante que o vídeo do mascote no fundo está rodando
         if(videoMascote) {
-            videoMascote.play().catch(e => console.log("Vídeo auto-play bloqueado, mas a tela abriu."));
+            videoMascote.play().catch(e => console.log("Vídeo auto-play bloqueado."));
         }
 
-        // A IA começa a falar instantaneamente
         if(chatDisplay.children.length === 0) {
-            const msgInicial = "Olá! Sou o arquiteto inteligente da thIAguinho Soluções! Como posso te chamar? E você busca uma solução para sua Empresa ou para sua Vida Pessoal/Rotina? [OPCOES: Para minha Empresa | Para minha Rotina Pessoal]";
+            const msgInicial = "Olá! Sou o arquiteto inteligente da thIAguinho Soluções! Como posso te chamar? E você busca uma solução para sua Empresa ou para sua Vida Pessoal? [OPCOES: Para minha Empresa | Para minha Vida Pessoal]";
             processarEExibirMensagemBot(msgInicial);
         }
     });
 
-    // --- SÍNTESE DE VOZ ---
-    const synthesis = window.speechSynthesis;
-    function falar(texto) {
-        if (synthesis.speaking) synthesis.cancel();
-        // Remove as tags e formatações para o robô ler limpo
+    // --- A SÍNTESE DE VOZ (Com a ElevenLabs) ---
+    async function falar(texto) {
+        // Interrompe qualquer áudio tocando
+        if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+        if (audioAtual) { audioAtual.pause(); audioAtual = null; }
+
         let textoVoz = texto.replace(/\[OPCOES:.*?\]/i, '').replace(/\*\*/g, '');
+        if(!textoVoz.trim()) return;
+
+        // Se o Thiago configurou a ElevenLabs no painel, usamos a API Mágica!
+        if (elevenLabsKey && elevenLabsVoiceId) {
+            try {
+                // Chama o robô da ElevenLabs no modo Multilingual V2 (Para falar Português perfeito)
+                const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${elevenLabsVoiceId}`, {
+                    method: 'POST',
+                    headers: {
+                        'accept': 'audio/mpeg',
+                        'xi-api-key': elevenLabsKey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: textoVoz,
+                        model_id: "eleven_multilingual_v2",
+                        voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+                    })
+                });
+
+                if (!response.ok) throw new Error('Falha na ElevenLabs');
+                
+                // Toca a sua voz clonada na mesma hora!
+                const blob = await response.blob();
+                const audioUrl = window.URL.createObjectURL(blob);
+                audioAtual = new Audio(audioUrl);
+                audioAtual.play();
+                return;
+            } catch (error) {
+                console.error("Falha na Voz Clonada, usando a voz nativa do celular.");
+            }
+        }
+
+        // Se não tiver chave, cai na voz robótica gratuita (Fallback)
         const utterance = new SpeechSynthesisUtterance(textoVoz);
         utterance.lang = 'pt-BR';
-        synthesis.speak(utterance);
+        window.speechSynthesis.speak(utterance);
     }
 
-    // --- LÓGICA DO MICROFONE ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
@@ -89,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         addMsgVisual('bot', textoLimpo);
         adicionarAoHistorico('bot', respostaCompleta); 
-        falar(textoLimpo);
+        falar(textoLimpo); // Dispara a sua voz clonada
 
         if (match && match[1]) {
             const opcoes = match[1].split('|').map(o => o.trim());
@@ -110,18 +152,11 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.className = 'btn-opcao';
             btn.innerText = opcaoText;
             btn.onclick = (event) => {
-                if(isProcessing) {
-                    event.preventDefault();
-                    return;
-                }
+                if(isProcessing) { event.preventDefault(); return; }
                 isProcessing = true; 
-                
                 container.style.opacity = '0.5';
                 container.style.pointerEvents = 'none'; 
-                
-                setTimeout(() => {
-                    enviarMensagemClicada(opcaoText);
-                }, 50); 
+                setTimeout(() => { enviarMensagemClicada(opcaoText); }, 50); 
             };
             container.appendChild(btn);
         });
@@ -133,7 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
     async function enviarMensagemClicada(textoClicado) {
         const antigasOpcoes = document.getElementById('opcoes-ativas');
         if(antigasOpcoes) antigasOpcoes.remove(); 
-        
         addMsgVisual('user', textoClicado);
         adicionarAoHistorico('user', textoClicado);
         await invocarGemini(textoClicado);
@@ -141,10 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function enviarMensagemDigitada() {
         if(isProcessing) return;
-        
         const msg = userInput.value.trim();
         if (!msg) return;
-        
         isProcessing = true;
         
         userInput.value = '';
@@ -164,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const ind = document.createElement('div');
         ind.className = "text-xs text-slate-400 mt-1 mb-3 text-center font-bold";
         ind.id = "digitando"; 
-        ind.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Construindo a arquitetura técnica...";
+        ind.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Pensando na arquitetura...";
         chatDisplay.appendChild(ind);
         chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
@@ -181,7 +213,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     btnSend.addEventListener('click', enviarMensagemDigitada);
-    userInput.addEventListener('keypress', (e) => { 
-        if (e.key === 'Enter') enviarMensagemDigitada(); 
-    });
+    userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') enviarMensagemDigitada(); });
 });
