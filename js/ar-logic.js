@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let isProcessing = false;
     let audioAtual = null;
 
-    // --- CARREGA AS CHAVES DE VOZ DO FIREBASE ---
+    // --- CARREGAMENTO DAS CHAVES DA ELEVENLABS ---
     let elevenLabsKey = "";
     let elevenLabsVoiceId = "";
 
@@ -43,19 +43,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // --- A SÍNTESE DE VOZ (Com a ElevenLabs) ---
+    // --- SÍNTESE DE VOZ COM ELEVENLABS OU NATIVA ---
     async function falar(texto) {
-        // Interrompe qualquer áudio tocando
         if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
         if (audioAtual) { audioAtual.pause(); audioAtual = null; }
 
         let textoVoz = texto.replace(/\[OPCOES:.*?\]/i, '').replace(/\*\*/g, '');
         if(!textoVoz.trim()) return;
 
-        // Se o Thiago configurou a ElevenLabs no painel, usamos a API Mágica!
+        // Tenta usar a ElevenLabs se configurado no painel
         if (elevenLabsKey && elevenLabsVoiceId) {
             try {
-                // Chama o robô da ElevenLabs no modo Multilingual V2 (Para falar Português perfeito)
                 const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${elevenLabsVoiceId}`, {
                     method: 'POST',
                     headers: {
@@ -70,20 +68,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                     })
                 });
 
-                if (!response.ok) throw new Error('Falha na ElevenLabs');
-                
-                // Toca a sua voz clonada na mesma hora!
-                const blob = await response.blob();
-                const audioUrl = window.URL.createObjectURL(blob);
-                audioAtual = new Audio(audioUrl);
-                audioAtual.play();
-                return;
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const audioUrl = window.URL.createObjectURL(blob);
+                    audioAtual = new Audio(audioUrl);
+                    audioAtual.play();
+                    return; // Sai da função se a ElevenLabs der certo
+                }
             } catch (error) {
-                console.error("Falha na Voz Clonada, usando a voz nativa do celular.");
+                console.error("Falha na ElevenLabs, caindo para voz robótica padrão.");
             }
         }
 
-        // Se não tiver chave, cai na voz robótica gratuita (Fallback)
+        // Fallback: Usa a voz do celular se a ElevenLabs não estiver configurada ou der erro
         const utterance = new SpeechSynthesisUtterance(textoVoz);
         utterance.lang = 'pt-BR';
         window.speechSynthesis.speak(utterance);
@@ -98,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (btnMic.classList.contains('listening')) { 
                 recognition.stop(); 
                 btnMic.classList.remove('listening'); 
-                userInput.placeholder = "Digite ou fale com o mascote..."; 
+                userInput.placeholder = "Digite ou escolha uma opção..."; 
             } else { 
                 recognition.start(); 
                 btnMic.classList.add('listening'); 
@@ -108,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         recognition.onresult = (e) => {
             userInput.value = e.results[0][0].transcript;
             btnMic.classList.remove('listening');
-            userInput.placeholder = "Digite ou fale com o mascote..."; 
+            userInput.placeholder = "Digite ou escolha uma opção..."; 
             enviarMensagemDigitada(); 
         };
     } else {
@@ -131,7 +128,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         addMsgVisual('bot', textoLimpo);
         adicionarAoHistorico('bot', respostaCompleta); 
-        falar(textoLimpo); // Dispara a sua voz clonada
+        falar(textoLimpo);
 
         if (match && match[1]) {
             const opcoes = match[1].split('|').map(o => o.trim());
@@ -196,7 +193,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const ind = document.createElement('div');
         ind.className = "text-xs text-slate-400 mt-1 mb-3 text-center font-bold";
         ind.id = "digitando"; 
-        ind.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Pensando na arquitetura...";
+        ind.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Construindo a arquitetura técnica...";
         chatDisplay.appendChild(ind);
         chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
