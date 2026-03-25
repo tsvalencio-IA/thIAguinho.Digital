@@ -1,5 +1,5 @@
 // NOME DO FICHEIRO: admin-logic.js
-// LOCALIZAÇÃO: Dentro da pasta 'js'
+// LOCALIZAÇÃO: Fica OBRIGATORIAMENTE dentro da pasta 'js' (Substitua tudo o que lá estiver)
 
 import { auth, database, signInWithEmailAndPassword, signOut, onAuthStateChanged, ref, set, onValue, get } from './firebase-config.js';
 import { atualizarPromptMemoria, systemPrompt as promptPadraoDaAPI, conversarComDesenvolvedorIA, resetarChatAdmin } from './gemini-api.js';
@@ -106,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const card = document.createElement('div');
                 card.className = "bg-slate-900 border border-slate-700 rounded-xl p-5 hover:border-sky-500 transition shadow-lg flex flex-col justify-between cursor-pointer group";
-                // Torna o card todo clicável para abrir o Estúdio
                 card.onclick = (e) => { if(!e.target.closest('a') && !e.target.closest('button.btn-trash')) window.abrirModalProjeto(index); };
                 card.innerHTML = `
                     <div>
@@ -146,10 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Define o contexto que a IA vai ler para ajudar a programar
         contextoProjetoAtual = `Cliente: ${c.nome}. Empresa: ${c.empresa}. Dor: ${c.dores}. A ideia do sistema a construir é: ${c.facilitoide}`;
         
-        // Limpa o chat do programador sempre que abre um projeto novo
         resetarChatAdmin();
         const chatDisplay = document.getElementById('dev-chat-display');
-        chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! Sou o seu Desenvolvedor IA. Analisei a arquitetura deste projeto. Podes pedir-me o código HTML, a lógica JS, ou as configurações de Firebase e Cloudinary que precisas.</div>`;
+        chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! Sou a sua IA Desenvolvedora. Analisei a arquitetura deste projeto. Pode pedir-me o código HTML, a lógica JS, ou as configurações de Firebase e Cloudinary que precisa.</div>`;
 
         let numModal = c.whatsapp ? c.whatsapp.replace(/\D/g, '') : '';
         if (numModal.length >= 10 && numModal.length <= 11) numModal = '55' + numModal;
@@ -166,8 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatDisplay = document.getElementById('dev-chat-display');
 
     function formatarCodigoIA(texto) {
-        // Transforma blocos de código markdown (```) em tags <pre><code> legíveis no painel
-        return texto.replace(/```(.*?)\n([\s\S]*?)```/g, '<pre><code class="$1">$2</code></pre>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // Formata os blocos de código Markdown para exibição bonita no ecrã
+        return texto.replace(/```(.*?)\n([\s\S]*?)```/g, '<pre><code class="$1">$2</code></pre>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
     }
 
     async function enviarMsgDev() {
@@ -178,17 +176,15 @@ document.addEventListener('DOMContentLoaded', () => {
         devInput.disabled = true;
         btnDevSend.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
 
-        // Imprime a pergunta do Thiago
         const divAdmin = document.createElement('div');
         divAdmin.className = "msg-dev admin";
         divAdmin.innerText = msg;
         chatDisplay.appendChild(divAdmin);
         chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
-        // Chama a IA com o contexto do projeto aberto
+        // Chama a 2ª Mente da IA (A Desenvolvedora de Código)
         const respostaDaIA = await conversarComDesenvolvedorIA(msg, contextoProjetoAtual);
 
-        // Imprime a resposta (com os códigos) da IA
         const divAI = document.createElement('div');
         divAI.className = "msg-dev ai shadow-lg";
         divAI.innerHTML = formatarCodigoIA(respostaDaIA);
@@ -200,6 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btnDevSend.innerHTML = "<i class='bx bx-send'></i>";
     }
 
-    btnDevSend.addEventListener('click', enviarMsgDev);
-    devInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') enviarMsgDev(); });
+    if(btnDevSend) btnDevSend.addEventListener('click', enviarMsgDev);
+    if(devInput) devInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') enviarMsgDev(); });
 });
