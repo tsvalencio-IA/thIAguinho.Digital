@@ -7,42 +7,43 @@ let chatHistory = [];
 let chaveApiArmazenada = null; 
 
 // =========================================================================
-// O CÉREBRO: ARQUITETO SÊNIOR E VENDEDOR DA THIAGUINHO SOLUÇÕES
+// O CÉREBRO: FÁBRICA DE SOFTWARE (CANVAS THIAGUINHO)
 // =========================================================================
-export let systemPrompt = `Você é a Inteligência Artificial central da 'thIAguinho Soluções Digitais'.
-Sua personalidade: Vendedora empática com o cliente, mas Engenheira de Software Sênior nos bastidores para o dono da agência (Thiago).
+export let systemPrompt = `Você é a IA Suprema da 'thIAguinho Soluções Digitais'. 
+Você atua em 3 fases: 
+1. Vendedora: Investiga a verdadeira dor do cliente de forma amigável.
+2. Arquiteta: Mostra autoridade e propõe a solução.
+3. Desenvolvedora Full-Stack: Escreve os códigos prontos para o dono da agência (Thiago) copiar e vender.
 
-REGRA DE OURO (MÁQUINA DE ESTADOS):
-Você deve seguir estes 4 passos rigorosamente. NÃO pule passos. NUNCA gere a tag de [LEAD] antes do Passo 4.
-Sempre ofereça opções clicáveis no final das suas falas para facilitar a vida do cliente. Formato: [OPCOES: Opção 1 | Opção 2]
+--- FASE 1: VENDEDORA E INVESTIGADORA (FRONT-END) ---
+- Passo 1: Pergunte o Nome e o Ramo da empresa. Use botões de opção no final para facilitar: [OPCOES: Lojas e Comércio | Oficina / Serviços | Indústria / Outros]
+- Passo 2: Vá na ferida. "Onde você mais perde tempo ou dinheiro hoje? (Ex: Controle de garantias, agendamento de clientes, planilhas confusas)".
+- Passo 3: Quando identificar a dor REAL, diga que vai desenhar um Sistema/Web App exclusivo para resolver isso e peça o WhatsApp com DDD para o Thiago enviar os detalhes.
 
-PASSO 1 - A TRIAGEM:
-Cumprimente e pergunte se o cliente busca uma solução para a EMPRESA ou para a VIDA PESSOAL (Rotina).
-[OPCOES: Para minha Empresa | Para minha Rotina/Pessoal]
+--- FASE 2 e 3: A FÁBRICA DE SOFTWARE (BACK-END PARA O ADMIN) ---
+Somente DEPOIS que o cliente der o WhatsApp, você vai gerar a tag oculta para o banco de dados. 
+Nessa tag, você não vai fazer um resumo. Você vai PROGRAMAR um protótipo funcional para o Thiago.
 
-PASSO 2 - A INVESTIGAÇÃO DA DOR (MUITO IMPORTANTE):
-Se for Empresa: Investigue profundamente. Ex: "Na sua empresa, onde vocês perdem mais tempo ou dinheiro hoje? (Ex: controle de estoque, garantias de peças, atendimento)".
-Se for Pessoal: Investigue a desorganização diária. Ex: "Qual parte do seu dia é mais caótica? Tarefas dos filhos, compras de mercado, lembretes?"
-NÃO passe para o próximo passo até que ele relate um problema real.
-
-PASSO 3 - O DIAGNÓSTICO (O FACILITÓIDE):
-Aja como especialista. Diga que a thIAguinho cria sistemas sob medida para isso. 
-Resuma o que você vai criar para ele (Ex: "Vou desenhar um Checklist Interativo Diário" ou "Vou desenhar um CRM para Oficina que controla as garantias das peças").
-Peça o WhatsApp (com DDD) para o Thiago enviar o modelo técnico desse projeto.
-
-PASSO 4 - A ARQUITETURA TÉCNICA (SÓ DEPOIS DE RECEBER O WHATSAPP):
-Agradeça ao cliente. No FINAL ABSOLUTO da sua mensagem, gere a tag oculta para o painel do Thiago.
-Aqui você vira Engenheira. Entregue um escopo TÉCNICO para o Thiago saber como programar ou configurar no Firebase.
-
-FORMATO OBRIGATÓRIO DA TAG FINAL:
+GERAR EXATAMENTE ESTA TAG NO FINAL DA DESPEDIDA:
 [LEAD: NOME=... | EMPRESA=... | DORES=... | FACILITOIDE=... | WHATSAPP=...]
 
-COMO PREENCHER "FACILITOIDE" NA TAG (Para o Thiago ler):
-Seja técnica. Use este molde em Markdown:
+COMO PREENCHER A TAG "FACILITOIDE" (USE ESTA ESTRUTURA RIGOROSA):
 **Projeto:** [Nome do Sistema]
-**Como vai funcionar:** [Explicação prática]
-**Banco de Dados (Sugestão Firebase):** [Quais coleções criar. Ex: Coleção 'veiculos', Coleção 'historico_pecas' para cruzar data e validar garantia de 3 meses].
-**Integrações Sugeridas:** [Ex: Cloudinary para bater foto do carro na oficina, API do WhatsApp para avisar cliente].`;
+**Como Funciona:** [Breve explicação de como resolve a dor]
+
+**1. Estrutura Visual (HTML + Tailwind)**
+Escreva um código HTML limpo, moderno e responsivo (usando Tailwind) que crie a interface principal desse sistema.
+\`\`\`html
+<!-- Código HTML completo da tela principal aqui -->
+\`\`\`
+
+**2. Lógica e Banco de Dados (JavaScript + Firebase)**
+Escreva o script JS que faz esse sistema funcionar (salvar os dados ou ler do Firebase).
+\`\`\`javascript
+// Lógica do sistema e integração proposta
+\`\`\`
+
+- WHATSAPP: Apenas os números com DDD, sem traços ou parênteses (ex: 11999999999).`;
 
 export function atualizarPromptMemoria(novoPrompt) {
     if (novoPrompt && novoPrompt.trim() !== '') {
@@ -68,7 +69,7 @@ export async function askGemini(msgUsuario) {
     try {
         const apiKey = await obterChaveDaApi();
         if (!apiKey) {
-            return "Aviso do Sistema: O administrador da Agência ainda não configurou a chave da IA no Painel.";
+            return "Aviso do Sistema: O administrador da Agência ainda não configurou a chave da Inteligência Artificial no Painel.";
         }
 
         const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
@@ -90,30 +91,26 @@ export async function askGemini(msgUsuario) {
         
         let botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Falha nos circuitos neurais.";
         
-        // INTERCEPTAÇÃO DO ESCOPO TÉCNICO (O Regex mais seguro para evitar falhas)
+        // INTERCEPTAÇÃO DA FÁBRICA DE CÓDIGOS
         const regexLead = /\[LEAD:\s*NOME=([\s\S]*?)\|\s*EMPRESA=([\s\S]*?)\|\s*DORES=([\s\S]*?)\|\s*FACILITOIDE=([\s\S]*?)\|\s*WHATSAPP=([\s\S]*?)\]/i;
         const match = botReply.match(regexLead);
         
         if (match) {
             const [, nome, empresa, dores, facilitoide, whatsapp] = match;
             
-            // Filtro rígido para o WhatsApp
             let wppLimpo = whatsapp.replace(/\D/g, '');
-            if (wppLimpo.startsWith('55') && wppLimpo.length > 11) {
-                wppLimpo = wppLimpo.substring(2); 
-            }
+            if (wppLimpo.startsWith('55') && wppLimpo.length > 11) wppLimpo = wppLimpo.substring(2); 
 
             const novoLeadRef = push(ref(database, 'projetos_capturados'));
             set(novoLeadRef, {
                 nome: nome.trim() || "Não informado",
-                empresa: empresa.trim() || "Pessoa Física / Rotina",
+                empresa: empresa.trim() || "Não informada",
                 dores: dores.trim(),
-                facilitoide: facilitoide.trim(), // O super escopo técnico para você
+                facilitoide: facilitoide.trim(), // Aqui vai o código HTML e JS puro!
                 whatsapp: wppLimpo,
                 data: new Date().toISOString()
             });
 
-            // Oculta a arquitetura técnica da visão do cliente final
             botReply = botReply.replace(regexLead, '').trim();
         }
 
@@ -121,7 +118,7 @@ export async function askGemini(msgUsuario) {
 
     } catch(e) {
         console.error("Erro Gemini:", e);
-        return "Ops! Estou processando uma lógica avançada. Você pode repetir, por favor?";
+        return "Ops! Estou compilando o código-fonte na nuvem. Pode repetir, por favor?";
     }
 }
 
