@@ -1,38 +1,26 @@
-// NOME DO ARQUIVO: admin-logic.js
+// NOME DO FICHEIRO: admin-logic.js
 // LOCALIZAÇÃO: Dentro da pasta 'js'
 
 import { auth, database, signInWithEmailAndPassword, signOut, onAuthStateChanged, ref, set, onValue, get } from './firebase-config.js';
-import { atualizarPromptMemoria, systemPrompt as promptPadraoDaAPI } from './gemini-api.js';
-
-// Função global para copiar códigos (O botão do Canvas)
-window.copiarCodigo = function(btnElement, codigoCodificado) {
-    const codigoReal = decodeURIComponent(codigoCodificado);
-    navigator.clipboard.writeText(codigoReal).then(() => {
-        const textoOriginal = btnElement.innerHTML;
-        btnElement.innerHTML = "<i class='bx bx-check'></i> Copiado!";
-        btnElement.classList.replace("bg-slate-700", "bg-emerald-600");
-        setTimeout(() => {
-            btnElement.innerHTML = textoOriginal;
-            btnElement.classList.replace("bg-emerald-600", "bg-slate-700");
-        }, 2000);
-    }).catch(err => console.error("Falha ao copiar", err));
-};
+import { atualizarPromptMemoria, systemPrompt as promptPadraoDaAPI, conversarComDesenvolvedorIA, resetarChatAdmin } from './gemini-api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    
     const emailInput = document.getElementById('email-admin');
     const senhaInput = document.getElementById('senha-admin');
     const btnLogin = document.getElementById('btn-login');
     const btnLogout = document.getElementById('btn-logout');
     const erroMsg = document.getElementById('msg-erro-login');
-    const btnSavePrompt = document.getElementById('btn-save-prompt');
-    const btnSaveKey = document.getElementById('btn-save-key');
+    
     const apiKeyInput = document.getElementById('api-key-input');
     const gridLeads = document.getElementById('grid-leads');
     const modalProjeto = document.getElementById('modal-projeto');
     
     let usuarioLogado = null;
     let listaDeClientesGlobais = [];
+    let contextoProjetoAtual = ""; // Guarda o texto do projeto aberto para a IA saber sobre o que programar
 
+    // --- SESSÃO E LOGIN ---
     onAuthStateChanged(auth, (user) => {
         if (user) {
             usuarioLogado = user;
@@ -49,11 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if(btnLogin) {
         btnLogin.addEventListener('click', () => {
-            btnLogin.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Conectando...";
-            signInWithEmailAndPassword(auth, emailInput.value, senhaInput.value).catch(() => {
-                erroMsg.classList.remove('oculto');
-                btnLogin.innerHTML = "Entrar no Painel";
-            });
+            btnLogin.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> A ligar...";
+            signInWithEmailAndPassword(auth, emailInput.value, senhaInput.value)
+                .catch((error) => { erroMsg.classList.remove('oculto'); btnLogin.innerHTML = "Entrar no Painel"; });
         });
     }
 
@@ -61,40 +47,42 @@ document.addEventListener('DOMContentLoaded', () => {
         btnLogout.addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
     }
 
-    if(btnSaveKey) {
-        btnSaveKey.addEventListener('click', () => {
+    if(document.getElementById('btn-save-key')) {
+        document.getElementById('btn-save-key').addEventListener('click', () => {
+            if (!usuarioLogado) return;
             const novaChave = apiKeyInput.value.trim();
             if(!novaChave) return;
-            btnSaveKey.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
-            set(ref(database, 'admin_config/gemini_api_key'), novaChave).then(() => {
-                btnSaveKey.innerHTML = "<i class='bx bx-check'></i> Guardada";
-                setTimeout(() => btnSaveKey.innerHTML = "Salvar", 2000);
-            });
+            const btn = document.getElementById('btn-save-key');
+            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
+            set(ref(database, 'admin_config/gemini_api_key'), novaChave)
+                .then(() => { btn.innerHTML = "Guardada"; setTimeout(() => btn.innerHTML = "Guardar", 2000); });
         });
     }
 
-    if(btnSavePrompt) {
-        btnSavePrompt.addEventListener('click', () => {
+    if(document.getElementById('btn-save-prompt')) {
+        document.getElementById('btn-save-prompt').addEventListener('click', () => {
+            if (!usuarioLogado) return;
+            const btn = document.getElementById('btn-save-prompt');
+            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>...";
             const novoPrompt = document.getElementById('prompt-ia').value;
-            const originalText = btnSavePrompt.innerHTML;
-            btnSavePrompt.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Salvando...";
-            set(ref(database, 'admin_config/prompt_mascote'), novoPrompt).then(() => {
-                atualizarPromptMemoria(novoPrompt);
-                btnSavePrompt.innerHTML = "<i class='bx bx-check'></i> Atualizado!";
-                setTimeout(() => btnSavePrompt.innerHTML = originalText, 2000);
-            });
+            set(ref(database, 'admin_config/prompt_mascote'), novoPrompt)
+                .then(() => { atualizarPromptMemoria(novoPrompt); btn.innerHTML = "Atualizado!"; setTimeout(() => btn.innerHTML = "Atualizar Cérebro", 2000); });
         });
     }
 
+    // --- LEITURA DA BASE DE DADOS CRM ---
     function iniciarLeituraDoBancoDeDados() {
-        get(ref(database, 'admin_config/gemini_api_key')).then((snap) => { if(snap.exists() && apiKeyInput) apiKeyInput.value = snap.val(); });
-        get(ref(database, 'admin_config/prompt_mascote')).then((snap) => {
+        get(ref(database, 'admin_config/gemini_api_key')).then((snapshot) => {
+            if(snapshot.exists() && apiKeyInput) apiKeyInput.value = snapshot.val();
+        });
+
+        get(ref(database, 'admin_config/prompt_mascote')).then((snapshot) => {
             const caixaTexto = document.getElementById('prompt-ia');
-            if (snap.exists()) {
-                if(caixaTexto) caixaTexto.value = snap.val();
-                atualizarPromptMemoria(snap.val());
-            } else {
-                if(caixaTexto) caixaTexto.value = promptPadraoDaAPI;
+            if (snapshot.exists() && caixaTexto) {
+                caixaTexto.value = snapshot.val();
+                atualizarPromptMemoria(snapshot.val());
+            } else if(caixaTexto) {
+                caixaTexto.value = promptPadraoDaAPI;
             }
         });
 
@@ -102,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(!gridLeads) return;
             gridLeads.innerHTML = ''; 
             if (!snapshot.exists()) {
-                gridLeads.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500"><p>Nenhum código gerado ainda.</p></div>';
+                gridLeads.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500"><p>Nenhum projeto desenhado ainda.</p></div>';
                 return;
             }
 
@@ -111,34 +99,27 @@ document.addEventListener('DOMContentLoaded', () => {
             listaDeClientesGlobais.sort((a, b) => new Date(b.data) - new Date(a.data));
 
             listaDeClientesGlobais.forEach((cliente, index) => {
-                const dataFormatada = new Date(cliente.data).toLocaleDateString('pt-BR');
-                let numeroLimpo = cliente.whatsapp ? cliente.whatsapp.replace(/\D/g, '') : '';
-                if (numeroLimpo.length >= 10 && numeroLimpo.length <= 11) numeroLimpo = '55' + numeroLimpo; 
+                const dataFormatada = new Date(cliente.data).toLocaleDateString('pt-PT');
+                let numWpp = cliente.whatsapp ? cliente.whatsapp.replace(/\D/g, '') : '';
+                if (numWpp.length >= 10 && numWpp.length <= 11) numWpp = '55' + numWpp; 
+                else if (!numWpp.startsWith('55') && numWpp.length >= 12) numWpp = '55' + numWpp; 
                 
                 const card = document.createElement('div');
-                card.className = "bg-slate-900 border border-slate-700 rounded-xl p-5 hover:border-red-500 transition shadow-lg flex flex-col justify-between";
+                card.className = "bg-slate-900 border border-slate-700 rounded-xl p-5 hover:border-sky-500 transition shadow-lg flex flex-col justify-between cursor-pointer group";
+                // Torna o card todo clicável para abrir o Estúdio
+                card.onclick = (e) => { if(!e.target.closest('a') && !e.target.closest('button.btn-trash')) window.abrirModalProjeto(index); };
                 card.innerHTML = `
                     <div>
                         <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <h4 class="font-bold text-white text-lg leading-tight">${cliente.nome}</h4>
-                                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">${cliente.empresa}</p>
-                            </div>
+                            <div><h4 class="font-bold text-white text-lg">${cliente.nome}</h4><p class="text-xs text-sky-400 font-semibold uppercase">${cliente.empresa}</p></div>
                             <span class="text-[10px] text-slate-500 bg-slate-800 px-2 py-1 rounded">${dataFormatada}</span>
                         </div>
                         <p class="text-sm text-slate-300 line-clamp-2 mb-4 italic">"${cliente.dores}"</p>
                     </div>
-                    
                     <div class="border-t border-slate-700 pt-4 mt-auto flex gap-2">
-                        <button onclick="window.abrirModalProjeto(${index})" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold py-2 rounded-lg transition border border-slate-600 flex items-center justify-center gap-2">
-                            <i class='bx bx-code-block'></i> Ver Códigos
-                        </button>
-                        <a href="https://wa.me/${numeroLimpo}?text=${encodeURIComponent(`Olá ${cliente.nome}! Nossa IA já construiu e programou a estrutura do seu novo sistema. Podemos conversar?`)}" target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center" title="Iniciar Venda">
-                            <i class='bx bxl-whatsapp text-lg'></i>
-                        </a>
-                        <button onclick="window.excluirProjeto('${cliente.id}')" class="w-10 bg-red-900 hover:bg-red-700 text-white rounded-lg flex items-center justify-center">
-                            <i class='bx bx-trash text-lg'></i>
-                        </button>
+                        <button class="flex-1 bg-sky-900/40 group-hover:bg-sky-600 text-white text-sm font-semibold py-2 rounded-lg transition border border-sky-800 flex items-center justify-center gap-2"><i class='bx bx-terminal'></i> Abrir Fábrica</button>
+                        <a href="https://wa.me/${numWpp}?text=Olá ${cliente.nome}, sou o Thiago..." target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center"><i class='bx bxl-whatsapp text-lg'></i></a>
+                        <button onclick="window.excluirProjeto('${cliente.id}')" class="btn-trash w-10 bg-slate-800 hover:bg-red-700 text-slate-400 hover:text-white rounded-lg flex items-center justify-center"><i class='bx bx-trash text-lg'></i></button>
                     </div>
                 `;
                 gridLeads.appendChild(card);
@@ -147,40 +128,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.excluirProjeto = function(idProjeto) {
-        if (confirm("Excluir este código de projeto permanentemente?")) {
-            set(ref(database, `projetos_capturados/${idProjeto}`), null);
-        }
+        if (confirm("Deseja eliminar este projeto da fábrica?")) set(ref(database, `projetos_capturados/${idProjeto}`), null);
     };
 
-    // --- FORMATADOR DE CÓDIGO (ESTILO CANVAS) ---
-    function formatarComoCanvas(texto) {
-        if(!texto) return "Nenhum dado recebido.";
-        
-        // 1. Formata negritos e quebras de linha normais
-        let html = texto.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>');
-        
-        // 2. Extrai blocos de código ```linguagem ... ``` e cria as Caixas Negras com botão Copiar
-        html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, function(match, linguagem, codigo) {
-            const langName = linguagem ? linguagem.toUpperCase() : 'CÓDIGO';
-            const codigoEncode = encodeURIComponent(codigo.trim());
-            const codigoSafe = codigo.replace(/</g, '&lt;').replace(/>/g, '&gt;').trim();
-            
-            return `
-            <div class="bg-[#0d1117] rounded-xl border border-slate-600 my-5 overflow-hidden shadow-2xl">
-                <div class="flex justify-between items-center bg-[#161b22] px-4 py-3 border-b border-slate-700">
-                    <span class="text-xs text-slate-400 font-mono uppercase flex items-center gap-2"><i class='bx bx-code-alt'></i> ${langName}</span>
-                    <button onclick="window.copiarCodigo(this, '${codigoEncode}')" class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-4 py-1.5 rounded-lg transition font-semibold flex items-center gap-1 shadow"><i class='bx bx-copy'></i> Copiar</button>
-                </div>
-                <div class="p-4 overflow-x-auto bg-[#0d1117]">
-                    <pre class="text-[13px] text-emerald-400 font-mono leading-relaxed"><code>${codigoSafe}</code></pre>
-                </div>
-            </div>`;
-        });
-        
-        // Aplica quebras de linha (<br>) apenas FORA dos blocos de código
-        return html.replace(/\n(?![^<]*<\/code>)/g, '<br>');
-    }
-
+    // --- O ESTÚDIO DO ARQUITETO (MODAL + CHAT DEV) ---
     window.abrirModalProjeto = function(index) {
         const c = listaDeClientesGlobais[index];
         if(!c) return;
@@ -189,17 +140,66 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('modal-empresa').innerText = c.empresa;
         document.getElementById('modal-dores').innerText = c.dores;
         
-        // Aplica a formatação de caixas de código ao Facilitóide
-        document.getElementById('modal-facilitoide').innerHTML = formatarComoCanvas(c.facilitoide);
+        let formataFacilitoide = c.facilitoide ? c.facilitoide.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>') : "Sem arquitetura.";
+        document.getElementById('modal-facilitoide').innerHTML = formataFacilitoide;
         
-        let wpp = c.whatsapp ? c.whatsapp.replace(/\D/g, '') : '';
-        if (wpp.length >= 10 && wpp.length <= 11) wpp = '55' + wpp;
+        // Define o contexto que a IA vai ler para ajudar a programar
+        contextoProjetoAtual = `Cliente: ${c.nome}. Empresa: ${c.empresa}. Dor: ${c.dores}. A ideia do sistema a construir é: ${c.facilitoide}`;
+        
+        // Limpa o chat do programador sempre que abre um projeto novo
+        resetarChatAdmin();
+        const chatDisplay = document.getElementById('dev-chat-display');
+        chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! Sou o seu Desenvolvedor IA. Analisei a arquitetura deste projeto. Podes pedir-me o código HTML, a lógica JS, ou as configurações de Firebase e Cloudinary que precisas.</div>`;
 
-        document.getElementById('modal-whatsapp').href = `https://wa.me/${wpp}?text=${encodeURIComponent(`Olá ${c.nome}! Nossa IA já programou o código-fonte do seu sistema. Podemos marcar uma reunião?`)}`;
+        let numModal = c.whatsapp ? c.whatsapp.replace(/\D/g, '') : '';
+        if (numModal.length >= 10 && numModal.length <= 11) numModal = '55' + numModal;
+        document.getElementById('modal-whatsapp').href = `https://wa.me/${numModal}`;
+
         if(modalProjeto) modalProjeto.classList.remove('oculto');
     };
 
-    const fecharModal = () => { if(modalProjeto) modalProjeto.classList.add('oculto'); };
-    document.getElementById('btn-fechar-modal')?.addEventListener('click', fecharModal);
-    document.getElementById('btn-fechar-modal-2')?.addEventListener('click', fecharModal);
+    document.getElementById('btn-fechar-modal').addEventListener('click', () => modalProjeto.classList.add('oculto'));
+
+    // --- LÓGICA DO CHAT DE PROGRAMAÇÃO (CANVAS ADMIN) ---
+    const devInput = document.getElementById('dev-input');
+    const btnDevSend = document.getElementById('btn-dev-send');
+    const chatDisplay = document.getElementById('dev-chat-display');
+
+    function formatarCodigoIA(texto) {
+        // Transforma blocos de código markdown (```) em tags <pre><code> legíveis no painel
+        return texto.replace(/```(.*?)\n([\s\S]*?)```/g, '<pre><code class="$1">$2</code></pre>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    }
+
+    async function enviarMsgDev() {
+        const msg = devInput.value.trim();
+        if(!msg) return;
+
+        devInput.value = '';
+        devInput.disabled = true;
+        btnDevSend.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
+
+        // Imprime a pergunta do Thiago
+        const divAdmin = document.createElement('div');
+        divAdmin.className = "msg-dev admin";
+        divAdmin.innerText = msg;
+        chatDisplay.appendChild(divAdmin);
+        chatDisplay.scrollTop = chatDisplay.scrollHeight;
+
+        // Chama a IA com o contexto do projeto aberto
+        const respostaDaIA = await conversarComDesenvolvedorIA(msg, contextoProjetoAtual);
+
+        // Imprime a resposta (com os códigos) da IA
+        const divAI = document.createElement('div');
+        divAI.className = "msg-dev ai shadow-lg";
+        divAI.innerHTML = formatarCodigoIA(respostaDaIA);
+        chatDisplay.appendChild(divAI);
+        chatDisplay.scrollTop = chatDisplay.scrollHeight;
+
+        devInput.disabled = false;
+        devInput.focus();
+        btnDevSend.innerHTML = "<i class='bx bx-send'></i>";
+    }
+
+    btnDevSend.addEventListener('click', enviarMsgDev);
+    devInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') enviarMsgDev(); });
 });
