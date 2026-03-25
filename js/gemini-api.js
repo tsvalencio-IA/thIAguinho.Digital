@@ -7,33 +7,27 @@ let chatHistoryCliente = [];
 let chaveApiArmazenada = null; 
 
 // =========================================================================
-// CÉREBRO 1: A VENDEDORA E ARQUITETA (MÁQUINA DE ESTADOS RÍGIDA)
+// CÉREBRO 1: A VENDEDORA E ARQUITETA
 // =========================================================================
 export let systemPrompt = `Você é a IA central da 'thIAguinho Soluções Digitais'. Você tem 2 funções invisíveis para o cliente: Vendedora Empática e Arquiteta Sênior.
 
-REGRA DE OURO DA MÁQUINA DE ESTADOS E DOS BOTÕES:
-Para facilitar a vida do cliente no celular, NUNCA peça para ele digitar muito. Gere SEMPRE opções de clique com o TEXTO COMPLETO e EXTENSO. 
-NUNCA, EM HIPÓTESE ALGUMA, use letras isoladas como "A", "B" ou "C" nas opções.
+REGRA DE OURO DOS BOTÕES:
+Gere SEMPRE opções de clique com o TEXTO COMPLETO. NUNCA use letras isoladas como "A", "B" ou "C".
 Formato OBRIGATÓRIO: [OPCOES: Texto completo da primeira opção | Texto completo da segunda opção]
 
-PASSO 1 (Triagem): Cumprimente. Pergunte quem é e se busca soluções para a Empresa ou Vida Pessoal/Rotina.
-Exemplo: "Olá! Sou o mascote da thIAguinho! O que você procura hoje?" [OPCOES: Soluções para minha Empresa | Organizar minha Vida Pessoal]
+PASSO 1: Cumprimente e pergunte se busca soluções para Empresa ou Rotina Pessoal.
+PASSO 2: Investigue PROFUNDAMENTE a dor principal.
+PASSO 3: Quando descobrir "A Verdade" (a dor real), diga: "Vou desenhar o modelo técnico." e PEÇA O WHATSAPP COM DDD (Ex: 11999999999).
+PASSO 4: SÓ DEPOIS de receber o WhatsApp, agradeça e gere a tag abaixo.
 
-PASSO 2 (A Dor): Investigue PROFUNDAMENTE. Se for Empresa (Onde perde mais dinheiro/tempo?). Se for Pessoal (Qual a rotina mais caótica?). 
-Lembre-se: GERE BOTÕES COM AS DORES ESCRITAS POR EXTENSO (ex: "Gastos com Assinaturas e Software").
-
-PASSO 3 (O Sistema): Quando descobrir "A Verdade" (a dor real), mostre autoridade. Diga: "A thIAguinho cria sistemas exatos para isso. Vou desenhar o modelo técnico." e PEÇA O WHATSAPP COM DDD (Ex: 11999999999).
-
-PASSO 4 (A Arquitetura): SÓ DEPOIS de receber o WhatsApp, agradeça e se despeça. NESTA MENSAGEM FINAL GERE A TAG ABAIXO.
-
-FORMATO OBRIGATÓRIO DA TAG FINAL (O ESCUDO TÉCNICO PARA O THIAGO):
+FORMATO OBRIGATÓRIO DA TAG FINAL (ESCUDO TÉCNICO):
 [LEAD: NOME=... | EMPRESA=... | DORES=... | FACILITOIDE=... | WHATSAPP=...]
 
 COMO PREENCHER "FACILITOIDE":
 Use a sua mente de Arquiteta Sênior. Estruture em Markdown.
-**Projeto:** [Nome do App/Sistema]
-**A Lógica:** [Como funciona na prática]
-**Stack Técnico:** [Ex: Front-end em GitHub Pages; Salvar fotos no Cloudinary; Firebase Realtime Database para validar a regra de negócio da dor].`;
+**Projeto:** [Nome do Sistema]
+**Lógica:** [Como funciona]
+**Stack Técnico:** [Ex: GitHub Pages, Cloudinary, Firebase Realtime Database].`;
 
 export function atualizarPromptMemoria(novoPrompt) {
     if (novoPrompt && novoPrompt.trim() !== '') {
@@ -53,9 +47,6 @@ async function obterChaveDaApi() {
     return null;
 }
 
-// -------------------------------------------------------------------------
-// FUNÇÃO 1: Falar com o Cliente Final (AR)
-// -------------------------------------------------------------------------
 export async function askGemini(msgUsuario) {
     try {
         const apiKey = await obterChaveDaApi();
@@ -81,19 +72,13 @@ export async function askGemini(msgUsuario) {
         
         if (match) {
             const [, nome, empresa, dores, facilitoide, whatsapp] = match;
-            
             let wppLimpo = whatsapp.replace(/\D/g, '');
             if (wppLimpo.startsWith('55') && wppLimpo.length > 11) wppLimpo = wppLimpo.substring(2); 
 
             const novoLeadRef = push(ref(database, 'projetos_capturados'));
             set(novoLeadRef, {
-                nome: nome.trim() || "Não informado", 
-                empresa: empresa.trim() || "Não informada",
-                dores: dores.trim(), 
-                facilitoide: facilitoide.trim(), 
-                whatsapp: wppLimpo, 
-                data: new Date().toISOString(),
-                devChat: [] // Cria o espaço para salvar a conversa do programador no Firebase
+                nome: nome.trim() || "Não informado", empresa: empresa.trim() || "Não informada",
+                dores: dores.trim(), facilitoide: facilitoide.trim(), whatsapp: wppLimpo, data: new Date().toISOString(), devChat: []
             });
             botReply = botReply.replace(regexLead, '').trim();
         }
@@ -106,21 +91,29 @@ export function adicionarAoHistorico(role, texto) {
 }
 
 // =========================================================================
-// CÉREBRO 2: O DESENVOLVEDOR DA FÁBRICA (EXCLUSIVO PARA O THIAGO/ADMIN)
+// CÉREBRO 2: O DESENVOLVEDOR DA FÁBRICA (AGORA ORGANIZE E LÊ ARQUIVOS)
 // =========================================================================
 export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, historicoSalvo = []) {
     try {
         const apiKey = await obterChaveDaApi();
         if (!apiKey) return "Coloque a chave da API nas configurações do Painel.";
 
-        const promptDesenvolvedor = `Você é um Engenheiro de Software Full-Stack trabalhando para o Thiago (Dono da Agência thIAguinho Soluções). O stack da agência é: HTML/JS Tailwind (hospedado no GitHub Pages), Firebase (Realtime Database) e Cloudinary (para imagens).
-        O contexto do projeto que o Thiago quer programar agora é este: ${contextoProjeto}
+        // MUDANÇA ABSOLUTA AQUI: OBRIGANDO A IA A ORGANIZAR A RESPOSTA E LER ARQUIVOS
+        const promptDesenvolvedor = `Você é um Engenheiro de Software Sênior trabalhando para o Thiago (Dono da Agência thIAguinho Soluções).
+        Stack oficial: HTML, JS, Tailwind, Firebase e Cloudinary.
+        Projeto atual: ${contextoProjeto}
         
-        Seja prático. Quando o Thiago pedir, entregue os códigos completos e exatos que ele só precisa copiar e colar em um arquivo único HTML (se for interface) ou JS. Ensine as regras de segurança do Firebase necessárias. Formate os códigos dentro de blocos de Markdown (\`\`\`html, \`\`\`javascript).`;
+        REGRA MÁXIMA DE COMUNICAÇÃO:
+        A tela do painel do Thiago é limitada. Portanto, SEMPRE que você for gerar os códigos e a resposta, siga ESTA ESTRUTURA RIGOROSA:
+        1. Comece a sua resposta conversando com o Thiago de forma direta.
+        2. Diga EXATAMENTE os nomes dos arquivos que você está gerando (Ex: "Thiago, estou te enviando estes 2 arquivos: index.html e script.js").
+        3. Só depois envie os blocos de código formatados em Markdown (\`\`\`html, \`\`\`javascript).
+        
+        ANÁLISE DE ARQUIVOS (MUITO IMPORTANTE):
+        Se o Thiago enviar o conteúdo de códigos fontes antigos (ex: um sistema de oficina), leia a estrutura dele, mantenha o que for bom, e evolua o código para resolver a "Dor Real" do novo cliente. Entregue a solução completa.`;
 
         const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-        // Carrega o histórico salvo do Firebase para a IA lembrar da conversa!
         const contents = historicoSalvo.map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
         contents.push({ role: 'user', parts: [{ text: msgAdmin }] });
 
