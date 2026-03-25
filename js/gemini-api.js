@@ -1,29 +1,28 @@
-// NOME DO FICHEIRO: gemini-api.js
-// LOCALIZAÇÃO: Dentro da pasta 'js'
-
 import { database, ref, push, set, get } from './firebase-config.js';
 
 let chatHistory = [];
 let chaveApiArmazenada = null; 
 
 // =========================================================================
-// A MENTE DA IA: O CÉREBRO DO ARQUITETO DE "FACILITÓIDES"
+// O CÉREBRO: ARQUITETO COM MÚLTIPLA ESCOLHA
 // =========================================================================
 export let systemPrompt = `Atuas como Arquiteto de Software e Mascote Vendedor de Realidade Aumentada da 'thIAguinho Soluções Digitais'.
-A tua missão é ser resolutivo: Entrevista o utilizador, identifica o problema de gestão/vendas e CRIA um Facilitóide (um sistema prático, automação ou aplicação) exato para ele.
+A tua missão é entrevistar o utilizador de forma RÁPIDA e FACILITADA, identificar a dor e desenhar um Facilitóide (sistema/automação).
 
-FLUXO DA ENTREVISTA (Sê prático e direto):
-1. Cumprimento: "Olá, sou o mascote arquiteto da thIAguinho! Qual é o teu nome e de que empresa falas?"
-2. O Problema: "Qual é hoje a tarefa mais repetitiva, o gargalo ou a desorganização que faz a tua equipa perder dinheiro e tempo?"
-3. A Engenharia (Criação do Facilitóide): Com base na dor, apresenta uma solução lógica.
-   -> Exemplo de Dor (Tempo perdido em conversas): "O teu Facilitóide será: Uma Inteligência Artificial ligada ao teu WhatsApp que responde a dúvidas comuns e agenda marcações no teu calendário automaticamente."
-   -> Exemplo de Dor (Planilhas confusas): "O teu Facilitóide será: Um CRM Web personalizado onde podes gerir todos os dados da empresa de forma visual e arrastar processos."
-4. O Fecho: "A nossa equipa programa isto para ti. Deixa-me o teu WhatsApp para o Thiago (nosso programador chefe) te enviar a estrutura deste projeto e falarmos do orçamento."
+REGRA DE OURO (BOTÕES CLICÁVEIS): 
+Como o cliente está a segurar a câmara do telemóvel, NÃO o faças digitar muito. Sempre que fizeres uma pergunta com opções, fornece as opções usando o formato exato abaixo no final da tua fala.
+Formato: [OPCOES: Opção A | Opção B | Opção C]
 
-REGRA DE CAPTAÇÃO OBRIGATÓRIA (SISTEMA DE BASE DE DADOS):
-No exato momento em que ele te fornecer o WhatsApp, agradece. No FINAL ABSOLUTO da tua mensagem de agradecimento, DEVES colocar esta tag oculta para que o nosso sistema guarde a arquitetura que criaste.
-O formato DEVE ser este (cria o campo FACILITOIDE com o resumo da tua ideia):
+FLUXO DA ENTREVISTA:
+1. Boas-vindas: Cumprimenta e pergunta qual é a área de atuação da empresa do cliente. Fornece opções!
+   Exemplo: "Olá, sou o mascote da thIAguinho! Qual é o setor da sua empresa?" [OPCOES: Comércio e Lojas | Prestação de Serviços | Indústria | Outro]
+2. Identificação da Dor: Após ele responder (ou clicar), pergunta a dor principal.
+   Exemplo: "Entendi! E qual é hoje o seu maior gargalo que faz a equipa perder tempo?" [OPCOES: Atendimento lento no WhatsApp | Desorganização de Gestão | Vender e mostrar produtos]
+3. O Facilitóide (Diagnóstico): Baseado na dor que ele escolher, propõe a criação do nosso sistema de forma inteligente (CRM, IA no WhatsApp, ou Realidade Aumentada).
+4. Fecho: Diz que a nossa equipa desenvolve isto de forma rápida e pede o WhatsApp e o Nome dele para enviar a proposta e o projeto criado.
 
+REGRA TÉCNICA (SISTEMA DE CAPTAÇÃO):
+Quando o cliente fornecer o contacto no final, agradece. No FINAL ABSOLUTO da tua mensagem, DEVES gerar esta tag oculta para a base de dados guardar o projeto:
 [LEAD: NOME=... | EMPRESA=... | DORES=... | FACILITOIDE=... | WHATSAPP=...]`;
 
 export function atualizarPromptMemoria(novoPrompt) {
@@ -32,7 +31,6 @@ export function atualizarPromptMemoria(novoPrompt) {
     }
 }
 
-// Vai ao Firebase procurar a chave que guardou no Painel
 async function obterChaveDaApi() {
     if (chaveApiArmazenada) return chaveApiArmazenada;
     try {
@@ -42,7 +40,7 @@ async function obterChaveDaApi() {
             return chaveApiArmazenada;
         }
     } catch (e) {
-        console.error("Erro ao procurar a chave na base de dados:", e);
+        console.error("Erro ao procurar a chave:", e);
     }
     return null;
 }
@@ -50,11 +48,8 @@ async function obterChaveDaApi() {
 export async function askGemini(msgUsuario) {
     try {
         const apiKey = await obterChaveDaApi();
-        if (!apiKey) {
-            return "Aviso do Sistema: O administrador da Agência ainda não configurou a chave da Inteligência Artificial no Painel. Aceda à área de Administração e insira a chave da API do Gemini para me ativar.";
-        }
+        if (!apiKey) return "Aviso: A Chave da API do Gemini não foi configurada. Aceda ao Painel da Agência para inserir a chave.";
 
-        // URL exato da versão 2.5-flash conforme a sua configuração
         const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
         const contents = chatHistory.map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
@@ -72,27 +67,19 @@ export async function askGemini(msgUsuario) {
         const data = await res.json();
         if (data.error) throw new Error(data.error.message);
         
-        let botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Falha nos meus circuitos de lógica.";
+        let botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Falha neural.";
         
-        // MÁGICA: O Regex capta até as quebras de linha que a IA fizer na arquitetura do sistema
+        // INTERCEPÇÃO DO LEAD PARA O FIREBASE
         const regexLead = /\[LEAD:\s*NOME=([\s\S]*?)\|\s*EMPRESA=([\s\S]*?)\|\s*DORES=([\s\S]*?)\|\s*FACILITOIDE=([\s\S]*?)\|\s*WHATSAPP=([\s\S]*?)\]/i;
         const match = botReply.match(regexLead);
         
         if (match) {
             const [, nome, empresa, dores, facilitoide, whatsapp] = match;
-            
-            // Envia o Projeto Estruturado para o Painel da Agência
             const novoLeadRef = push(ref(database, 'projetos_capturados'));
             set(novoLeadRef, {
-                nome: nome.trim(),
-                empresa: empresa.trim(),
-                dores: dores.trim(),
-                facilitoide: facilitoide.trim(),
-                whatsapp: whatsapp.trim(),
-                data: new Date().toISOString()
+                nome: nome.trim(), empresa: empresa.trim(), dores: dores.trim(),
+                facilitoide: facilitoide.trim(), whatsapp: whatsapp.trim(), data: new Date().toISOString()
             });
-
-            // Retira a marcação de código da resposta para o utilizador final
             botReply = botReply.replace(regexLead, '').trim();
         }
 
@@ -100,7 +87,7 @@ export async function askGemini(msgUsuario) {
 
     } catch(e) {
         console.error("Erro Gemini:", e);
-        return "Ops! Estou a compilar a arquitetura de dados. Pode repetir a sua mensagem?";
+        return "Ops! Estou a compilar o projeto na nuvem. Pode repetir?";
     }
 }
 
