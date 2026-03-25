@@ -1,29 +1,35 @@
 // NOME DO FICHEIRO: gemini-api.js
 // LOCALIZAÇÃO: Dentro da pasta 'js'
 
-import { database, ref, push, set, get } from './firebase-config.js';
+import { database, ref, push, set } from './firebase-config.js';
+
+// =========================================================================
+// COLE AQUI A SUA CHAVE DO GEMINI API
+// Acesse https://aistudio.google.com/app/apikey para criar a sua
+// =========================================================================
+const GEMINI_API_KEY = "COLE_AQUI_A_SUA_CHAVE_DO_GEMINI"; 
+
+const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 let chatHistory = [];
-let chaveApiArmazenada = null; // A chave será puxada do Firebase
 
 // =========================================================================
-// O CÉREBRO: ARQUITETO DE SISTEMAS (FACILITÓIDES)
+// A MENTE DA IA: O CÉREBRO DO ARQUITETO DE "FACILITÓIDES"
 // =========================================================================
-export let systemPrompt = `Você é o Arquiteto de Software e Mascote Vendedor de Realidade Aumentada da 'thIAguinho Soluções Digitais'.
-A sua missão é atuar como um engenheiro de soluções sénior. Deve entrevistar o utilizador, entender a sua dor real e criar uma solução inteligente e prática que funcione (um "Facilitóide").
+export let systemPrompt = `Atuas como Arquiteto de Software e Mascote Vendedor de Realidade Aumentada da 'thIAguinho Soluções Digitais'.
+A tua missão é ser resolutivo: Entrevista o utilizador, identifica o problema de gestão/vendas e CRIA um Facilitóide (um sistema prático, automação ou aplicação) exato para ele.
 
-FLUXO DA ENTREVISTA VERDADEIRA:
-1. Boas-vindas: Diga que é o mascote inteligente da thIAguinho. Pergunte o NOME do cliente e a EMPRESA.
-2. Identificação da Dor: "Para que eu desenhe a solução perfeita, diga-me: qual é o processo que hoje toma mais tempo, dinheiro ou gera desorganização na sua empresa?"
-3. Criação do Facilitóide (A Mágica): Aja como um programador especialista. Com base na resposta, desenhe um sistema ou automação exata:
-   -> Se o problema for gestão/papéis: "Perfeito. Acabei de idealizar um Facilitóide para si: Um CRM Web integrado ao WhatsApp, onde a sua equipa arrasta as tarefas e o sistema faz o seguimento automático."
-   -> Se o problema for atendimento: "Problema resolvido. O seu Facilitóide será: Uma Inteligência Artificial no vosso WhatsApp que atende, vende e agenda serviços 24h por dia no calendário."
-   -> Se quiser inovação para vendas: "O seu Facilitóide será uma experiência em Realidade Aumentada onde o seu catálogo salta em 3D."
-4. Fechamento: Diga que a nossa equipa de desenvolvimento programa isto rapidamente. Peça o número de WhatsApp para que o Thiago (nosso Gestor) possa mostrar-lhe a arquitetura pronta e enviar a proposta.
+FLUXO DA ENTREVISTA (Sê prático e direto):
+1. Cumprimento: "Olá, sou o mascote arquiteto da thIAguinho! Qual é o teu nome e de que empresa falas?"
+2. O Problema: "Qual é hoje a tarefa mais repetitiva, o gargalo ou a desorganização que faz a tua equipa perder dinheiro e tempo?"
+3. A Engenharia (Criação do Facilitóide): Com base na dor, apresenta uma solução lógica.
+   -> Exemplo de Dor (Tempo perdido em conversas): "O teu Facilitóide será: Uma Inteligência Artificial ligada ao teu WhatsApp que responde a dúvidas comuns e agenda marcações no teu calendário automaticamente."
+   -> Exemplo de Dor (Planilhas confusas): "O teu Facilitóide será: Um CRM Web personalizado onde podes gerir todos os dados da empresa de forma visual e arrastar processos."
+4. O Fecho: "A nossa equipa programa isto para ti. Deixa-me o teu WhatsApp para o Thiago (nosso programador chefe) te enviar a estrutura deste projeto e falarmos do orçamento."
 
-REGRA TÉCNICA OBRIGATÓRIA (SISTEMA DE CAPTAÇÃO):
-Assim que o cliente fornecer o WhatsApp, agradeça. Exatamente no FINAL da sua mensagem de agradecimento, deve gerar o código oculto para a nossa base de dados ler o projeto.
-O formato DEVE ser rigorosamente este (seja claro a detalhar a solução na tag FACILITOIDE):
+REGRA DE CAPTAÇÃO OBRIGATÓRIA (SISTEMA DE BASE DE DADOS):
+No exato momento em que ele te fornecer o WhatsApp, agradece. No FINAL ABSOLUTO da tua mensagem de agradecimento, DEVES colocar esta tag oculta para que o nosso sistema guarde a arquitetura que criaste.
+O formato DEVE ser este (cria o campo FACILITOIDE com o resumo da tua ideia):
 
 [LEAD: NOME=... | EMPRESA=... | DORES=... | FACILITOIDE=... | WHATSAPP=...]`;
 
@@ -34,30 +40,8 @@ export function atualizarPromptMemoria(novoPrompt) {
     }
 }
 
-// Procura a Chave da API guardada no Painel Admin
-async function obterChaveDaApi() {
-    if (chaveApiArmazenada) return chaveApiArmazenada;
-    try {
-        const snapshot = await get(ref(database, 'configuracoes/gemini_api_key'));
-        if (snapshot.exists()) {
-            chaveApiArmazenada = snapshot.val();
-            return chaveApiArmazenada;
-        }
-    } catch (e) {
-        console.error("Erro ao ler a chave da API:", e);
-    }
-    return null;
-}
-
 export async function askGemini(msgUsuario) {
     try {
-        const apiKey = await obterChaveDaApi();
-        if (!apiKey) {
-            return "Aviso do Sistema: O administrador da Agência ainda não configurou a chave da Inteligência Artificial no Painel. Por favor, aceda à área de Administração e insira a chave da API do Gemini.";
-        }
-
-        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
         const contents = chatHistory.map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
         contents.push({ role: 'user', parts: [{ text: msgUsuario }] });
 
@@ -73,15 +57,16 @@ export async function askGemini(msgUsuario) {
         const data = await response.json();
         if (data.error) throw new Error(data.error.message);
         
-        let botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Falha nos meus circuitos.";
+        let botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Falha nos meus circuitos de lógica.";
         
-        // INTERCEPTAÇÃO: O Regex extrai o Facilitóide desenhado e guarda no Firebase
+        // MÁGICA: O Regex capta até as quebras de linha que a IA fizer na arquitetura do sistema
         const regexLead = /\[LEAD:\s*NOME=([\s\S]*?)\|\s*EMPRESA=([\s\S]*?)\|\s*DORES=([\s\S]*?)\|\s*FACILITOIDE=([\s\S]*?)\|\s*WHATSAPP=([\s\S]*?)\]/i;
         const match = botReply.match(regexLead);
         
         if (match) {
             const [, nome, empresa, dores, facilitoide, whatsapp] = match;
             
+            // Envia o Projeto Estruturado para o Painel da Agência
             const novoLeadRef = push(ref(database, 'leads'));
             set(novoLeadRef, {
                 nome: nome.trim(),
@@ -92,7 +77,7 @@ export async function askGemini(msgUsuario) {
                 data: new Date().toISOString()
             });
 
-            // Remove a linguagem de programação da vista do cliente
+            // Retira a marcação de código da resposta para o utilizador final
             botReply = botReply.replace(regexLead, '').trim();
         }
 
@@ -100,7 +85,7 @@ export async function askGemini(msgUsuario) {
 
     } catch(e) {
         console.error("Erro Gemini:", e);
-        return "Ops! Estou a processar as engrenagens de IA. Pode repetir a mensagem?";
+        return "Ops! Estou a compilar a arquitetura de dados. Pode repetir a sua mensagem?";
     }
 }
 
