@@ -11,7 +11,7 @@
     <style>
         :root {
             --bs-body-bg: #212529; /* Darker background */
-            --bs-body-color: #f8f9fa; /* Light text */
+            --bs-body-color: #f8f9fa; /* Light text (off-white) */
             --bs-dark-card: #343a40; /* Darker card/nav */
             --bs-accent: #e65100; /* Vibrant Orange */
             --bs-primary-light: #0d6efd; /* For feedback button */
@@ -19,7 +19,7 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bs-body-bg);
-            color: var(--bs-body-color);
+            color: var(--bs-body-color); /* General body text color */
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -55,7 +55,7 @@
         }
         .card-header {
             background-color: var(--bs-accent);
-            color: white;
+            color: white; /* Header text is always white for contrast */
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             border-top-left-radius: calc(0.75rem - 1px);
             border-top-right-radius: calc(0.75rem - 1px);
@@ -84,22 +84,22 @@
 
         .form-control, .form-select, .form-control:focus, .form-select:focus {
             background-color: #495057; /* Darker input fields */
-            color: var(--bs-body-color);
+            color: var(--bs-body-color); /* Input text color */
             border-color: #6c757d;
         }
         .form-control::placeholder {
-            color: #ced4da;
+            color: rgba(255, 255, 255, 0.7); /* Brighter placeholder text */
         }
         label {
-            color: var(--bs-body-color);
+            color: var(--bs-body-color); /* Label text color */
         }
         .table {
             margin-top: 15px;
-            color: var(--bs-body-color);
+            color: var(--bs-body-color); /* Table body text color */
         }
         .table thead th {
             background-color: #495057;
-            color: white;
+            color: white; /* Table header text is white */
         }
         .table-striped tbody tr:nth-of-type(odd) {
             background-color: rgba(255, 255, 255, 0.05);
@@ -107,20 +107,28 @@
         .table-hover tbody tr:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
+        /* Ensure table text in empty state is visible */
+        .table td {
+            color: var(--bs-body-color);
+        }
+        .empty-list-message { /* Custom class for empty list messages */
+            color: var(--bs-body-color);
+        }
+
         .modal-content {
             background-color: var(--bs-dark-card);
-            color: var(--bs-body-color);
+            color: var(--bs-body-color); /* Modal body text color */
         }
         .modal-header {
             background-color: var(--bs-accent);
-            color: white;
+            color: white; /* Modal header text color */
             border-bottom: none;
         }
         .modal-footer {
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
         .btn-close {
-            filter: invert(1) grayscale(100%) brightness(200%); /* Make close button white */
+            filter: invert(1) grayscale(100%) brightness(200%); /* Make close button bright white */
         }
 
         /* Responsive Modals (forcing fullscreen on small devices) */
@@ -160,6 +168,7 @@
             border-radius: 0.5rem;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
             background-color: #3f464e; /* Slightly lighter dark for contrast */
+            color: var(--bs-body-color); /* Ensure card text is light */
         }
         .servico-card.status-agendado { border-color: #0d6efd; } /* Blue - for pending */
         .servico-card.status-em-andamento { border-color: #ffc107; } /* Yellow - for in progress */
@@ -169,10 +178,10 @@
         .servico-card h6 {
             margin-bottom: 5px;
             font-weight: bold;
-            color: var(--bs-body-color);
+            color: var(--bs-body-color); /* Card title text color */
         }
         .servico-card small {
-            color: #ced4da;
+            color: var(--bs-body-color); /* Small text within card color */
         }
         .servico-card .actions {
             margin-top: 10px;
@@ -193,7 +202,7 @@
             right: 20px;
             z-index: 1000;
             background-color: var(--bs-primary-light); /* Bootstrap primary blue for distinctness */
-            color: white;
+            color: white; /* Feedback button text color */
             border-radius: 50px;
             padding: 15px 20px;
             font-size: 1.1em;
@@ -226,7 +235,7 @@
         /* Footer */
         footer {
             background-color: var(--bs-dark-card);
-            color: #ced4da;
+            color: var(--bs-body-color); /* Footer text color */
             padding: 15px 0;
             text-align: center;
             margin-top: auto; /* Push footer to the bottom */
@@ -242,10 +251,14 @@
             border-radius: 0.5rem;
             margin-bottom: 20px;
             border-left: 5px solid var(--bs-accent);
+            color: var(--bs-body-color); /* Ensure card text is light */
         }
         .moto-dashboard-card h5 {
-            color: var(--bs-accent);
+            color: var(--bs-accent); /* Special color for specific card titles */
             margin-bottom: 10px;
+        }
+        .moto-dashboard-card p {
+            color: var(--bs-body-color);
         }
         .moto-dashboard-card .badge {
             font-size: 1em;
@@ -257,22 +270,24 @@
             padding: 15px;
             border-radius: 0.75rem;
             margin-bottom: 15px;
-            color: white;
+            color: white; /* Status card text is white */
         }
         .status-card.bg-agendado { background-color: #0d6efd; }
-        .status-card.bg-em-andamento { background-color: #ffc107; color: #343a40; }
+        .status-card.bg-em-andamento { background-color: #ffc107; color: #343a40; } /* Dark text on light background is okay */
         .status-card.bg-concluido { background-color: #28a745; }
         .status-card.bg-cancelado { background-color: #dc3545; }
         .status-card h4 {
             margin-bottom: 0.5rem;
+            color: white; /* Ensure h4 in status card is white */
         }
         .status-card p {
             font-size: 0.9em;
             margin-bottom: 0;
+            color: white; /* Ensure p in status card is white */
         }
 
         .service-timeline {
-            border-left: 2px solid #6c757d;
+            border-left: 2px solid var(--bs-body-color); /* Timeline line is light */
             padding-left: 20px;
             margin-left: 10px;
         }
@@ -304,13 +319,19 @@
         .timeline-item-status-cancelado::before { background-color: #dc3545; }
 
         .timeline-item h6 {
-            color: var(--bs-body-color);
+            color: var(--bs-body-color); /* Timeline item title color */
             font-weight: bold;
             margin-bottom: 5px;
         }
         .timeline-item small {
             display: block;
-            color: #ced4da;
+            color: var(--bs-body-color); /* Timeline item small text color */
+        }
+        /* Alert error messages */
+        .alert-danger {
+            color: white;
+            background-color: #dc3545;
+            border-color: #dc3545;
         }
     </style>
 </head>
@@ -586,23 +607,23 @@
                         <h5><i class="bi bi-motorbike me-2"></i>Minhas Motos</h5>
                     </div>
                     <div class="card-body" id="clientMotosList">
-                        <p class="text-muted">Nenhuma moto cadastrada para este cliente.</p>
+                        <p class="empty-list-message">Nenhuma moto cadastrada para este cliente.</p>
                     </div>
                 </div>
 
                 <h4 class="mt-4 mb-3"><i class="bi bi-gear me-2"></i>Status dos Serviços Atuais</h4>
                 <div id="clientCurrentServicesStatus" class="row">
-                    <div class="col-12"><p class="text-muted">Nenhum serviço em andamento ou agendado para suas motos no momento.</p></div>
+                    <div class="col-12"><p class="empty-list-message">Nenhum serviço em andamento ou agendado para suas motos no momento.</p></div>
                 </div>
 
                 <h4 class="mt-4 mb-3"><i class="bi bi-journal-text me-2"></i>Histórico Detalhado de Serviços</h4>
                 <div id="clientServicesHistory">
-                    <p class="text-muted">Nenhum histórico de serviços encontrado.</p>
+                    <p class="empty-list-message">Nenhum histórico de serviços encontrado.</p>
                 </div>
 
                 <h4 class="mt-4 mb-3"><i class="bi bi-wallet2 me-2"></i>Resumo de Gastos por Moto</h4>
                 <div id="clientSpendingSummary">
-                    <p class="text-muted">Nenhum gasto registrado para suas motos.</p>
+                    <p class="empty-list-message">Nenhum gasto registrado para suas motos.</p>
                 </div>
             </div>
             <div id="clientPanelError" class="alert alert-danger mt-3" style="display:none;">
@@ -674,7 +695,7 @@
                             <button type="button" class="btn btn-info w-100" onclick="generateClientPanelLink()">
                                 <i class="bi bi-whatsapp me-1"></i> Gerar Link de Acesso & Enviar WhatsApp
                             </button>
-                            <small class="text-muted d-block mt-2 text-center">O link será copiado para a área de transferência e uma opção de WhatsApp será exibida.</small>
+                            <small class="text-white-50 d-block mt-2 text-center">O link será copiado para a área de transferência e uma opção de WhatsApp será exibida.</small>
                         </div>
                         <hr class="my-4">
                         <button type="submit" class="btn btn-primary w-100">Salvar Cliente</button>
@@ -999,7 +1020,7 @@
             const list = document.getElementById('listaEstoque');
             list.innerHTML = '';
             if (estoqueItems.length === 0) {
-                list.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Nenhum item no estoque.</td></tr>';
+                list.innerHTML = '<tr><td colspan="6" class="text-center empty-list-message">Nenhum item no estoque.</td></tr>';
                 return;
             }
             estoqueItems.forEach(item => {
@@ -1092,7 +1113,7 @@
             const list = document.getElementById('listaClientes');
             list.innerHTML = '';
             if (clientes.length === 0) {
-                list.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Nenhum cliente cadastrado.</td></tr>';
+                list.innerHTML = '<tr><td colspan="3" class="text-center empty-list-message">Nenhum cliente cadastrado.</td></tr>';
                 return;
             }
             clientes.forEach(cliente => {
@@ -1219,7 +1240,7 @@
             const list = document.getElementById('listaMotos');
             list.innerHTML = '';
             if (motos.length === 0) {
-                list.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Nenhuma moto cadastrada.</td></tr>';
+                list.innerHTML = '<tr><td colspan="5" class="text-center empty-list-message">Nenhuma moto cadastrada.</td></tr>';
                 return;
             }
             motos.forEach(moto => {
@@ -1341,7 +1362,7 @@
             const list = document.getElementById('listaFuncionarios');
             list.innerHTML = '';
             if (funcionarios.length === 0) {
-                list.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Nenhum funcionário cadastrado.</td></tr>';
+                list.innerHTML = '<tr><td colspan="4" class="text-center empty-list-message">Nenhum funcionário cadastrado.</td></tr>';
                 return;
             }
             funcionarios.forEach(func => {
@@ -1439,7 +1460,7 @@
             const list = document.getElementById('listaFornecedores');
             list.innerHTML = '';
             if (fornecedores.length === 0) {
-                list.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Nenhum fornecedor cadastrado.</td></tr>';
+                list.innerHTML = '<tr><td colspan="4" class="text-center empty-list-message">Nenhum fornecedor cadastrado.</td></tr>';
                 return;
             }
             fornecedores.forEach(forn => {
@@ -1531,7 +1552,7 @@
             const sortedDates = Object.keys(groupedServicos).sort((a, b) => new Date(a) - new Date(b));
 
             if (sortedDates.length === 0) {
-                list.innerHTML = '<p class="text-muted text-center mt-3">Nenhum serviço registrado.</p>';
+                list.innerHTML = '<p class="empty-list-message text-center mt-3">Nenhum serviço registrado.</p>';
                 return;
             }
 
@@ -1709,7 +1730,7 @@
             let totalSaidas = 0;
 
             if (financeiroItems.length === 0) {
-                list.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Nenhuma transação financeira registrada.</td></tr>';
+                list.innerHTML = '<tr><td colspan="6" class="text-center empty-list-message">Nenhuma transação financeira registrada.</td></tr>';
             }
 
             const sortedFinanceiro = [...financeiroItems].sort((a, b) => new Date(b.data) - new Date(a.data));
@@ -1832,7 +1853,7 @@
             const clientMotosList = document.getElementById('clientMotosList');
             clientMotosList.innerHTML = '';
             if (motosDoCliente.length === 0) {
-                clientMotosList.innerHTML = '<p class="text-muted">Você ainda não possui motos cadastradas conosco.</p>';
+                clientMotosList.innerHTML = '<p class="empty-list-message">Você ainda não possui motos cadastradas conosco.</p>';
             } else {
                 motosDoCliente.forEach(moto => {
                     clientMotosList.innerHTML += `
@@ -1852,7 +1873,7 @@
             const servicesInProgressOrScheduled = servicos.filter(s => motosDoCliente.some(m => m.id === s.motoId) && (s.status === 'Agendado' || s.status === 'Em Andamento'));
 
             if (servicesInProgressOrScheduled.length === 0) {
-                clientCurrentServicesStatus.innerHTML = '<div class="col-12"><p class="text-muted">Nenhum serviço em andamento ou agendado para suas motos no momento.</p></div>';
+                clientCurrentServicesStatus.innerHTML = '<div class="col-12"><p class="empty-list-message">Nenhum serviço em andamento ou agendado para suas motos no momento.</p></div>';
             } else {
                 servicesInProgressOrScheduled.sort((a,b) => new Date(a.dataAgendamento) - new Date(b.dataAgendamento)).forEach(serv => {
                     const moto = motosDoCliente.find(m => m.id === serv.motoId);
@@ -1879,7 +1900,7 @@
             let allServicesForClient = servicos.filter(s => motosDoCliente.some(m => m.id === s.motoId));
 
             if (allServicesForClient.length === 0) {
-                clientServicesHistory.innerHTML = '<p class="text-muted">Nenhum histórico de serviços encontrado para suas motos.</p>';
+                clientServicesHistory.innerHTML = '<p class="empty-list-message">Nenhum histórico de serviços encontrado para suas motos.</p>';
             } else {
                 const servicesByMoto = allServicesForClient.reduce((acc, service) => {
                     if (!acc[service.motoId]) acc[service.motoId] = [];
@@ -1918,7 +1939,7 @@
             clientSpendingSummary.innerHTML = '';
 
             if (motosDoCliente.length === 0) {
-                clientSpendingSummary.innerHTML = '<p class="text-muted">Nenhum gasto registrado para suas motos.</p>';
+                clientSpendingSummary.innerHTML = '<p class="empty-list-message">Nenhum gasto registrado para suas motos.</p>';
             } else {
                 motosDoCliente.forEach(moto => {
                     const servicosDaMotoConcluidos = servicos.filter(s => s.motoId === moto.id && s.status === 'Concluido');
