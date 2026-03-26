@@ -142,8 +142,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.innerHTML = "<i class='bx bx-check'></i> Publicado!";
                 btn.classList.replace('bg-purple-600', 'bg-emerald-600');
                 
-                navigator.clipboard.writeText(pageUrl);
-                alert(`Sistema publicado com sucesso!\n\nLink: ${pageUrl}\n\n(Lembrete: O GitHub demora de 1 a 2 minutos para colocar no ar. Se der 404, espere um minutinho e recarregue a página).\n\nO link JÁ ESTÁ COPIADO. Cole na mensagem do WhatsApp do cliente.`);
+                // MÁGICA AQUI: Salva o link oficial do cliente direto no Firebase!
+                await set(ref(database, `projetos_capturados/${idProjetoAberto}/linkDemo`), pageUrl);
+                
+                alert(`Sistema publicado com sucesso!\n\nLink: ${pageUrl}\n\nO link já foi salvo no painel! Feche esta janela e clique no botão verde do WhatsApp, o link vai aparecer lá automaticamente.`);
             } else {
                 const err = await putRes.json();
                 alert("Erro ao publicar no GitHub: " + err.message);
@@ -232,14 +234,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const projetosFiltrados = listaDeClientesGlobais.filter(c => { const s = c.status || 'novo'; return abaAtiva === 'novos' ? s === 'novo' : s === 'concluido'; });
         if (projetosFiltrados.length === 0) { gridLeads.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500"><i class='bx bx-sleepy text-4xl mb-3'></i><p>Nenhum projeto nesta aba.</p></div>`; return; }
 
-        const msgWppBase = "Olá, eu sou o Tiago Ventura Valêncio responsável pela Thiaguinho Soluções. Temos aqui um demo com uma proposta para a gente começar a discutir. Acesse o link para testar o sistema: \n\n[ COLE O LINK DO GITHUB AQUI ]";
-
         projetosFiltrados.forEach(cliente => {
             const dataFormatada = cliente.data ? new Date(cliente.data).toLocaleDateString('pt-BR') : 'Sem data';
             let numWpp = cliente.whatsapp ? String(cliente.whatsapp).replace(/\D/g, '') : '';
             if (numWpp.length >= 10 && numWpp.length <= 11) numWpp = '55' + numWpp; 
             
-            const linkWppComTexto = `https://wa.me/${numWpp}?text=${encodeURIComponent(msgWppBase)}`;
+            // LÓGICA DO TEXTO DINÂMICO DO WHATSAPP
+            let textoWpp = `Olá, eu sou o Thiago Ventura Valencio responsável pela Thiaguinho Soluções. Temos aqui um demo com uma proposta para a gente começar a discutir. Acesse o link para testar o sistema: \n\n`;
+            if(cliente.linkDemo) {
+                textoWpp += cliente.linkDemo; // Usa o link real salvo no banco de dados!
+            } else {
+                textoWpp += "[ O LINK SERÁ GERADO AQUI APÓS VOCÊ PUBLICAR NO PAINEL ]";
+            }
+            
+            const linkWppComTexto = `https://wa.me/${numWpp}?text=${encodeURIComponent(textoWpp)}`;
             
             const card = document.createElement('div');
             card.className = "w-full shrink-0 bg-slate-900 border border-slate-700 rounded-xl p-4 hover:border-sky-500 transition shadow-lg flex flex-col mb-4";
@@ -295,8 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const chatDisplay = document.getElementById('dev-chat-display');
             if(chatDisplay) {
-                // MENSAGEM DO PAINEL ATUALIZADA (SEM MENÇÃO AO TRIAL DE 5 USOS)
-                chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! O sistema que eu gerar agora sairá livre para o cliente usar, contendo o <b>Chat de Feedback Reverso</b>. Depois de gerar, clique em <b>Publicar no GitHub</b>!</div>`;
+                chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! O sistema que eu gerar sairá livre para o cliente usar, com o <b>Chat de Feedback Reverso</b>. Depois de gerar, clique em <b>Publicar no GitHub</b> para salvar o link automaticamente no botão do WhatsApp!</div>`;
 
                 if(Array.isArray(historicoDevAtual)) {
                     historicoDevAtual.forEach(msg => {
