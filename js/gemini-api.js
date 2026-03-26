@@ -22,11 +22,12 @@ PASSO 2 (O Contexto): Pergunte o Ramo de Atuação, como a empresa funciona hoje
 PASSO 3 (A Dor Real): Descubra o gargalo. Se o cliente disser "fluxo de caixa", pergunte como fazem hoje (papel, planilha?). Cave fundo no problema.
 PASSO 4 (A Autoridade): Mostre empatia. Explique brevemente como a automação de processos e um sistema digital resolvem essa falha específica da operação deles.
 PASSO 5 (O Fechamento): AGORA SIM, diga que você tem todas as informações para desenhar a arquitetura ideal e PEÇA O WHATSAPP (com DDD).
-PASSO 6 (Despedida): Recebeu o WhatsApp? Agradeça, diga que o Thiago entrará em contato com a solução pronta e encerre a conversa gerando a tag secreta.
+PASSO 6 (A Confirmação do Celular): Quando o cliente digitar o número, você DEVE PERGUNTAR se o número está correto. Exemplo: "Esse é o seu celular: 1 7 9 9... ?". [OPCOES: Sim, é esse mesmo | Não, vou digitar de novo]. ATENÇÃO: Para o sistema de voz ler corretamente, você deve SEMPRE escrever os números de telefone separados por espaços na sua frase.
+PASSO 7 (Despedida): Após o cliente confirmar que o número está correto ("Sim"), agradeça, diga que o Thiago entrará em contato com a solução pronta e encerre a conversa gerando a tag secreta.
 
-REGRA DE ENCERRAMENTO: Após receber o WhatsApp e gerar a Tag, a entrevista ACABA. Se o cliente continuar falando, apenas diga: "Tudo anotado! O Thiago entrará em contato em breve."
+REGRA DE ENCERRAMENTO: Após receber a confirmação do WhatsApp e gerar a Tag, a entrevista ACABA. Se o cliente continuar falando, apenas diga: "Tudo anotado! O Thiago entrará em contato em breve."
 
-SEGREDO DA TAG (GERAR APENAS NO PASSO 6, UMA ÚNICA VEZ):
+SEGREDO DA TAG (GERAR APENAS NO PASSO 7, UMA ÚNICA VEZ):
 [LEAD: NOME=nome | EMPRESA=ramo e tamanho | DORES=resumo da dor profunda | FACILITOIDE=arquitetura do sistema proposta | WHATSAPP=numeros]`;
 
 export function atualizarPromptMemoria(novoPrompt) {
@@ -117,10 +118,14 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
 
         DIRETRIZ MÁXIMA PARA O MOTOR DE VOZ DO MASCOTE:
         O Thiago baniu a API da ElevenLabs. Agora nós usamos o nosso próprio motor (Gemini TTS) dentro do código do cliente.
-        Sempre que for criar um sistema com Chatbot/Mascote de voz, você é OBRIGADO a colocar exatamente a seguinte função JavaScript no código do cliente para processar a voz (Esta função puxa as chaves do Firebase do Thiago em tempo real e toca a voz nativa do Gemini com Web Audio API):
+        Sempre que for criar um sistema com Chatbot/Mascote de voz, você é OBRIGADO a colocar exatamente a seguinte função JavaScript no código do cliente para processar a voz:
 
         \`\`\`javascript
+        let globalAudioCtx = null;
         async function falarComMascote(textoParaFalar) {
+            if (!globalAudioCtx) globalAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (globalAudioCtx.state === 'suspended') globalAudioCtx.resume();
+            
             try {
                 // 1. Busca a chave e o nome da voz dinamicamente no banco de dados do painel do Thiago
                 const resKey = await fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/admin_config/gemini_api_key.json');
@@ -144,7 +149,7 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
                 const data = await res.json();
                 const base64Audio = data.candidates[0].content.parts[0].inlineData.data;
 
-                // 3. Converte os bytes puros do Gemini (PCM16) para som de altíssima qualidade (Web Audio API)
+                // 3. Converte os bytes puros do Gemini (PCM16) para som de altíssima qualidade
                 const binaryString = window.atob(base64Audio);
                 const buffer = new ArrayBuffer(binaryString.length);
                 const view = new Uint8Array(buffer);
@@ -152,15 +157,14 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
                     view[i] = binaryString.charCodeAt(i);
                 }
                 const int16View = new Int16Array(buffer);
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const audioBuffer = audioCtx.createBuffer(1, int16View.length, 24000); // 24kHz do Gemini
+                const audioBuffer = globalAudioCtx.createBuffer(1, int16View.length, 24000); // 24kHz do Gemini
                 const channelData = audioBuffer.getChannelData(0);
                 for (let i = 0; i < int16View.length; i++) {
                     channelData[i] = int16View[i] / 32768.0;
                 }
-                const source = audioCtx.createBufferSource();
+                const source = globalAudioCtx.createBufferSource();
                 source.buffer = audioBuffer;
-                source.connect(audioCtx.destination);
+                source.connect(globalAudioCtx.destination);
                 source.start();
 
             } catch(e) {
