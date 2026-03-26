@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>thIAguinho Soluções - Controle de Estoque Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button.cancel-btn {
+            background-color: #6c757d;
+        }
+        button.cancel-btn:hover {
+            background-color: #5a6268;
+        }
+        .inventory-list {
+            margin-top: 30px;
+        }
+        .inventory-list table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .inventory-list th, .inventory-list td {
+            border: 1px solid #eee;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        .inventory-list th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        .inventory-list td {
+            background-color: #ffffff;
+            font-size: 0.95em;
+        }
+        .inventory-list tr:nth-child(even) td {
+            background-color: #fcfcfc;
+        }
+        .inventory-list td button {
+            padding: 8px 15px;
+            font-size: 0.85em;
+            margin-right: 5px;
+        }
+        .inventory-list td button.edit-btn {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .inventory-list td button.edit-btn:hover {
+            background-color: #e0a800;
+        }
+        .inventory-list td button.delete-btn {
+            background-color: #dc3545;
+        }
+        .inventory-list td button.delete-btn:hover {
+            background-color: #c82333;
+        }
+        .low-stock {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        /* CHAT REVERSO STYLES */
+        .feedback-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #28a745; /* Verde chamativo */
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            z-index: 1000;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .feedback-button:hover {
+            background-color: #218838;
+            transform: translateY(-3px);
+        }
+        .feedback-form-container {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 300px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            gap: 15px;
+        }
+        .feedback-form-container textarea {
+            width: calc(100% - 20px);
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            resize: vertical;
+        }
+        .feedback-form-container button {
+            background-color: #28a745;
+            width: 100%;
+            margin-right: 0;
+        }
+        .feedback-form-container button:hover {
+            background-color: #218838;
+        }
+
+        /* TRIAL BLOCKER STYLES */
+        #trial-blocker {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 99999;
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            font-size: 2em;
+            padding: 20px;
+            box-sizing: border-box;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Controle de Estoque thIAguinho Soluções</h1>
+        <p style="text-align: center; color: #666;">Gerencie seus itens em estoque de forma simples.</p>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+
+        <h2>Adicionar/Editar Item</h2>
+        <form id="inventory-form">
+            <input type="hidden" id="item-id">
+            <div class="form-group">
+                <label for="item-name">Nome do Item:</label>
+                <input type="text" id="item-name" placeholder="Ex: Camiseta P" required>
+            </div>
+            <div class="form-group">
+                <label for="item-quantity">Quantidade:</label>
+                <input type="number" id="item-quantity" placeholder="0" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="item-threshold">Alerta de Estoque Baixo (mínimo):</label>
+                <input type="number" id="item-threshold" placeholder="5" min="0" required>
+            </div>
+            <button type="submit" id="save-item-btn">Adicionar Item</button>
+            <button type="button" id="cancel-edit-btn" class="cancel-btn" style="display: none;">Cancelar</button>
+        </form>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+
+        <div class="inventory-list">
+            <h2>Itens em Estoque</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Quantidade</th>
+                        <th>Alerta Min.</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="inventory-table-body">
+                    <!-- Itens serão carregados aqui -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- CHAT REVERSO -->
+    <div class="feedback-button" id="open-feedback-btn">Gostou? Fale com o Thiago</div>
+    <div class="feedback-form-container" id="feedback-form-container">
+        <h3>Sua opinião é importante!</h3>
+        <textarea id="feedback-message" placeholder="Conte-nos o que você achou do sistema, suas sugestões ou dúvidas!"></textarea>
+        <button id="send-feedback-btn">Enviar Mensagem</button>
+        <button class="cancel-btn" id="close-feedback-btn">Fechar</button>
+    </div>
+
+    <!-- TRIAL BLOCKER -->
+    <div id="trial-blocker">
+        Atenção: A sua versão de demonstração expirou. Entre em contato com a thIAguinho Soluções para adquirir o sistema completo.
+    </div>
+
+    <script>
+        const CLIENT_UNIQUE_ID = "-OobhwS__re7sZnlXntm";
+        const FIREBASE_FEEDBACK_URL = `https://thiaguinho-40a14-default-rtdb.firebaseio.com/projetos_capturados/${CLIENT_UNIQUE_ID}/feedbacks.json`;
+        const TRIAL_USES_KEY = 'thiaguinho_trial_uses';
+        const MAX_TRIAL_USES = 5;
+
+        let inventory = [];
+        let editingItemId = null;
+
+        // --- TRIAL LOGIC ---
+        function getTrialUses() {
+            const uses = localStorage.getItem(TRIAL_USES_KEY);
+            return uses ? parseInt(uses, 10) : 0;
+        }
+
+        function incrementTrialUse() {
+            let uses = getTrialUses();
+            uses++;
+            localStorage.setItem(TRIAL_USES_KEY, uses);
+            console.log(`Trial uses: ${uses}`);
+            if (uses >= MAX_TRIAL_USES) {
+                blockSystem();
+            }
+        }
+
+        function blockSystem() {
+            document.getElementById('trial-blocker').style.display = 'flex';
+            // Disable all interactive elements
+            document.querySelectorAll('button, input, textarea, a').forEach(el => {
+                el.disabled = true;
+                el.style.pointerEvents = 'none';
+                el.style.opacity = '0.5';
+            });
+            // Ensure feedback button is also hidden or disabled if not already
+            document.getElementById('open-feedback-btn').style.display = 'none';
+            document.getElementById('feedback-form-container').style.display = 'none';
+        }
+
+        function checkTrialStatus() {
+            if (getTrialUses() >= MAX_TRIAL_USES) {
+                blockSystem();
+            }
+        }
+
+        // --- INVENTORY APP LOGIC ---
+        function generateId() {
+            return '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function loadInventory() {
+            const storedInventory = localStorage.getItem('inventory');
+            if (storedInventory) {
+                inventory = JSON.parse(storedInventory);
+            }
+            renderInventory();
+        }
+
+        function saveInventory() {
+            localStorage.setItem('inventory', JSON.stringify(inventory));
+        }
+
+        function renderInventory() {
+            const tableBody = document.getElementById('inventory-table-body');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            if (inventory.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #888; padding: 20px;">Nenhum item em estoque. Adicione um novo item!</td></tr>`;
+                return;
+            }
+
+            inventory.forEach(item => {
+                const row = tableBody.insertRow();
+                const isLowStock = item.quantity <= item.threshold;
+                const statusClass = isLowStock ? 'low-stock' : '';
+
+                row.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.name}</td>
+                    <td class="${statusClass}">${item.quantity}</td>
+                    <td>${item.threshold}</td>
+                    <td class="${statusClass}">${isLowStock ? 'BAIXO' : 'OK'}</td>
+                    <td>
+                        <button class="edit-btn" data-id="${item.id}">Editar</button>
+                        <button class="delete-btn" data-id="${item.id}">Excluir</button>
+                    </td>
+                `;
+            });
+        }
+
+        document.getElementById('inventory-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            // Check trial status BEFORE processing the action
+            if (getTrialUses() >= MAX_TRIAL_USES) {
+                blockSystem();
+                return;
+            }
+
+            const itemId = document.getElementById('item-id').value;
+            const itemName = document.getElementById('item-name').value;
+            const itemQuantity = parseInt(document.getElementById('item-quantity').value, 10);
+            const itemThreshold = parseInt(document.getElementById('item-threshold').value, 10);
+
+            if (editingItemId) {
+                // Edit existing item
+                const itemIndex = inventory.findIndex(item => item.id === editingItemId);
+                if (itemIndex !== -1) {
+                    inventory[itemIndex] = {
+                        id: editingItemId,
+                        name: itemName,
+                        quantity: itemQuantity,
+                        threshold: itemThreshold
+                    };
+                    incrementTrialUse(); // Count edit as a valuable action
+                }
+                editingItemId = null;
+                document.getElementById('save-item-btn').textContent = 'Adicionar Item';
+                document.getElementById('cancel-edit-btn').style.display = 'none';
+            } else {
+                // Add new item
+                const newItem = {
+                    id: generateId(),
+                    name: itemName,
+                    quantity: itemQuantity,
+                    threshold: itemThreshold
+                };
+                inventory.push(newItem);
+                incrementTrialUse(); // Count add as a valuable action
+            }
+
+            saveInventory();
+            renderInventory();
+            this.reset(); // Clear form
+        });
+
+        document.getElementById('inventory-table-body').addEventListener('click', function(event) {
+            if (event.target.classList.contains('edit-btn')) {
+                // Check trial status BEFORE processing the action
+                if (getTrialUses() >= MAX_TRIAL_USES) {
+                    blockSystem();
+                    return;
+                }
+
+                editingItemId = event.target.dataset.id;
+                const itemToEdit = inventory.find(item => item.id === editingItemId);
+
+                if (itemToEdit) {
+                    document.getElementById('item-id').value = itemToEdit.id;
+                    document.getElementById('item-name').value = itemToEdit.name;
+                    document.getElementById('item-quantity').value = itemToEdit.quantity;
+                    document.getElementById('item-threshold').value = itemToEdit.threshold;
+                    document.getElementById('save-item-btn').textContent = 'Salvar Alterações';
+                    document.getElementById('cancel-edit-btn').style.display = 'inline-block';
+                }
+            } else if (event.target.classList.contains('delete-btn')) {
+                 // Check trial status BEFORE processing the action
+                if (getTrialUses() >= MAX_TRIAL_USES) {
+                    blockSystem();
+                    return;
+                }
+
+                const itemIdToDelete = event.target.dataset.id;
+                if (confirm('Tem certeza que deseja excluir este item?')) {
+                    inventory = inventory.filter(item => item.id !== itemIdToDelete);
+                    saveInventory();
+                    renderInventory();
+                    incrementTrialUse(); // Count delete as a valuable action
+                }
+            }
+        });
+
+        document.getElementById('cancel-edit-btn').addEventListener('click', function() {
+            editingItemId = null;
+            document.getElementById('inventory-form').reset();
+            document.getElementById('save-item-btn').textContent = 'Adicionar Item';
+            document.getElementById('cancel-edit-btn').style.display = 'none';
+        });
+
+        // --- CHAT REVERSO LOGIC ---
+        const openFeedbackBtn = document.getElementById('open-feedback-btn');
+        const feedbackFormContainer = document.getElementById('feedback-form-container');
+        const sendFeedbackBtn = document.getElementById('send-feedback-btn');
+        const closeFeedbackBtn = document.getElementById('close-feedback-btn');
+        const feedbackMessageInput = document.getElementById('feedback-message');
+
+        openFeedbackBtn.addEventListener('click', () => {
+            feedbackFormContainer.style.display = 'flex';
+            openFeedbackBtn.style.display = 'none'; // Hide main button when form is open
+        });
+
+        closeFeedbackBtn.addEventListener('click', () => {
+            feedbackFormContainer.style.display = 'none';
+            openFeedbackBtn.style.display = 'block'; // Show main button again
+        });
+
+        sendFeedbackBtn.addEventListener('click', async () => {
+            const message = feedbackMessageInput.value.trim();
+            if (!message) {
+                alert('Por favor, digite sua mensagem.');
+                return;
+            }
+
+            try {
+                const response = await fetch(FIREBASE_FEEDBACK_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        texto: message,
+                        data: new Date().toISOString()
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    alert("Mensagem enviada com sucesso ao Thiago!");
+                    feedbackMessageInput.value = '';
+                    feedbackFormContainer.style.display = 'none';
+                    openFeedbackBtn.style.display = 'block'; // Show main button again
+                } else {
+                    alert("Ocorreu um erro ao enviar a mensagem. Tente novamente mais tarde.");
+                    console.error('Firebase response error:', await response.text());
+                }
+            } catch (error) {
+                alert("Ocorreu um erro de conexão. Verifique sua internet e tente novamente.");
+                console.error('Fetch error:', error);
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            checkTrialStatus(); // Check trial status immediately
+            loadInventory();
+        });
+    </script>
+</body>
+</html>
