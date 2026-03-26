@@ -17,18 +17,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     let isProcessing = false;
     let audioAtual = null;
 
-    // --- CARREGAMENTO DAS CHAVES DA ELEVENLABS ---
-    let elevenLabsKey = "";
-    let elevenLabsVoiceId = "";
-
-    try {
-        const snapKey = await get(ref(database, 'admin_config/elevenlabs_api_key'));
-        if(snapKey.exists()) elevenLabsKey = snapKey.val();
-        
-        const snapVoice = await get(ref(database, 'admin_config/elevenlabs_voice_id'));
-        if(snapVoice.exists()) elevenLabsVoiceId = snapVoice.val();
-    } catch(e) { console.error("Erro ao carregar configurações de voz."); }
-
     document.getElementById('btn-start').addEventListener('click', () => {
         startScreen.classList.add('hidden');
         uiLayer.classList.remove('hidden');
@@ -43,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // --- SÍNTESE DE VOZ COM ELEVENLABS OU NATIVA ---
+    // --- SÍNTESE DE VOZ 100% GEMINI TTS (Qualidade de Estúdio 24kHz) ---
     async function falar(texto) {
         if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
         if (audioAtual) { audioAtual.pause(); audioAtual = null; }
@@ -51,36 +39,56 @@ document.addEventListener('DOMContentLoaded', async () => {
         let textoVoz = texto.replace(/\[OPCOES:.*?\]/i, '').replace(/\*\*/g, '');
         if(!textoVoz.trim()) return;
 
-        // Tenta usar a ElevenLabs se configurado no painel
-        if (elevenLabsKey && elevenLabsVoiceId) {
-            try {
-                const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${elevenLabsVoiceId}`, {
-                    method: 'POST',
-                    headers: {
-                        'accept': 'audio/mpeg',
-                        'xi-api-key': elevenLabsKey,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        text: textoVoz,
-                        model_id: "eleven_multilingual_v2",
-                        voice_settings: { stability: 0.5, similarity_boost: 0.75 }
-                    })
-                });
+        try {
+            // Busca as chaves do Gemini que você configurou no painel Admin
+            const snapKey = await get(ref(database, 'admin_config/gemini_api_key'));
+            const snapVoice = await get(ref(database, 'admin_config/gemini_voice_name'));
+            
+            if (snapKey.exists()) {
+                const apiKey = snapKey.val();
+                const voiceName = snapVoice.exists() ? snapVoice.val() : "Aoede";
+                
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{ parts: [{ text: textoVoz }] }],
+                    generationConfig: {
+                        responseModalities: ["AUDIO"],
+                        speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } } }
+                    }
+                };
 
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const audioUrl = window.URL.createObjectURL(blob);
-                    audioAtual = new Audio(audioUrl);
-                    audioAtual.play();
-                    return; // Sai da função se a ElevenLabs der certo
+                const res = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+                const data = await res.json();
+                
+                if (data.candidates && data.candidates[0].content.parts[0].inlineData) {
+                    const base64Audio = data.candidates[0].content.parts[0].inlineData.data;
+                    const binaryString = window.atob(base64Audio);
+                    const buffer = new ArrayBuffer(binaryString.length);
+                    const view = new Uint8Array(buffer);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        view[i] = binaryString.charCodeAt(i);
+                    }
+                    
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const int16View = new Int16Array(buffer);
+                    const audioBuffer = audioCtx.createBuffer(1, int16View.length, 24000); // 24kHz do Gemini
+                    const channelData = audioBuffer.getChannelData(0);
+                    for (let i = 0; i < int16View.length; i++) {
+                        channelData[i] = int16View[i] / 32768.0;
+                    }
+                    
+                    const source = audioCtx.createBufferSource();
+                    source.buffer = audioBuffer;
+                    source.connect(audioCtx.destination);
+                    source.start();
+                    return; // Sucesso com a Voz do Gemini!
                 }
-            } catch (error) {
-                console.error("Falha na ElevenLabs, caindo para voz robótica padrão.");
             }
+        } catch (error) {
+            console.warn("Falha no Motor Gemini, ativando plano B local: ", error);
         }
 
-        // Fallback: Usa a voz do celular se a ElevenLabs não estiver configurada ou der erro
+        // Fallback: Voz nativa se der erro de internet
         const utterance = new SpeechSynthesisUtterance(textoVoz);
         utterance.lang = 'pt-BR';
         window.speechSynthesis.speak(utterance);
