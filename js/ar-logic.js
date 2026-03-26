@@ -16,8 +16,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let isProcessing = false;
     let audioAtual = null;
+    
+    // VARIÁVEL GLOBAL DE ÁUDIO
+    let globalAudioCtx = null;
+
+    // A MÁGICA DEFINITIVA PARA DESTRANCAR O ÁUDIO NO IPHONE/ANDROID
+    function unlockAudio() {
+        if (!globalAudioCtx) {
+            globalAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (globalAudioCtx.state === 'suspended') {
+            globalAudioCtx.resume();
+        }
+        // Cria e toca um "som mudo" de 1 milissegundo. Isso força o celular a liberar o alto-falante para a nossa IA.
+        const buffer = globalAudioCtx.createBuffer(1, 1, 22050);
+        const source = globalAudioCtx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(globalAudioCtx.destination);
+        source.start(0);
+    }
 
     document.getElementById('btn-start').addEventListener('click', () => {
+        unlockAudio(); // Destranca no clique inicial
+        
         startScreen.classList.add('hidden');
         uiLayer.classList.remove('hidden');
         
@@ -31,16 +52,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // --- SÍNTESE DE VOZ 100% GEMINI TTS (Qualidade de Estúdio 24kHz) ---
+    // --- SÍNTESE DE VOZ 100% GEMINI TTS ---
     async function falar(texto) {
         if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
-        if (audioAtual) { audioAtual.pause(); audioAtual = null; }
+        
+        if (globalAudioCtx && audioAtual) {
+            try { audioAtual.stop(); } catch(e){}
+        }
 
         let textoVoz = texto.replace(/\[OPCOES:.*?\]/i, '').replace(/\*\*/g, '');
         if(!textoVoz.trim()) return;
 
+        // BLINDAGEM CONTRA "MILHÕES/BILHÕES": Qualquer número com 5+ dígitos é fatiado com espaços para ser lido dígito por dígito.
+        textoVoz = textoVoz.replace(/\d{5,}/g, match => match.split('').join(' '));
+
         try {
-            // Busca as chaves do Gemini que você configurou no painel Admin
             const snapKey = await get(ref(database, 'admin_config/gemini_api_key'));
             const snapVoice = await get(ref(database, 'admin_config/gemini_voice_name'));
             
@@ -69,26 +95,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                         view[i] = binaryString.charCodeAt(i);
                     }
                     
-                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     const int16View = new Int16Array(buffer);
-                    const audioBuffer = audioCtx.createBuffer(1, int16View.length, 24000); // 24kHz do Gemini
+                    const audioBuffer = globalAudioCtx.createBuffer(1, int16View.length, 24000); 
                     const channelData = audioBuffer.getChannelData(0);
                     for (let i = 0; i < int16View.length; i++) {
                         channelData[i] = int16View[i] / 32768.0;
                     }
                     
-                    const source = audioCtx.createBufferSource();
-                    source.buffer = audioBuffer;
-                    source.connect(audioCtx.destination);
-                    source.start();
+                    audioAtual = globalAudioCtx.createBufferSource();
+                    audioAtual.buffer = audioBuffer;
+                    audioAtual.connect(globalAudioCtx.destination);
+                    audioAtual.start();
                     return; // Sucesso com a Voz do Gemini!
                 }
             }
         } catch (error) {
-            console.warn("Falha no Motor Gemini, ativando plano B local: ", error);
+            console.error("Falha fatal no Motor Gemini, ativando plano B local: ", error);
         }
 
-        // Fallback: Voz nativa se der erro de internet
+        // Fallback: Apenas em último caso extremo de falta de internet
         const utterance = new SpeechSynthesisUtterance(textoVoz);
         utterance.lang = 'pt-BR';
         window.speechSynthesis.speak(utterance);
@@ -99,6 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const recognition = new SpeechRecognition();
         recognition.lang = 'pt-BR';
         btnMic.addEventListener('click', () => {
+            unlockAudio(); // Garante liberação
             if (isProcessing) return; 
             if (btnMic.classList.contains('listening')) { 
                 recognition.stop(); 
@@ -157,6 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             btn.className = 'btn-opcao';
             btn.innerText = opcaoText;
             btn.onclick = (event) => {
+                unlockAudio(); // Garante liberação
                 if(isProcessing) { event.preventDefault(); return; }
                 isProcessing = true; 
                 container.style.opacity = '0.5';
@@ -179,6 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function enviarMensagemDigitada() {
+        unlockAudio(); // Garante liberação
         if(isProcessing) return;
         const msg = userInput.value.trim();
         if (!msg) return;
