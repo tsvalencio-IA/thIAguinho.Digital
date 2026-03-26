@@ -15,19 +15,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiKeyInput = document.getElementById('api-key-input');
     const elevenKeyInput = document.getElementById('eleven-key-input');
     const elevenVoiceInput = document.getElementById('eleven-voice-input');
+    const githubTokenInput = document.getElementById('github-token-input');
+    const githubRepoInput = document.getElementById('github-repo-input');
+    
     const gridLeads = document.getElementById('grid-leads');
-    const modalProjeto = document.getElementById('modal-projeto');
     
     let usuarioLogado = null;
     let listaDeClientesGlobais = [];
     let abaAtiva = 'novos'; 
-    
     let contextoProjetoAtual = ""; 
     let idProjetoAberto = null;
     let historicoDevAtual = [];
     let bufferArquivosAnexados = "";
-    
-    // Variável para desligar a escuta do chat de feedback quando fechar o modal
     let unsubFeedbacks = null;
 
     function escapeHtml(unsafe) {
@@ -45,11 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (['html', 'javascript', 'js', 'css'].includes(linguagem)) {
                 let ext = linguagem === 'javascript' ? 'js' : linguagem;
-                botoes += `<button onclick="window.baixarCodigo('${blockId}', '${ext}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded ml-2 transition text-[10px] font-bold"><i class='bx bx-download'></i> Baixar Arquivo</button>`;
+                botoes += `<button onclick="window.baixarCodigo('${blockId}', '${ext}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded ml-2 transition text-[10px] font-bold"><i class='bx bx-download'></i> Baixar</button>`;
             }
 
             if (linguagem === 'html') {
-                botoes += `<button onclick="window.abrirPreview('${blockId}')" class="bg-sky-600 hover:bg-sky-500 text-white px-2 py-1 rounded ml-2 transition text-[10px] font-bold"><i class='bx bx-play'></i> Visualizar</button>`;
+                botoes += `<button onclick="window.abrirPreview('${blockId}')" class="bg-sky-600 hover:bg-sky-500 text-white px-2 py-1 rounded ml-2 transition text-[10px] font-bold"><i class='bx bx-play'></i> Preview</button>`;
+                // O BOTÃO MÁGICO DE DEPLOY NO GITHUB
+                botoes += `<button onclick="window.publicarNoGitHub(event, '${blockId}', 'html')" class="bg-purple-600 hover:bg-purple-500 text-white px-2 py-1 rounded ml-2 transition text-[10px] font-bold shadow-lg"><i class='bx bxl-github'></i> Publicar no GitHub</button>`;
             }
 
             return `
@@ -72,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `sistema_demo_${idProjetoAberto || 'thiaguinho'}.${extensao}`;
+        a.download = `projeto_${idProjetoAberto || 'demo'}.${extensao}`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -86,6 +87,76 @@ document.addEventListener('DOMContentLoaded', () => {
         janelaPreview.document.close();
     };
 
+    // --- FUNÇÃO PARA PUBLICAR O CÓDIGO DIRETO NO GITHUB PAGES ---
+    window.publicarNoGitHub = async function(event, blockId, extensao) {
+        const btn = event.currentTarget;
+        const textoOriginal = btn.innerHTML;
+        btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Publicando...";
+        btn.disabled = true;
+
+        const token = githubTokenInput ? githubTokenInput.value.trim() : "";
+        const repo = githubRepoInput ? githubRepoInput.value.trim() : "";
+
+        if(!token || !repo) {
+            alert("Atenção: Você precisa configurar o Token e o Repositório do GitHub no painel lateral primeiro!");
+            btn.innerHTML = textoOriginal;
+            btn.disabled = false;
+            return;
+        }
+
+        const codigoRaw = document.getElementById(blockId).innerText;
+        // Btoa converte o código para Base64 (Exigência do GitHub)
+        const contentEncoded = btoa(unescape(encodeURIComponent(codigoRaw)));
+        // Cria uma pasta "clientes" e coloca o ID do cliente como nome do arquivo
+        const path = `clientes/projeto_${idProjetoAberto}.${extensao}`;
+        const url = `https://api.github.com/repos/${repo}/contents/${path}`;
+
+        try {
+            // Verifica se o arquivo já existe para poder atualizar (pega o SHA)
+            let sha = null;
+            const checkRes = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+            if(checkRes.ok) {
+                const checkData = await checkRes.json();
+                sha = checkData.sha;
+            }
+
+            const bodyParams = {
+                message: `Deploy Automático thIAguinho Canvas - Projeto ${idProjetoAberto}`,
+                content: contentEncoded
+            };
+            if(sha) bodyParams.sha = sha;
+
+            const putRes = await fetch(url, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(bodyParams)
+            });
+
+            if(putRes.ok) {
+                // Monta o link público do GitHub Pages (ex: https://thiago.github.io/thiaguinho.digital/clientes/projeto_123.html)
+                const username = repo.split('/')[0];
+                const repoName = repo.split('/')[1];
+                const pageUrl = `https://${username}.github.io/${repoName}/${path}`;
+                
+                btn.innerHTML = "<i class='bx bx-check'></i> Publicado!";
+                btn.classList.replace('bg-purple-600', 'bg-emerald-600');
+                
+                // Copia o link para a área de transferência do Thiago
+                navigator.clipboard.writeText(pageUrl);
+                alert(`Sistema publicado na nuvem com sucesso!\n\nO link já foi COPIADO.\nBasta clicar no botão do WhatsApp do cliente e COAR o link no final da mensagem.`);
+            } else {
+                const err = await putRes.json();
+                alert("Erro ao publicar no GitHub: " + err.message);
+                btn.innerHTML = textoOriginal;
+            }
+        } catch(e) {
+            alert("Erro de conexão com o GitHub: " + e.message);
+            btn.innerHTML = textoOriginal;
+        }
+        btn.disabled = false;
+    };
+
+    // --- SESSÃO E LOGIN ---
     const tabNovos = document.getElementById('tab-novos');
     const tabConcluidos = document.getElementById('tab-concluidos');
 
@@ -95,100 +166,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     onAuthStateChanged(auth, (user) => {
-        if (user) {
-            usuarioLogado = user;
-            if(erroMsg) erroMsg.classList.add('oculto');
-            document.getElementById('admin-login')?.classList.add('oculto');
-            document.getElementById('admin-dashboard')?.classList.remove('oculto');
-            iniciarLeituraDoBancoDeDados();
-        } else {
-            usuarioLogado = null;
-            document.getElementById('admin-dashboard')?.classList.add('oculto');
-            document.getElementById('admin-login')?.classList.remove('oculto');
-        }
+        if (user) { usuarioLogado = user; if(erroMsg) erroMsg.classList.add('oculto'); document.getElementById('admin-login')?.classList.add('oculto'); document.getElementById('admin-dashboard')?.classList.remove('oculto'); iniciarLeituraDoBancoDeDados(); } 
+        else { usuarioLogado = null; document.getElementById('admin-dashboard')?.classList.add('oculto'); document.getElementById('admin-login')?.classList.remove('oculto'); }
     });
 
-    if(btnLogin) {
-        btnLogin.addEventListener('click', () => {
-            btnLogin.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Conectando...";
-            signInWithEmailAndPassword(auth, emailInput.value, senhaInput.value)
-                .catch((error) => { erroMsg.classList.remove('oculto'); btnLogin.innerHTML = "Entrar no Painel"; });
-        });
-    }
+    if(btnLogin) btnLogin.addEventListener('click', () => { btnLogin.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>"; signInWithEmailAndPassword(auth, emailInput.value, senhaInput.value).catch(() => { erroMsg.classList.remove('oculto'); btnLogin.innerHTML = "Entrar no Painel"; }); });
+    if(btnLogout) btnLogout.addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
 
-    if(btnLogout) {
-        btnLogout.addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
-    }
-
+    // --- SALVAR CHAVES NO FIREBASE ---
     if(document.getElementById('btn-save-key')) {
         document.getElementById('btn-save-key').addEventListener('click', () => {
             if (!usuarioLogado) return;
-            const novaChave = apiKeyInput.value.trim();
-            if(!novaChave) return;
-            const btn = document.getElementById('btn-save-key');
-            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
-            set(ref(database, 'admin_config/gemini_api_key'), novaChave).then(() => { btn.innerHTML = "Salva"; setTimeout(() => btn.innerHTML = "Salvar", 2000); });
+            const btn = document.getElementById('btn-save-key'); btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
+            set(ref(database, 'admin_config/gemini_api_key'), apiKeyInput.value.trim()).then(() => { btn.innerHTML = "Salva"; setTimeout(() => btn.innerHTML = "Salvar", 2000); });
         });
     }
     
     if(document.getElementById('btn-save-voice')) {
         document.getElementById('btn-save-voice').addEventListener('click', () => {
             if (!usuarioLogado) return;
-            const btn = document.getElementById('btn-save-voice');
-            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
+            const btn = document.getElementById('btn-save-voice'); btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
             set(ref(database, 'admin_config/elevenlabs_api_key'), elevenKeyInput.value.trim());
             set(ref(database, 'admin_config/elevenlabs_voice_id'), elevenVoiceInput.value.trim()).then(() => { btn.innerHTML = "Salvo"; setTimeout(() => btn.innerHTML = "Salvar Voz", 2000); });
+        });
+    }
+
+    if(document.getElementById('btn-save-github')) {
+        document.getElementById('btn-save-github').addEventListener('click', () => {
+            if (!usuarioLogado) return;
+            const btn = document.getElementById('btn-save-github'); btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
+            set(ref(database, 'admin_config/github_token'), githubTokenInput.value.trim());
+            set(ref(database, 'admin_config/github_repo'), githubRepoInput.value.trim()).then(() => { btn.innerHTML = "Salvo"; setTimeout(() => btn.innerHTML = "Salvar GitHub", 2000); });
         });
     }
 
     if(document.getElementById('btn-save-prompt')) {
         document.getElementById('btn-save-prompt').addEventListener('click', () => {
             if (!usuarioLogado) return;
-            const btn = document.getElementById('btn-save-prompt');
-            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>...";
-            const novoPrompt = document.getElementById('prompt-ia').value;
-            set(ref(database, 'admin_config/prompt_mascote'), novoPrompt)
-                .then(() => { atualizarPromptMemoria(novoPrompt); btn.innerHTML = "Atualizado!"; setTimeout(() => btn.innerHTML = "Atualizar Cérebro", 2000); });
+            const btn = document.getElementById('btn-save-prompt'); btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>...";
+            set(ref(database, 'admin_config/prompt_mascote'), document.getElementById('prompt-ia').value)
+                .then(() => { atualizarPromptMemoria(document.getElementById('prompt-ia').value); btn.innerHTML = "Atualizado!"; setTimeout(() => btn.innerHTML = "Atualizar Cérebro", 2000); });
         });
     }
 
     function iniciarLeituraDoBancoDeDados() {
-        get(ref(database, 'admin_config/gemini_api_key')).then((snapshot) => { if(snapshot.exists() && apiKeyInput) apiKeyInput.value = snapshot.val(); });
-        get(ref(database, 'admin_config/elevenlabs_api_key')).then((snapshot) => { if(snapshot.exists() && elevenKeyInput) elevenKeyInput.value = snapshot.val(); });
-        get(ref(database, 'admin_config/elevenlabs_voice_id')).then((snapshot) => { if(snapshot.exists() && elevenVoiceInput) elevenVoiceInput.value = snapshot.val(); });
+        get(ref(database, 'admin_config/gemini_api_key')).then((s) => { if(s.exists() && apiKeyInput) apiKeyInput.value = s.val(); });
+        get(ref(database, 'admin_config/elevenlabs_api_key')).then((s) => { if(s.exists() && elevenKeyInput) elevenKeyInput.value = s.val(); });
+        get(ref(database, 'admin_config/elevenlabs_voice_id')).then((s) => { if(s.exists() && elevenVoiceInput) elevenVoiceInput.value = s.val(); });
+        get(ref(database, 'admin_config/github_token')).then((s) => { if(s.exists() && githubTokenInput) githubTokenInput.value = s.val(); });
+        get(ref(database, 'admin_config/github_repo')).then((s) => { if(s.exists() && githubRepoInput) githubRepoInput.value = s.val(); });
 
-        get(ref(database, 'admin_config/prompt_mascote')).then((snapshot) => {
+        get(ref(database, 'admin_config/prompt_mascote')).then((s) => {
             const caixaTexto = document.getElementById('prompt-ia');
-            if (snapshot.exists() && caixaTexto) { caixaTexto.value = snapshot.val(); atualizarPromptMemoria(snapshot.val()); } 
+            if (s.exists() && caixaTexto) { caixaTexto.value = s.val(); atualizarPromptMemoria(s.val()); } 
             else if(caixaTexto) { caixaTexto.value = promptPadraoDaAPI; }
         });
 
         onValue(ref(database, 'projetos_capturados'), (snapshot) => {
             listaDeClientesGlobais = [];
-            if (snapshot.exists()) {
-                snapshot.forEach((filho) => { listaDeClientesGlobais.push({ id: filho.key, ...filho.val() }); });
-                listaDeClientesGlobais.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
-            }
+            if (snapshot.exists()) { snapshot.forEach((filho) => { listaDeClientesGlobais.push({ id: filho.key, ...filho.val() }); }); listaDeClientesGlobais.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0)); }
             renderizarProjetos();
         });
     }
 
     function renderizarProjetos() {
-        if(!gridLeads) return;
-        gridLeads.innerHTML = ''; 
-        
-        const projetosFiltrados = listaDeClientesGlobais.filter(cliente => {
-            const status = cliente.status || 'novo'; 
-            return abaAtiva === 'novos' ? status === 'novo' : status === 'concluido';
-        });
+        if(!gridLeads) return; gridLeads.innerHTML = ''; 
+        const projetosFiltrados = listaDeClientesGlobais.filter(c => { const s = c.status || 'novo'; return abaAtiva === 'novos' ? s === 'novo' : s === 'concluido'; });
+        if (projetosFiltrados.length === 0) { gridLeads.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500"><i class='bx bx-sleepy text-4xl mb-3'></i><p>Nenhum projeto nesta aba.</p></div>`; return; }
 
-        if (projetosFiltrados.length === 0) {
-            gridLeads.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500"><i class='bx bx-sleepy text-4xl mb-3'></i><p>Nenhum projeto nesta aba.</p></div>`;
-            return;
-        }
-
-        // TEXTO PROFISSIONAL DO WHATSAPP AQUI
-        const msgWppBase = "Olá, eu sou o Tiago Ventura Valêncio responsável pela Thiaguinho Soluções. Temos aqui um demo com uma proposta para a gente começar a discutir. Acesse o link: ";
+        // TEXTO DE VENDAS DO WHATSAPP (Com instrução para colar o link)
+        const msgWppBase = "Olá, eu sou o Tiago Ventura Valêncio responsável pela Thiaguinho Soluções. Temos aqui um demo com uma proposta para a gente começar a discutir. Acesse o link para testar o sistema: \n\n[ COLE O LINK DO GITHUB AQUI ]";
 
         projetosFiltrados.forEach(cliente => {
             const dataFormatada = cliente.data ? new Date(cliente.data).toLocaleDateString('pt-BR') : 'Sem data';
@@ -200,63 +247,44 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             card.className = "w-full shrink-0 bg-slate-900 border border-slate-700 rounded-xl p-4 hover:border-sky-500 transition shadow-lg flex flex-col mb-4";
             
-            const htmlHeader = `
+            card.innerHTML = `
                 <div class="flex justify-between items-center cursor-pointer select-none" onclick="window.toggleCard('${cliente.id}')">
-                    <div class="flex-1">
-                        <h4 class="font-bold text-white text-lg leading-tight">${cliente.nome || "Cliente Indefinido"}</h4>
-                        <p class="text-xs text-sky-400 font-semibold uppercase tracking-wider">${cliente.empresa || "Sem Empresa"}</p>
+                    <div class="flex-1 overflow-hidden">
+                        <h4 class="font-bold text-white text-lg leading-tight truncate">${cliente.nome || "Cliente Indefinido"}</h4>
+                        <p class="text-xs text-sky-400 font-semibold uppercase tracking-wider truncate">${cliente.empresa || "Sem Empresa"}</p>
                     </div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 shrink-0">
                         <span class="text-[10px] text-slate-500 bg-slate-800 px-2 py-1 rounded hidden md:block">${dataFormatada}</span>
                         <i id="icon-${cliente.id}" class='bx bx-chevron-down text-2xl text-slate-400 transition-transform duration-300'></i>
                     </div>
                 </div>
-            `;
-
-            const htmlBody = `
                 <div id="body-${cliente.id}" class="hidden mt-4 pt-4 border-t border-slate-700">
                     <p class="text-sm text-slate-300 mb-4 italic">"${cliente.dores || "Não informou dores específicas."}"</p>
                     <div class="flex flex-wrap gap-2">
                         <button onclick="window.abrirModalProjeto('${cliente.id}')" class="flex-1 bg-sky-900/40 hover:bg-sky-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition border border-sky-800 flex items-center justify-center gap-2">
                             <i class='bx bx-terminal'></i> Abrir Fábrica
                         </button>
-                        <a href="${linkWppComTexto}" target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center" title="Enviar Demo no WhatsApp"><i class='bx bxl-whatsapp text-lg'></i></a>
-                        
-                        ${abaAtiva === 'novos' 
-                            ? `<button onclick="window.alterarStatus('${cliente.id}', 'concluido')" class="w-10 bg-emerald-900/50 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-lg flex items-center justify-center transition border border-emerald-800" title="Marcar como Sistema Gerado"><i class='bx bx-check-double text-lg'></i></button>`
-                            : `<button onclick="window.alterarStatus('${cliente.id}', 'novo')" class="w-10 bg-orange-900/50 hover:bg-orange-600 text-orange-400 hover:text-white rounded-lg flex items-center justify-center transition border border-orange-800" title="Voltar para Novos Projetos"><i class='bx bx-undo text-lg'></i></button>`
-                        }
-                        
-                        <button onclick="window.excluirProjeto('${cliente.id}')" class="w-10 bg-slate-800 hover:bg-red-700 text-slate-400 hover:text-white rounded-lg flex items-center justify-center transition"><i class='bx bx-trash text-lg'></i></button>
+                        <a href="${linkWppComTexto}" target="_blank" class="w-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center shrink-0" title="Chamar no WhatsApp"><i class='bx bxl-whatsapp text-lg'></i></a>
+                        ${abaAtiva === 'novos' ? `<button onclick="window.alterarStatus('${cliente.id}', 'concluido')" class="w-10 bg-emerald-900/50 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-lg flex items-center justify-center transition border border-emerald-800 shrink-0"><i class='bx bx-check-double text-lg'></i></button>` : `<button onclick="window.alterarStatus('${cliente.id}', 'novo')" class="w-10 bg-orange-900/50 hover:bg-orange-600 text-orange-400 hover:text-white rounded-lg flex items-center justify-center transition border border-orange-800 shrink-0"><i class='bx bx-undo text-lg'></i></button>`}
+                        <button onclick="window.excluirProjeto('${cliente.id}')" class="w-10 bg-slate-800 hover:bg-red-700 text-slate-400 hover:text-white rounded-lg flex items-center justify-center transition shrink-0"><i class='bx bx-trash text-lg'></i></button>
                     </div>
                 </div>
             `;
-
-            card.innerHTML = htmlHeader + htmlBody;
             gridLeads.appendChild(card);
         });
     }
 
-    window.toggleCard = function(id) {
-        const body = document.getElementById(`body-${id}`);
-        const icon = document.getElementById(`icon-${id}`);
-        if(body && icon) {
-            body.classList.toggle('hidden');
-            icon.style.transform = body.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
-        }
-    };
-
+    window.toggleCard = function(id) { const b = document.getElementById(`body-${id}`); const i = document.getElementById(`icon-${id}`); if(b && i) { b.classList.toggle('hidden'); i.style.transform = b.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)'; } };
     window.alterarStatus = function(id, novoStatus) { set(ref(database, `projetos_capturados/${id}/status`), novoStatus); };
     window.excluirProjeto = function(id) { if (confirm("Deseja excluir definitivamente este projeto?")) set(ref(database, `projetos_capturados/${id}`), null); };
 
-    // --- MODAL E ESCUTA DE FEEDBACK DO CLIENTE ---
+    // --- MODAL DE FÁBRICA COM ESCUTA DO CHAT REVERSO ---
     window.abrirModalProjeto = function(id) {
         try {
             const c = listaDeClientesGlobais.find(item => item.id === id);
             if(!c) return;
 
             idProjetoAberto = c.id;
-            
             let chatSalvo = c.devChat || [];
             if (typeof chatSalvo === 'string') historicoDevAtual = [{role: 'model', text: chatSalvo}];
             else if (!Array.isArray(chatSalvo) && typeof chatSalvo === 'object') historicoDevAtual = Object.values(chatSalvo);
@@ -267,13 +295,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if(document.getElementById('modal-nome')) document.getElementById('modal-nome').innerText = c.nome || "Cliente";
             if(document.getElementById('modal-empresa')) document.getElementById('modal-empresa').innerText = c.empresa || "Empresa";
             if(document.getElementById('modal-dores')) document.getElementById('modal-dores').innerText = c.dores || "Sem dor detalhada.";
-            
             contextoProjetoAtual = `Cliente: ${c.nome}. Empresa: ${c.empresa}. Dor: ${c.dores}.`;
             
-            // Renderiza o Chat da IA
             const chatDisplay = document.getElementById('dev-chat-display');
             if(chatDisplay) {
-                chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! Sou seu Perito de Software. O que vamos codificar para este cliente? O código já sairá blindado (5 usos) e com o Chat Reverso integrado!</div>`;
+                chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! O sistema que eu gerar agora terá a blindagem de 5 usos REAIS e o Chat de Feedback. Depois de gerar, clique em <b>Publicar no GitHub</b> e mande o link para o cliente testar!</div>`;
 
                 if(Array.isArray(historicoDevAtual)) {
                     historicoDevAtual.forEach(msg => {
@@ -288,8 +314,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 chatDisplay.scrollTop = chatDisplay.scrollHeight;
             }
             
-            // INICIA A ESCUTA DOS FEEDBACKS DO CLIENTE NESTE PROJETO
-            if(unsubFeedbacks) unsubFeedbacks(); // Desliga escuta antiga se houver
+            // LIGA A ESCUTA DAS MENSAGENS DO CLIENTE NO APP DELE
+            if(unsubFeedbacks) unsubFeedbacks(); 
             const feedbacksRef = ref(database, `projetos_capturados/${idProjetoAberto}/feedbacks`);
             unsubFeedbacks = onValue(feedbacksRef, (snap) => {
                 const boxFeedbacks = document.getElementById('modal-feedbacks');
@@ -297,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 boxFeedbacks.innerHTML = '';
                 if(!snap.exists()) {
-                    boxFeedbacks.innerHTML = '<span class="text-xs text-slate-500 italic">O cliente ainda não enviou mensagens pelo App de Teste.</span>';
+                    boxFeedbacks.innerHTML = '<span class="text-xs text-slate-500 italic">O cliente ainda não enviou mensagens do demo.</span>';
                     return;
                 }
                 
@@ -306,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const dataFormatada = new Date(msg.data).toLocaleString('pt-BR');
                     boxFeedbacks.innerHTML += `
                         <div class="bg-slate-800 p-2 rounded text-xs text-slate-200 border border-slate-600 shadow-sm">
-                            <strong class="text-sky-400">Cliente diz:</strong> ${escapeHtml(msg.texto)} 
+                            <strong class="text-emerald-400">Cliente diz:</strong> ${escapeHtml(msg.texto)} 
                             <br><span class="text-[9px] text-slate-500">${dataFormatada}</span>
                         </div>`;
                 });
@@ -323,11 +349,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('btn-fechar-modal').addEventListener('click', () => {
             const m = document.getElementById('modal-projeto');
             if(m) m.classList.add('oculto');
-            if(unsubFeedbacks) { unsubFeedbacks(); unsubFeedbacks = null; } // Desliga escuta
+            if(unsubFeedbacks) { unsubFeedbacks(); unsubFeedbacks = null; } 
         });
     }
 
-    // --- LÓGICA DO CHAT DA FÁBRICA ---
     const devInput = document.getElementById('dev-input');
     const btnDevSend = document.getElementById('btn-dev-send');
     const devFile = document.getElementById('dev-file');
@@ -370,18 +395,17 @@ document.addEventListener('DOMContentLoaded', () => {
         bufferArquivosAnexados = ""; 
         if(chatDisplay) chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
-        // PASSA O ID DO PROJETO PARA A IA SABER ONDE JOGAR O CHAT REVERSO!
         const respostaDaIA = await conversarComDesenvolvedorIA(msgFinalParaIA, contextoProjetoAtual, historicoDevAtual, idProjetoAberto);
 
         if(chatDisplay) {
             const divAI = document.createElement('div');
-            divAI.className = "msg-dev ai shadow-lg";
+            divAI.className = "msg-dev ai shadow-lg w-full overflow-hidden";
             divAI.innerHTML = formatarCodigoIA(respostaDaIA);
             chatDisplay.appendChild(divAI);
             chatDisplay.scrollTop = chatDisplay.scrollHeight;
         }
 
-        historicoDevAtual.push({ role: 'user', text: msg ? msg : "Envio de arquivos anexos." });
+        historicoDevAtual.push({ role: 'user', text: msg ? msg : "Envio de arquivos base." });
         historicoDevAtual.push({ role: 'model', text: respostaDaIA });
         set(ref(database, `projetos_capturados/${idProjetoAberto}/devChat`), historicoDevAtual);
 
