@@ -139,12 +139,12 @@
         .btn-warning:hover { background-color: #e0a800; }
 
 
-        /* Tabela de Estoque */
-        .stock-section, .log-section {
+        /* Seções de Tabela */
+        .stock-section, .log-section, .order-suggestion-section {
             margin-top: 30px;
         }
 
-        .stock-section h2, .log-section h2 {
+        .stock-section h2, .log-section h2, .order-suggestion-section h2 {
             color: var(--kumon-blue);
         }
 
@@ -191,12 +191,19 @@
             display: flex;
             gap: 5px;
             justify-content: center;
+            flex-wrap: wrap; /* Para botões em várias linhas em telas pequenas */
         }
 
         .table-actions .btn {
             padding: 6px 10px;
             font-size: 0.85em;
         }
+        
+        .table-actions .btn-entrada,
+        .table-actions .btn-baixa {
+            min-width: 70px; /* Para garantir que os botões "Entrada" e "Baixa" tenham largura similar */
+        }
+
 
         /* Alertas */
         .alert-container {
@@ -211,9 +218,7 @@
         .alert-warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
         .alert-info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
 
-        /* Feedback Button / Modal (existing styles apply) */
-
-        /* Modals for stock adjustment */
+        /* Modals (existing styles apply) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -225,7 +230,7 @@
             justify-content: center;
             align-items: center;
             z-index: 1001;
-            overflow-y: auto; /* Para modais altos em telas pequenas */
+            overflow-y: auto;
         }
 
         .modal-content {
@@ -234,9 +239,9 @@
             border-radius: 10px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
             width: 90%;
-            max-width: 600px; /* Mais largo para os novos campos */
+            max-width: 600px;
             position: relative;
-            margin: 20px 0; /* Espaço para scrollar dentro do overlay */
+            margin: 20px 0;
         }
 
         .modal-content h3 {
@@ -295,7 +300,7 @@
         #feedback-btn img {
             width: 24px; /* Ícone um pouco maior */
             height: 24px;
-            filter: invert(1);
+            filter: invert(1); /* Deixa o ícone branco */
         }
 
 
@@ -333,10 +338,12 @@
                 font-size: 0.9em;
             }
             .table-actions {
-                flex-wrap: wrap;
+                flex-direction: column; /* Botões de ação em coluna em telas pequenas */
+                gap: 8px;
             }
             .table-actions .btn {
-                flex: 1 1 auto;
+                width: 100%;
+                box-sizing: border-box; /* Garante que padding e border não aumentem a largura */
             }
             #feedback-btn {
                 font-size: 1em;
@@ -398,6 +405,11 @@
                         <label for="max-stock">Estoque Máximo (Alerta):</label>
                         <input type="number" id="max-stock" value="100" min="0" required>
                     </div>
+                    <div class="form-group">
+                        <label for="estimated-monthly-consumption">Consumo Médio Mensal (Unidades):</label>
+                        <input type="number" id="estimated-monthly-consumption" value="0" min="0" placeholder="Ex: 500 (folhas/mês)" required>
+                        <small>Baseado no seu número de alunos por estágio. Usado para sugestão de pedidos.</small>
+                    </div>
                 </div>
                 <div class="button-group">
                     <button type="submit" class="btn btn-primary" id="save-material-btn">Adicionar Material</button>
@@ -427,6 +439,38 @@
                 </table>
             </div>
         </section>
+
+        <section class="order-suggestion-section">
+            <h2>Sugestão de Pedido</h2>
+            <div class="form-grid" style="grid-template-columns: 1fr auto; max-width: 400px; margin: 0 auto 20px auto;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="months-to-forecast">Meses de Estoque Desejado (Fator Multiplicador):</label>
+                    <input type="number" id="months-to-forecast" value="3" min="1" required>
+                    <small>Ex: 3 meses para atender à demanda de seus alunos.</small>
+                </div>
+                <div class="button-group" style="justify-content: flex-start; margin-top: 0; align-items: flex-end;">
+                    <button type="button" class="btn btn-info" id="generate-order-suggestion">Gerar Sugestão de Pedido</button>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Material</th>
+                            <th>Estoque Atual</th>
+                            <th>Consumo Mensal Estimado</th>
+                            <th>Estoque Desejado (<span id="forecast-months-display">3</span> meses)</th>
+                            <th>Quantidade a Pedir</th>
+                        </tr>
+                    </thead>
+                    <tbody id="order-suggestion-list">
+                        <tr><td colspan="5" style="text-align: center;">Clique em "Gerar Sugestão de Pedido" para ver as recomendações.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
 
         <section class="log-section">
             <h2>Log de Auditoria de Movimentações</h2>
@@ -568,8 +612,8 @@
     </footer>
 
     <script>
-        const STORAGE_KEY_INVENTORY = 'kumon_inventory_v2';
-        const STORAGE_KEY_LOGS = 'kumon_transaction_log_v2';
+        const STORAGE_KEY_INVENTORY = 'kumon_inventory_v3'; // Versão atualizada do storage
+        const STORAGE_KEY_LOGS = 'kumon_transaction_log_v3'; // Versão atualizada do storage
         let inventory = [];
         let transactionLog = [];
         let editingId = null;
@@ -582,6 +626,7 @@
         const initialStockGroup = document.getElementById('initial-stock-group');
         const minStockInput = document.getElementById('min-stock');
         const maxStockInput = document.getElementById('max-stock');
+        const estimatedMonthlyConsumptionInput = document.getElementById('estimated-monthly-consumption'); // Novo campo
         const saveMaterialBtn = document.getElementById('save-material-btn');
         const cancelEditBtn = document.getElementById('cancel-edit-btn');
         const stockList = document.getElementById('stock-list');
@@ -624,6 +669,12 @@
         const baixaDestinationInput = document.getElementById('baixa-destination');
         const baixaDateInput = document.getElementById('baixa-date');
 
+        // Order Suggestion Elements
+        const monthsToForecastInput = document.getElementById('months-to-forecast');
+        const generateOrderSuggestionBtn = document.getElementById('generate-order-suggestion');
+        const orderSuggestionList = document.getElementById('order-suggestion-list');
+        const forecastMonthsDisplay = document.getElementById('forecast-months-display');
+
 
         // Load data from localStorage
         function loadData() {
@@ -650,6 +701,8 @@
             renderInventory();
             checkStockAlerts();
             renderTransactionLog();
+            // Clear order suggestion when data changes, user needs to re-generate
+            orderSuggestionList.innerHTML = `<tr><td colspan="5" style="text-align: center;">Clique em "Gerar Sugestão de Pedido" para ver as recomendações.</td></tr>`;
         }
 
         // Render inventory list
@@ -676,8 +729,8 @@
                     <td>${item.minStock}</td>
                     <td>${item.maxStock}</td>
                     <td class="table-actions">
-                        <button class="btn btn-success" onclick="openEntradaModal('${item.id}')" title="Registrar Entrada">Entrada</button>
-                        <button class="btn btn-danger" onclick="openBaixaModal('${item.id}')" title="Registrar Baixa">Baixa</button>
+                        <button class="btn btn-success btn-entrada" onclick="openEntradaModal('${item.id}')" title="Registrar Entrada">Entrada</button>
+                        <button class="btn btn-danger btn-baixa" onclick="openBaixaModal('${item.id}')" title="Registrar Baixa">Baixa</button>
                         <button class="btn btn-info" onclick="editMaterial('${item.id}')" title="Editar Material">Editar</button>
                         <button class="btn btn-warning" onclick="deleteMaterial('${item.id}')" title="Excluir Material">Excluir</button>
                     </td>
@@ -708,7 +761,7 @@
                 } else if (log.action === 'Criação') {
                     detailsHtml = `Estoque inicial: ${log.quantity}`;
                 } else if (log.action === 'Edição') {
-                     detailsHtml = `Nome: '${log.details.oldName}' &rarr; '${log.details.newName}', Tipo: '${log.details.oldType}' &rarr; '${log.details.newType}', Min: ${log.details.oldMinStock} &rarr; ${log.details.newMinStock}, Max: ${log.details.oldMaxStock} &rarr; ${log.details.newMaxStock}`;
+                     detailsHtml = `Nome: '${log.details.oldName}' &rarr; '${log.details.newName}', Tipo: '${log.details.oldType}' &rarr; '${log.details.newType}', Min: ${log.details.oldMinStock} &rarr; ${log.details.newMinStock}, Max: ${log.details.oldMaxStock} &rarr; ${log.details.newMaxStock}, Consumo/Mês: ${log.details.oldEstimatedMonthlyConsumption} &rarr; ${log.details.newEstimatedMonthlyConsumption}`;
                 } else if (log.action === 'Exclusão') {
                     detailsHtml = `Motivo: ${log.details.reason || 'N/A'}`;
                 }
@@ -740,6 +793,7 @@
             const initialStock = parseInt(initialStockInput.value);
             const minStock = parseInt(minStockInput.value);
             const maxStock = parseInt(maxStockInput.value);
+            const estimatedMonthlyConsumption = parseInt(estimatedMonthlyConsumptionInput.value); // Novo campo
             const responsible = 'Sistema'; // Para criação/edição via formulário principal
 
             if (editingId) {
@@ -747,7 +801,7 @@
                 const index = inventory.findIndex(item => item.id === editingId);
                 if (index !== -1) {
                     const oldMaterial = { ...inventory[index] };
-                    inventory[index] = { ...oldMaterial, name, type, minStock, maxStock };
+                    inventory[index] = { ...oldMaterial, name, type, minStock, maxStock, estimatedMonthlyConsumption };
 
                     // Log update action (no stock change here, only properties)
                     addTransactionLog({
@@ -764,7 +818,9 @@
                             oldMinStock: oldMaterial.minStock,
                             newMinStock: minStock,
                             oldMaxStock: oldMaterial.maxStock,
-                            newMaxStock: maxStock
+                            newMaxStock: maxStock,
+                            oldEstimatedMonthlyConsumption: oldMaterial.estimatedMonthlyConsumption,
+                            newEstimatedMonthlyConsumption: estimatedMonthlyConsumption
                         }
                     });
                     alert('Material atualizado com sucesso!');
@@ -777,7 +833,8 @@
                     type,
                     currentStock: initialStock,
                     minStock,
-                    maxStock
+                    maxStock,
+                    estimatedMonthlyConsumption // Novo campo
                 };
                 inventory.push(newMaterial);
 
@@ -815,6 +872,7 @@
                 initialStockGroup.style.display = 'none'; // Esconder estoque inicial ao editar
                 minStockInput.value = material.minStock;
                 maxStockInput.value = material.maxStock;
+                estimatedMonthlyConsumptionInput.value = material.estimatedMonthlyConsumption; // Carregar novo campo
 
                 saveMaterialBtn.textContent = 'Salvar Alterações';
                 cancelEditBtn.style.display = 'inline-block';
@@ -1045,6 +1103,38 @@
                 baixaForm.reset();
                 alert(`Baixa de ${quantity} unidades de ${material.name} registrada com sucesso!`);
             }
+        });
+
+        // --- Order Suggestion Logic ---
+        generateOrderSuggestionBtn.addEventListener('click', () => {
+            const monthsToForecast = parseInt(monthsToForecastInput.value);
+            if (isNaN(monthsToForecast) || monthsToForecast <= 0) {
+                alert('Por favor, insira um número válido para os meses de estoque desejado.');
+                return;
+            }
+
+            forecastMonthsDisplay.textContent = monthsToForecast; // Update display
+            orderSuggestionList.innerHTML = ''; // Clear previous suggestions
+
+            if (inventory.length === 0) {
+                orderSuggestionList.innerHTML = `<tr><td colspan="5" style="text-align: center;">Nenhum material cadastrado para gerar sugestões.</td></tr>`;
+                return;
+            }
+
+            inventory.forEach(item => {
+                const desiredStock = item.estimatedMonthlyConsumption * monthsToForecast;
+                const quantityToOrder = Math.max(0, desiredStock - item.currentStock); // Order if current stock is less than desired
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.currentStock}</td>
+                    <td>${item.estimatedMonthlyConsumption}</td>
+                    <td>${desiredStock}</td>
+                    <td><strong>${quantityToOrder}</strong></td>
+                `;
+                orderSuggestionList.appendChild(row);
+            });
         });
 
 
