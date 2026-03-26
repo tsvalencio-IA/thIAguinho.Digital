@@ -88,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
         janelaPreview.document.close();
     };
 
-    // --- FUNÇÃO PARA PUBLICAR O CÓDIGO NO GITHUB (COM LINK CURTO) ---
     window.publicarNoGitHub = async function(event, blockId, extensao) {
         const btn = event.currentTarget;
         const textoOriginal = btn.innerHTML;
@@ -108,10 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const codigoRaw = document.getElementById(blockId).innerText;
         const contentEncoded = btoa(unescape(encodeURIComponent(codigoRaw)));
         
-        // GERADOR DO NOME CURTO: Pega o primeiro nome do cliente e um número pequeno (Ex: projeto_pedro_42.html)
         const clienteAtivo = listaDeClientesGlobais.find(c => c.id === idProjetoAberto);
         const safeName = clienteAtivo && clienteAtivo.nome ? clienteAtivo.nome.split(' ')[0].toLowerCase().replace(/[^a-z0-9]/g, '') : 'demo';
-        const shortId = Math.floor(Math.random() * 100); // 0 a 99
+        const shortId = Math.floor(Math.random() * 100); 
         const path = `clientes/projeto_${safeName}_${shortId}.${extensao}`; 
         
         const url = `https://api.github.com/repos/${repo}/contents/${path}`;
@@ -137,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if(putRes.ok) {
-                // AQUI RESOLVEMOS O ERRO 404 DE MAIÚSCULAS/MINÚSCULAS: Forçamos o username a ficar minúsculo na URL
                 const username = repo.split('/')[0].toLowerCase(); 
                 const repoName = repo.split('/')[1];
                 const pageUrl = `https://${username}.github.io/${repoName}/${path}`;
@@ -159,7 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = false;
     };
 
-    // --- SESSÃO E LOGIN ---
     const tabNovos = document.getElementById('tab-novos');
     const tabConcluidos = document.getElementById('tab-concluidos');
 
@@ -176,7 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if(btnLogin) btnLogin.addEventListener('click', () => { btnLogin.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>"; signInWithEmailAndPassword(auth, emailInput.value, senhaInput.value).catch(() => { erroMsg.classList.remove('oculto'); btnLogin.innerHTML = "Entrar no Painel"; }); });
     if(btnLogout) btnLogout.addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
 
-    // --- SALVAR CHAVES NO FIREBASE ---
     if(document.getElementById('btn-save-key')) {
         document.getElementById('btn-save-key').addEventListener('click', () => {
             if (!usuarioLogado) return;
@@ -300,7 +295,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const chatDisplay = document.getElementById('dev-chat-display');
             if(chatDisplay) {
-                chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! O sistema que eu gerar agora terá a blindagem de 5 usos REAIS (começando em 0) e o Chat de Feedback. Depois de gerar, clique em <b>Publicar no GitHub</b> e cole o link no WhatsApp do cliente!</div>`;
+                // MENSAGEM DO PAINEL ATUALIZADA (SEM MENÇÃO AO TRIAL DE 5 USOS)
+                chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! O sistema que eu gerar agora sairá livre para o cliente usar, contendo o <b>Chat de Feedback Reverso</b>. Depois de gerar, clique em <b>Publicar no GitHub</b>!</div>`;
 
                 if(Array.isArray(historicoDevAtual)) {
                     historicoDevAtual.forEach(msg => {
