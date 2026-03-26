@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Painel CRM & Canvas - thIAguinho Soluções</title>
+    <title>Painel CRM & SaaS - thIAguinho Soluções</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
@@ -21,7 +21,7 @@
         ::-webkit-scrollbar-track { background: #1e293b; }
         ::-webkit-scrollbar-thumb { background: #dc2626; border-radius: 4px; }
 
-        /* SCROLL MOBILE CORRIGIDO E BLINDADO */
+        /* SCROLL MOBILE BLINDADO */
         .dev-chat-box { background: #020617; border: 1px solid #334155; border-radius: 12px; height: 50vh; overflow-y: auto; overflow-x: hidden; padding: 15px; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; touch-action: pan-y; }
         .msg-dev { padding: 12px 16px; border-radius: 10px; font-size: 14px; max-width: 95%; line-height: 1.6; word-break: break-word; }
         .msg-dev.admin { background: #dc2626; color: white; align-self: flex-end; }
@@ -29,12 +29,13 @@
         
         .code-container { background: #000; border-radius: 8px; margin: 10px 0; border: 1px solid #334155; overflow: hidden; width: 100%; }
         .code-header { background: #0f172a; padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 5px; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; font-size: 12px; color: #94a3b8; }
-        .code-content { padding: 12px; overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior: contain; }
+        .code-content { padding: 12px; overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
         .code-content code { font-family: monospace; color: #38bdf8; font-size: 13px; white-space: pre; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
+    <!-- TELA DE LOGIN -->
     <div id="admin-login" class="flex-1 flex items-center justify-center p-4">
         <div class="bg-slate-800 p-8 rounded-2xl w-full max-w-sm border border-slate-700 shadow-2xl text-center">
             <i class='bx bx-shield-quarter text-5xl text-red-500 mb-2'></i>
@@ -46,6 +47,7 @@
         </div>
     </div>
 
+    <!-- PAINEL CRM -->
     <div id="admin-dashboard" class="oculto flex-1 flex flex-col h-screen overflow-hidden">
         <header class="bg-slate-800 border-b border-slate-700 p-4 md:px-8 flex justify-between items-center shrink-0">
             <div class="flex items-center gap-3">
@@ -62,29 +64,48 @@
         
         <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
             
-            <div class="w-full lg:w-1/3 bg-slate-900 flex flex-col p-4 md:p-6 overflow-y-auto order-1 lg:order-1 border-b lg:border-b-0 lg:border-r border-slate-700">
-                <h3 class="font-bold text-white text-xl flex items-center gap-2 mb-4"><i class='bx bx-cog text-red-500'></i> Configurações</h3>
+            <!-- Coluna de Configurações -->
+            <div class="w-full lg:w-1/3 bg-slate-900 flex flex-col p-4 md:p-6 overflow-y-auto order-2 lg:order-1 border-t lg:border-t-0 lg:border-r border-slate-700">
+                <h3 class="font-bold text-white text-xl flex items-center gap-2 mb-4"><i class='bx bx-cog text-red-500'></i> Configurações da Nuvem</h3>
                 
+                <!-- GEMINI -->
                 <div class="mb-4 bg-slate-800 p-4 rounded-xl border border-slate-600">
-                    <h3 class="font-bold text-white mb-2 flex items-center gap-2 text-sm"><i class='bx bx-key text-yellow-500'></i> API Gemini (Cérebro)</h3>
+                    <h3 class="font-bold text-white mb-2 flex items-center gap-2 text-sm"><i class='bx bx-brain text-yellow-500'></i> API Gemini (Cérebro)</h3>
                     <div class="flex gap-2">
                         <input type="password" id="api-key-input" class="flex-1 w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-sm text-white outline-none focus:border-yellow-500" placeholder="AIzaSy...">
                         <button id="btn-save-key" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded-lg text-sm font-bold transition shrink-0">Salvar</button>
                     </div>
                 </div>
+
+                <!-- GITHUB DEPLOY -->
+                <div class="mb-4 bg-slate-800 p-4 rounded-xl border border-slate-600">
+                    <h3 class="font-bold text-white mb-2 flex items-center gap-2 text-sm"><i class='bx bxl-github text-white'></i> GitHub Pages (Hospedagem)</h3>
+                    <p class="text-xs text-slate-400 mb-2">Para criar o link do cliente automaticamente.</p>
+                    <div class="flex flex-col gap-2">
+                        <input type="password" id="github-token-input" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-sm text-white outline-none focus:border-white" placeholder="Token do GitHub (ghp_...)">
+                        <input type="text" id="github-repo-input" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-sm text-white outline-none focus:border-white" placeholder="Seu Repositório (ex: thiago/thiaguinho.digital)">
+                        <button id="btn-save-github" class="w-full bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg text-sm font-bold transition mt-1">Salvar GitHub</button>
+                    </div>
+                </div>
                 
+                <!-- ELEVENLABS -->
                 <div class="mb-6 bg-slate-800 p-4 rounded-xl border border-slate-600">
                     <h3 class="font-bold text-white mb-2 flex items-center gap-2 text-sm"><i class='bx bx-microphone text-sky-500'></i> ElevenLabs (Sua Voz)</h3>
-                    <p class="text-xs text-slate-400 mb-3">Chaves para o Mascote usar a sua voz clonada.</p>
                     <div class="flex flex-col gap-2">
                         <input type="password" id="eleven-key-input" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-sm text-white outline-none focus:border-sky-500" placeholder="API Key da ElevenLabs...">
                         <input type="text" id="eleven-voice-input" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-sm text-white outline-none focus:border-sky-500" placeholder="Voice ID (Ex: pNInz6obbfdqI...)">
                         <button id="btn-save-voice" class="w-full bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition mt-1">Salvar Voz</button>
                     </div>
                 </div>
+
+                <hr class="border-slate-700 mb-6">
+                <h3 class="font-bold text-red-500 mb-2 flex items-center gap-2 text-lg"><i class='bx bx-slider-alt'></i> Mente da Arquiteta</h3>
+                <textarea id="prompt-ia" class="flex-1 w-full bg-slate-800 border border-slate-600 rounded-xl p-4 text-sm text-white resize-none outline-none focus:border-red-500 shadow-inner min-h-[150px]"></textarea>
+                <button id="btn-save-prompt" class="w-full mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition shadow-lg">Atualizar Cérebro</button>
             </div>
 
-            <div class="w-full lg:w-2/3 bg-slate-800 flex flex-col p-4 md:p-6 overflow-hidden order-2 lg:order-2">
+            <!-- Coluna de Projetos -->
+            <div class="w-full lg:w-2/3 bg-slate-800 flex flex-col p-4 md:p-6 overflow-hidden order-1 lg:order-2">
                 <h3 class="font-bold text-white text-xl flex items-center gap-2 mb-4 shrink-0">
                     <i class='bx bxs-inbox text-red-500'></i> Linha de Produção
                 </h3>
@@ -92,23 +113,24 @@
                     <button id="tab-novos" class="text-white font-bold border-b-2 border-red-500 pb-2 px-1 transition focus:outline-none">Novos Pedidos</button>
                     <button id="tab-concluidos" class="text-slate-400 hover:text-white font-semibold pb-2 px-1 transition focus:outline-none">Sistemas Gerados</button>
                 </div>
-                <div id="grid-leads" class="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4 pb-10 content-start items-start">
+                <div id="grid-leads" class="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4 pb-10 content-start items-start -webkit-overflow-scrolling: touch;">
                     <div class="col-span-full text-center py-10 text-slate-500"><p>Carregando projetos...</p></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- JANELA DA FÁBRICA -->
+    <!-- JANELA DA FÁBRICA (O ESTÚDIO SaaS) -->
     <div id="modal-projeto" class="fixed inset-0 modal-overlay oculto flex items-center justify-center p-2 md:p-4">
         <div class="modal-content bg-slate-800 border border-slate-600 rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col h-[98vh] md:h-[95vh]">
             <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900 rounded-t-2xl shrink-0">
-                <h3 class="text-lg md:text-xl font-bold text-white flex items-center gap-2 truncate"><i class='bx bx-code-block text-red-500'></i> O Estúdio</h3>
+                <h3 class="text-lg md:text-xl font-bold text-white flex items-center gap-2 truncate"><i class='bx bx-code-block text-red-500'></i> O Estúdio SaaS</h3>
                 <button id="btn-fechar-modal" class="text-slate-400 hover:text-white transition bg-slate-800 p-1 rounded-lg"><i class='bx bx-x text-2xl'></i></button>
             </div>
             
             <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
-                <div class="w-full lg:w-1/3 p-4 overflow-y-auto border-b lg:border-b-0 lg:border-r border-slate-700 bg-slate-800/50 max-h-[40vh] lg:max-h-full flex flex-col">
+                <!-- LADO ESQUERDO: Dados e Feedback -->
+                <div class="w-full lg:w-1/3 p-4 overflow-y-auto border-b lg:border-b-0 lg:border-r border-slate-700 bg-slate-800/50 flex flex-col lg:max-h-full max-h-[40vh] -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain;">
                     <div class="flex items-start gap-3 p-3 bg-slate-900 rounded-xl border border-slate-700 mb-4 shrink-0">
                         <div class="w-10 h-10 rounded-full bg-red-600/20 flex items-center justify-center text-red-500 shrink-0"><i class='bx bxs-business text-xl'></i></div>
                         <div class="overflow-hidden">
@@ -117,28 +139,29 @@
                         </div>
                     </div>
                     <div class="mb-4 shrink-0">
-                        <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-1"><i class='bx bx-target-lock'></i> A Verdade (Dor)</p>
+                        <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-1"><i class='bx bx-target-lock'></i> A Verdade (Dor Real)</p>
                         <div id="modal-dores" class="bg-slate-700/50 p-3 rounded-xl text-xs md:text-sm leading-relaxed text-slate-200 border border-slate-600"></div>
                     </div>
                     
-                    <!-- NOVO PAINEL DE FEEDBACK REVERSO (Mensagens do App do Cliente) -->
-                    <div class="mt-2 border-t border-slate-700 pt-4 flex-1 flex flex-col min-h-[150px]">
-                        <p class="text-[10px] text-sky-400 uppercase tracking-wider font-semibold mb-2"><i class='bx bx-message-dots'></i> Chat do App de Teste (Cliente)</p>
-                        <div id="modal-feedbacks" class="bg-slate-900 p-3 rounded-xl flex-1 overflow-y-auto border border-slate-700 flex flex-col gap-2 -webkit-overflow-scrolling: touch;">
-                            <span class="text-xs text-slate-500 italic">Nenhuma mensagem do cliente ainda.</span>
+                    <!-- CHAT REVERSO -->
+                    <div class="mt-auto border-t border-slate-700 pt-4 flex-1 flex flex-col min-h-[150px]">
+                        <p class="text-[10px] text-emerald-400 uppercase tracking-wider font-semibold mb-2"><i class='bx bx-message-dots'></i> Chat do App de Teste (Feedbacks)</p>
+                        <div id="modal-feedbacks" class="bg-slate-900 p-3 rounded-xl flex-1 overflow-y-auto border border-slate-700 flex flex-col gap-2 -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain;">
+                            <span class="text-xs text-slate-500 italic">O cliente ainda não enviou mensagens do demo.</span>
                         </div>
                     </div>
                 </div>
 
+                <!-- LADO DIREITO: IA Dev -->
                 <div class="w-full lg:w-2/3 p-2 md:p-6 flex flex-col bg-slate-900/50 flex-1 overflow-hidden">
                     <div id="dev-chat-display" class="dev-chat-box flex-1 mb-3 bg-slate-900"></div>
                     
                     <div class="flex gap-2 shrink-0 items-center bg-slate-800 p-1 md:p-2 rounded-xl border border-slate-600">
-                        <label for="dev-file" class="bg-slate-700 hover:bg-slate-600 text-slate-300 p-2 md:p-3 rounded-lg cursor-pointer transition flex items-center justify-center shrink-0" title="Anexar arquivos base">
+                        <label for="dev-file" class="bg-slate-700 hover:bg-slate-600 text-slate-300 p-2 md:p-3 rounded-lg cursor-pointer transition flex items-center justify-center shrink-0" title="Anexar códigos base (HTML/JS)">
                             <i class='bx bx-paperclip text-lg md:text-xl'></i>
                             <input type="file" id="dev-file" class="hidden" multiple accept=".html,.js,.css,.json,.txt">
                         </label>
-                        <input type="text" id="dev-input" class="flex-1 w-full bg-transparent border-none p-2 text-xs md:text-sm text-white outline-none" placeholder="Ex: Gere o HTML do sistema de testes...">
+                        <input type="text" id="dev-input" class="flex-1 w-full bg-transparent border-none p-2 text-xs md:text-sm text-white outline-none" placeholder="Ex: Gere o checklist de oficina com a blindagem...">
                         <button id="btn-dev-send" class="bg-sky-600 hover:bg-sky-700 text-white p-2 md:p-3 rounded-lg transition font-bold flex items-center justify-center shrink-0">
                             <i class='bx bx-send text-lg md:text-xl'></i>
                         </button>
