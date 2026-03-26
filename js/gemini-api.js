@@ -6,23 +6,29 @@ import { database, ref, push, set, get } from './firebase-config.js';
 let chatHistoryCliente = [];
 let chaveApiArmazenada = null; 
 
+// A BLINDAGEM MESTRA CONTRA DUPLICAÇÃO NO BANCO DE DADOS
+let leadJaCapturado = false;
+
 // =========================================================================
 // CÉREBRO 1: A VENDEDORA E ARQUITETA
 // =========================================================================
 export let systemPrompt = `Você é o Arquiteto da 'thIAguinho Soluções'. Sua missão é entrevistar o cliente e descobrir suas dores corporativas.
 
-REGRA ABSOLUTA DOS BOTÕES (NUNCA FALHE NESSA REGRA):
-Você é OBRIGADO a finalizar TODAS as suas mensagens com opções clicáveis para facilitar a resposta do cliente no celular.
+REGRA ABSOLUTA DOS BOTÕES:
+Finalize TODAS as suas mensagens com opções clicáveis OBRIGATÓRIAS.
 Formato exato: [OPCOES: Resposta completa 1 | Resposta completa 2]. NUNCA use "A" ou "B". NUNCA esqueça os botões.
 
 FLUXO DA CONVERSA:
-PASSO 1: Pergunte o nome e se quer sistema para Empresa ou Pessoal. (Use o botão [OPCOES: ...])
-PASSO 2: Investigue a DOR principal. (Use o botão [OPCOES: ...])
+PASSO 1: Pergunte o nome e se quer sistema para Empresa ou Pessoal. (Use botão [OPCOES: ...])
+PASSO 2: Investigue a DOR principal. (Use botão [OPCOES: ...])
 PASSO 3: Diga: "Vou desenhar a arquitetura técnica. Por favor, digite seu WhatsApp com DDD."
-PASSO 4: QUANDO RECEBER O WHATSAPP, agradeça e despeça-se. 
+PASSO 4: QUANDO RECEBER O WHATSAPP, agradeça e despeça-se gerando a tag secreta no final do texto.
 
-SEGREDO DA TAG (GERAR APENAS NO PASSO 4):
-Na ÚLTIMA mensagem, cole exatamente esta tag no FINAL do seu texto. O sistema apagará antes do cliente ver.
+REGRA DE ENCERRAMENTO (MUITO IMPORTANTE):
+Depois que o cliente fornecer o WhatsApp e você gerar a Tag secreta, a entrevista ACABA.
+Se a cliente continuar puxando assunto, tagarelando ou mandando mensagens extras, NÃO FAÇA MAIS PERGUNTAS. NÃO PEÇA MAIS DETALHES. Apenas responda com simpatia: "Tudo anotado! Nosso especialista Thiago entrará em contato com você em breve com a solução!"
+
+SEGREDO DA TAG (GERAR APENAS NO PASSO 4, UMA ÚNICA VEZ):
 [LEAD: NOME=nome do cliente | EMPRESA=tipo de negócio | DORES=resumo da dor | FACILITOIDE=arquitetura do sistema proposta | WHATSAPP=apenas numeros]`;
 
 export function atualizarPromptMemoria(novoPrompt) {
@@ -67,23 +73,29 @@ export async function askGemini(msgUsuario) {
         const match = botReply.match(regexLead);
         
         if (match) {
-            const [, nome, empresa, dores, facilitoide, whatsapp] = match;
-            let wppLimpo = whatsapp.replace(/\D/g, '');
-            if (wppLimpo.startsWith('55') && wppLimpo.length > 11) wppLimpo = wppLimpo.substring(2); 
+            // AQUI ESTÁ A BLINDAGEM: Só salva se não tiver salvo antes nesta sessão
+            if (!leadJaCapturado) {
+                const [, nome, empresa, dores, facilitoide, whatsapp] = match;
+                let wppLimpo = whatsapp.replace(/\D/g, '');
+                if (wppLimpo.startsWith('55') && wppLimpo.length > 11) wppLimpo = wppLimpo.substring(2); 
 
-            const novoLeadRef = push(ref(database, 'projetos_capturados'));
-            set(novoLeadRef, {
-                nome: nome.trim() || "Cliente Indefinido", 
-                empresa: empresa.trim() || "Não informada",
-                dores: dores.trim() || "Sem dor detalhada", 
-                facilitoide: facilitoide.trim() || "Arquitetura pendente.", 
-                whatsapp: wppLimpo, 
-                data: new Date().toISOString(), 
-                devChat: [],
-                status: 'novo'
-            });
-            
+                const novoLeadRef = push(ref(database, 'projetos_capturados'));
+                set(novoLeadRef, {
+                    nome: nome.trim() || "Cliente Indefinido", 
+                    empresa: empresa.trim() || "Não informada",
+                    dores: dores.trim() || "Sem dor detalhada", 
+                    facilitoide: facilitoide.trim() || "Arquitetura pendente.", 
+                    whatsapp: wppLimpo, 
+                    data: new Date().toISOString(), 
+                    devChat: [],
+                    status: 'novo'
+                });
+                leadJaCapturado = true; // Trava a sessão, não salva mais nenhum cliente deste chat
+            }
             botReply = botReply.replace(regexLead, '').trim();
+        } else if (leadJaCapturado) {
+            // Se a IA alucinar e tentar gerar de novo de forma torta, a gente apaga por segurança
+            botReply = botReply.replace(/\[LEAD:.*?\]/gi, '').trim();
         }
         return botReply;
     } catch(e) { return "Houve uma falha na conexão. Pode repetir a informação?"; }
@@ -111,9 +123,10 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
         Toda vez que o Thiago pedir a você para gerar um arquivo HTML completo do sistema para o cliente testar, você DEVE OBRIGATORIAMENTE injetar 2 funcionalidades lógicas no código JavaScript daquele HTML:
         
         1. BLOQUEIO DE 5 USOS REAIS (Trial Inteligente):
-        - Crie uma lógica no código do sistema que conte "ações completas de valor" feitas pelo cliente. (Por exemplo: se você criar um checklist, conte 1 uso apenas quando o cliente clicar no botão de "Salvar" ou "Adicionar" item. Não conte simples cliques aleatórios na tela).
+        - A contagem DEVE começar em 0 (zero). Se a variável no localStorage não existir, defina-a como 0. Nunca comece a tela bloqueada.
+        - Crie uma função lógica no sistema que conte "ações completas de valor" feitas pelo cliente. (Por exemplo: se você criar um checklist, some +1 apenas quando o cliente clicar no botão de "Salvar" ou "Adicionar" item. Não conte simples cliques na tela).
         - Salve essa contagem no localStorage ('thiaguinho_trial_uses').
-        - Quando a contagem chegar a 5 usos, bloqueie toda a interface do sistema (injete uma div preta com z-index alto) e exiba a mensagem em branco: "Atenção: A sua versão de demonstração expirou. Entre em contato com a thIAguinho Soluções para adquirir o sistema completo." Não permita que ele feche essa mensagem.
+        - APENAS quando a contagem for MAIOR OU IGUAL a 5 usos, bloqueie toda a interface do sistema (injete uma div preta com z-index altíssimo) e exiba a mensagem: "Atenção: A sua versão de demonstração expirou. Entre em contato com a thIAguinho Soluções para adquirir o sistema completo." Não permita que ele feche essa mensagem.
         
         2. CHAT REVERSO (FEEDBACK DIRETO PARA O THIAGO):
         - Adicione um botão flutuante e chamativo no HTML (ex: "Gostou? Fale com o Thiago").
