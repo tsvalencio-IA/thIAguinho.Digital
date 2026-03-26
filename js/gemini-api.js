@@ -94,7 +94,7 @@ export function adicionarAoHistorico(role, texto) {
 }
 
 // =========================================================================
-// CÉREBRO 2: O DESENVOLVEDOR DA FÁBRICA (SaaS + TRIAL + CHAT REVERSO)
+// CÉREBRO 2: O ENGENHEIRO SAAS (INJETOR DO TRIAL DE 5 USOS)
 // =========================================================================
 export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, historicoSalvo = [], idProjetoAtivo = "padrao") {
     try {
@@ -103,27 +103,28 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
 
         const promptDesenvolvedor = `Você é um Engenheiro de Software Sênior construindo sistemas SaaS para a thIAguinho Soluções.
         Projeto atual: ${contextoProjeto}
-        ID do Banco de Dados do Cliente: ${idProjetoAtivo}
+        ID ÚNICO do Cliente: ${idProjetoAtivo}
         
-        Sempre coloque os códigos gerados em blocos Markdown (ex: \`\`\`html).
+        Sempre coloque os códigos gerados em blocos Markdown puros (ex: \`\`\`html).
 
-        DIRETRIZ MÁXIMA PARA DEMONSTRAÇÕES (TRIAL E CHAT REVERSO):
-        Toda vez que você gerar um arquivo HTML completo para o cliente testar, você DEVE INCLUIR OBRIGATORIAMENTE 2 funções no código:
+        DIRETRIZ MÁXIMA PARA SISTEMAS DE DEMONSTRAÇÃO:
+        Toda vez que o Thiago pedir a você para gerar um arquivo HTML completo do sistema para o cliente testar, você DEVE OBRIGATORIAMENTE injetar 2 funcionalidades lógicas no código JavaScript daquele HTML:
         
-        1. SCRIPT DE BLOQUEIO DE 5 USOS (Trial Inteligente):
-        - Crie uma lógica no JS gerado que conte "usos completos/ações reais" (ex: salvar um item de checklist, enviar um form de simulação) e salve no localStorage ('thIAguinho_trial_uses').
-        - Não conte apenas cliques bobos na tela. Conte ações principais do sistema que você criar.
-        - Quando a variável chegar a 5, congele o sistema injetando uma div preta fullscreen com z-index 9999 e o texto: "Atenção: A sua versão de demonstração expirou. Entre em contato com a thIAguinho Soluções para adquirir o sistema completo." Sem botão de fechar.
+        1. BLOQUEIO DE 5 USOS REAIS (Trial Inteligente):
+        - Crie uma lógica no código do sistema que conte "ações completas de valor" feitas pelo cliente. (Por exemplo: se você criar um checklist, conte 1 uso apenas quando o cliente clicar no botão de "Salvar" ou "Adicionar" item. Não conte simples cliques aleatórios na tela).
+        - Salve essa contagem no localStorage ('thiaguinho_trial_uses').
+        - Quando a contagem chegar a 5 usos, bloqueie toda a interface do sistema (injete uma div preta com z-index alto) e exiba a mensagem em branco: "Atenção: A sua versão de demonstração expirou. Entre em contato com a thIAguinho Soluções para adquirir o sistema completo." Não permita que ele feche essa mensagem.
         
-        2. CHAT DE FEEDBACK (CONEXÃO DIRETA COM O FIREBASE DO THIAGO):
-        - Adicione um botão flutuante no HTML (ex: canto inferior direito) escrito: "Gostou? Fale com o Thiago".
-        - Ao clicar, abre uma pequena interface de chat/input.
-        - Quando o cliente digitar a mensagem e enviar, você DEVE fazer um POST usando a API REST do Firebase para salvar a mensagem diretamente no painel do Thiago.
-        - URL EXATA PARA O FETCH DE ENVIO: https://thiaguinho-40a14-default-rtdb.firebaseio.com/projetos_capturados/${idProjetoAtivo}/feedbacks.json
-        - PAYLOAD DO FETCH (method: 'POST'): JSON.stringify({ texto: mensagem_digitada, data: new Date().toISOString() })
-        - Dê um alert amigável "Mensagem enviada!" ao cliente após o fetch e limpe o input.
-        
-        Comece sua resposta dizendo: "Thiago, o código está pronto. Ele já contém a blindagem de 5 usos reais e a conexão de feedback direto para o seu painel."`;
+        2. CHAT REVERSO (FEEDBACK DIRETO PARA O THIAGO):
+        - Adicione um botão flutuante e chamativo no HTML (ex: "Gostou? Fale com o Thiago").
+        - Ao clicar, ele deve abrir um pequeno formulário de texto para o cliente digitar.
+        - Quando o cliente enviar, OBRIGATORIAMENTE faça um fetch usando a API REST do Firebase para enviar essa mensagem para o Thiago em tempo real.
+        - URL EXATA DO FETCH: https://thiaguinho-40a14-default-rtdb.firebaseio.com/projetos_capturados/${idProjetoAtivo}/feedbacks.json
+        - Exemplo do código do fetch que você deve gerar no HTML do cliente:
+          fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/projetos_capturados/${idProjetoAtivo}/feedbacks.json', { method: 'POST', body: JSON.stringify({ texto: mensagem_do_cliente, data: new Date().toISOString() }) })
+        - Dê um alert("Mensagem enviada com sucesso ao Thiago!") e feche o form.
+
+        Comece sua resposta avisando o Thiago que o código está blindado com o Trial de 5 usos e integrado ao Firebase dele.`;
 
         const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
@@ -138,9 +139,9 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
         const data = await res.json();
         if (data.error) throw new Error(data.error.message);
         
-        return data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro de processamento.";
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro de processamento da IA.";
 
     } catch(e) {
-        return "Erro de compilação na IA: " + e.message;
+        return "Erro de compilação da IA: " + e.message;
     }
 }
