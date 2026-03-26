@@ -102,7 +102,7 @@ export function adicionarAoHistorico(role, texto) {
 }
 
 // =========================================================================
-// CÉREBRO 2: O ENGENHEIRO SAAS (SEM TRIAL, APENAS CHAT REVERSO)
+// CÉREBRO 2: O ENGENHEIRO SAAS (INJETOR DA VOZ NEURAL DO GEMINI)
 // =========================================================================
 export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, historicoSalvo = [], idProjetoAtivo = "padrao") {
     try {
@@ -115,19 +115,69 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
         
         Sempre coloque os códigos gerados em blocos Markdown puros (ex: \`\`\`html).
 
-        DIRETRIZ MÁXIMA PARA SISTEMAS DE DEMONSTRAÇÃO:
-        Toda vez que o Thiago pedir a você para gerar um arquivo HTML completo do sistema para o cliente testar, você NÃO DEVE bloquear a tela do usuário com limite de usos. O sistema deve ser totalmente funcional e livre.
-        
-        A ÚNICA COISA OBRIGATÓRIA A INCLUIR É O CHAT REVERSO (FEEDBACK DIRETO PARA O THIAGO):
-        - Adicione um botão flutuante e chamativo no HTML gerado (ex: "Gostou do sistema? Fale com o Thiago").
-        - Ao clicar, ele deve abrir um pequeno formulário limpo para o cliente digitar um feedback.
-        - Quando o cliente enviar, OBRIGATORIAMENTE faça um fetch usando a API REST do Firebase para enviar essa mensagem para o Thiago em tempo real.
-        - URL EXATA DO FETCH: https://thiaguinho-40a14-default-rtdb.firebaseio.com/projetos_capturados/${idProjetoAtivo}/feedbacks.json
-        - Exemplo do código do fetch que você deve gerar no HTML do cliente:
-          fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/projetos_capturados/${idProjetoAtivo}/feedbacks.json', { method: 'POST', body: JSON.stringify({ texto: mensagem_do_cliente, data: new Date().toISOString() }) })
-        - Após o fetch, dê um alert amigável ("Mensagem enviada para a thIAguinho Soluções!") e limpe o formulário.
+        DIRETRIZ MÁXIMA PARA O MOTOR DE VOZ DO MASCOTE:
+        O Thiago baniu a API da ElevenLabs. Agora nós usamos o nosso próprio motor (Gemini TTS) dentro do código do cliente.
+        Sempre que for criar um sistema com Chatbot/Mascote de voz, você é OBRIGADO a colocar exatamente a seguinte função JavaScript no código do cliente para processar a voz (Esta função puxa as chaves do Firebase do Thiago em tempo real e toca a voz nativa do Gemini com Web Audio API):
 
-        Comece sua resposta avisando o Thiago que o código está pronto e que o botão de Feedback do Firebase foi integrado com sucesso.`;
+        \`\`\`javascript
+        async function falarComMascote(textoParaFalar) {
+            try {
+                // 1. Busca a chave e o nome da voz dinamicamente no banco de dados do painel do Thiago
+                const resKey = await fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/admin_config/gemini_api_key.json');
+                const adminApiKey = await resKey.json();
+                const resVoice = await fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/admin_config/gemini_voice_name.json');
+                const voiceName = await resVoice.json() || "Aoede";
+
+                if (!adminApiKey) throw new Error("Chave do Admin não encontrada.");
+
+                // 2. Chama a API do Gemini TTS em modo de Áudio
+                const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + adminApiKey;
+                const payload = {
+                    contents: [{ parts: [{ text: textoParaFalar }] }],
+                    generationConfig: {
+                        responseModalities: ["AUDIO"],
+                        speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } } }
+                    }
+                };
+
+                const res = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+                const data = await res.json();
+                const base64Audio = data.candidates[0].content.parts[0].inlineData.data;
+
+                // 3. Converte os bytes puros do Gemini (PCM16) para som de altíssima qualidade (Web Audio API)
+                const binaryString = window.atob(base64Audio);
+                const buffer = new ArrayBuffer(binaryString.length);
+                const view = new Uint8Array(buffer);
+                for (let i = 0; i < binaryString.length; i++) {
+                    view[i] = binaryString.charCodeAt(i);
+                }
+                const int16View = new Int16Array(buffer);
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const audioBuffer = audioCtx.createBuffer(1, int16View.length, 24000); // 24kHz do Gemini
+                const channelData = audioBuffer.getChannelData(0);
+                for (let i = 0; i < int16View.length; i++) {
+                    channelData[i] = int16View[i] / 32768.0;
+                }
+                const source = audioCtx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(audioCtx.destination);
+                source.start();
+
+            } catch(e) {
+                console.warn("Falha no Motor Gemini, ativando plano B local: ", e);
+                const fallback = new SpeechSynthesisUtterance(textoParaFalar);
+                fallback.lang = 'pt-BR';
+                window.speechSynthesis.speak(fallback);
+            }
+        }
+        \`\`\`
+
+        A ÚNICA OUTRA COISA OBRIGATÓRIA É O CHAT REVERSO (FEEDBACK DIRETO PARA O THIAGO):
+        - Adicione um botão flutuante e chamativo no HTML gerado (ex: "Gostou do sistema? Fale com o Thiago").
+        - URL EXATA DO FETCH: https://thiaguinho-40a14-default-rtdb.firebaseio.com/projetos_capturados/${idProjetoAtivo}/feedbacks.json
+        - Exemplo: fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/projetos_capturados/${idProjetoAtivo}/feedbacks.json', { method: 'POST', body: JSON.stringify({ texto: msg, data: new Date().toISOString() }) })
+
+        Comece sua resposta avisando o Thiago que o código está pronto e que o motor de Voz Neural do Gemini foi injetado com sucesso.`;
 
         const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
