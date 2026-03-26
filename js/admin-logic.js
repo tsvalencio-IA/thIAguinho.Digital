@@ -49,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (linguagem === 'html') {
                 botoes += `<button onclick="window.abrirPreview('${blockId}')" class="bg-sky-600 hover:bg-sky-500 text-white px-2 py-1 rounded ml-2 transition text-[10px] font-bold"><i class='bx bx-play'></i> Preview</button>`;
-                // O BOTÃO MÁGICO DE DEPLOY NO GITHUB
                 botoes += `<button onclick="window.publicarNoGitHub(event, '${blockId}', 'html')" class="bg-purple-600 hover:bg-purple-500 text-white px-2 py-1 rounded ml-2 transition text-[10px] font-bold shadow-lg"><i class='bx bxl-github'></i> Publicar no GitHub</button>`;
             }
 
@@ -73,7 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `projeto_${idProjetoAberto || 'demo'}.${extensao}`;
+        const clienteAtivo = listaDeClientesGlobais.find(c => c.id === idProjetoAberto);
+        const nomeSanitizado = clienteAtivo && clienteAtivo.nome ? clienteAtivo.nome.split(' ')[0].toLowerCase().replace(/[^a-z0-9]/g, '') : 'demo';
+        a.download = `projeto_${nomeSanitizado}.${extensao}`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -87,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
         janelaPreview.document.close();
     };
 
-    // --- FUNÇÃO PARA PUBLICAR O CÓDIGO DIRETO NO GITHUB PAGES ---
+    // --- FUNÇÃO PARA PUBLICAR O CÓDIGO NO GITHUB (COM LINK CURTO) ---
     window.publicarNoGitHub = async function(event, blockId, extensao) {
         const btn = event.currentTarget;
         const textoOriginal = btn.innerHTML;
@@ -98,21 +99,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const repo = githubRepoInput ? githubRepoInput.value.trim() : "";
 
         if(!token || !repo) {
-            alert("Atenção: Você precisa configurar o Token e o Repositório do GitHub no painel lateral primeiro!");
+            alert("Você precisa configurar o Token e o Repositório do GitHub nas Configurações da Nuvem primeiro!");
             btn.innerHTML = textoOriginal;
             btn.disabled = false;
             return;
         }
 
         const codigoRaw = document.getElementById(blockId).innerText;
-        // Btoa converte o código para Base64 (Exigência do GitHub)
         const contentEncoded = btoa(unescape(encodeURIComponent(codigoRaw)));
-        // Cria uma pasta "clientes" e coloca o ID do cliente como nome do arquivo
-        const path = `clientes/projeto_${idProjetoAberto}.${extensao}`;
+        
+        // GERADOR DO NOME CURTO: Pega o primeiro nome do cliente e um número pequeno (Ex: projeto_pedro_42.html)
+        const clienteAtivo = listaDeClientesGlobais.find(c => c.id === idProjetoAberto);
+        const safeName = clienteAtivo && clienteAtivo.nome ? clienteAtivo.nome.split(' ')[0].toLowerCase().replace(/[^a-z0-9]/g, '') : 'demo';
+        const shortId = Math.floor(Math.random() * 100); // 0 a 99
+        const path = `clientes/projeto_${safeName}_${shortId}.${extensao}`; 
+        
         const url = `https://api.github.com/repos/${repo}/contents/${path}`;
 
         try {
-            // Verifica se o arquivo já existe para poder atualizar (pega o SHA)
             let sha = null;
             const checkRes = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
             if(checkRes.ok) {
@@ -121,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const bodyParams = {
-                message: `Deploy Automático thIAguinho Canvas - Projeto ${idProjetoAberto}`,
+                message: `Deploy thIAguinho Canvas - Projeto ${safeName}`,
                 content: contentEncoded
             };
             if(sha) bodyParams.sha = sha;
@@ -133,24 +137,23 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if(putRes.ok) {
-                // Monta o link público do GitHub Pages (ex: https://thiago.github.io/thiaguinho.digital/clientes/projeto_123.html)
-                const username = repo.split('/')[0];
+                // AQUI RESOLVEMOS O ERRO 404 DE MAIÚSCULAS/MINÚSCULAS: Forçamos o username a ficar minúsculo na URL
+                const username = repo.split('/')[0].toLowerCase(); 
                 const repoName = repo.split('/')[1];
                 const pageUrl = `https://${username}.github.io/${repoName}/${path}`;
                 
                 btn.innerHTML = "<i class='bx bx-check'></i> Publicado!";
                 btn.classList.replace('bg-purple-600', 'bg-emerald-600');
                 
-                // Copia o link para a área de transferência do Thiago
                 navigator.clipboard.writeText(pageUrl);
-                alert(`Sistema publicado na nuvem com sucesso!\n\nO link já foi COPIADO.\nBasta clicar no botão do WhatsApp do cliente e COAR o link no final da mensagem.`);
+                alert(`Sistema publicado com sucesso!\n\nLink: ${pageUrl}\n\n(Lembrete: O GitHub demora de 1 a 2 minutos para colocar no ar. Se der 404, espere um minutinho e recarregue a página).\n\nO link JÁ ESTÁ COPIADO. Cole na mensagem do WhatsApp do cliente.`);
             } else {
                 const err = await putRes.json();
                 alert("Erro ao publicar no GitHub: " + err.message);
                 btn.innerHTML = textoOriginal;
             }
         } catch(e) {
-            alert("Erro de conexão com o GitHub: " + e.message);
+            alert("Erro de conexão: " + e.message);
             btn.innerHTML = textoOriginal;
         }
         btn.disabled = false;
@@ -234,7 +237,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const projetosFiltrados = listaDeClientesGlobais.filter(c => { const s = c.status || 'novo'; return abaAtiva === 'novos' ? s === 'novo' : s === 'concluido'; });
         if (projetosFiltrados.length === 0) { gridLeads.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500"><i class='bx bx-sleepy text-4xl mb-3'></i><p>Nenhum projeto nesta aba.</p></div>`; return; }
 
-        // TEXTO DE VENDAS DO WHATSAPP (Com instrução para colar o link)
         const msgWppBase = "Olá, eu sou o Tiago Ventura Valêncio responsável pela Thiaguinho Soluções. Temos aqui um demo com uma proposta para a gente começar a discutir. Acesse o link para testar o sistema: \n\n[ COLE O LINK DO GITHUB AQUI ]";
 
         projetosFiltrados.forEach(cliente => {
@@ -278,7 +280,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.alterarStatus = function(id, novoStatus) { set(ref(database, `projetos_capturados/${id}/status`), novoStatus); };
     window.excluirProjeto = function(id) { if (confirm("Deseja excluir definitivamente este projeto?")) set(ref(database, `projetos_capturados/${id}`), null); };
 
-    // --- MODAL DE FÁBRICA COM ESCUTA DO CHAT REVERSO ---
     window.abrirModalProjeto = function(id) {
         try {
             const c = listaDeClientesGlobais.find(item => item.id === id);
@@ -299,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const chatDisplay = document.getElementById('dev-chat-display');
             if(chatDisplay) {
-                chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! O sistema que eu gerar agora terá a blindagem de 5 usos REAIS e o Chat de Feedback. Depois de gerar, clique em <b>Publicar no GitHub</b> e mande o link para o cliente testar!</div>`;
+                chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! O sistema que eu gerar agora terá a blindagem de 5 usos REAIS (começando em 0) e o Chat de Feedback. Depois de gerar, clique em <b>Publicar no GitHub</b> e cole o link no WhatsApp do cliente!</div>`;
 
                 if(Array.isArray(historicoDevAtual)) {
                     historicoDevAtual.forEach(msg => {
@@ -314,7 +315,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 chatDisplay.scrollTop = chatDisplay.scrollHeight;
             }
             
-            // LIGA A ESCUTA DAS MENSAGENS DO CLIENTE NO APP DELE
             if(unsubFeedbacks) unsubFeedbacks(); 
             const feedbacksRef = ref(database, `projetos_capturados/${idProjetoAberto}/feedbacks`);
             unsubFeedbacks = onValue(feedbacksRef, (snap) => {
