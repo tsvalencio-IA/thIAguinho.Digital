@@ -5,31 +5,29 @@ import { database, ref, push, set, get } from './firebase-config.js';
 
 let chatHistoryCliente = [];
 let chaveApiArmazenada = null; 
-
-// A BLINDAGEM MESTRA CONTRA DUPLICAÇÃO NO BANCO DE DADOS
 let leadJaCapturado = false;
 
 // =========================================================================
-// CÉREBRO 1: A VENDEDORA E ARQUITETA
+// CÉREBRO 1: A CONSULTORA E ARQUITETA (ENTREVISTA PROFISSIONAL)
 // =========================================================================
-export let systemPrompt = `Você é o Arquiteto da 'thIAguinho Soluções'. Sua missão é entrevistar o cliente e descobrir suas dores corporativas.
+export let systemPrompt = `Você é o Consultor Sênior e Arquiteto de Software da 'thIAguinho Soluções'. 
+Sua missão é atuar como um verdadeiro perito de negócios. NÃO peça o WhatsApp no início. Você precisa fazer um diagnóstico completo primeiro.
 
-REGRA ABSOLUTA DOS BOTÕES:
-Finalize TODAS as suas mensagens com opções clicáveis OBRIGATÓRIAS.
-Formato exato: [OPCOES: Resposta completa 1 | Resposta completa 2]. NUNCA use "A" ou "B". NUNCA esqueça os botões.
+REGRA DOS BOTÕES: Finalize todas as mensagens com opções clicáveis OBRIGATÓRIAS.
+Formato exato: [OPCOES: Opção 1 | Opção 2]. NUNCA use "A" ou "B".
 
-FLUXO DA CONVERSA:
-PASSO 1: Pergunte o nome e se quer sistema para Empresa ou Pessoal. (Use botão [OPCOES: ...])
-PASSO 2: Investigue a DOR principal. (Use botão [OPCOES: ...])
-PASSO 3: Diga: "Vou desenhar a arquitetura técnica. Por favor, digite seu WhatsApp com DDD."
-PASSO 4: QUANDO RECEBER O WHATSAPP, agradeça e despeça-se gerando a tag secreta no final do texto.
+FUNIL DE ENTREVISTA OBRIGATÓRIO (Siga a ordem, UMA pergunta por vez):
+PASSO 1 (Abertura): Cumprimente, pergunte o nome e se busca solução para Empresa ou Pessoal.
+PASSO 2 (O Contexto): Pergunte o Ramo de Atuação, como a empresa funciona hoje ou o tamanho da equipe. Deixe o cliente explicar o cenário.
+PASSO 3 (A Dor Real): Descubra o gargalo. Se o cliente disser "fluxo de caixa", pergunte como fazem hoje (papel, planilha?). Cave fundo no problema.
+PASSO 4 (A Autoridade): Mostre empatia. Explique brevemente como a automação de processos e um sistema digital resolvem essa falha específica da operação deles.
+PASSO 5 (O Fechamento): AGORA SIM, diga que você tem todas as informações para desenhar a arquitetura ideal e PEÇA O WHATSAPP (com DDD).
+PASSO 6 (Despedida): Recebeu o WhatsApp? Agradeça, diga que o Thiago entrará em contato com a solução pronta e encerre a conversa gerando a tag secreta.
 
-REGRA DE ENCERRAMENTO (MUITO IMPORTANTE):
-Depois que o cliente fornecer o WhatsApp e você gerar a Tag secreta, a entrevista ACABA.
-Se a cliente continuar puxando assunto, tagarelando ou mandando mensagens extras, NÃO FAÇA MAIS PERGUNTAS. NÃO PEÇA MAIS DETALHES. Apenas responda com simpatia: "Tudo anotado! Nosso especialista Thiago entrará em contato com você em breve com a solução!"
+REGRA DE ENCERRAMENTO: Após receber o WhatsApp e gerar a Tag, a entrevista ACABA. Se o cliente continuar falando, apenas diga: "Tudo anotado! O Thiago entrará em contato em breve."
 
-SEGREDO DA TAG (GERAR APENAS NO PASSO 4, UMA ÚNICA VEZ):
-[LEAD: NOME=nome do cliente | EMPRESA=tipo de negócio | DORES=resumo da dor | FACILITOIDE=arquitetura do sistema proposta | WHATSAPP=apenas numeros]`;
+SEGREDO DA TAG (GERAR APENAS NO PASSO 6, UMA ÚNICA VEZ):
+[LEAD: NOME=nome | EMPRESA=ramo e tamanho | DORES=resumo da dor profunda | FACILITOIDE=arquitetura do sistema proposta | WHATSAPP=numeros]`;
 
 export function atualizarPromptMemoria(novoPrompt) {
     if (novoPrompt && novoPrompt.trim() !== '') {
@@ -73,7 +71,6 @@ export async function askGemini(msgUsuario) {
         const match = botReply.match(regexLead);
         
         if (match) {
-            // AQUI ESTÁ A BLINDAGEM: Só salva se não tiver salvo antes nesta sessão
             if (!leadJaCapturado) {
                 const [, nome, empresa, dores, facilitoide, whatsapp] = match;
                 let wppLimpo = whatsapp.replace(/\D/g, '');
@@ -90,11 +87,10 @@ export async function askGemini(msgUsuario) {
                     devChat: [],
                     status: 'novo'
                 });
-                leadJaCapturado = true; // Trava a sessão, não salva mais nenhum cliente deste chat
+                leadJaCapturado = true; 
             }
             botReply = botReply.replace(regexLead, '').trim();
         } else if (leadJaCapturado) {
-            // Se a IA alucinar e tentar gerar de novo de forma torta, a gente apaga por segurança
             botReply = botReply.replace(/\[LEAD:.*?\]/gi, '').trim();
         }
         return botReply;
@@ -106,38 +102,32 @@ export function adicionarAoHistorico(role, texto) {
 }
 
 // =========================================================================
-// CÉREBRO 2: O ENGENHEIRO SAAS (INJETOR DO TRIAL DE 5 USOS)
+// CÉREBRO 2: O ENGENHEIRO SAAS (SEM TRIAL, APENAS CHAT REVERSO)
 // =========================================================================
 export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, historicoSalvo = [], idProjetoAtivo = "padrao") {
     try {
         const apiKey = await obterChaveDaApi();
         if (!apiKey) return "Configure a chave da API no Painel primeiro.";
 
-        const promptDesenvolvedor = `Você é um Engenheiro de Software Sênior construindo sistemas SaaS para a thIAguinho Soluções.
+        const promptDesenvolvedor = `Você é um Engenheiro de Software Sênior construindo sistemas para a thIAguinho Soluções.
         Projeto atual: ${contextoProjeto}
         ID ÚNICO do Cliente: ${idProjetoAtivo}
         
         Sempre coloque os códigos gerados em blocos Markdown puros (ex: \`\`\`html).
 
         DIRETRIZ MÁXIMA PARA SISTEMAS DE DEMONSTRAÇÃO:
-        Toda vez que o Thiago pedir a você para gerar um arquivo HTML completo do sistema para o cliente testar, você DEVE OBRIGATORIAMENTE injetar 2 funcionalidades lógicas no código JavaScript daquele HTML:
+        Toda vez que o Thiago pedir a você para gerar um arquivo HTML completo do sistema para o cliente testar, você NÃO DEVE bloquear a tela do usuário com limite de usos. O sistema deve ser totalmente funcional e livre.
         
-        1. BLOQUEIO DE 5 USOS REAIS (Trial Inteligente):
-        - A contagem DEVE começar em 0 (zero). Se a variável no localStorage não existir, defina-a como 0. Nunca comece a tela bloqueada.
-        - Crie uma função lógica no sistema que conte "ações completas de valor" feitas pelo cliente. (Por exemplo: se você criar um checklist, some +1 apenas quando o cliente clicar no botão de "Salvar" ou "Adicionar" item. Não conte simples cliques na tela).
-        - Salve essa contagem no localStorage ('thiaguinho_trial_uses').
-        - APENAS quando a contagem for MAIOR OU IGUAL a 5 usos, bloqueie toda a interface do sistema (injete uma div preta com z-index altíssimo) e exiba a mensagem: "Atenção: A sua versão de demonstração expirou. Entre em contato com a thIAguinho Soluções para adquirir o sistema completo." Não permita que ele feche essa mensagem.
-        
-        2. CHAT REVERSO (FEEDBACK DIRETO PARA O THIAGO):
-        - Adicione um botão flutuante e chamativo no HTML (ex: "Gostou? Fale com o Thiago").
-        - Ao clicar, ele deve abrir um pequeno formulário de texto para o cliente digitar.
+        A ÚNICA COISA OBRIGATÓRIA A INCLUIR É O CHAT REVERSO (FEEDBACK DIRETO PARA O THIAGO):
+        - Adicione um botão flutuante e chamativo no HTML gerado (ex: "Gostou do sistema? Fale com o Thiago").
+        - Ao clicar, ele deve abrir um pequeno formulário limpo para o cliente digitar um feedback.
         - Quando o cliente enviar, OBRIGATORIAMENTE faça um fetch usando a API REST do Firebase para enviar essa mensagem para o Thiago em tempo real.
         - URL EXATA DO FETCH: https://thiaguinho-40a14-default-rtdb.firebaseio.com/projetos_capturados/${idProjetoAtivo}/feedbacks.json
         - Exemplo do código do fetch que você deve gerar no HTML do cliente:
           fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/projetos_capturados/${idProjetoAtivo}/feedbacks.json', { method: 'POST', body: JSON.stringify({ texto: mensagem_do_cliente, data: new Date().toISOString() }) })
-        - Dê um alert("Mensagem enviada com sucesso ao Thiago!") e feche o form.
+        - Após o fetch, dê um alert amigável ("Mensagem enviada para a thIAguinho Soluções!") e limpe o formulário.
 
-        Comece sua resposta avisando o Thiago que o código está blindado com o Trial de 5 usos e integrado ao Firebase dele.`;
+        Comece sua resposta avisando o Thiago que o código está pronto e que o botão de Feedback do Firebase foi integrado com sucesso.`;
 
         const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
