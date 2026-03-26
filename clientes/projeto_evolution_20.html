@@ -38,6 +38,10 @@
             color: var(--bs-accent) !important;
             border-bottom: 2px solid var(--bs-accent);
         }
+        /* Highlight hamburger menu icon */
+        .navbar-toggler-icon {
+            filter: invert(1) grayscale(100%) brightness(200%); /* Turns default dark icon to bright white */
+        }
         .container-fluid {
             padding-top: 20px;
             flex-grow: 1;
@@ -119,7 +123,7 @@
             filter: invert(1) grayscale(100%) brightness(200%); /* Make close button white */
         }
 
-        /* Responsive Modals */
+        /* Responsive Modals (forcing fullscreen on small devices) */
         @media (max-width: 575.98px) {
             .modal-dialog {
                 margin: 0;
@@ -135,6 +139,16 @@
             }
             .modal.show .modal-dialog {
                 transform: translate(0,0);
+            }
+            /* Ensure form controls are readable and tappable without zoom */
+            .modal-body .form-control,
+            .modal-body .form-select,
+            .modal-body .btn {
+                min-height: 48px; /* Standard touch target size */
+                font-size: 1.1em; /* Slightly larger text for readability */
+            }
+            .modal-body label {
+                font-size: 1em; /* Ensure label is readable */
             }
         }
 
