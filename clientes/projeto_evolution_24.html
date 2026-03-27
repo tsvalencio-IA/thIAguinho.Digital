@@ -170,10 +170,15 @@
             background-color: #3f464e; /* Slightly lighter dark for contrast */
             color: var(--bs-body-color); /* Ensure card text is light */
         }
-        .servico-card.status-agendado { border-color: #0d6efd; } /* Blue - for pending */
-        .servico-card.status-em-andamento { border-color: #ffc107; } /* Yellow - for in progress */
-        .servico-card.status-concluido { border-color: #28a745; } /* Green - for completed */
-        .servico-card.status-cancelado { border-color: #dc3545; } /* Red - for cancelled */
+        .servico-card.status-aguardando-orcamento { border-color: #ffc107; } /* Yellow */
+        .servico-card.status-orcamento-enviado { border-color: #0d6efd; } /* Blue */
+        .servico-card.status-aguardando-aprovacao { border-color: #0d6efd; } /* Blue */
+        .servico-card.status-aprovado { border-color: #28a745; } /* Green */
+        .servico-card.status-recusado { border-color: #dc3545; } /* Red */
+        .servico-card.status-em-andamento { border-color: #fd7e14; } /* Orange */
+        .servico-card.status-concluido { border-color: #198754; } /* Darker Green */
+        .servico-card.status-cancelado { border-color: #6c757d; } /* Gray */
+
 
         .servico-card h6 {
             margin-bottom: 5px;
@@ -257,10 +262,29 @@
             display: flex;
             align-items: center;
             margin-bottom: 5px;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
         }
         .part-item select, .part-item input {
             flex-grow: 1;
             margin-right: 5px;
+            margin-bottom: 5px; /* Add margin for mobile layout */
+        }
+        .part-item .remove-part-btn {
+            margin-bottom: 5px; /* Align with other elements */
+        }
+        .part-price-display {
+            font-size: 0.9em;
+            color: var(--bs-body-color);
+            margin-left: auto; /* Push to right */
+            white-space: nowrap;
+        }
+        @media (min-width: 576px) { /* On larger screens, keep elements in one line */
+            .part-item select, .part-item input {
+                margin-bottom: 0;
+            }
+            .part-item .remove-part-btn {
+                margin-bottom: 0;
+            }
         }
     </style>
 </head>
@@ -304,9 +328,17 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5><i class="bi bi-box-seam me-2"></i>Controle de Estoque</h5>
-                        <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#estoqueModal" onclick="prepareEstoqueModal('add')">
-                            <i class="bi bi-plus-circle me-1"></i> Adicionar Peça/Produto
-                        </button>
+                        <div>
+                            <button class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#stockAdjustmentModal" onclick="prepareStockAdjustmentModal('add')">
+                                <i class="bi bi-plus-circle me-1"></i> Add Qtd.
+                            </button>
+                            <button class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#stockAdjustmentModal" onclick="prepareStockAdjustmentModal('remove')">
+                                <i class="bi bi-dash-circle me-1"></i> Rem. Qtd.
+                            </button>
+                            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#estoqueModal" onclick="prepareEstoqueModal('add')">
+                                <i class="bi bi-plus-circle me-1"></i> Novo Item
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -419,9 +451,14 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5><i class="bi bi-truck me-2"></i>Cadastro de Fornecedores</h5>
-                        <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#fornecedorModal" onclick="prepareFornecedorModal('add')">
-                            <i class="bi bi-plus-circle me-1"></i> Adicionar Fornecedor
-                        </button>
+                        <div>
+                            <button class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#purchaseModal" onclick="preparePurchaseModal()">
+                                <i class="bi bi-receipt me-1"></i> Registrar Compra
+                            </button>
+                            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#fornecedorModal" onclick="prepareFornecedorModal('add')">
+                                <i class="bi bi-plus-circle me-1"></i> Novo Fornecedor
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -447,9 +484,9 @@
             <section id="agendamentos" class="admin-section" style="display:none;">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5><i class="bi bi-calendar-check me-2"></i>Gerenciamento de Serviços</h5>
+                        <h5><i class="bi bi-calendar-check me-2"></i>Gerenciamento de Ordens de Serviço</h5>
                         <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#servicoModal" onclick="prepareServicoModal('add')">
-                            <i class="bi bi-plus-circle me-1"></i> Registrar Serviço
+                            <i class="bi bi-plus-circle me-1"></i> Nova OS
                         </button>
                     </div>
                     <div class="card-body">
@@ -506,6 +543,7 @@
                                         <th>Valor</th>
                                         <th>Data</th>
                                         <th>Categoria</th>
+                                        <th>Origem</th>
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
@@ -522,7 +560,7 @@
 
     <!-- Modals (shared) -->
 
-    <!-- Estoque Modal -->
+    <!-- Estoque Modal (Add/Edit Item) -->
     <div class="modal fade" id="estoqueModal" tabindex="-1" aria-labelledby="estoqueModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
             <div class="modal-content">
@@ -542,7 +580,7 @@
                             <textarea class="form-control" id="estoqueDescricao" rows="2"></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="estoqueCusto" class="form-label">Preço de Custo</label>
+                            <label for="estoqueCusto" class="form-label">Preço de Custo (última compra)</label>
                             <input type="number" step="0.01" class="form-control" id="estoqueCusto" required>
                         </div>
                         <div class="mb-3">
@@ -550,10 +588,42 @@
                             <input type="number" step="0.01" class="form-control" id="estoqueVenda" required>
                         </div>
                         <div class="mb-3">
-                            <label for="estoqueQuantidade" class="form-label">Quantidade</label>
+                            <label for="estoqueQuantidade" class="form-label">Quantidade Inicial</label>
                             <input type="number" class="form-control" id="estoqueQuantidade" required>
                         </div>
                         <button type="submit" class="btn btn-primary mt-3 w-100">Salvar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Adjustment Modal (Add/Remove Quantity) -->
+    <div class="modal fade" id="stockAdjustmentModal" tabindex="-1" aria-labelledby="stockAdjustmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="stockAdjustmentModalLabel">Ajustar Quantidade de Estoque</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="stockAdjustmentForm">
+                        <input type="hidden" id="adjustmentType"> <!-- 'add' or 'remove' -->
+                        <div class="mb-3">
+                            <label for="adjustmentItem" class="form-label">Peça/Produto</label>
+                            <select class="form-select" id="adjustmentItem" required>
+                                <!-- Estoque items will be loaded here -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="adjustmentQuantity" class="form-label">Quantidade</label>
+                            <input type="number" class="form-control" id="adjustmentQuantity" min="1" required>
+                        </div>
+                        <div class="mb-3" id="adjustmentReasonGroup">
+                            <label for="adjustmentReason" class="form-label">Motivo (Opcional)</label>
+                            <input type="text" class="form-control" id="adjustmentReason" placeholder="Ex: Contagem de estoque, Quebra, Uso interno">
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3 w-100" id="stockAdjustmentSubmitBtn">Salvar Ajuste</button>
                     </form>
                 </div>
             </div>
@@ -571,6 +641,7 @@
                 <div class="modal-body">
                     <form id="clienteForm">
                         <input type="hidden" id="clienteId">
+                        <input type="hidden" id="clientePanelLinkInput"> <!-- To store the permanent link -->
                         <div class="mb-3">
                             <label for="clienteNome" class="form-label">Nome do Cliente</label>
                             <input type="text" class="form-control" id="clienteNome" required>
@@ -580,10 +651,10 @@
                             <input type="text" class="form-control" id="clienteContato" placeholder="Ex: (XX) 9XXXX-XXXX ou email@exemplo.com">
                         </div>
                         <div id="clienteLinkContainer" class="mt-4" style="display:none;">
-                            <button type="button" class="btn btn-info w-100" onclick="generateClientPanelLink()">
-                                <i class="bi bi-whatsapp me-1"></i> Gerar Link de Acesso & Enviar WhatsApp
+                            <button type="button" class="btn btn-info w-100" onclick="sendClientPanelLink()">
+                                <i class="bi bi-whatsapp me-1"></i> Enviar Link do Painel (WhatsApp)
                             </button>
-                            <small class="text-white-50 d-block mt-2 text-center">O link será copiado para a área de transferência e uma opção de WhatsApp será exibida.</small>
+                            <small class="text-white-50 d-block mt-2 text-center">O link permanente do cliente será enviado via WhatsApp.</small>
                         </div>
                         <hr class="my-4">
                         <button type="submit" class="btn btn-primary w-100">Salvar Cliente</button>
@@ -697,19 +768,67 @@
         </div>
     </div>
 
+    <!-- Purchase Modal (Entrada de Nota de Compra) -->
+    <div class="modal fade" id="purchaseModal" tabindex="-1" aria-labelledby="purchaseModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="purchaseModalLabel">Registrar Compra de Material</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="purchaseForm">
+                        <div class="mb-3">
+                            <label for="purchaseFornecedorId" class="form-label">Fornecedor</label>
+                            <select class="form-select" id="purchaseFornecedorId" required>
+                                <!-- Fornecedores will be loaded here -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="purchaseDate" class="form-label">Data da Compra</label>
+                            <input type="date" class="form-control" id="purchaseDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Itens Comprados:</label>
+                            <div id="purchaseItemsContainer" class="mb-2">
+                                <!-- Dynamic purchase item fields will be added here -->
+                                <div class="purchase-item d-flex align-items-center mb-2">
+                                    <select class="form-select form-control-sm me-2" onchange="updatePurchaseItemName(this)">
+                                        <option value="">Selecione a Peça</option>
+                                    </select>
+                                    <input type="text" class="form-control form-control-sm me-2 purchase-item-new-name" placeholder="Ou Novo Nome" style="display:none;">
+                                    <input type="number" class="form-control form-control-sm me-2" placeholder="Qtd" min="1" value="1">
+                                    <input type="number" step="0.01" class="form-control form-control-sm me-2" placeholder="Custo Unit." min="0.01" value="0.01">
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.purchase-item').remove()">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="addPurchaseItemField()">
+                                <i class="bi bi-plus-circle me-1"></i> Adicionar Item
+                            </button>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3 w-100">Registrar Compra</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Serviço Modal -->
     <div class="modal fade" id="servicoModal" tabindex="-1" aria-labelledby="servicoModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="servicoModalLabel">Registrar/Editar Serviço</h5>
+                    <h5 class="modal-title" id="servicoModalLabel">Registrar/Editar Ordem de Serviço</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="servicoForm">
                         <input type="hidden" id="servicoId">
-                        <input type="hidden" id="originalServicoStatus"> <!-- To track status change for financial ops -->
-                        <input type="hidden" id="originalServicoParts"> <!-- To track parts change for stock ops -->
+                        <input type="hidden" id="originalServicoStatus"> 
+                        <input type="hidden" id="originalServicoParts"> 
 
                         <div class="mb-3">
                             <label for="servicoClienteId" class="form-label">Cliente</label>
@@ -745,13 +864,22 @@
                         <div class="mb-3">
                             <label for="servicoStatus" class="form-label">Status</label>
                             <select class="form-select" id="servicoStatus">
-                                <option value="Agendado">Agendado</option>
+                                <option value="Aguardando Orçamento">Aguardando Orçamento</option>
+                                <option value="Orçamento Enviado">Orçamento Enviado</option>
+                                <option value="Aguardando Aprovação">Aguardando Aprovação (Cliente)</option>
+                                <option value="Aprovado">Aprovado</option>
+                                <option value="Recusado">Recusado</option>
                                 <option value="Em Andamento">Em Andamento</option>
                                 <option value="Concluido">Concluído</option>
                                 <option value="Cancelado">Cancelado</option>
                             </select>
                         </div>
                         
+                        <div class="mb-3">
+                            <label for="servicoLaborCost" class="form-label">Mão de Obra (R$)</label>
+                            <input type="number" step="0.01" class="form-control" id="servicoLaborCost" value="0" oninput="calculateServiceTotal()">
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label">Peças Utilizadas:</label>
                             <div id="partsUsedContainer" class="mb-2">
@@ -763,18 +891,23 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="servicoCustoTotal" class="form-label">Custo Total do Serviço (R$)</label>
-                            <input type="number" step="0.01" class="form-control" id="servicoCustoTotal" value="0">
+                            <label for="servicoCustoTotal" class="form-label">Custo Total da OS (R$)</label>
+                            <input type="number" step="0.01" class="form-control" id="servicoCustoTotal" value="0" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="servicoBudgetNotes" class="form-label">Observações do Orçamento (Cliente)</label>
+                            <textarea class="form-control" id="servicoBudgetNotes" rows="2" readonly></textarea>
+                            <small class="form-text text-white-50">Campo para visualização das perguntas do cliente sobre o orçamento.</small>
                         </div>
                         <div class="mb-3">
                             <label for="servicoDataConclusao" class="form-label">Data de Conclusão (se aplicável)</label>
                             <input type="date" class="form-control" id="servicoDataConclusao">
                         </div>
                         <div class="mb-3">
-                            <label for="servicoObservacoes" class="form-label">Observações</label>
+                            <label for="servicoObservacoes" class="form-label">Observações Internas</label>
                             <textarea class="form-control" id="servicoObservacoes" rows="2"></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary mt-3 w-100">Salvar</button>
+                        <button type="submit" class="btn btn-primary mt-3 w-100">Salvar OS</button>
                     </form>
                 </div>
             </div>
@@ -792,7 +925,9 @@
                 <div class="modal-body">
                     <form id="financeiroForm">
                         <input type="hidden" id="financeiroId">
-                        <input type="hidden" id="financeiroServicoId"> <!-- To link to service, if automatic -->
+                        <input type="hidden" id="financeiroOriginId"> <!-- To link to service/purchase/adjustment -->
+                        <input type="hidden" id="financeiroOriginType"> <!-- 'service', 'purchase', 'stock-adjustment' -->
+
                         <div class="mb-3">
                             <label for="financeiroTipo" class="form-label">Tipo</label>
                             <select class="form-select" id="financeiroTipo" required>
@@ -1007,6 +1142,8 @@
                 modalLabel.textContent = 'Adicionar Peça/Produto';
                 form.reset();
                 estoqueId.value = '';
+                estoqueQuantidade.disabled = false; // Initial quantity can be set for new items
+                estoqueCusto.disabled = false; // Initial cost can be set
             } else if (mode === 'edit') {
                 modalLabel.textContent = 'Editar Peça/Produto';
                 const item = estoqueItems.find(i => i.id === id);
@@ -1017,6 +1154,8 @@
                     estoqueCusto.value = item.custo;
                     estoqueVenda.value = item.venda;
                     estoqueQuantidade.value = item.quantidade;
+                    estoqueQuantidade.disabled = true; // Quantity adjusted via other modals
+                    estoqueCusto.disabled = true; // Cost adjusted via purchase modal
                 }
             }
         }
@@ -1038,7 +1177,7 @@
             if (id) {
                 const index = estoqueItems.findIndex(item => item.id === id);
                 if (index !== -1) {
-                    estoqueItems[index] = { id, nome, descricao, custo, venda, quantidade };
+                    estoqueItems[index] = { id, nome, descricao, custo, venda, quantidade: estoqueItems[index].quantidade }; // Qtd and Custo cannot be edited here
                 }
             } else {
                 estoqueItems.push({ id: generateUniqueId(), nome, descricao, custo, venda, quantidade });
@@ -1055,9 +1194,14 @@
                 const isUsedInService = servicos.some(service => 
                     service.partsUsed && service.partsUsed.some(part => part.itemId === id)
                 );
+                // Check if this item is used in any financial transaction (e.g., purchase or internal use)
+                const isUsedInFinance = financeiroItems.some(finance => 
+                    (finance.originType === 'purchase' || finance.originType === 'stock-adjustment') && finance.originDetails && finance.originDetails.itemId === id
+                );
 
-                if (isUsedInService) {
-                    alert('Não é possível excluir este item, pois ele está sendo utilizado em um ou mais serviços.');
+
+                if (isUsedInService || isUsedInFinance) {
+                    alert('Não é possível excluir este item, pois ele está sendo utilizado em um ou mais serviços ou transações financeiras.');
                     return;
                 }
 
@@ -1066,6 +1210,86 @@
                 renderEstoque();
             }
         }
+
+        // --- Stock Adjustment Logic ---
+        function populateAdjustmentItems() {
+            const select = document.getElementById('adjustmentItem');
+            select.innerHTML = '<option value="">Selecione a Peça</option>';
+            estoqueItems.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = `${item.nome} (Qtd atual: ${item.quantidade})`;
+                select.appendChild(option);
+            });
+        }
+
+        function prepareStockAdjustmentModal(type) {
+            document.getElementById('adjustmentType').value = type;
+            document.getElementById('stockAdjustmentModalLabel').textContent = type === 'add' ? 'Adicionar Quantidade no Estoque' : 'Remover Quantidade do Estoque';
+            document.getElementById('stockAdjustmentSubmitBtn').textContent = type === 'add' ? 'Adicionar' : 'Remover';
+            document.getElementById('stockAdjustmentForm').reset();
+            populateAdjustmentItems();
+        }
+
+        document.getElementById('stockAdjustmentForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const type = document.getElementById('adjustmentType').value;
+            const itemId = document.getElementById('adjustmentItem').value;
+            const quantity = parseInt(document.getElementById('adjustmentQuantity').value);
+            const reason = document.getElementById('adjustmentReason').value || (type === 'add' ? 'Adição Manual' : 'Remoção Manual');
+
+            if (!itemId || isNaN(quantity) || quantity <= 0) {
+                alert('Por favor, selecione uma peça e insira uma quantidade válida.');
+                return;
+            }
+
+            const itemIndex = estoqueItems.findIndex(item => item.id === itemId);
+            if (itemIndex === -1) {
+                alert('Peça não encontrada no estoque.');
+                return;
+            }
+
+            if (type === 'remove' && estoqueItems[itemIndex].quantidade < quantity) {
+                alert(`Quantidade insuficiente em estoque. Disponível: ${estoqueItems[itemIndex].quantidade}.`);
+                return;
+            }
+
+            const oldQuantity = estoqueItems[itemIndex].quantidade;
+            let financialChange = 0;
+            let financialDescription = "";
+            let financialType = "";
+
+            if (type === 'add') {
+                estoqueItems[itemIndex].quantidade += quantity;
+                // No direct financial impact for manual addition (usually means found stock or a return not tied to a purchase)
+            } else { // 'remove'
+                estoqueItems[itemIndex].quantidade -= quantity;
+                // For internal use, create a financial outflow based on average cost
+                financialType = 'Saída';
+                financialChange = quantity * estoqueItems[itemIndex].custo;
+                financialDescription = `Uso Interno/Ajuste: ${estoqueItems[itemIndex].nome} (${quantity} un) - Motivo: ${reason}`;
+                
+                financeiroItems.push({
+                    id: generateUniqueId(),
+                    tipo: financialType,
+                    descricao: financialDescription,
+                    valor: financialChange,
+                    data: new Date().toISOString().split('T')[0],
+                    categoria: 'Ajuste de Estoque/Uso Interno',
+                    originType: 'stock-adjustment',
+                    originId: generateUniqueId(), // Unique ID for this adjustment transaction
+                    originDetails: { itemId: itemId, quantity: quantity, reason: reason }
+                });
+                saveData('financeiroItems', financeiroItems);
+            }
+
+            saveData('estoqueItems', estoqueItems);
+            renderEstoque();
+            renderFinanceiro(); // Update financial view
+            const modal = bootstrap.Modal.getInstance(document.getElementById('stockAdjustmentModal'));
+            modal.hide();
+        });
+
 
         // --- Clientes Logic ---
         function renderClientes() {
@@ -1101,11 +1325,13 @@
             const clienteNome = document.getElementById('clienteNome');
             const clienteContato = document.getElementById('clienteContato');
             const clienteLinkContainer = document.getElementById('clienteLinkContainer');
+            const clientePanelLinkInput = document.getElementById('clientePanelLinkInput');
 
             if (mode === 'add') {
                 modalLabel.textContent = 'Adicionar Cliente';
                 form.reset();
                 clienteIdField.value = '';
+                clientePanelLinkInput.value = ''; // Clear temporary link storage
                 clienteLinkContainer.style.display = 'none'; // Hide link generation for new clients
             } else if (mode === 'edit') {
                 modalLabel.textContent = 'Editar Cliente';
@@ -1114,6 +1340,7 @@
                     clienteIdField.value = item.id;
                     clienteNome.value = item.nome;
                     clienteContato.value = item.contato;
+                    clientePanelLinkInput.value = item.clientPanelLink || ''; // Load existing link
                     clienteLinkContainer.style.display = 'block'; // Show link generation for existing clients
                 }
             }
@@ -1124,14 +1351,22 @@
             const id = document.getElementById('clienteId').value;
             const nome = document.getElementById('clienteNome').value;
             const contato = document.getElementById('clienteContato').value;
+            let clientPanelLink = document.getElementById('clientePanelLinkInput').value;
+
+            // Generate permanent link only if it's a new client or doesn't exist
+            if (!id || !clientPanelLink) {
+                const newClientId = id || generateUniqueId();
+                const currentBaseUrl = window.location.origin + window.location.pathname.replace('index.html', 'client-panel.html');
+                clientPanelLink = `${currentBaseUrl}?clienteId=${newClientId}`;
+            }
 
             if (id) {
                 const index = clientes.findIndex(item => item.id === id);
                 if (index !== -1) {
-                    clientes[index] = { id, nome, contato };
+                    clientes[index] = { id, nome, contato, clientPanelLink };
                 }
             } else {
-                clientes.push({ id: generateUniqueId(), nome, contato });
+                clientes.push({ id: generateUniqueId(), nome, contato, clientPanelLink });
             }
             saveData('clientes', clientes);
             renderClientes();
@@ -1155,19 +1390,16 @@
             }
         }
 
-        function generateClientPanelLink() {
+        function sendClientPanelLink() {
             const clienteId = document.getElementById('clienteId').value;
             const cliente = clientes.find(c => c.id === clienteId);
-            if (!cliente) {
-                alert('Cliente não encontrado para gerar o link.');
+            if (!cliente || !cliente.clientPanelLink) {
+                alert('Cliente não encontrado ou link do painel não gerado.');
                 return;
             }
 
-            // Points to the separate client-panel.html
-            const currentBaseUrl = window.location.origin + window.location.pathname.replace('index.html', 'client-panel.html');
-            const clientPanelUrl = `${currentBaseUrl}?clienteId=${clienteId}`;
-            
-            let whatsappMessage = `Olá ${cliente.nome}, acompanhe o status dos serviços da sua sua moto e o histórico completo na Evolution Motors através deste link: ${clientPanelUrl}`;
+            const clientPanelUrl = cliente.clientPanelLink;
+            let whatsappMessage = `Olá ${cliente.nome}, acompanhe o status dos serviços da sua moto e o histórico completo na Evolution Motors através deste link: ${clientPanelUrl}`;
             
             let phoneNumber = '';
             if (cliente.contato) {
@@ -1179,7 +1411,6 @@
                 }
             }
 
-            // Copy to clipboard
             navigator.clipboard.writeText(clientPanelUrl).then(() => {
                 alert(`Link para o Painel do Cliente copiado para a área de transferência:\n\n${clientPanelUrl}`);
                 if (phoneNumber) {
@@ -1230,19 +1461,19 @@
             const selectClienteServico = document.getElementById('servicoClienteId');
             
             // Clear existing options first
-            selectClienteMoto.innerHTML = '<option value="">Selecione um Cliente</option>';
-            selectClienteServico.innerHTML = '<option value="">Selecione um Cliente</option>';
+            if(selectClienteMoto) selectClienteMoto.innerHTML = '<option value="">Selecione um Cliente</option>';
+            if(selectClienteServico) selectClienteServico.innerHTML = '<option value="">Selecione um Cliente</option>';
 
             clientes.forEach(cliente => {
                 const optionMoto = document.createElement('option');
                 optionMoto.value = cliente.id;
                 optionMoto.textContent = cliente.nome;
-                selectClienteMoto.appendChild(optionMoto);
+                if(selectClienteMoto) selectClienteMoto.appendChild(optionMoto);
 
                 const optionServico = document.createElement('option');
                 optionServico.value = cliente.id;
                 optionServico.textContent = cliente.nome;
-                selectClienteServico.appendChild(optionServico);
+                if(selectClienteServico) selectClienteServico.appendChild(optionServico);
             });
         }
 
@@ -1348,13 +1579,13 @@
 
         function populateFuncionarioSelects() {
             const selectFuncionarioServico = document.getElementById('servicoFuncionarioId');
-            selectFuncionarioServico.innerHTML = '<option value="">Não Atribuído</option>';
+            if(selectFuncionarioServico) selectFuncionarioServico.innerHTML = '<option value="">Não Atribuído</option>';
 
             funcionarios.forEach(func => {
                 const option = document.createElement('option');
                 option.value = func.id;
                 option.textContent = func.nome;
-                selectFuncionarioServico.appendChild(option);
+                if(selectFuncionarioServico) selectFuncionarioServico.appendChild(option);
             });
         }
 
@@ -1441,6 +1672,7 @@
                 `;
                 list.appendChild(row);
             });
+            populatePurchaseFornecedorSelect();
         }
 
         function prepareFornecedorModal(mode, id = null) {
@@ -1489,12 +1721,214 @@
         });
 
         function deleteFornecedor(id) {
+             const hasPurchases = financeiroItems.some(f => f.originType === 'purchase' && f.originDetails && f.originDetails.fornecedorId === id);
+            if (hasPurchases) {
+                alert('Não é possível excluir este fornecedor, pois ele possui compras registradas. Remova-as primeiro.');
+                return;
+            }
             if (confirm('Tem certeza que deseja excluir este fornecedor?')) {
                 fornecedores = fornecedores.filter(item => item.id !== id);
                 saveData('fornecedores', fornecedores);
                 renderFornecedores();
             }
         }
+
+        // --- Purchase Logic (Entrada de Nota de Compra) ---
+        function populatePurchaseFornecedorSelect() {
+            const select = document.getElementById('purchaseFornecedorId');
+            select.innerHTML = '<option value="">Selecione um Fornecedor</option>';
+            fornecedores.forEach(forn => {
+                const option = document.createElement('option');
+                option.value = forn.id;
+                option.textContent = forn.nome;
+                select.appendChild(option);
+            });
+        }
+        
+        function populatePurchaseItemSelect(selectElement, currentItemId = null) {
+            selectElement.innerHTML = '<option value="">Selecione a Peça</option><option value="new_item">-- Nova Peça --</option>';
+            estoqueItems.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.nome;
+                if (item.id === currentItemId) {
+                    option.selected = true;
+                }
+                selectElement.appendChild(option);
+            });
+        }
+
+        function addPurchaseItemField(item = null, quantity = 1, unitCost = 0.01) {
+            const container = document.getElementById('purchaseItemsContainer');
+            const div = document.createElement('div');
+            div.className = 'purchase-item d-flex align-items-center mb-2 flex-wrap';
+
+            const selectItem = document.createElement('select');
+            selectItem.className = 'form-select form-control-sm me-2';
+            selectItem.style.flexGrow = '2';
+            populatePurchaseItemSelect(selectItem, item ? item.id : null);
+            selectItem.onchange = (event) => updatePurchaseItemName(event.target);
+            
+            const newItemNameInput = document.createElement('input');
+            newItemNameInput.type = 'text';
+            newItemNameInput.className = 'form-control form-control-sm me-2 purchase-item-new-name';
+            newItemNameInput.placeholder = 'Nome da Nova Peça';
+            newItemNameInput.style.display = (item && item.id === 'new_item') || !item ? 'block' : 'none';
+
+            const quantityInput = document.createElement('input');
+            quantityInput.type = 'number';
+            quantityInput.className = 'form-control form-control-sm me-2';
+            quantityInput.placeholder = 'Qtd';
+            quantityInput.min = '1';
+            quantityInput.value = quantity;
+            quantityInput.style.width = '70px';
+
+            const unitCostInput = document.createElement('input');
+            unitCostInput.type = 'number';
+            unitCostInput.step = '0.01';
+            unitCostInput.className = 'form-control form-control-sm me-2';
+            unitCostInput.placeholder = 'Custo Unit.';
+            unitCostInput.min = '0.01';
+            unitCostInput.value = unitCost;
+            unitCostInput.style.width = '100px';
+
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'btn btn-danger btn-sm remove-part-btn';
+            removeButton.innerHTML = '<i class="bi bi-x"></i>';
+            removeButton.onclick = () => div.remove();
+
+            div.appendChild(selectItem);
+            div.appendChild(newItemNameInput);
+            div.appendChild(quantityInput);
+            div.appendChild(unitCostInput);
+            div.appendChild(removeButton);
+            container.appendChild(div);
+
+            if (item && item.id === 'new_item') {
+                newItemNameInput.value = item.name || '';
+            } else if (item && item.id && item.id !== 'new_item') {
+                selectItem.value = item.id;
+            }
+        }
+
+        function updatePurchaseItemName(selectElement) {
+            const parentDiv = selectElement.closest('.purchase-item');
+            const newItemNameInput = parentDiv.querySelector('.purchase-item-new-name');
+            if (selectElement.value === 'new_item') {
+                newItemNameInput.style.display = 'block';
+                newItemNameInput.required = true;
+            } else {
+                newItemNameInput.style.display = 'none';
+                newItemNameInput.required = false;
+            }
+        }
+
+        function preparePurchaseModal() {
+            document.getElementById('purchaseForm').reset();
+            document.getElementById('purchaseDate').value = new Date().toISOString().split('T')[0];
+            populatePurchaseFornecedorSelect();
+            document.getElementById('purchaseItemsContainer').innerHTML = ''; // Clear previous items
+            addPurchaseItemField(); // Add one default item row
+        }
+
+        document.getElementById('purchaseForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const fornecedorId = document.getElementById('purchaseFornecedorId').value;
+            const purchaseDate = document.getElementById('purchaseDate').value;
+            const purchaseItemsDivs = document.querySelectorAll('#purchaseItemsContainer .purchase-item');
+
+            if (!fornecedorId) {
+                alert('Por favor, selecione um fornecedor.');
+                return;
+            }
+            if (purchaseItemsDivs.length === 0) {
+                alert('Adicione pelo menos um item à compra.');
+                return;
+            }
+
+            let totalPurchaseCost = 0;
+            const purchasedItems = [];
+            let isValid = true;
+
+            purchaseItemsDivs.forEach(itemDiv => {
+                const select = itemDiv.querySelector('select');
+                const newItemNameInput = itemDiv.querySelector('.purchase-item-new-name');
+                const quantityInput = itemDiv.querySelector('input[type="number"]:nth-of-type(1)');
+                const unitCostInput = itemDiv.querySelector('input[type="number"]:nth-of-type(2)');
+
+                const itemId = select.value;
+                const newItemName = newItemNameInput.value.trim();
+                const quantity = parseInt(quantityInput.value);
+                const unitCost = parseFloat(unitCostInput.value);
+
+                if (itemId === 'new_item' && !newItemName) {
+                    alert('Nome da nova peça é obrigatório.');
+                    isValid = false; return;
+                }
+                if (isNaN(quantity) || quantity <= 0 || isNaN(unitCost) || unitCost <= 0) {
+                    alert('Quantidade e custo unitário devem ser números positivos.');
+                    isValid = false; return;
+                }
+
+                purchasedItems.push({ itemId, newItemName, quantity, unitCost });
+                totalPurchaseCost += quantity * unitCost;
+            });
+
+            if (!isValid) return;
+
+            const purchaseId = generateUniqueId();
+            const fornecedor = fornecedores.find(f => f.id === fornecedorId);
+            const fornecedorName = fornecedor ? fornecedor.nome : 'Desconhecido';
+            const financialDescription = `Compra de Material: ${fornecedorName}`;
+
+            purchasedItems.forEach(pItem => {
+                let currentItem = estoqueItems.find(item => item.id === pItem.itemId);
+                
+                if (pItem.itemId === 'new_item' || !currentItem) { // Create new item or if selected item not found
+                    const newId = generateUniqueId();
+                    estoqueItems.push({
+                        id: newId,
+                        nome: pItem.newItemName,
+                        descricao: `Comprado de ${fornecedorName}`,
+                        custo: pItem.unitCost, // Initial cost
+                        venda: pItem.unitCost * 1.5, // Default 50% markup
+                        quantidade: pItem.quantity
+                    });
+                } else { // Update existing item
+                    currentItem.quantidade += pItem.quantity;
+                    currentItem.custo = pItem.unitCost; // Update last purchase cost
+                }
+            });
+
+            financeiroItems.push({
+                id: generateUniqueId(),
+                tipo: 'Saída',
+                descricao: financialDescription,
+                valor: totalPurchaseCost,
+                data: purchaseDate,
+                categoria: 'Compras de Fornecedores',
+                originType: 'purchase',
+                originId: purchaseId,
+                originDetails: {
+                    fornecedorId: fornecedorId,
+                    items: purchasedItems.map(pi => ({
+                        itemId: pi.itemId === 'new_item' ? (estoqueItems.find(i => i.nome === pi.newItemName && i.custo === pi.unitCost))?.id : pi.itemId,
+                        name: pi.itemId === 'new_item' ? pi.newItemName : estoqueItems.find(i => i.id === pi.itemId)?.nome,
+                        quantity: pi.quantity,
+                        unitCost: pi.unitCost
+                    }))
+                }
+            });
+            
+            saveData('estoqueItems', estoqueItems);
+            saveData('financeiroItems', financeiroItems);
+            renderEstoque();
+            renderFinanceiro();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('purchaseModal'));
+            modal.hide();
+        });
+
 
         // --- Serviços Logic (with Stock and Financial Integration) ---
         function renderServicos() {
@@ -1543,16 +1977,18 @@
                     const motoInfo = moto ? `${moto.modelo} (${moto.placa})` : 'Moto Desconhecida';
                     const funcionarioNome = funcionario ? `Responsável: ${funcionario.nome}` : '';
 
+                    const statusClass = `status-${item.status.toLowerCase().replace(/\s/g, '-')}`;
 
                     const servicoDiv = document.createElement('div');
-                    servicoDiv.className = `servico-card status-${item.status.toLowerCase().replace(/\s/g, '-')}`;
+                    servicoDiv.className = `servico-card ${statusClass}`;
                     servicoDiv.innerHTML = `
                         <h6>${item.horaAgendamento} - ${clienteNome} (${motoInfo})</h6>
                         <small>Serviço: ${item.descricaoServico}</small><br>
                         <small>Status: <strong>${item.status}</strong></small><br>
                         ${funcionarioNome ? `<small>${funcionarioNome}</small><br>` : ''}
+                        ${item.status === 'Orçamento Enviado' || item.status === 'Aguardando Aprovação' || item.status === 'Aprovado' ? `<small>Total: ${formatCurrency(item.custoTotal)}</small><br>` : ''}
                         <div class="actions">
-                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#servicoModal" onclick="prepareServicoModal('edit', '${item.id}')">
+                            <button class="btn btn-sm btn-warning me-1" data-bs-toggle="modal" data-bs-target="#servicoModal" onclick="prepareServicoModal('edit', '${item.id}')">
                                 <i class="bi bi-pencil"></i>
                             </button>
                             <button class="btn btn-sm btn-danger" onclick="deleteServico('${item.id}')">
@@ -1568,12 +2004,34 @@
             });
         }
 
-        function populateEstoqueSelects(selectElement, currentItemId = null) {
+        function populateServicoMotoSelects(selectedClienteId = null, currentMotoId = null) {
+            const selectMoto = document.getElementById('servicoMotoId');
+            selectMoto.innerHTML = '<option value="">Selecione uma Moto</option>';
+            
+            const filteredMotos = selectedClienteId ? motos.filter(m => m.clienteId === selectedClienteId) : [];
+
+            filteredMotos.forEach(moto => {
+                const option = document.createElement('option');
+                option.value = moto.id;
+                option.textContent = `${moto.modelo} (${moto.placa})`;
+                if (moto.id === currentMotoId) {
+                    option.selected = true;
+                }
+                selectMoto.appendChild(option);
+            });
+        }
+
+        function filterMotosByCliente() {
+            const selectedClienteId = document.getElementById('servicoClienteId').value;
+            populateServicoMotoSelects(selectedClienteId);
+        }
+
+        function populateServicePartSelect(selectElement, currentItemId = null) {
             selectElement.innerHTML = '<option value="">Selecione a Peça</option>';
             estoqueItems.forEach(item => {
                 const option = document.createElement('option');
                 option.value = item.id;
-                option.textContent = `${item.nome} (Qtd: ${item.quantidade})`;
+                option.textContent = `${item.nome} (Estoque: ${item.quantidade} - Venda: ${formatCurrency(item.venda)})`;
                 if (item.id === currentItemId) {
                     option.selected = true;
                 }
@@ -1593,26 +2051,45 @@
 
             const select = document.createElement('select');
             select.className = 'form-select form-control-sm me-2';
-            select.style.flexGrow = '2'; // Give more space to part name
-            populateEstoqueSelects(select, part ? part.itemId : null);
+            select.style.flexGrow = '2'; 
+            select.onchange = calculateServiceTotal; // Recalculate total when part changes
+            populateServicePartSelect(select, part ? part.itemId : null);
 
             const quantityInput = document.createElement('input');
             quantityInput.type = 'number';
             quantityInput.className = 'form-control form-control-sm me-2';
             quantityInput.value = part ? part.quantity : 1;
             quantityInput.min = '1';
-            quantityInput.style.width = '70px'; // Fixed width for quantity
+            quantityInput.style.width = '70px'; 
+            quantityInput.oninput = calculateServiceTotal; // Recalculate total when quantity changes
 
             const removeButton = document.createElement('button');
             removeButton.type = 'button';
             removeButton.className = 'btn btn-danger btn-sm';
             removeButton.innerHTML = '<i class="bi bi-x"></i>';
-            removeButton.onclick = () => div.remove();
+            removeButton.onclick = () => { div.remove(); calculateServiceTotal(); }; // Recalculate on remove
 
             div.appendChild(select);
             div.appendChild(quantityInput);
             div.appendChild(removeButton);
             container.appendChild(div);
+            calculateServiceTotal(); // Initial calculation when adding a field
+        }
+
+        function calculateServiceTotal() {
+            const laborCost = parseFloat(document.getElementById('servicoLaborCost').value) || 0;
+            let partsTotal = 0;
+
+            document.querySelectorAll('#partsUsedContainer .part-item').forEach(partDiv => {
+                const itemId = partDiv.querySelector('select').value;
+                const quantity = parseInt(partDiv.querySelector('input').value);
+                const estoqueItem = estoqueItems.find(item => item.id === itemId);
+
+                if (estoqueItem && quantity > 0) {
+                    partsTotal += estoqueItem.venda * quantity;
+                }
+            });
+            document.getElementById('servicoCustoTotal').value = (laborCost + partsTotal).toFixed(2);
         }
 
         function getPartsUsedFromForm() {
@@ -1620,13 +2097,17 @@
             document.querySelectorAll('#partsUsedContainer .part-item').forEach(partDiv => {
                 const itemId = partDiv.querySelector('select').value;
                 const quantity = parseInt(partDiv.querySelector('input').value);
-                if (itemId && quantity > 0) {
-                    parts.push({ itemId, quantity });
+                const estoqueItem = estoqueItems.find(item => item.id === itemId);
+
+                if (itemId && quantity > 0 && estoqueItem) {
+                    parts.push({ itemId, quantity, unitPrice: estoqueItem.venda }); // Store price at time of use
                 }
             });
             return parts;
         }
 
+        // Adjusts stock based on oldParts (from stored service) and newParts (from form)
+        // Returns true if adjustment is successful, false if stock is insufficient
         function applyStockAdjustments(oldParts, newParts) {
             const stockAdjustments = {}; // {itemId: delta_quantity}
 
@@ -1634,10 +2115,8 @@
             oldParts.forEach(oldPart => {
                 const newPart = newParts.find(np => np.itemId === oldPart.itemId);
                 if (newPart) {
-                    // Part exists in both, calculate difference (old quantity - new quantity) -> positive delta means return, negative means further deduction
                     stockAdjustments[oldPart.itemId] = (stockAdjustments[oldPart.itemId] || 0) + (oldPart.quantity - newPart.quantity);
                 } else {
-                    // Part removed, return full quantity
                     stockAdjustments[oldPart.itemId] = (stockAdjustments[oldPart.itemId] || 0) + oldPart.quantity;
                 }
             });
@@ -1646,69 +2125,39 @@
             newParts.forEach(newPart => {
                 const oldPart = oldParts.find(op => op.itemId === newPart.itemId);
                 if (!oldPart) {
-                    // New part added, deduct full quantity
                     stockAdjustments[newPart.itemId] = (stockAdjustments[newPart.itemId] || 0) - newPart.quantity;
                 } else if (newPart.quantity > oldPart.quantity) {
-                    // Quantity increased, deduct the difference
                     stockAdjustments[newPart.itemId] = (stockAdjustments[newPart.itemId] || 0) - (newPart.quantity - oldPart.quantity);
                 }
             });
 
-            // Apply adjustments to estoqueItems
-            let stockUpdateSuccessful = true;
-            const pendingStockChanges = []; // To store temporary changes for rollback if needed
-
+            // Check if proposed changes result in negative stock before applying
             for (const itemId in stockAdjustments) {
                 const itemIndex = estoqueItems.findIndex(item => item.id === itemId);
                 if (itemIndex !== -1) {
                     const currentStock = estoqueItems[itemIndex].quantidade;
                     const delta = stockAdjustments[itemId];
                     
-                    if (currentStock + delta < 0) { // Check if deduction would result in negative stock
+                    if (currentStock + delta < 0) { 
                         alert(`Estoque insuficiente para a peça "${estoqueItems[itemIndex].nome}". Disponível: ${currentStock}, Necessário remover: ${-delta}.`);
-                        stockUpdateSuccessful = false;
-                        break; 
+                        return false; 
                     }
-                    pendingStockChanges.push({index: itemIndex, oldQuantity: currentStock, newQuantity: currentStock + delta});
                 } else {
                     console.warn(`Peça com ID ${itemId} não encontrada no estoque durante ajuste.`);
                 }
             }
 
-            if (stockUpdateSuccessful) {
-                pendingStockChanges.forEach(change => {
-                    estoqueItems[change.index].quantidade = change.newQuantity;
-                });
-                saveData('estoqueItems', estoqueItems);
-            } else {
-                // No changes are saved if any part fails
-                // In a real system, you might have a more complex transaction rollback mechanism.
-            }
-            return stockUpdateSuccessful;
-        }
-
-
-        function populateMotoSelects(selectedClienteId = null, currentMotoId = null) {
-            const selectMoto = document.getElementById('servicoMotoId');
-            selectMoto.innerHTML = '<option value="">Selecione uma Moto</option>';
-            
-            const filteredMotos = selectedClienteId ? motos.filter(m => m.clienteId === selectedClienteId) : [];
-
-            filteredMotos.forEach(moto => {
-                const option = document.createElement('option');
-                option.value = moto.id;
-                option.textContent = `${moto.modelo} (${moto.placa})`;
-                if (moto.id === currentMotoId) {
-                    option.selected = true;
+            // If all checks pass, apply changes
+            for (const itemId in stockAdjustments) {
+                const itemIndex = estoqueItems.findIndex(item => item.id === itemId);
+                if (itemIndex !== -1) {
+                    estoqueItems[itemIndex].quantidade += stockAdjustments[itemId];
                 }
-                selectMoto.appendChild(option);
-            });
+            }
+            saveData('estoqueItems', estoqueItems);
+            return true;
         }
 
-        function filterMotosByCliente() {
-            const selectedClienteId = document.getElementById('servicoClienteId').value;
-            populateMotoSelects(selectedClienteId);
-        }
 
         function prepareServicoModal(mode, id = null) {
             const modalLabel = document.getElementById('servicoModalLabel');
@@ -1721,7 +2170,9 @@
             const servicoDataAgendamento = document.getElementById('servicoDataAgendamento');
             const servicoHoraAgendamento = document.getElementById('servicoHoraAgendamento');
             const servicoStatus = document.getElementById('servicoStatus');
-            const servicoCustoTotal = document.getElementById('servicoCustoTotal');
+            const servicoLaborCost = document.getElementById('servicoLaborCost');
+            const servicoCustoTotal = document.getElementById('servicoCustoTotal'); // This is readonly
+            const servicoBudgetNotes = document.getElementById('servicoBudgetNotes');
             const servicoDataConclusao = document.getElementById('servicoDataConclusao');
             const servicoObservacoes = document.getElementById('servicoObservacoes');
             const partsUsedContainer = document.getElementById('partsUsedContainer');
@@ -1729,44 +2180,46 @@
             const originalServicoParts = document.getElementById('originalServicoParts');
 
 
-            populateClienteSelects(); // Popula os clientes no select
-            populateFuncionarioSelects(); // Popula os funcionários no select
-
-            partsUsedContainer.innerHTML = ''; // Clear parts list
+            populateClienteSelects();
+            populateFuncionarioSelects();
+            partsUsedContainer.innerHTML = ''; 
 
             if (mode === 'add') {
-                modalLabel.textContent = 'Registrar Serviço';
+                modalLabel.textContent = 'Registrar Nova Ordem de Serviço';
                 form.reset();
                 servicoId.value = '';
-                servicoStatus.value = 'Agendado';
+                servicoStatus.value = 'Aguardando Orçamento';
                 servicoDataAgendamento.value = new Date().toISOString().split('T')[0];
                 servicoHoraAgendamento.value = new Date().toTimeString().split(' ')[0].substring(0, 5);
+                servicoLaborCost.value = '0';
                 servicoCustoTotal.value = '0';
+                servicoBudgetNotes.value = '';
                 servicoDataConclusao.value = '';
                 servicoObservacoes.value = '';
-                servicoFuncionarioId.value = ''; // Reset funcionario selection
+                servicoFuncionarioId.value = ''; 
                 servicoMotoId.innerHTML = '<option value="">Selecione uma Moto</option>';
                 originalServicoStatus.value = '';
-                originalServicoParts.value = JSON.stringify([]); // No parts initially
+                originalServicoParts.value = JSON.stringify([]); 
             } else if (mode === 'edit') {
-                modalLabel.textContent = 'Editar Serviço';
+                modalLabel.textContent = 'Editar Ordem de Serviço';
                 const item = servicos.find(i => i.id === id);
                 if (item) {
                     servicoId.value = item.id;
                     servicoClienteId.value = item.clienteId;
                     
-                    populateMotoSelects(item.clienteId, item.motoId); // Popula motos para o cliente selecionado e seleciona a moto do serviço
+                    populateServicoMotoSelects(item.clienteId, item.motoId); 
                     
                     servicoFuncionarioId.value = item.funcionarioId || '';
                     servicoDescricao.value = item.descricaoServico;
                     servicoDataAgendamento.value = item.dataAgendamento;
                     servicoHoraAgendamento.value = item.horaAgendamento;
                     servicoStatus.value = item.status;
+                    servicoLaborCost.value = item.laborCost || 0;
                     servicoCustoTotal.value = item.custoTotal;
+                    servicoBudgetNotes.value = item.budgetNotes || '';
                     servicoDataConclusao.value = item.dataConclusao || '';
                     servicoObservacoes.value = item.observacoes || '';
 
-                    // Populate parts used
                     if (item.partsUsed && item.partsUsed.length > 0) {
                         item.partsUsed.forEach(part => addPartField(part));
                     }
@@ -1774,6 +2227,7 @@
                     originalServicoParts.value = JSON.stringify(item.partsUsed || []);
                 }
             }
+            calculateServiceTotal(); // Ensure total is calculated on modal load
         }
 
         document.getElementById('servicoForm').addEventListener('submit', function(event) {
@@ -1786,7 +2240,9 @@
             const dataAgendamento = document.getElementById('servicoDataAgendamento').value;
             const horaAgendamento = document.getElementById('servicoHoraAgendamento').value;
             const newStatus = document.getElementById('servicoStatus').value;
-            const custoTotal = parseFloat(document.getElementById('servicoCustoTotal').value) || 0;
+            const laborCost = parseFloat(document.getElementById('servicoLaborCost').value) || 0;
+            const custoTotal = parseFloat(document.getElementById('servicoCustoTotal').value) || 0; // Readonly, already calculated
+            const budgetNotes = document.getElementById('servicoBudgetNotes').value;
             const dataConclusao = document.getElementById('servicoDataConclusao').value;
             const observacoes = document.getElementById('servicoObservacoes').value;
             const partsUsed = getPartsUsedFromForm();
@@ -1808,8 +2264,7 @@
             // --- Stock adjustment logic ---
             const stockAdjustmentSuccessful = applyStockAdjustments(oldPartsUsed, partsUsed);
             if (!stockAdjustmentSuccessful) {
-                // If stock adjustment failed, prevent saving the service
-                return; 
+                return; // Prevent saving if stock is insufficient
             }
 
             // --- Financial transaction logic ---
@@ -1823,20 +2278,21 @@
                     tipo: 'Entrada', 
                     descricao: financialDescription, 
                     valor: custoTotal, 
-                    data: dataConclusao || new Date().toISOString().split('T')[0], // Use conclusion date or current date
+                    data: dataConclusao || new Date().toISOString().split('T')[0], 
                     categoria: 'Serviços de Oficina',
-                    servicoId: id || 'temp-' + generateUniqueId() // Link to service
+                    originType: 'service',
+                    originId: id || generateUniqueId() // Use existing service ID or temp for new service
                 });
                 saveData('financeiroItems', financeiroItems);
             } 
             // If status changes FROM 'Concluido' to something else, remove financial entry
             else if (newStatus !== 'Concluido' && oldStatus === 'Concluido' && currentServico) {
-                financeiroItems = financeiroItems.filter(item => item.servicoId !== currentServico.id);
+                financeiroItems = financeiroItems.filter(item => item.originId !== currentServico.id || item.originType !== 'service');
                 saveData('financeiroItems', financeiroItems);
             }
-            // If it was Concluido and still is, but amount changed, update the financial entry
+            // If it was Concluido and still is, but amount or date changed, update the financial entry
             else if (newStatus === 'Concluido' && oldStatus === 'Concluido' && currentServico) {
-                const financialEntryIndex = financeiroItems.findIndex(item => item.servicoId === currentServico.id);
+                const financialEntryIndex = financeiroItems.findIndex(item => item.originId === currentServico.id && item.originType === 'service');
                 if (financialEntryIndex !== -1) {
                     financeiroItems[financialEntryIndex].valor = custoTotal;
                     financeiroItems[financialEntryIndex].data = dataConclusao || financeiroItems[financialEntryIndex].data;
@@ -1844,15 +2300,16 @@
                 }
             }
 
-
             // --- Save service data ---
+            const serviceData = { id: id || generateUniqueId(), clienteId, motoId, funcionarioId, descricaoServico, dataAgendamento, horaAgendamento, status: newStatus, laborCost, custoTotal, budgetNotes, dataConclusao, observacoes, partsUsed };
+
             if (id) {
                 const index = servicos.findIndex(item => item.id === id);
                 if (index !== -1) {
-                    servicos[index] = { id, clienteId, motoId, funcionarioId, descricaoServico, dataAgendamento, horaAgendamento, status: newStatus, custoTotal, dataConclusao, observacoes, partsUsed };
+                    servicos[index] = serviceData;
                 }
             } else {
-                servicos.push({ id: generateUniqueId(), clienteId, motoId, funcionarioId, descricaoServico, dataAgendamento, horaAgendamento, status: newStatus, custoTotal, dataConclusao, observacoes, partsUsed });
+                servicos.push(serviceData);
             }
             saveData('servicos', servicos);
             renderServicos();
@@ -1863,7 +2320,7 @@
         });
 
         function deleteServico(id) {
-            if (confirm('Tem certeza que deseja excluir este serviço? Todas as peças serão repostas ao estoque e a transação financeira (se houver) será removida.')) {
+            if (confirm('Tem certeza que deseja excluir esta Ordem de Serviço? Todas as peças serão repostas ao estoque e a transação financeira (se houver) será removida.')) {
                 const serviceToDelete = servicos.find(s => s.id === id);
 
                 // Revert stock for parts used
@@ -1879,7 +2336,7 @@
 
                 // Remove financial entry if it was concluded
                 if (serviceToDelete && serviceToDelete.status === 'Concluido') {
-                    financeiroItems = financeiroItems.filter(item => item.servicoId !== id);
+                    financeiroItems = financeiroItems.filter(item => item.originId !== id || item.originType !== 'service');
                     saveData('financeiroItems', financeiroItems);
                 }
 
@@ -1900,7 +2357,7 @@
             let totalSaidas = 0;
 
             if (financeiroItems.length === 0) {
-                list.innerHTML = '<tr><td colspan="6" class="text-center empty-list-message">Nenhuma transação financeira registrada.</td></tr>';
+                list.innerHTML = '<tr><td colspan="7" class="text-center empty-list-message">Nenhuma transação financeira registrada.</td></tr>';
             }
 
             const sortedFinanceiro = [...financeiroItems].sort((a, b) => new Date(b.data) - new Date(a.data));
@@ -1921,6 +2378,7 @@
                     <td>${formatCurrency(item.valor)}</td>
                     <td>${formatDate(item.data)}</td>
                     <td>${item.categoria || '-'}</td>
+                    <td>${item.originType || 'Manual'}</td>
                     <td>
                         <button class="btn btn-sm btn-warning me-1" data-bs-toggle="modal" data-bs-target="#financeiroModal" onclick="prepareFinanceiroModal('edit', '${item.id}')">
                             <i class="bi bi-pencil"></i>
@@ -1947,7 +2405,8 @@
             const financeiroValor = document.getElementById('financeiroValor');
             const financeiroData = document.getElementById('financeiroData');
             const financeiroCategoria = document.getElementById('financeiroCategoria');
-            const financeiroServicoId = document.getElementById('financeiroServicoId');
+            const financeiroOriginId = document.getElementById('financeiroOriginId');
+            const financeiroOriginType = document.getElementById('financeiroOriginType');
 
 
             if (mode === 'add') {
@@ -1956,7 +2415,8 @@
                 financeiroId.value = '';
                 financeiroTipo.value = 'Entrada';
                 financeiroData.value = new Date().toISOString().split('T')[0];
-                financeiroServicoId.value = ''; // Not linked to a service by default
+                financeiroOriginId.value = ''; 
+                financeiroOriginType.value = '';
             } else if (mode === 'edit') {
                 modalLabel.textContent = 'Editar Transação Financeira';
                 const item = financeiroItems.find(i => i.id === id);
@@ -1967,7 +2427,21 @@
                     financeiroValor.value = item.valor;
                     financeiroData.value = item.data;
                     financeiroCategoria.value = item.categoria;
-                    financeiroServicoId.value = item.servicoId || '';
+                    financeiroOriginId.value = item.originId || '';
+                    financeiroOriginType.value = item.originType || '';
+
+                    if (item.originType) { // Disable editing for auto-generated transactions
+                        document.querySelectorAll('#financeiroForm input, #financeiroForm select').forEach(el => {
+                            if (el.id !== 'financeiroId' && el.id !== 'financeiroOriginId' && el.id !== 'financeiroOriginType') {
+                                el.disabled = true;
+                            }
+                        });
+                        document.querySelector('#financeiroForm button[type="submit"]').disabled = true;
+                        alert('Transações financeiras vinculadas a outros módulos (Serviço, Compras, Estoque) não podem ser editadas diretamente aqui. Edite-as no módulo de origem.');
+                    } else {
+                        document.querySelectorAll('#financeiroForm input, #financeiroForm select').forEach(el => el.disabled = false);
+                        document.querySelector('#financeiroForm button[type="submit"]').disabled = false;
+                    }
                 }
             }
         }
@@ -1980,25 +2454,25 @@
             const valor = parseFloat(document.getElementById('financeiroValor').value);
             const data = document.getElementById('financeiroData').value;
             const categoria = document.getElementById('financeiroCategoria').value;
-            const servicoId = document.getElementById('financeiroServicoId').value; // Will be empty unless auto-generated
+            const originId = document.getElementById('financeiroOriginId').value;
+            const originType = document.getElementById('financeiroOriginType').value;
 
             if (isNaN(valor) || valor <= 0) {
                 alert('Por favor, insira um valor numérico positivo para a transação.');
                 return;
             }
-            if (servicoId) {
-                alert('Transações financeiras vinculadas a serviços não podem ser editadas manualmente. Por favor, edite o serviço correspondente.');
+            if (originType) { // If it's an auto-generated transaction, should be disabled, but for safety
+                alert('Transações financeiras vinculadas a outros módulos não podem ser editadas manualmente. Por favor, edite no módulo de origem.');
                 return;
             }
-
 
             if (id) {
                 const index = financeiroItems.findIndex(item => item.id === id);
                 if (index !== -1) {
-                    financeiroItems[index] = { id, tipo, descricao, valor, data, categoria, servicoId };
+                    financeiroItems[index] = { id, tipo, descricao, valor, data, categoria, originId: '', originType: '' }; // Ensure manual items have no origin
                 }
             } else {
-                financeiroItems.push({ id: generateUniqueId(), tipo, descricao, valor, data, categoria, servicoId: '' }); // Manually added items have no serviceId
+                financeiroItems.push({ id: generateUniqueId(), tipo, descricao, valor, data, categoria, originId: '', originType: '' });
             }
             saveData('financeiroItems', financeiroItems);
             renderFinanceiro();
@@ -2008,11 +2482,11 @@
 
         function deleteFinanceiroItem(id) {
             const itemToDelete = financeiroItems.find(item => item.id === id);
-            if (itemToDelete && itemToDelete.servicoId) {
-                 alert('Esta transação está vinculada a um serviço. Exclua o serviço para remover a transação financeira.');
+            if (itemToDelete && itemToDelete.originType) {
+                 alert('Esta transação está vinculada a um serviço, compra ou ajuste de estoque. Exclua/edite-o(a) no módulo de origem para remover a transação financeira.');
                  return;
             }
-            if (confirm('Tem certeza que deseja excluir esta transação financeira?')) {
+            if (confirm('Tem certeza que deseja excluir esta transação financeira manual?')) {
                 financeiroItems = financeiroItems.filter(item => item.id !== id);
                 saveData('financeiroItems', financeiroItems);
                 renderFinanceiro();
@@ -2054,8 +2528,6 @@
 
         // --- Initial Load Logic (Admin Panel Only) ---
         document.addEventListener('DOMContentLoaded', () => {
-            // This is the admin panel, so always show it.
-            // The client panel logic is now in client-panel.html
             document.getElementById('adminPanel').style.display = 'flex';
             showAdminSection('estoque'); // Default admin section
         });
