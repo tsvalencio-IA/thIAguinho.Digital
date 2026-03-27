@@ -22,7 +22,7 @@ PASSO 2 (O Contexto): Pergunte o Ramo de Atuação, como a empresa funciona hoje
 PASSO 3 (A Dor Real): Descubra o gargalo. Se o cliente disser "fluxo de caixa", pergunte como fazem hoje (papel, planilha?). Cave fundo no problema.
 PASSO 4 (A Autoridade): Mostre empatia. Explique brevemente como a automação de processos e um sistema digital resolvem essa falha específica da operação deles.
 PASSO 5 (O Fechamento): AGORA SIM, diga que você tem todas as informações para desenhar a arquitetura ideal e PEÇA O WHATSAPP (com DDD).
-PASSO 6 (A Confirmação do Celular): Quando o cliente digitar o número, você DEVE PERGUNTAR se o número está correto. Exemplo: "Esse é o seu celular: 1 7 9 9... ?". [OPCOES: Sim, é esse mesmo | Não, vou digitar de novo]. ATENÇÃO: Para o sistema de voz ler corretamente, você deve SEMPRE escrever os números de telefone separados por espaços na sua frase.
+PASSO 6 (A Confirmação do Celular): Quando o cliente digitar o número, você DEVE PERGUNTAR se o número está correto. Exemplo: "Esse é o seu celular: 1-7-9-9... ?". [OPCOES: Sim, é esse mesmo | Não, vou digitar de novo]. ATENÇÃO MÁXIMA: Para a nossa voz robótica ler o número corretamente e não como milhões, você DEVE OBRIGATORIAMENTE escrever o número com hífens entre cada dígito (exemplo: 1-7-9-9-7-6-3-1-2-1-0). Nunca escreva os números todos juntos.
 PASSO 7 (Despedida): Após o cliente confirmar que o número está correto ("Sim"), agradeça, diga que o Thiago entrará em contato com a solução pronta e encerre a conversa gerando a tag secreta.
 
 REGRA DE ENCERRAMENTO: Após receber a confirmação do WhatsApp e gerar a Tag, a entrevista ACABA. Se o cliente continuar falando, apenas diga: "Tudo anotado! O Thiago entrará em contato em breve."
@@ -117,7 +117,6 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
         Sempre coloque os códigos gerados em blocos Markdown puros (ex: \`\`\`html).
 
         DIRETRIZ MÁXIMA PARA O MOTOR DE VOZ DO MASCOTE:
-        O Thiago baniu a API da ElevenLabs. Agora nós usamos o nosso próprio motor (Gemini TTS) dentro do código do cliente.
         Sempre que for criar um sistema com Chatbot/Mascote de voz, você é OBRIGADO a colocar exatamente a seguinte função JavaScript no código do cliente para processar a voz:
 
         \`\`\`javascript
@@ -127,7 +126,6 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
             if (globalAudioCtx.state === 'suspended') globalAudioCtx.resume();
             
             try {
-                // 1. Busca a chave e o nome da voz dinamicamente no banco de dados do painel do Thiago
                 const resKey = await fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/admin_config/gemini_api_key.json');
                 const adminApiKey = await resKey.json();
                 const resVoice = await fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/admin_config/gemini_voice_name.json');
@@ -135,33 +133,24 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
 
                 if (!adminApiKey) throw new Error("Chave do Admin não encontrada.");
 
-                // 2. Chama a API do Gemini TTS em modo de Áudio
                 const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + adminApiKey;
                 const payload = {
                     contents: [{ parts: [{ text: textoParaFalar }] }],
-                    generationConfig: {
-                        responseModalities: ["AUDIO"],
-                        speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } } }
-                    }
+                    generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } } } }
                 };
 
                 const res = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
                 const data = await res.json();
                 const base64Audio = data.candidates[0].content.parts[0].inlineData.data;
 
-                // 3. Converte os bytes puros do Gemini (PCM16) para som de altíssima qualidade
                 const binaryString = window.atob(base64Audio);
                 const buffer = new ArrayBuffer(binaryString.length);
                 const view = new Uint8Array(buffer);
-                for (let i = 0; i < binaryString.length; i++) {
-                    view[i] = binaryString.charCodeAt(i);
-                }
+                for (let i = 0; i < binaryString.length; i++) { view[i] = binaryString.charCodeAt(i); }
                 const int16View = new Int16Array(buffer);
-                const audioBuffer = globalAudioCtx.createBuffer(1, int16View.length, 24000); // 24kHz do Gemini
+                const audioBuffer = globalAudioCtx.createBuffer(1, int16View.length, 24000);
                 const channelData = audioBuffer.getChannelData(0);
-                for (let i = 0; i < int16View.length; i++) {
-                    channelData[i] = int16View[i] / 32768.0;
-                }
+                for (let i = 0; i < int16View.length; i++) { channelData[i] = int16View[i] / 32768.0; }
                 const source = globalAudioCtx.createBufferSource();
                 source.buffer = audioBuffer;
                 source.connect(globalAudioCtx.destination);
@@ -200,5 +189,70 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
 
     } catch(e) {
         return "Erro de compilação da IA: " + e.message;
+    }
+}
+
+// =========================================================================
+// CÉREBRO 3: ENGENHARIA DE PROCESSOS (AIMP - PADRÃO MCDONALD'S)
+// =========================================================================
+export async function analisarEGerarProcessoAIMP(contextoCaotico, nomeVideoAnexado = null) {
+    try {
+        const apiKey = await obterChaveDaApi();
+        if (!apiKey) throw new Error("Chave da API não encontrada.");
+
+        let intro = contextoCaotico;
+        if (nomeVideoAnexado) {
+            intro = `[Análise Simulada do Vídeo Anexado: ${nomeVideoAnexado}]\n\n` + intro;
+        }
+
+        const promptEngenheiroProcessos = `Você é um Engenheiro de Processos Sênior, criador do AIMP. 
+        Sua especialidade é criar a "Consistência McDonald's" para empresas que têm rotinas caóticas.
+        O usuário vai relatar um problema na operação dele (ou simular a visão de um vídeo anexado).
+        
+        Sua Missão: Transformar essa bagunça em um Procedimento Operacional Padrão (POP) perfeito e à prova de falhas.
+        
+        REGRAS DE FORMATAÇÃO MÁXIMA (Obrigatório):
+        - NÃO USE markdown de bloco de código (\`\`\`html).
+        - Você deve responder APENAS com código HTML puro, usando as classes do Tailwind CSS para ficar lindo dentro do painel do Thiago.
+        - Estrutura esperada:
+          <h1 class="text-xl font-bold text-emerald-400 mb-4 border-b border-slate-700 pb-2">POP: [Nome do Processo]</h1>
+          <div class="mb-4 bg-slate-900 p-4 rounded-lg border-l-4 border-emerald-500">
+             <h2 class="text-white font-bold mb-2">1. Objetivo</h2>
+             <p class="text-slate-300 text-sm">...</p>
+          </div>
+          <div class="mb-4 bg-slate-900 p-4 rounded-lg border-l-4 border-emerald-500">
+             <h2 class="text-white font-bold mb-2">2. Checklist Passo a Passo</h2>
+             <ul class="list-none space-y-2 text-sm text-slate-300">
+                <li class="flex items-start gap-2"><i class='bx bx-check-circle text-emerald-400 mt-1'></i> [Ação]</li>
+             </ul>
+          </div>
+          <div class="bg-red-900/20 p-4 rounded-lg border border-red-900/50">
+             <h2 class="text-red-400 font-bold mb-2"><i class='bx bx-error-circle'></i> Pontos Críticos de Falha</h2>
+             <p class="text-slate-300 text-sm">...</p>
+          </div>
+        
+        Seja analítico, inteligente e mostre que a thIAguinho Soluções é capaz de estruturar negócios perfeitamente.`;
+
+        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+        const res = await fetch(MODEL_URL, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                contents: [{ role: 'user', parts: [{ text: intro }] }], 
+                systemInstruction: { parts: [{ text: promptEngenheiroProcessos }] } 
+            })
+        });
+        
+        const data = await res.json();
+        if (data.error) throw new Error(data.error.message);
+        
+        let htmlResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro de geração.";
+        
+        // Remove markdown tags if the AI accidentally adds them
+        htmlResponse = htmlResponse.replace(/```html/g, '').replace(/```/g, '').trim();
+        return htmlResponse;
+
+    } catch(e) {
+        throw new Error("Falha no Cérebro AIMP: " + e.message);
     }
 }
