@@ -2,10 +2,11 @@
 // LOCALIZAÇÃO: Dentro da pasta 'js'
 
 import { auth, database, signInWithEmailAndPassword, signOut, onAuthStateChanged, ref, set, onValue, get } from './firebase-config.js';
-import { atualizarPromptMemoria, systemPrompt as promptPadraoDaAPI, conversarComDesenvolvedorIA } from './gemini-api.js';
+import { atualizarPromptMemoria, systemPrompt as promptPadraoDaAPI, conversarComDesenvolvedorIA, analisarEGerarProcessoAIMP } from './gemini-api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     
+    // Auth & Inputs Básicos
     const emailInput = document.getElementById('email-admin');
     const senhaInput = document.getElementById('senha-admin');
     const btnLogin = document.getElementById('btn-login');
@@ -13,16 +14,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const erroMsg = document.getElementById('msg-erro-login');
     
     const apiKeyInput = document.getElementById('api-key-input');
-    const elevenKeyInput = document.getElementById('eleven-key-input');
-    const elevenVoiceInput = document.getElementById('eleven-voice-input');
+    const geminiVoiceInput = document.getElementById('gemini-voice-input');
     const githubTokenInput = document.getElementById('github-token-input');
     const githubRepoInput = document.getElementById('github-repo-input');
     
-    const gridLeads = document.getElementById('grid-leads');
+    // Áreas Principais
+    const gridLeads = document.getElementById('view-crm');
+    const viewProcessos = document.getElementById('view-processos');
     
     let usuarioLogado = null;
     let listaDeClientesGlobais = [];
-    let abaAtiva = 'novos'; 
+    let abaAtiva = 'novos'; // 'novos', 'concluidos', 'processos'
     let contextoProjetoAtual = ""; 
     let idProjetoAberto = null;
     let historicoDevAtual = [];
@@ -66,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return textoFormatado.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
     }
 
+    // Funções Globais na Window
     window.baixarCodigo = function(blockId, extensao) {
         const codigoRaw = document.getElementById(blockId).innerText;
         const blob = new Blob([codigoRaw], { type: 'text/html;charset=utf-8' });
@@ -142,7 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.innerHTML = "<i class='bx bx-check'></i> Publicado!";
                 btn.classList.replace('bg-purple-600', 'bg-emerald-600');
                 
-                // MÁGICA AQUI: Salva o link oficial do cliente direto no Firebase!
                 await set(ref(database, `projetos_capturados/${idProjetoAberto}/linkDemo`), pageUrl);
                 
                 alert(`Sistema publicado com sucesso!\n\nLink: ${pageUrl}\n\nO link já foi salvo no painel! Feche esta janela e clique no botão verde do WhatsApp, o link vai aparecer lá automaticamente.`);
@@ -158,14 +160,101 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = false;
     };
 
+    // LÓGICA DAS ABAS SUPERIORES
     const tabNovos = document.getElementById('tab-novos');
     const tabConcluidos = document.getElementById('tab-concluidos');
+    const tabProcessos = document.getElementById('tab-processos');
 
-    if(tabNovos && tabConcluidos) {
-        tabNovos.addEventListener('click', () => { abaAtiva = 'novos'; tabNovos.classList.replace('text-slate-400', 'text-white'); tabNovos.classList.add('border-b-2', 'border-red-500'); tabConcluidos.classList.replace('text-white', 'text-slate-400'); tabConcluidos.classList.remove('border-b-2', 'border-red-500'); renderizarProjetos(); });
-        tabConcluidos.addEventListener('click', () => { abaAtiva = 'concluidos'; tabConcluidos.classList.replace('text-slate-400', 'text-white'); tabConcluidos.classList.add('border-b-2', 'border-red-500'); tabNovos.classList.replace('text-white', 'text-slate-400'); tabNovos.classList.remove('border-b-2', 'border-red-500'); renderizarProjetos(); });
+    function switchTab(tabName) {
+        abaAtiva = tabName;
+        // Reseta todos os estilos
+        [tabNovos, tabConcluidos, tabProcessos].forEach(t => {
+            t.classList.remove('text-white', 'border-b-2', 'border-red-500', 'text-emerald-400', 'border-emerald-500');
+            if(t.id === 'tab-processos') t.classList.add('text-emerald-500/70');
+            else t.classList.add('text-slate-400');
+        });
+
+        if(tabName === 'processos') {
+            tabProcessos.classList.remove('text-emerald-500/70');
+            tabProcessos.classList.add('text-emerald-400', 'border-b-2', 'border-emerald-500');
+            gridLeads.classList.add('oculto');
+            viewProcessos.classList.remove('oculto');
+        } else {
+            const activeEl = tabName === 'novos' ? tabNovos : tabConcluidos;
+            activeEl.classList.remove('text-slate-400');
+            activeEl.classList.add('text-white', 'border-b-2', 'border-red-500');
+            viewProcessos.classList.add('oculto');
+            gridLeads.classList.remove('oculto');
+            renderizarProjetos();
+        }
     }
 
+    if(tabNovos) tabNovos.addEventListener('click', () => switchTab('novos'));
+    if(tabConcluidos) tabConcluidos.addEventListener('click', () => switchTab('concluidos'));
+    if(tabProcessos) tabProcessos.addEventListener('click', () => switchTab('processos'));
+
+    // LÓGICA DO MÓDULO AIMP (ENGENHARIA DE PROCESSOS)
+    const aimpVideoInput = document.getElementById('aimp-video');
+    const aimpFileName = document.getElementById('aimp-file-name');
+    const aimpContexto = document.getElementById('aimp-contexto');
+    const btnGerarPop = document.getElementById('btn-gerar-pop');
+    const aimpResultado = document.getElementById('aimp-resultado');
+
+    if(aimpVideoInput) {
+        aimpVideoInput.addEventListener('change', (e) => {
+            if(e.target.files.length > 0) {
+                aimpFileName.textContent = `Anexado: ${e.target.files[0].name}`;
+                aimpFileName.classList.replace('text-slate-500', 'text-emerald-400');
+            }
+        });
+    }
+
+    if(btnGerarPop) {
+        btnGerarPop.addEventListener('click', async () => {
+            const contexto = aimpContexto.value.trim();
+            const fileName = aimpVideoInput.files.length > 0 ? aimpVideoInput.files[0].name : null;
+            
+            if(!contexto && !fileName) {
+                alert("Por favor, descreva a rotina ou anexe um arquivo/vídeo para análise.");
+                return;
+            }
+
+            btnGerarPop.innerHTML = "<i class='bx bx-loader-alt bx-spin text-xl'></i> Aplicando Padrão McDonald's...";
+            btnGerarPop.disabled = true;
+            aimpResultado.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-emerald-500 animate-pulse">
+                    <i class='bx bx-layer text-6xl mb-4'></i>
+                    <p class="font-bold tracking-wider uppercase text-sm">O Arquiteto está modelando o processo...</p>
+                </div>
+            `;
+
+            try {
+                // Aguarda 2 segundos simulando análise de vídeo pesada para o UX
+                if(fileName) await new Promise(r => setTimeout(r, 2000));
+                
+                const resultadoHTML = await analisarEGerarProcessoAIMP(contexto, fileName);
+                
+                aimpResultado.innerHTML = `
+                    <div class="bg-slate-800 border border-emerald-900/50 rounded-xl p-6 shadow-2xl">
+                        <div class="flex justify-between items-center border-b border-slate-700 pb-3 mb-4">
+                            <h2 class="text-emerald-400 font-bold text-xl"><i class='bx bx-check-shield'></i> POP Gerado com Sucesso</h2>
+                            <button onclick="navigator.clipboard.writeText(document.getElementById('pop-content').innerText); alert('Copiado para a área de transferência!')" class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg flex items-center gap-1 transition"><i class='bx bx-copy'></i> Copiar POP</button>
+                        </div>
+                        <div id="pop-content" class="text-slate-200 leading-relaxed text-sm format-aimp-html">
+                            ${resultadoHTML}
+                        </div>
+                    </div>
+                `;
+            } catch(e) {
+                aimpResultado.innerHTML = `<div class="text-red-500 text-center p-10"><i class='bx bx-error text-4xl mb-2'></i><p>Erro ao gerar processo: ${e.message}</p></div>`;
+            }
+            
+            btnGerarPop.innerHTML = "<i class='bx bx-brain'></i> Analisar e Gerar Padrão Ouro";
+            btnGerarPop.disabled = false;
+        });
+    }
+
+    // SISTEMA DE LOGIN E BANCO DE DADOS
     onAuthStateChanged(auth, (user) => {
         if (user) { usuarioLogado = user; if(erroMsg) erroMsg.classList.add('oculto'); document.getElementById('admin-login')?.classList.add('oculto'); document.getElementById('admin-dashboard')?.classList.remove('oculto'); iniciarLeituraDoBancoDeDados(); } 
         else { usuarioLogado = null; document.getElementById('admin-dashboard')?.classList.add('oculto'); document.getElementById('admin-login')?.classList.remove('oculto'); }
@@ -178,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('btn-save-key').addEventListener('click', () => {
             if (!usuarioLogado) return;
             const btn = document.getElementById('btn-save-key'); btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
-            set(ref(database, 'admin_config/gemini_api_key'), apiKeyInput.value.trim()).then(() => { btn.innerHTML = "Salva"; setTimeout(() => btn.innerHTML = "Salvar", 2000); });
+            set(ref(database, 'admin_config/gemini_api_key'), apiKeyInput.value.trim()).then(() => { btn.innerHTML = "Salvo"; setTimeout(() => btn.innerHTML = "Salvar", 2000); });
         });
     }
     
@@ -186,8 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('btn-save-voice').addEventListener('click', () => {
             if (!usuarioLogado) return;
             const btn = document.getElementById('btn-save-voice'); btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
-            set(ref(database, 'admin_config/elevenlabs_api_key'), elevenKeyInput.value.trim());
-            set(ref(database, 'admin_config/elevenlabs_voice_id'), elevenVoiceInput.value.trim()).then(() => { btn.innerHTML = "Salvo"; setTimeout(() => btn.innerHTML = "Salvar Voz", 2000); });
+            set(ref(database, 'admin_config/gemini_voice_name'), geminiVoiceInput.value).then(() => { btn.innerHTML = "Salvo"; setTimeout(() => btn.innerHTML = "Salvar Voz", 2000); });
         });
     }
 
@@ -203,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(document.getElementById('btn-save-prompt')) {
         document.getElementById('btn-save-prompt').addEventListener('click', () => {
             if (!usuarioLogado) return;
-            const btn = document.getElementById('btn-save-prompt'); btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>...";
+            const btn = document.getElementById('btn-save-prompt'); btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
             set(ref(database, 'admin_config/prompt_mascote'), document.getElementById('prompt-ia').value)
                 .then(() => { atualizarPromptMemoria(document.getElementById('prompt-ia').value); btn.innerHTML = "Atualizado!"; setTimeout(() => btn.innerHTML = "Atualizar Cérebro", 2000); });
         });
@@ -211,8 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function iniciarLeituraDoBancoDeDados() {
         get(ref(database, 'admin_config/gemini_api_key')).then((s) => { if(s.exists() && apiKeyInput) apiKeyInput.value = s.val(); });
-        get(ref(database, 'admin_config/elevenlabs_api_key')).then((s) => { if(s.exists() && elevenKeyInput) elevenKeyInput.value = s.val(); });
-        get(ref(database, 'admin_config/elevenlabs_voice_id')).then((s) => { if(s.exists() && elevenVoiceInput) elevenVoiceInput.value = s.val(); });
+        get(ref(database, 'admin_config/gemini_voice_name')).then((s) => { if(s.exists() && geminiVoiceInput) geminiVoiceInput.value = s.val(); });
         get(ref(database, 'admin_config/github_token')).then((s) => { if(s.exists() && githubTokenInput) githubTokenInput.value = s.val(); });
         get(ref(database, 'admin_config/github_repo')).then((s) => { if(s.exists() && githubRepoInput) githubRepoInput.value = s.val(); });
 
@@ -225,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
         onValue(ref(database, 'projetos_capturados'), (snapshot) => {
             listaDeClientesGlobais = [];
             if (snapshot.exists()) { snapshot.forEach((filho) => { listaDeClientesGlobais.push({ id: filho.key, ...filho.val() }); }); listaDeClientesGlobais.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0)); }
-            renderizarProjetos();
+            if(abaAtiva !== 'processos') renderizarProjetos();
         });
     }
 
@@ -239,10 +326,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let numWpp = cliente.whatsapp ? String(cliente.whatsapp).replace(/\D/g, '') : '';
             if (numWpp.length >= 10 && numWpp.length <= 11) numWpp = '55' + numWpp; 
             
-            // LÓGICA DO TEXTO DINÂMICO DO WHATSAPP
             let textoWpp = `Olá, eu sou o Thiago Ventura Valencio responsável pela Thiaguinho Soluções. Temos aqui um demo com uma proposta para a gente começar a discutir. Acesse o link para testar o sistema: \n\n`;
             if(cliente.linkDemo) {
-                textoWpp += cliente.linkDemo; // Usa o link real salvo no banco de dados!
+                textoWpp += cliente.linkDemo; 
             } else {
                 textoWpp += "[ O LINK SERÁ GERADO AQUI APÓS VOCÊ PUBLICAR NO PAINEL ]";
             }
@@ -303,7 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const chatDisplay = document.getElementById('dev-chat-display');
             if(chatDisplay) {
-                chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! O sistema que eu gerar sairá livre para o cliente usar, com o <b>Chat de Feedback Reverso</b>. Depois de gerar, clique em <b>Publicar no GitHub</b> para salvar o link automaticamente no botão do WhatsApp!</div>`;
+                chatDisplay.innerHTML = `<div class="msg-dev ai">Olá, Thiago! O sistema que eu gerar agora vai processar a <b>Voz Neural do Gemini</b> automaticamente direto no código do cliente. Clica no botão Roxo para publicar!</div>`;
 
                 if(Array.isArray(historicoDevAtual)) {
                     historicoDevAtual.forEach(msg => {
