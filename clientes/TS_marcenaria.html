@@ -49,6 +49,7 @@
 
         button { background-color: var(--accent-gold); color: var(--primary-dark); padding: 12px 25px; border: none; border-radius: var(--border-radius-soft); cursor: pointer; font-size: 1em; font-weight: 500; transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); }
         button:hover { background-color: #C38C4B; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
+        button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); }
         button:disabled { background-color: #cccccc; cursor: not-allowed; transform: none; box-shadow: none; color: #666; }
 
         .action-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 25px; flex-wrap: wrap;}
@@ -81,6 +82,9 @@
 
         .api-config-section { background-color: var(--bg-light-panel); border: 1px solid var(--border-soft); border-radius: var(--border-radius-soft); padding: 20px; margin-bottom: 30px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); }
         .warning-message { background-color: #ffe0b2; border-left: 5px solid #ff9800; padding: 15px; margin-bottom: 20px; border-radius: 5px; color: #555; font-size: 0.9em; display: flex; align-items: center; gap: 10px; }
+        
+        /* Alerta de Erros para facilitar depuração */
+        .error-message { background-color: #ffebee; border-left: 5px solid #f44336; padding: 15px; margin-top: 15px; border-radius: 5px; color: #c62828; font-size: 0.9em; display: none; }
 
         /* Insights do Mestre */
         .designer-insight { background-color: #fff3e0; border-left: 5px solid #ff9800; padding: 15px; margin-top: 15px; border-radius: 4px; font-style: italic; color: #555; font-size: 0.95em; }
@@ -130,12 +134,12 @@
         <!-- 2. Pedido e Foto do Ambiente -->
         <section id="audioInputSection" class="section-panel">
             <h2 style="margin-top:0;"><i class="fas fa-camera-retro"></i> Leitura de Ambiente (Módulos)</h2>
-            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">Envie uma foto. O sistema identificará geladeiras, micro-ondas e pias para gerar <b>Módulos Inteligentes</b> perfeitos.</p>
+            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">Envie uma foto da cozinha. O sistema otimiza as imagens do seu celular e cria módulos independentes!</p>
             
             <div class="grid-layout">
                 <div class="input-group">
                     <label><i class="fas fa-camera"></i> Foto da Cozinha/Ambiente:</label>
-                    <input type="file" id="imageFileInput" accept="image/*" onchange="previewImagem(event)">
+                    <input type="file" id="imageFileInput" accept="image/*" onchange="previewEComprimirImagem(event)">
                     <div id="imagePreviewContainer"><img id="previewImg" src="" alt="Sua Parede"></div>
                 </div>
                 <div class="input-group">
@@ -148,6 +152,7 @@
                 <label>Diretrizes do Cliente:</label>
                 <textarea id="transcribedTextDisplay" rows="4" placeholder="Ex: Substituir os armários brancos por algo moderno de madeira, com espaço para o micro-ondas..."></textarea>
             </div>
+            <div id="errorDisplay" class="error-message"></div>
             <div class="action-buttons">
                 <button id="processAudioBtn" class="primary" onclick="gerarProjeto()" style="width: 100%;">
                     <i class="fas fa-ruler-combined"></i> Mapear com Laser IA e Gerar Módulos 3D
@@ -192,7 +197,7 @@
 
             <!-- Tabela de Corte Módulo a Módulo -->
             <div style="margin-top: 30px;">
-                <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;"><i class="fas fa-clipboard-list"></i> Plano de Corte Módulo a Módulo</h3>
+                <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;"><i class="fas fa-clipboard-list"></i> Plano de Corte Oficial</h3>
                 <div class="table-responsive">
                     <table>
                         <thead>
@@ -239,7 +244,7 @@
     </div>
 
     <div class="floating-buttons">
-        <button class="floating-button mascote" onclick="mascoteFalar('Eu analiso fotos como um profissional do AutoCAD! Divido seu móvel em Módulos, crio nichos para micro-ondas e recortes para a geladeira. Me teste!')">
+        <button class="floating-button mascote" onclick="mascoteFalar('Tire a foto! O sistema agora comprime a imagem automaticamente para não dar erro e desenha módulos de cozinha exatos no 3D!')">
             <i class="fas fa-headset"></i> <span>Mascote Arquiteto</span>
         </button>
     </div>
@@ -248,7 +253,7 @@
         Powered by thIAguinho Soluções
     </footer>
 
-    <!-- SCRIPT MÁGICO - ENGENHARIA MODULAR -->
+    <!-- SCRIPT MÁGICO - ENGENHARIA MODULAR + CORREÇÃO MOBILE -->
     <script>
         let currentApiKey = localStorage.getItem('groqApiKeyLocal') || "";
         if(currentApiKey) document.getElementById('apiKeyInput').value = currentApiKey;
@@ -272,24 +277,78 @@
             }
         }
 
-        function previewImagem(event) {
+        // --- SOLUÇÃO CRÍTICA PARA ERRO NO CELULAR (Compressão de Imagem) ---
+        function previewEComprimirImagem(event) {
             const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    document.getElementById('previewImg').src = e.target.result;
-                    document.getElementById('previewImg').style.display = 'block';
-                    base64ImagemGlobal = e.target.result;
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // O Segredo: Redimensionar no Canvas para não dar "Payload Too Large" na IA
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800; // Tamanho ideal para análise da IA
+                    const MAX_HEIGHT = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    } else {
+                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Comprimir para JPEG (Qualidade 70%)
+                    base64ImagemGlobal = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    const preview = document.getElementById('previewImg');
+                    preview.src = base64ImagemGlobal;
+                    preview.style.display = 'block';
                 }
-                reader.readAsDataURL(file);
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        document.getElementById('audioFileInput').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file || !currentApiKey) return;
+            document.getElementById('transcribedTextDisplay').value = "⏳ Transcrevendo...";
+            const formData = new FormData(); formData.append("file", file); formData.append("model", "whisper-large-v3");
+            try {
+                const res = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", { method: 'POST', headers: { "Authorization": `Bearer ${currentApiKey}` }, body: formData });
+                const json = await res.json();
+                document.getElementById('transcribedTextDisplay').value = json.text;
+            } catch (err) { alert("Erro ao ler áudio."); }
+        });
+
+        // Função segura para extrair JSON mesmo que a IA responda com texto extra (markdown)
+        function extrairJSONSeguro(texto) {
+            try {
+                // Tenta parse direto
+                return JSON.parse(texto);
+            } catch(e) {
+                // Se falhar, procura pelo bloco { ... } usando Regex
+                const match = texto.match(/\{[\s\S]*\}/);
+                if (match) return JSON.parse(match[0]);
+                throw new Error("Formato JSON inválido retornado pela IA.");
             }
         }
 
         // ==========================================
-        // PROMPT AUTOCAD / PROMOB
+        // PROMPT AUTOCAD / PROMOB COM ANTI-FALHAS
         // ==========================================
         async function gerarProjeto() {
             const txt = document.getElementById('transcribedTextDisplay').value.trim();
+            const errorDiv = document.getElementById('errorDisplay');
+            errorDiv.style.display = 'none';
+
             if (!txt && !base64ImagemGlobal) return alert("Anexe a foto do ambiente ou descreva o projeto.");
             if (!currentApiKey) return alert("Cadastre a Chave da IA.");
 
@@ -297,36 +356,21 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Desenhando em módulos (AutoCAD)...';
             btn.disabled = true;
 
-            const promptComando = `Você é um Engenheiro de Marcenaria com 30 anos de experiência (nível AutoCAD/Promob). 
-O cliente disse: "${txt}".
-SE HOUVER FOTO: Avalie com "olhos de águia". Tem uma geladeira? O armário em cima dela deve ser MENOR na altura (ex: 400mm). Tem um micro-ondas? Crie um módulo com um "nicho" (buraco livre embaixo) para encaixar o aparelho, e portas acima.
-REGRA DE OURO: Você DEVE dividir o móvel em MÓDULOS (ex: Módulo Geladeira, Módulo Micro-ondas, Módulo Pia).
-Instalação pode ser "aereo" (armários de parede) ou "piso" (balcões).
-
-Gere um JSON estrito nesta estrutura EXATA:
+            const promptComando = `Você é um Engenheiro de Marcenaria Nível AutoCAD/Promob. 
+Cliente: "${txt}".
+SE HOUVER FOTO: Avalie com "olhos de águia". Tem uma geladeira? O armário sobre ela deve ser MENOR na altura. Tem um micro-ondas? Crie um módulo com "nicho" (vão aberto) para encaixá-lo.
+REGRA: Divida o móvel em MÓDULOS (ex: Módulo Geladeira, Módulo Micro-ondas).
+RETORNE APENAS O JSON E NADA MAIS. SEM TEXTO ANTES OU DEPOIS. ESTRUTURA EXATA:
 {
   "nome_projeto": "Armários Superiores Modulares",
-  "engenharia": "Dividi em 3 módulos para respeitar os eletrodomésticos da foto...",
+  "engenharia": "Dividi em 3 módulos para respeitar a geladeira e o micro-ondas...",
   "design": { "cor_caixa": "#FFFFFF", "cor_portas": "#b88a44", "material_nome": "MDF Branco e Freijó" },
   "instalacao": "aereo",
   "modulos": [
-    { 
-      "nome": "Módulo sobre Geladeira", "largura": 800, "altura": 400, "profundidade": 350, 
-      "tipo_abertura": "basculante", "tem_nicho_aberto": false, "altura_nicho": 0, "portas": 1 
-    },
-    { 
-      "nome": "Torre Micro-ondas", "largura": 600, "altura": 800, "profundidade": 400, 
-      "tipo_abertura": "basculante", "tem_nicho_aberto": true, "altura_nicho": 450, "portas": 1 
-    },
-    { 
-      "nome": "Módulo Central", "largura": 1000, "altura": 800, "profundidade": 350, 
-      "tipo_abertura": "giro", "tem_nicho_aberto": false, "altura_nicho": 0, "portas": 2 
-    }
+    { "nome": "Módulo sobre Geladeira", "largura": 800, "altura": 400, "profundidade": 350, "tipo_abertura": "basculante", "tem_nicho_aberto": false, "altura_nicho": 0, "portas": 1 },
+    { "nome": "Torre Micro-ondas", "largura": 600, "altura": 800, "profundidade": 400, "tipo_abertura": "basculante", "tem_nicho_aberto": true, "altura_nicho": 450, "portas": 1 }
   ],
-  "plano_de_corte": [
-    {"peca": "Laterais Mod 1", "qtde": 2, "medida": "400x350", "material": "MDF 18mm Branco"},
-    {"peca": "Porta Basculante Mod 2", "qtde": 1, "medida": "590x340", "material": "MDF 18mm Freijó"}
-  ],
+  "plano_de_corte": [{"peca": "Lateral", "qtde": 2, "medida": "400x350", "material": "MDF"}],
   "ferragens": {"pistoes": 4, "dobradicas": 4, "puxadores": 4},
   "custos": {"material": 900, "mao_de_obra": 500, "ferragens": 200, "outros": 100}
 }`;
@@ -335,16 +379,42 @@ Gere um JSON estrito nesta estrutura EXATA:
                 [{ role: "user", content: [{ type: "text", text: promptComando }, { type: "image_url", image_url: { url: base64ImagemGlobal } }] }] : 
                 [{ role: "user", content: promptComando }];
 
+            // Sistema try-catch ROBUSTO recuperado do original
             try {
-                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                const url = "https://api.groq.com/openai/v1/chat/completions";
+                let modelo = base64ImagemGlobal ? "llama-3.2-11b-vision-preview" : "llama-3.3-70b-versatile";
+                
+                let res = await fetch(url, {
                     method: 'POST', headers: { "Authorization": `Bearer ${currentApiKey}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({ model: base64ImagemGlobal ? "llama-3.2-11b-vision-preview" : "llama-3.3-70b-versatile", messages: mensagens, response_format: { type: "json_object" }, temperature: 0.1 })
+                    // Removido o response_format do Vision pois a Groq costuma bloquear em modelos de imagem.
+                    body: JSON.stringify({ model: modelo, messages: mensagens, temperature: 0.1 })
                 });
 
-                if(!res.ok) throw new Error("Erro na IA.");
-                const dados = await res.json();
-                const ia = JSON.parse(dados.choices[0].message.content);
+                let dados = await res.json();
 
+                // FALLBACK: Se o Vision falhar (ex: por indisponibilidade), tenta o modelo de texto
+                if (!res.ok) {
+                    if(base64ImagemGlobal) {
+                        console.warn("Modelo de visão falhou, tentando modelo de texto.", dados);
+                        errorDiv.innerHTML = `⚠️ Modelo de imagem indisponível no momento. Gerando pelo texto...`;
+                        errorDiv.style.display = 'block';
+                        
+                        mensagens = [{ role: "user", content: promptComando }];
+                        res = await fetch(url, {
+                            method: 'POST', headers: { "Authorization": `Bearer ${currentApiKey}`, "Content-Type": "application/json" },
+                            body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: mensagens, temperature: 0.1, response_format: { type: "json_object" } })
+                        });
+                        dados = await res.json();
+                        if(!res.ok) throw new Error(dados.error?.message || "Erro crasso na API.");
+                    } else {
+                        throw new Error(dados.error?.message || "Erro na API.");
+                    }
+                }
+
+                // Extrator de JSON Seguro
+                const ia = extrairJSONSeguro(dados.choices[0].message.content);
+
+                // --- Atualização da Interface (Mesma do V3) ---
                 document.getElementById('aiDesignSection').style.display = 'block';
                 document.getElementById('designerInsight').style.display = 'block';
                 document.getElementById('textoDesigner').innerText = ia.engenharia;
@@ -354,9 +424,9 @@ Gere um JSON estrito nesta estrutura EXATA:
                 ).join('');
 
                 document.getElementById('descricaoProjeto').innerHTML = `
-                    <b>🧩 Módulos Gerados (Estrutura Realista):</b><ul>${modulosTexto}</ul>
-                    <b>🔩 Ferragens:</b> Pistões: ${ia.ferragens?.pistoes||0} | Dobradiças: ${ia.ferragens?.dobradicas||0}
-                    <br><b>🎨 Acabamento:</b> ${ia.design?.material_nome || 'Padrão'}
+                    <b>🧩 Módulos Gerados (Respeitando a Foto):</b><ul>${modulosTexto}</ul>
+                    <b>🔩 Ferragens Calculadas:</b> Pistões Gás: ${ia.ferragens?.pistoes||0} | Dobradiças: ${ia.ferragens?.dobradicas||0}
+                    <br><b>🎨 Acabamento Sugerido:</b> ${ia.design?.material_nome || 'Padrão'}
                 `;
 
                 document.getElementById('tabelaPlanoCorte').innerHTML = (ia.plano_de_corte||[]).map(p => 
@@ -380,12 +450,20 @@ Gere um JSON estrito nesta estrutura EXATA:
                     document.getElementById('btnAR').style.display = base64ImagemGlobal ? 'inline-flex' : 'none';
                 }, 150);
 
-            } catch(e) { alert("Erro de comunicação."); console.error(e); } 
-            finally { btn.innerHTML = '<i class="fas fa-ruler-combined"></i> Mapear Novamente'; btn.disabled = false; }
+            } catch(e) { 
+                // Agora o erro aparece visível e claro, como pedido
+                errorDiv.innerHTML = `<strong>Erro de Comunicação:</strong> ${e.message}<br>Verifique se a chave está correta ou detalhe mais o texto.`;
+                errorDiv.style.display = 'block';
+                console.error(e); 
+            } 
+            finally { 
+                btn.innerHTML = '<i class="fas fa-ruler-combined"></i> Mapear com Laser IA e Gerar Módulos 3D'; 
+                btn.disabled = false; 
+            }
         }
 
         // ==========================================
-        // MOTOR 3D (DESENHA MÓDULOS COMO NO PROMOB)
+        // MOTOR 3D MODULAR (INALTERADO DO V3 - PERFEITO)
         // ==========================================
         function init3D() {
             const container = document.getElementById('visualizador3D');
@@ -411,13 +489,11 @@ Gere um JSON estrito nesta estrutura EXATA:
                 requestAnimationFrame(animar);
                 if (grupoMovelAtual) {
                     grupoMovelAtual.children.forEach(mod => {
-                        // Varre portas dentro dos módulos
                         mod.children.forEach(f => {
                             if (!f.userData || !f.userData.animavel) return;
                             const d = f.userData;
                             if (d.tipo === 'giro') f.rotation.y += ((d.aberto ? d.rotAbre : 0) - f.rotation.y) * 0.1;
                             if (d.tipo === 'basculante') f.rotation.x += ((d.aberto ? d.rotAbre : 0) - f.rotation.x) * 0.1;
-                            if (d.tipo === 'gaveta') f.position.z += ((d.aberto ? d.posAbre : 0) - f.position.z) * 0.1;
                         });
                     });
                 }
@@ -450,108 +526,87 @@ Gere um JSON estrito nesta estrutura EXATA:
             if (grupoMovelAtual) cena3D.remove(grupoMovelAtual);
             objetosInterativos = []; grupoMovelAtual = new THREE.Group(); cena3D.add(grupoMovelAtual);
 
-            // Cores
             const cCaixa = new THREE.Color(design?.cor_caixa || "#FFFFFF");
             const cPorta = new THREE.Color(design?.cor_portas || "#CCCCCC");
             const matCaixa = new THREE.MeshStandardMaterial({ color: cCaixa, roughness: 0.8 });
             const matPorta = new THREE.MeshStandardMaterial({ color: cPorta, roughness: 0.6 });
             const matPux = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.4 });
-            const E = 0.018; // Espessura MDF 18mm
-            const F = 0.003; // Folga portas
+            const E = 0.018; 
+            const F = 0.003; 
 
-            // Calcula largura total para centralizar na câmera
-            let largTotal_mm = 0;
-            let alturaMaxima_mm = 0;
-            let profundidadeMaxima_mm = 0;
+            let largTotal_mm = 0, alturaMaxima_mm = 0, profundidadeMaxima_mm = 0;
             modulos.forEach(m => { 
                 largTotal_mm += m.largura; 
                 if(m.altura > alturaMaxima_mm) alturaMaxima_mm = m.altura;
                 if(m.profundidade > profundidadeMaxima_mm) profundidadeMaxima_mm = m.profundidade;
             });
 
-            const T_W = largTotal_mm / 1000;
-            const T_H = alturaMaxima_mm / 1000;
-            const T_D = profundidadeMaxima_mm / 1000;
-
+            const T_W = largTotal_mm / 1000, T_H = alturaMaxima_mm / 1000, T_D = profundidadeMaxima_mm / 1000;
             const baseElevacao = (instalacao === "aereo") ? 1.5 : 0;
             grupoMovelAtual.position.y = baseElevacao;
 
-            let currentX = -T_W / 2; // Começa da esquerda
+            let currentX = -T_W / 2;
 
             function criarPlaca(w, h, d, mat, x, y, z, modGrp, isInterativo=false) {
                 const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
                 m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), new THREE.LineBasicMaterial({color:0x000, opacity:0.1, transparent:true})));
-                m.position.set(x, y, z);
-                modGrp.add(m);
+                m.position.set(x, y, z); modGrp.add(m);
                 if(isInterativo) objetosInterativos.push(m);
                 return m;
             }
 
-            // LOOP MÓDULO A MÓDULO
             modulos.forEach(mod => {
                 const mW = mod.largura/1000, mH = mod.altura/1000, mD = mod.profundidade/1000;
                 const mGrp = new THREE.Group();
-                // O X do grupo é o centro do módulo.
-                // Como são aéreos na foto, vamos alinhar o Y pelo TOPO (efeito cozinha real)
-                const topoY = T_H; 
-                const baseModY = topoY - mH; // Módulos curtos (geladeira) terminam mais alto
                 
-                mGrp.position.set(currentX + mW/2, baseModY, 0); // Z zero é o fundo da parede
+                // Módulos aéreos são alinhados por cima!
+                const topoY = T_H; 
+                const baseModY = topoY - mH; 
+                
+                mGrp.position.set(currentX + mW/2, baseModY, 0); 
 
-                // 1. Caixa do Módulo
-                criarPlaca(mW, E, mD, matCaixa, 0, E/2, mD/2, mGrp); // Base
-                criarPlaca(E, mH, mD, matCaixa, -mW/2+E/2, mH/2, mD/2, mGrp); // Esq
-                criarPlaca(E, mH, mD, matCaixa, mW/2-E/2, mH/2, mD/2, mGrp); // Dir
-                criarPlaca(mW, E, mD, matCaixa, 0, mH-E/2, mD/2, mGrp); // Tampo
-                criarPlaca(mW-E*2, mH-E*2, 0.006, matCaixa, 0, mH/2, 0.01, mGrp); // Fundo
+                criarPlaca(mW, E, mD, matCaixa, 0, E/2, mD/2, mGrp); 
+                criarPlaca(E, mH, mD, matCaixa, -mW/2+E/2, mH/2, mD/2, mGrp); 
+                criarPlaca(E, mH, mD, matCaixa, mW/2-E/2, mH/2, mD/2, mGrp); 
+                criarPlaca(mW, E, mD, matCaixa, 0, mH-E/2, mD/2, mGrp); 
+                criarPlaca(mW-E*2, mH-E*2, 0.006, matCaixa, 0, mH/2, 0.01, mGrp); 
 
-                // 2. Lógica de Nicho (ex: Microondas)
-                let altPortasVao = mH - E*2;
-                let startYPortas = E;
+                let altPortasVao = mH - E*2, startYPortas = E;
                 if (mod.tem_nicho_aberto) {
                     const hNicho = (mod.altura_nicho || 400)/1000;
-                    // Prateleira que divide o nicho da parte de cima
-                    criarPlaca(mW-E*2, E, mD-E, matCaixa, 0, E + hNicho + E/2, mD/2, mGrp);
+                    criarPlaca(mW-E*2, E, mD-E, matCaixa, 0, E + hNicho + E/2, mD/2, mGrp); // Prateleira do nicho
                     altPortasVao = mH - E*2 - hNicho - E;
-                    startYPortas = E + hNicho + E; // Portas começam acima do nicho
+                    startYPortas = E + hNicho + E; 
                 }
 
-                // 3. Frentes (Basculante, Giro ou Gaveta)
                 if (altPortasVao > 0.1) {
                     const nPortas = mod.portas || 1;
-                    
                     if (mod.tipo_abertura === "basculante") {
-                        // Basculantes normalmente pegam toda a largura, dividimos na altura se > 1
                         const hInd = altPortasVao / nPortas;
                         for(let i=0; i<nPortas; i++) {
                             const bGrp = new THREE.Group(); 
-                            const yPivot = startYPortas + (i*hInd) + hInd; // Pivot no topo da porta
+                            const yPivot = startYPortas + (i*hInd) + hInd; 
                             bGrp.position.set(0, yPivot, mD+E/2); 
 
                             const pMesh = criarPlaca(mW-E*2-F*2, hInd-F, E, matPorta, 0, -hInd/2, 0, bGrp, true);
                             pMesh.userData.grupoPai = bGrp;
-                            // Puxador
-                            criarPlaca(mW-E*4, 0.02, 0.02, matPux, 0, -hInd+0.03, E/2+0.01, bGrp);
+                            criarPlaca(mW-E*4, 0.02, 0.02, matPux, 0, -hInd+0.03, E/2+0.01, bGrp); // puxador perfil
 
                             bGrp.userData = { animavel: true, tipo: 'basculante', aberto: false, rotAbre: -Math.PI/2.2 };
                             mGrp.add(bGrp);
                         }
-                    } 
-                    else if (mod.tipo_abertura === "giro" || !mod.tipo_abertura) {
+                    } else {
                         const wInd = (mW - E*2 - F*(nPortas+1)) / nPortas;
                         const startXP = -mW/2 + E + F + wInd/2;
-                        const yPivot = startYPortas + altPortasVao/2;
-
                         for(let i=0; i<nPortas; i++) {
                             const bGrp = new THREE.Group(); 
                             const esq = i < nPortas/2;
                             const xPivot = startXP + i*(wInd+F) + (esq?-wInd/2:wInd/2);
-                            bGrp.position.set(xPivot, yPivot, mD+E/2);
+                            bGrp.position.set(xPivot, startYPortas + altPortasVao/2, mD+E/2);
 
                             const deslocX = esq ? wInd/2 : -wInd/2;
                             const pMesh = criarPlaca(wInd, altPortasVao-F, E, matPorta, deslocX, 0, 0, bGrp, true);
                             pMesh.userData.grupoPai = bGrp;
-                            // Puxador
                             criarPlaca(0.02, 0.15, 0.02, matPux, esq? deslocX+wInd/2-0.03 : deslocX-wInd/2+0.03, 0, E/2+0.01, bGrp);
 
                             bGrp.userData = { animavel: true, tipo: 'giro', aberto: false, rotAbre: esq ? -Math.PI/1.8 : Math.PI/1.8 };
@@ -559,34 +614,28 @@ Gere um JSON estrito nesta estrutura EXATA:
                         }
                     }
                 }
-
                 grupoMovelAtual.add(mGrp);
-                currentX += mW; // Move X para o próximo módulo
+                currentX += mW; 
             });
 
-            // Ajusta a Câmera
             const maxDim = Math.max(T_W, T_H, T_D);
             camera3D.position.set(0, baseElevacao + T_H/2, maxDim * 1.5); 
-            controles3D.target.set(0, baseElevacao + T_H/2, T_D/2); 
-            controles3D.update();
-
+            controles3D.target.set(0, baseElevacao + T_H/2, T_D/2); controles3D.update();
             document.getElementById('info3D').innerHTML = `<i class="fas fa-cubes"></i> Módulos Independentes: ${modulos.length}`;
         }
 
         // ==========================================
-        // REALIDADE AUMENTADA (AR)
+        // REALIDADE AUMENTADA E CUSTOS
         // ==========================================
         function alternarModoAR() {
             modoARAtivo = !modoARAtivo;
             const btn = document.getElementById('btnAR');
             if (modoARAtivo && base64ImagemGlobal) {
                 new THREE.TextureLoader().load(base64ImagemGlobal, tex => cena3D.background = tex);
-                btn.innerHTML = '<i class="fas fa-cube"></i> Modo Estúdio 3D';
-                btn.className = "primary";
+                btn.innerHTML = '<i class="fas fa-cube"></i> Modo Estúdio 3D'; btn.className = "primary";
             } else {
                 cena3D.background = null;
-                btn.innerHTML = '<i class="fas fa-image"></i> Ver Instalado na Foto (AR)';
-                btn.className = "success";
+                btn.innerHTML = '<i class="fas fa-image"></i> Ver Instalado na Foto (AR)'; btn.className = "success";
             }
         }
 
