@@ -72,15 +72,13 @@
         /* ESTILOS DA EXPERIÊNCIA MOBILE FULLSCREEN AR */
         .fullscreen-ar { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 99990 !important; border-radius: 0 !important; border: none !important; background: #000 !important; }
         .fullscreen-ar.hud-open { height: 55vh !important; border-bottom: 2px solid var(--highlight-yellow) !important; }
-        
-        /* Modificado para COVER: Preenche a tela toda do celular (Anti-bordas) */
         .ar-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none; }
         
         .ar-ui-top { position: absolute; top: 20px; left: 20px; right: 20px; z-index: 10; display: none; justify-content: space-between; }
         .ar-ui-btn { background: var(--warning-red); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-size: 1em; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; }
         .ar-ui-magic { background: var(--ai-blue); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-size: 1em; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; }
         
-        /* O HUD DE EDIÇÃO PARAMÉTRICA */
+        /* HUD DE EDIÇÃO PARAMÉTRICA */
         .edit-hud {
             position: fixed; bottom: 0; left: 0; width: 100vw; z-index: 99999; display: none;
             background: rgba(15, 23, 42, 0.98); color: white; padding: 15px 20px 25px 20px; 
@@ -147,7 +145,7 @@
 <body>
     <div class="container">
         <h1>🛠️ Gerador de Projetos e Orçamentos para Marcenaria</h1>
-        <p class="subtitle">Oráculo CAD: A IA respeita estritamente o seu pedido de cores e sobrepõe o armário cirurgicamente.</p>
+        <p class="subtitle">Oráculo CAD: Design Universal, Curvas, Ambientes Completos e Auto-Encaixe AR.</p>
 
         <!-- 1. Configuração -->
         <section id="apiConfigSection" class="api-config-section">
@@ -165,50 +163,50 @@
 
         <!-- 2. Pedido e Foto do Ambiente -->
         <section id="audioInputSection" class="section-panel">
-            <h2 style="margin-top:0;"><i class="fas fa-camera-retro"></i> O Oráculo de Design (Módulos & Cores)</h2>
-            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">Envie a foto. Peça uma cor específica (ex: "armário azul escuro"). A IA vai gerar a paleta exata e encaixar no mesmo lugar da foto!</p>
+            <h2 style="margin-top:0;"><i class="fas fa-camera-retro"></i> O Arquiteto Universal (Fotos e Áudio)</h2>
+            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">Peça qualquer coisa: "Balcão de padaria em L", "Armário azul escuro" ou "Área Gourmet". A IA projeta formas complexas e acha a posição exata da foto!</p>
             
             <div class="grid-layout">
                 <div class="input-group">
-                    <label><i class="fas fa-camera"></i> Foto da Parede/Cozinha:</label>
+                    <label><i class="fas fa-camera"></i> Foto da Parede/Ambiente:</label>
                     <input type="file" id="imageFileInput" accept="image/*" onchange="previewEComprimirImagem(event)">
                     <div id="imagePreviewContainer"><img id="previewImg" src="" alt="Sua Parede"></div>
                 </div>
                 <div class="input-group">
-                    <label><i class="fas fa-microphone-alt"></i> Carregar Áudio:</label>
+                    <label><i class="fas fa-microphone-alt"></i> Áudio do Cliente:</label>
                     <input type="file" id="audioFileInput" accept="audio/*">
                 </div>
             </div>
 
             <div class="input-group full-width">
-                <label>Diretrizes do Cliente (Especifique cores!):</label>
-                <textarea id="transcribedTextDisplay" rows="3" placeholder="Ex: Substituir por um armário azul escuro, mantendo espaço para o micro-ondas..."></textarea>
+                <label>Diretrizes do Cliente (Especifique cores, formatos, etc):</label>
+                <textarea id="transcribedTextDisplay" rows="3" placeholder="Ex: Quero um balcão em L com cantos arredondados e prateleiras expostas... ou Armário azul escuro para substituir este..."></textarea>
             </div>
             <div id="errorDisplay" class="error-message"></div>
             <div class="action-buttons">
                 <button id="processAudioBtn" class="primary" onclick="gerarProjeto()" style="width: 100%;">
-                    <i class="fas fa-ruler-combined"></i> Mapear Cores, Posição e Gerar 3D CAD
+                    <i class="fas fa-ruler-combined"></i> Analisar Foto, Design e Gerar CAD 3D
                 </button>
             </div>
         </section>
 
         <!-- 3. Projeto Técnico AutoCAD / Promob -->
         <section id="aiDesignSection" class="ai-output-section" style="display: none;">
-            <h3 style="margin-top: 0;"><i class="fas fa-drafting-compass"></i> Projeto Modular Diamante</h3>
+            <h3 style="margin-top: 0;"><i class="fas fa-drafting-compass"></i> Projeto CAD Paramétrico Diamante</h3>
             
             <div id="designerInsight" class="designer-insight" style="display: none;">
-                <i class="fas fa-eye"></i> <b>O Oráculo do Design:</b> <span id="textoDesigner"></span>
+                <i class="fas fa-eye"></i> <b>Inteligência Espacial:</b> <span id="textoDesigner"></span>
             </div>
 
             <!-- Visor 3D Modular e Tela Cheia AR -->
             <div style="margin-top: 30px;">
                 <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;">
-                    <i class="fas fa-cube"></i> Substituição Cirúrgica Inteligente
+                    <i class="fas fa-cube"></i> Simulação 3D, Curvas e Auto-Encaixe
                 </h3>
                 
                 <div class="action-buttons" style="justify-content: flex-start; margin-bottom: 15px; margin-top: 0;">
                     <button id="btnAR" class="success" onclick="alternarModoAR()" style="display: none;">
-                        <i class="fas fa-expand-arrows-alt"></i> Ver Instalado na Foto (Auto-Encaixe Real)
+                        <i class="fas fa-expand-arrows-alt"></i> Ver Instalado na Foto (Auto-Match)
                     </button>
                     <p style="font-size: 0.85em; color: var(--earth-green); margin-top: auto; margin-bottom: auto; padding-left: 10px;">
                         <i class="fas fa-hand-pointer"></i> Segure o dedo sobre um módulo para editar.
@@ -230,7 +228,7 @@
                 </div>
             </div>
 
-            <!-- HUD DE EDIÇÃO DE MÓDULO (Bottom Sheet Ouro) -->
+            <!-- HUD DE EDIÇÃO DE MÓDULO -->
             <div id="editHUD" class="edit-hud">
                 <div class="hud-drag-indicator"></div>
                 <h4><span id="hudTitle">Módulo</span> <button class="hud-btn-close" onclick="fecharEdicao()"><i class="fas fa-times-circle"></i></button></h4>
@@ -238,25 +236,33 @@
                 <div class="hud-grid">
                     <div class="edit-slider">
                         <label><span>↔️ Larg. (mm)</span><span id="lblW"></span></label>
-                        <input type="range" id="sliderW" min="200" max="1500" step="10" oninput="atualizarModuloParametrico()">
+                        <input type="range" id="sliderW" min="200" max="3000" step="10" oninput="atualizarModuloParametrico()">
                     </div>
                     <div class="edit-slider">
                         <label><span>↕️ Alt. (mm)</span><span id="lblH"></span></label>
-                        <input type="range" id="sliderH" min="200" max="1500" step="10" oninput="atualizarModuloParametrico()">
+                        <input type="range" id="sliderH" min="200" max="2500" step="10" oninput="atualizarModuloParametrico()">
                     </div>
                     <div class="edit-slider">
                         <label><span>↘️ Prof. (mm)</span><span id="lblD"></span></label>
-                        <input type="range" id="sliderD" min="200" max="800" step="10" oninput="atualizarModuloParametrico()">
+                        <input type="range" id="sliderD" min="200" max="1000" step="10" oninput="atualizarModuloParametrico()">
                     </div>
                     <div class="edit-slider">
                         <label><span>📚 Prateleiras</span><span id="lblPrat"></span></label>
-                        <input type="range" id="sliderPrat" min="0" max="5" step="1" oninput="atualizarModuloParametrico()">
+                        <input type="range" id="sliderPrat" min="0" max="8" step="1" oninput="atualizarModuloParametrico()">
                     </div>
                     <div class="edit-slider" style="grid-column: 1 / -1;">
-                        <label><span>🚪 Tipo de Abertura</span></label>
+                        <label><span>🚪 Estrutura / Abertura</span></label>
                         <select id="selPorta" onchange="atualizarModuloParametrico()">
-                            <option value="giro">Giro (Para o lado)</option>
-                            <option value="basculante">Basculante (Para cima)</option>
+                            <option value="giro">Com Portas de Giro</option>
+                            <option value="basculante">Com Portas Basculantes</option>
+                            <option value="aberto">Aberto (Sem Portas, Apenas Prateleiras)</option>
+                        </select>
+                    </div>
+                    <div class="edit-slider" style="grid-column: 1 / -1;">
+                        <label><span>📐 Formato da Peça</span></label>
+                        <select id="selFormato" onchange="atualizarModuloParametrico()">
+                            <option value="reto">Reto Padrão</option>
+                            <option value="curvo">Canto Curvo / Arredondado</option>
                         </select>
                     </div>
                     
@@ -272,19 +278,23 @@
                 <div class="hud-drag-indicator"></div>
                 <h4><span style="color:var(--ai-blue);"><i class="fas fa-crop-alt"></i> Calibragem Manual AR</span> <button class="hud-btn-close" onclick="fecharPerspectiva()"><i class="fas fa-times-circle"></i></button></h4>
                 
-                <p style="font-size:0.8em; color:#ccc; margin-top:0;">O Auto-Encaixe IA já foi aplicado. Use isso para refinamento fino.</p>
+                <p style="font-size:0.8em; color:#ccc; margin-top:0;">A IA já encontrou as coordenadas da foto. Use aqui para refinamento fino.</p>
 
                 <div class="edit-slider">
                     <label><span>Tamanho na Foto (Escala)</span></label>
-                    <input type="range" id="camScale" min="0.3" max="2.5" step="0.01" value="1.0" oninput="ajustarPerspectivaManual()">
+                    <input type="range" id="camScale" min="0.3" max="3.5" step="0.01" value="1.0" oninput="ajustarPerspectivaManual()">
                 </div>
                 <div class="edit-slider">
-                    <label><span>Tombar Teto (Eixo X)</span></label>
+                    <label><span>Mover Horizontal (Eixo X)</span></label>
+                    <input type="range" id="camPosX" min="-15" max="15" step="0.1" value="0" oninput="ajustarPerspectivaManual()">
+                </div>
+                <div class="edit-slider">
+                    <label><span>Mover Vertical (Eixo Y)</span></label>
+                    <input type="range" id="camPosY" min="-15" max="15" step="0.1" value="0" oninput="ajustarPerspectivaManual()">
+                </div>
+                <div class="edit-slider">
+                    <label><span>Tombar / Inclinar Lente</span></label>
                     <input type="range" id="camRotX" min="-0.8" max="0.8" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
-                </div>
-                <div class="edit-slider">
-                    <label><span>Girar Parede (Eixo Y)</span></label>
-                    <input type="range" id="camRotY" min="-0.8" max="0.8" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
                 </div>
             </div>
 
@@ -318,10 +328,10 @@
         <section id="addItemSection" class="section-panel">
             <h2><i class="fas fa-money-check-alt"></i> Precificação Final</h2>
             <div class="grid-layout">
-                <div class="input-group full-width"><label>Nome do Projeto:</label><input type="text" id="itemName" placeholder="Cozinha Modular Inteligente"></div>
+                <div class="input-group full-width"><label>Nome do Projeto:</label><input type="text" id="itemName" placeholder="Cozinha / Balcão Modular"></div>
                 <div class="input-group"><label>MDF e Chapas (R$):</label><input type="number" id="costMaterial" value="0" min="0" step="0.01"></div>
                 <div class="input-group"><label>Mão de Obra/Montagem (R$):</label><input type="number" id="costLabor" value="0" min="0" step="0.01"></div>
-                <div class="input-group"><label>Ferragens Especiais (R$):</label><input type="number" id="costHardware" title="Pistões, Corrediças telescópicas..." value="0" min="0" step="0.01"></div>
+                <div class="input-group"><label>Ferragens / Acabamentos (R$):</label><input type="number" id="costHardware" title="Pistões, Corrediças, Tampos..." value="0" min="0" step="0.01"></div>
                 <div class="input-group"><label>Outros (Frete/Vidro) (R$):</label><input type="number" id="costOther" value="0" min="0" step="0.01"></div>
                 <div class="input-group"><label>Margem Desejada (%):</label><input type="number" id="profitMargin" value="35" min="0" max="100" step="1"></div>
                 <div class="input-group full-width action-buttons"><button class="primary" onclick="calcularTotal()"><i class="fas fa-calculator"></i> Recalcular Valor</button></div>
@@ -331,28 +341,28 @@
         <section id="summary">
             <h2><i class="fas fa-handshake"></i> Valor do Projeto Otimizado</h2>
             <p>Total Sugerido: <span id="totalProjectCost">R$ 0,00</span></p>
-            <button onclick="mascoteFalar('O total atualizado para esses módulos com as cores reais escolhidas é ' + document.getElementById('totalProjectCost').textContent)" class="warning">
+            <button onclick="mascoteFalar('O total atualizado para o ambiente completo é ' + document.getElementById('totalProjectCost').textContent)" class="warning">
                 <i class="fas fa-robot"></i> Perguntar ao Mascote
             </button>
         </section>
     </div>
 
     <div class="floating-buttons">
-        <button class="floating-button mascote" onclick="mascoteFalar('O Oráculo do Design chegou. Peça armários em tons escuros e eu gerarei cores sólidas! O 3D nunca mais vai sumir da sua tela na hora de dar zoom!')">
-            <i class="fas fa-headset"></i> <span>Mascote Oráculo</span>
+        <button class="floating-button mascote" onclick="mascoteFalar('Seja armário de cozinha ou um balcão em L com curvas. Eu mapeio o ambiente na foto, trago a cor exata que você pedir e encaixo o 3D lá dentro. Pode dar zoom à vontade, o motor 3D não corta mais as imagens!')">
+            <i class="fas fa-headset"></i> <span>Arquiteto Universal</span>
         </button>
     </div>
 
     <footer>Powered by thIAguinho Soluções</footer>
 
-    <!-- SCRIPT MÁGICO - ENGENHARIA ABSOLUTA (ORÁCULO + ANTI-CLIPPING + AUTO-MATCH) -->
+    <!-- SCRIPT MÁGICO - ENGENHARIA UNIVERSAL ABSOLUTA (COR, CURVAS, LAYOUT E AR) -->
     <script>
         let currentApiKey = localStorage.getItem('groqApiKeyLocal') || "";
         if(currentApiKey) document.getElementById('apiKeyInput').value = currentApiKey;
 
         // ESTADO GLOBAL
         let projetoGlobal = { 
-            modulos: [], design: null, instalacao: "aereo", 
+            modulos: [], design: null, instalacao: "chao", 
             posicionamento_auto_ar: { escala: 1.0, pos_x: 0, pos_y: 0, rot_x: 0, rot_y: 0, rot_z: 0 } 
         };
         let moduloSendoEditado = null; 
@@ -369,11 +379,8 @@
         let base64ImagemGlobal = null;
         let modoARAtivo = false;
 
-        // VARIÁVEIS DO LONG PRESS
-        let pressTimer;
-        let startTouchX, startTouchY;
-        let isEditingMode = false;
-        let isPerspectiveMode = false;
+        let pressTimer; let startTouchX, startTouchY;
+        let isEditingMode = false; let isPerspectiveMode = false;
 
         function salvarChave() {
             currentApiKey = document.getElementById('apiKeyInput').value.trim();
@@ -433,34 +440,38 @@
         }
 
         // ==========================================
-        // PROMPT DO ORÁCULO DE DESIGN (CORES ABSOLUTAS)
+        // PROMPT ARQUITETO UNIVERSAL (Cores, Curvas e Auto-Match)
         // ==========================================
         async function gerarProjeto() {
             const txt = document.getElementById('transcribedTextDisplay').value.trim();
             const errorDiv = document.getElementById('errorDisplay');
             errorDiv.style.display = 'none';
 
-            if (!txt && !base64ImagemGlobal) return alert("Anexe a foto da cozinha.");
+            if (!txt && !base64ImagemGlobal) return alert("Anexe a foto da cozinha/balcão.");
             if (!currentApiKey) return alert("Cadastre a Chave da IA.");
 
             const btn = document.getElementById('processAudioBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> O Oráculo está gerando Cores e Auto-Encaixe...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> O Arquiteto Universal está analisando a foto...';
             btn.disabled = true;
 
-            // CÉREBRO DEFINITIVO: Trava de cores + Auto-Fit
-            const promptComando = `Você é um ORÁCULO do Design de Interiores e Projetista Sênior. 
-AJA COM VERDADE ABSOLUTA NA FOTO DA ESQUERDA PARA A DIREITA.
-1. LEIA O PEDIDO ATENTAMENTE PARA AS CORES: Se o cliente pedir "tons azuis", "armário escuro", "preto", OBRIGATORIAMENTE use hexadecimais sólidos correspondentes no JSON (ex: #1c3144, #2c3e50). NUNCA use textura de madeira se não for pedido!
-2. AUTO-ENCAIXE (MATCH PHOTO): Defina escala, pos_x e pos_y para que o 3D tampe perfeitamente o móvel velho da foto.
-JSON ESTRITO:
+            const promptComando = `Você é um Arquiteto Universal, Designer de Interiores e Mestre em Fotogrametria 3D.
+AJA COM VERDADE ABSOLUTA:
+1. IDENTIFIQUE A CATEGORIA PELO PEDIDO E FOTO: É um armário de parede? É um "Balcão em L com cantos arredondados e aberto para doces"? Projete EXATAMENTE o que é. 
+2. CORES ABSOLUTAS: Se o cliente pedir uma cor ("armário azul", "preto", "escuro"), OBRIGATORIAMENTE gere a cor solicitada em HEXADECIMAL. Não use madeira se ele não pedir.
+3. FORMATOS E ABERTURAS: Se for um balcão com prateleiras de exposição, defina tipo_abertura como "aberto" e formato como "curvo" ou "reto".
+4. MAPA 3D (POS_X, POS_Z, ROT_Y): Você tem o poder de posicionar as peças. Se for um L, rotacione um módulo em rot_y: -90 e mude o pos_x/pos_z. Se não quiser layout complexo, deixe pos_x vazio para ficarem lado a lado.
+5. AUTO-ENCAIXE (MATCH PHOTO): Defina escala, pos_x e pos_y globais para o 3D tampar perfeitamente a posição do objeto velho na foto.
+
+JSON ESTRITO DE RESPOSTA:
 {
-  "nome_projeto": "Substituição Perfeita",
-  "engenharia": "Li seu pedido. Gerei as cores exatas solicitadas e ajustei os eixos para o 3D cobrir o armário velho.",
-  "design": { "cor_caixa": "<Sua_Cor_Aqui>", "cor_portas": "<Sua_Cor_Aqui>", "material_nome": "<Nome do Material baseado no pedido>" },
-  "posicionamento_auto_ar": { "escala": 1.0, "pos_x": 0.0, "pos_y": 1.0, "rot_x": -0.05, "rot_y": 0.0, "rot_z": 0.0 },
-  "instalacao": "aereo",
+  "nome_projeto": "Projeto Arquiteto",
+  "engenharia": "Analisei o ambiente. Detectei a categoria e apliquei as cores e perspectivas corretas para o match photo.",
+  "design": { "cor_caixa": "#SuaCorHex", "cor_portas": "#SuaCorHex", "material_nome": "Nome do Material" },
+  "posicionamento_auto_ar": { "escala": 1.0, "pos_x": 0.0, "pos_y": 0.0, "rot_x": 0.0, "rot_y": 0.0, "rot_z": 0.0 },
+  "instalacao": "chao", 
   "modulos": [
-    { "nome": "Mod Esq", "largura": 800, "altura": 400, "profundidade": 350, "tipo_abertura": "basculante", "tem_nicho_aberto": false, "altura_nicho": 0, "portas": 2, "prateleiras": 1 }
+    { "nome": "Frente Balcão", "largura": 1500, "altura": 1100, "profundidade": 600, "tipo_abertura": "aberto", "tem_nicho_aberto": false, "prateleiras": 4, "formato": "reto", "pos_x": 0, "pos_z": 0, "rot_y": 0 },
+    { "nome": "Canto Curvo", "largura": 600, "altura": 1100, "profundidade": 600, "tipo_abertura": "aberto", "prateleiras": 4, "formato": "curvo", "pos_x": 1050, "pos_z": 300, "rot_y": -90 }
   ],
   "custos": {"material": 1200, "mao_de_obra": 600, "ferragens": 300, "outros": 100}
 }`;
@@ -488,18 +499,17 @@ JSON ESTRITO:
                     } else { throw new Error(dados.error?.message || "Erro API."); }
                 }
 
-                // SALVA NO ESTADO GLOBAL
                 const ia = extrairJSONSeguro(dados.choices[0].message.content);
                 projetoGlobal.modulos = ia.modulos || [];
-                projetoGlobal.design = ia.design || { cor_caixa:"#2c3e50", cor_portas:"#1a252f", material_nome:"MDF Azul Petróleo" }; // Fallback seguro escuro
+                projetoGlobal.design = ia.design || { cor_caixa:"#FDFCF9", cor_portas:"#FDFCF9", material_nome:"MDF Padrão" }; 
                 projetoGlobal.instalacao = ia.instalacao || "aereo";
-                projetoGlobal.posicionamento_auto_ar = ia.posicionamento_auto_ar || { escala: 1.0, pos_x: 0, pos_y: 1.0, rot_x: -0.05, rot_y: 0, rot_z: 0 };
+                projetoGlobal.posicionamento_auto_ar = ia.posicionamento_auto_ar || { escala: 1.0, pos_x: 0, pos_y: 0, rot_x: 0, rot_y: 0, rot_z: 0 };
 
                 document.getElementById('aiDesignSection').style.display = 'block';
                 document.getElementById('designerInsight').style.display = 'block';
-                document.getElementById('textoDesigner').innerText = ia.engenharia + " (Cores: " + projetoGlobal.design.material_nome + ")";
+                document.getElementById('textoDesigner').innerText = ia.engenharia + " (Material: " + projetoGlobal.design.material_nome + ")";
 
-                document.getElementById('itemName').value = ia.nome_projeto || "Cozinha Modular";
+                document.getElementById('itemName').value = ia.nome_projeto || "Projeto Sob Medida";
                 if(ia.custos) {
                     document.getElementById('costMaterial').value = ia.custos.material||0;
                     document.getElementById('costLabor').value = ia.custos.mao_de_obra||0;
@@ -514,7 +524,7 @@ JSON ESTRITO:
                     reconstruirCenaParametrica(); 
                     
                     document.getElementById('btnAR').style.display = base64ImagemGlobal ? 'inline-flex' : 'none';
-                    if(modoARAtivo) alternarModoAR(); // Desliga pra resetar visualmente
+                    if(modoARAtivo) alternarModoAR(); // Desliga pra resetar e forçar o auto-encaixe novo
                 }, 150);
 
             } catch(e) { 
@@ -538,25 +548,30 @@ JSON ESTRITO:
                 const W = Math.round(m.largura), H = Math.round(m.altura), D = Math.round(m.profundidade);
                 const prat = m.prateleiras || 0;
 
-                tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Base/Tampo</td><td>2</td><td>${W}</td><td>${D}</td><td>Branco</td></tr>`;
-                tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Laterais</td><td>2</td><td>${H}</td><td>${D}</td><td>Branco</td></tr>`;
-                
-                let HPorta = m.tem_nicho_aberto ? H - (m.altura_nicho||0) : H;
-                if(m.portas > 0) {
-                    let wPorta = Math.round(W / m.portas);
-                    let nomePorta = m.tipo_abertura === 'basculante' ? 'Frente Basculante' : 'Frente Giro';
-                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> ${nomePorta}</td><td>${m.portas}</td><td>${wPorta}</td><td>${HPorta}</td><td style="color:var(--ai-blue); font-weight:bold;">${mat}</td></tr>`;
-                    if(m.tipo_abertura === 'basculante') custoFerExato += m.portas * 2 * 25; 
-                    else custoFerExato += m.portas * 2 * 5; 
+                if (m.formato === 'curvo') {
+                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras/Tampo Curvos</td><td>${prat + 2}</td><td>Raio ${W}</td><td>Raio ${W}</td><td>${mat}</td></tr>`;
+                    custoMatExato += (((W * W * (Math.PI/4)) * (prat+2)) / 1000000) * 90;
+                } else {
+                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Base/Tampo</td><td>2</td><td>${W}</td><td>${D}</td><td>MDF Base</td></tr>`;
+                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Laterais</td><td>2</td><td>${H}</td><td>${D}</td><td>MDF Base</td></tr>`;
+                    
+                    let HPorta = m.tem_nicho_aberto ? H - (m.altura_nicho||0) : H;
+                    
+                    if (m.tipo_abertura !== 'aberto' && m.portas > 0) {
+                        let wPorta = Math.round(W / m.portas);
+                        let nomePorta = m.tipo_abertura === 'basculante' ? 'Frente Basculante' : 'Frente Giro';
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> ${nomePorta}</td><td>${m.portas}</td><td>${wPorta}</td><td>${HPorta}</td><td style="color:var(--ai-blue); font-weight:bold;">${mat}</td></tr>`;
+                        if(m.tipo_abertura === 'basculante') custoFerExato += m.portas * 2 * 25; 
+                        else custoFerExato += m.portas * 2 * 5; 
+                    }
+                    
+                    if(prat > 0) {
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras Int.</td><td>${prat}</td><td>${W - E*2}</td><td>${D - E - 10}</td><td>MDF Base</td></tr>`;
+                        custoMatExato += (((W - E*2) * (D - E) * prat) / 1000000) * 80;
+                    }
+                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Fundo Traseiro</td><td>1</td><td>${W - E*2}</td><td>${HPorta - E*2}</td><td>MDF 6mm</td></tr>`;
+                    custoMatExato += (((W*D*2) + (H*D*2) + (W*HPorta)) / 1000000) * 80;
                 }
-                
-                if(prat > 0) {
-                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras Int.</td><td>${prat}</td><td>${W - E*2}</td><td>${D - E - 10}</td><td>Branco</td></tr>`;
-                    custoMatExato += (((W - E*2) * (D - E) * prat) / 1000000) * 80;
-                }
-
-                tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Fundo Traseiro</td><td>1</td><td>${W - E*2}</td><td>${HPorta - E*2}</td><td>MDF 6mm</td></tr>`;
-                custoMatExato += (((W*D*2) + (H*D*2) + (W*HPorta)) / 1000000) * 80;
             });
 
             document.getElementById('costMaterial').value = Math.round(custoMatExato);
@@ -576,8 +591,7 @@ JSON ESTRITO:
             const luz = new THREE.DirectionalLight(0xffffff, 0.6); luz.position.set(5, 10, 8); cena3D.add(luz);
             const luz2 = new THREE.DirectionalLight(0xDDA15E, 0.3); luz2.position.set(-5, 0, -5); cena3D.add(luz2);
 
-            // O SEGREDO DO ANTI-CLIPPING (Sumir uma parte):
-            // Near = 0.01 (MUITO perto), Far = 10000 (MUITO longe)
+            // ANTI-CLIPPING (Nunca mais some a peça ao dar zoom): Near 0.01, Far 10000
             camera3D = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 0.01, 10000);
             
             renderizador3D = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -588,7 +602,7 @@ JSON ESTRITO:
 
             controles3D = new THREE.OrbitControls(camera3D, renderizador3D.domElement);
             controles3D.enableDamping = true; controles3D.dampingFactor = 0.05;
-            controles3D.maxDistance = 5000; // Permite zoom infinito para trás
+            controles3D.maxDistance = 5000; 
 
             rootNode = new THREE.Group();
             cena3D.add(rootNode);
@@ -670,7 +684,7 @@ JSON ESTRITO:
         }
 
         // ==========================================
-        // FLUXO DE EDIÇÃO (O BOTTON SHEET MAGICO)
+        // FLUXO DE EDIÇÃO BOTTOM SHEET 
         // ==========================================
         function ativarEdicaoModulo(index) {
             fecharPerspectiva(); 
@@ -682,13 +696,13 @@ JSON ESTRITO:
             document.getElementById('sliderH').value = modObj.altura; document.getElementById('lblH').innerText = Math.round(modObj.altura);
             document.getElementById('sliderD').value = modObj.profundidade; document.getElementById('lblD').innerText = Math.round(modObj.profundidade);
             document.getElementById('selPorta').value = modObj.tipo_abertura || 'giro';
+            document.getElementById('selFormato').value = modObj.formato || 'reto';
             document.getElementById('sliderPrat').value = modObj.prateleiras || 0; document.getElementById('lblPrat').innerText = modObj.prateleiras || 0;
             
             const hud = document.getElementById('editHUD');
             hud.style.display = 'flex'; setTimeout(() => hud.classList.add('show'), 10);
             destacarModuloVisualmente(index);
 
-            // TELA DESLIZA PARA CIMA (Para não ocluir o 3D)
             if(modoARAtivo) {
                 document.getElementById('container3DWrapper').classList.add('hud-open');
                 setTimeout(ajustarTamanho3D, 300); 
@@ -716,6 +730,7 @@ JSON ESTRITO:
             const h = parseFloat(document.getElementById('sliderH').value);
             const d = parseFloat(document.getElementById('sliderD').value);
             const porta = document.getElementById('selPorta').value;
+            const formato = document.getElementById('selFormato').value;
             const prat = parseInt(document.getElementById('sliderPrat').value);
             
             document.getElementById('lblW').innerText = w; document.getElementById('lblH').innerText = h;
@@ -725,6 +740,7 @@ JSON ESTRITO:
             projetoGlobal.modulos[moduloSendoEditado].altura = h;
             projetoGlobal.modulos[moduloSendoEditado].profundidade = d;
             projetoGlobal.modulos[moduloSendoEditado].tipo_abertura = porta;
+            projetoGlobal.modulos[moduloSendoEditado].formato = formato;
             projetoGlobal.modulos[moduloSendoEditado].prateleiras = prat;
 
             reconstruirCenaParametrica();
@@ -751,20 +767,11 @@ JSON ESTRITO:
             if(targetMod) { boxHelper = new THREE.BoxHelper(targetMod, 0xffeb3b); cena3D.add(boxHelper); }
         }
 
-        // ==========================================
-        // PERSPECTIVA MANUAL DA PAREDE
-        // ==========================================
         function abrirAjustePerspectiva() {
-            fecharEdicao();
-            isPerspectiveMode = true; controles3D.enabled = false;
-            
+            fecharEdicao(); isPerspectiveMode = true; controles3D.enabled = false;
             const hud = document.getElementById('perspectiveHUD');
             hud.style.display = 'flex'; setTimeout(() => hud.classList.add('show'), 10);
-
-            if(modoARAtivo) {
-                document.getElementById('container3DWrapper').classList.add('hud-open');
-                setTimeout(ajustarTamanho3D, 300);
-            }
+            if(modoARAtivo) { document.getElementById('container3DWrapper').classList.add('hud-open'); setTimeout(ajustarTamanho3D, 300); }
         }
 
         function fecharPerspectiva() {
@@ -772,26 +779,27 @@ JSON ESTRITO:
             isPerspectiveMode = false; controles3D.enabled = true;
             const hud = document.getElementById('perspectiveHUD');
             hud.classList.remove('show'); setTimeout(() => hud.style.display = 'none', 300);
-
-            if(modoARAtivo) {
-                document.getElementById('container3DWrapper').classList.remove('hud-open');
-                setTimeout(ajustarTamanho3D, 300);
-            }
+            if(modoARAtivo) { document.getElementById('container3DWrapper').classList.remove('hud-open'); setTimeout(ajustarTamanho3D, 300); }
         }
 
         function ajustarPerspectivaManual() {
             if(!rootNode) return;
             const s = parseFloat(document.getElementById('camScale').value);
+            const pX = parseFloat(document.getElementById('camPosX').value);
+            const pY = parseFloat(document.getElementById('camPosY').value);
             const rX = parseFloat(document.getElementById('camRotX').value);
             const rY = parseFloat(document.getElementById('camRotY').value);
-            const rZ = parseFloat(document.getElementById('camRotZ').value);
             
             rootNode.scale.set(s, s, s);
-            rootNode.rotation.set(rX, rY, rZ);
+            rootNode.rotation.set(rX, rY, 0);
+            
+            // Move a câmera para simular deslocamento (pan) global
+            camera3D.position.set(pX, pY, camera3D.position.z);
+            controles3D.target.set(pX, pY, controles3D.target.z);
         }
 
         // ==========================================
-        // O CORAÇÃO DO RENDER (Material Ouro)
+        // O CORAÇÃO DO RENDER (AGORA COM CURVAS E ABERTOS)
         // ==========================================
         function reconstruirCenaParametrica() {
             if (grupoCozinha) rootNode.remove(grupoCozinha);
@@ -799,16 +807,18 @@ JSON ESTRITO:
 
             const design = projetoGlobal.design;
             const matCaixa = new THREE.MeshStandardMaterial({ color: new THREE.Color(design?.cor_caixa||"#FFF"), roughness: 0.8 });
-            const matPorta = new THREE.MeshStandardMaterial({ color: new THREE.Color(design?.cor_portas||"#CCC"), roughness: 0.6 });
+            const matPorta = new THREE.MeshStandardMaterial({ color: new THREE.Color(design?.cor_portas||"#CCC"), roughness: 0.5 });
             const matPux = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.4 });
             const E = 0.018; const F = 0.003; 
 
+            // Para layout livre da IA (caso ela envie pos_x e pos_z de L-shapes)
+            let usaLayoutLivre = projetoGlobal.modulos.some(m => m.pos_x !== undefined && m.pos_x !== 0);
+            
             let largTotal_mm = 0, alturaMaxima_mm = 0;
             projetoGlobal.modulos.forEach(m => { largTotal_mm += m.largura; if(m.altura > alturaMaxima_mm) alturaMaxima_mm = m.altura; });
 
             const T_W = largTotal_mm / 1000, T_H = alturaMaxima_mm / 1000;
             const baseElevacao = (projetoGlobal.instalacao === "aereo") ? 1.5 : 0;
-            
             grupoCozinha.position.y = baseElevacao;
 
             let currentX = -T_W / 2;
@@ -820,69 +830,100 @@ JSON ESTRITO:
                 if(isInt) objetosInterativos.push(m);
                 return m;
             }
+            
+            function criarCurva(raio, h, mat, y, modGrp, isInt=false) {
+                const geo = new THREE.CylinderGeometry(raio, raio, E, 32, 1, false, 0, Math.PI/2);
+                const m = new THREE.Mesh(geo, mat);
+                m.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({color:0x000, opacity:0.1, transparent:true})));
+                m.position.set(0, y, 0); modGrp.add(m);
+                if(isInt) objetosInterativos.push(m);
+                return m;
+            }
 
             projetoGlobal.modulos.forEach((mod, idx) => {
                 const mW = mod.largura/1000, mH = mod.altura/1000, mD = mod.profundidade/1000;
                 const mGrp = new THREE.Group();
                 mGrp.userData = { isModulo: true, modIndex: idx }; 
                 
+                // Posição: Se a IA mandou coordenadas livres, usa. Senão, lado a lado.
+                let mX = usaLayoutLivre && mod.pos_x !== undefined ? mod.pos_x/1000 : currentX + mW/2;
+                let mZ = usaLayoutLivre && mod.pos_z !== undefined ? mod.pos_z/1000 : 0;
+                let mRotY = mod.rot_y !== undefined ? (mod.rot_y * Math.PI / 180) : 0;
+                
                 const topoY = 0; const baseModY = topoY - mH; 
-                mGrp.position.set(currentX + mW/2, baseModY, 0); 
-
-                criarPlaca(mW, E, mD, matCaixa, 0, E/2, mD/2, mGrp, true); 
-                criarPlaca(E, mH, mD, matCaixa, -mW/2+E/2, mH/2, mD/2, mGrp, true); 
-                criarPlaca(E, mH, mD, matCaixa, mW/2-E/2, mH/2, mD/2, mGrp, true); 
-                criarPlaca(mW, E, mD, matCaixa, 0, mH-E/2, mD/2, mGrp, true); 
-                
-                let altFundo = mH - E*2, baseFundo = mH/2, altPortas = mH - E*2, startYPortas = E, startYPrat = E; 
-
-                if (mod.tem_nicho_aberto) {
-                    const hNicho = (mod.altura_nicho || 400)/1000;
-                    criarPlaca(mW-E*2, E, mD-E, matCaixa, 0, E + hNicho + E/2, mD/2, mGrp); 
-                    altPortas = mH - E*2 - hNicho - E; startYPortas = E + hNicho + E; 
-                    altFundo = altPortas; baseFundo = startYPortas + altFundo/2; startYPrat = E + hNicho + E;
-                }
-                
-                criarPlaca(mW-E*2, altFundo, 0.006, matCaixa, 0, baseFundo, 0.01, mGrp); 
+                mGrp.position.set(mX, baseModY, mZ); 
+                mGrp.rotation.y = mRotY;
 
                 const qPrat = mod.prateleiras || 0;
-                if (qPrat > 0 && altPortas > 0) {
-                    const espacoPrat = altPortas / (qPrat + 1);
-                    for(let i=1; i<=qPrat; i++) {
-                        criarPlaca(mW - E*2, E, mD - E - 0.01, matCaixa, 0, startYPrat + (espacoPrat * i), mD/2 - 0.005, mGrp);
-                    }
-                }
+                const espacoPrat = mH / (qPrat + 1);
 
-                if (altPortas > 0.1) {
-                    const nPortas = mod.portas || 1;
-                    if (mod.tipo_abertura === "basculante") {
-                        const hInd = altPortas / nPortas;
-                        for(let i=0; i<nPortas; i++) {
-                            const bGrp = new THREE.Group(); 
-                            bGrp.position.set(0, startYPortas + (i*hInd) + hInd, mD+E/2); 
-                            const pMesh = criarPlaca(mW-E*2-F*2, hInd-F, E, matPorta, 0, -hInd/2, 0, bGrp, true);
-                            pMesh.userData.grupoPai = bGrp;
-                            criarPlaca(mW-E*4, 0.02, 0.02, matPux, 0, -hInd+0.03, E/2+0.01, bGrp); 
-                            bGrp.userData = { animavel: true, tipo: 'basculante', aberto: false, rotAbre: -Math.PI/2.2 };
-                            mGrp.add(bGrp);
-                        }
-                    } else {
-                        const wInd = (mW - E*2 - F*(nPortas+1)) / nPortas;
-                        const startXP = -mW/2 + E + F + wInd/2;
-                        for(let i=0; i<nPortas; i++) {
-                            const bGrp = new THREE.Group(); const esq = i < nPortas/2;
-                            bGrp.position.set(startXP + i*(wInd+F) + (esq?-wInd/2:wInd/2), startYPortas + altPortas/2, mD+E/2);
-                            const deslocX = esq ? wInd/2 : -wInd/2;
-                            const pMesh = criarPlaca(wInd, altPortas-F, E, matPorta, deslocX, 0, 0, bGrp, true);
-                            pMesh.userData.grupoPai = bGrp;
-                            criarPlaca(0.02, 0.15, 0.02, matPux, esq? deslocX+wInd/2-0.03 : deslocX-wInd/2+0.03, 0, E/2+0.01, bGrp); 
-                            bGrp.userData = { animavel: true, tipo: 'giro', aberto: false, rotAbre: esq ? -Math.PI/1.8 : Math.PI/1.8 };
-                            mGrp.add(bGrp);
+                if (mod.formato === "curvo") {
+                    // BALCÃO CURVO (Ex: Padaria)
+                    criarCurva(mW, mH, matCaixa, E/2, mGrp, true); // Base
+                    criarCurva(mW, mH, matCaixa, mH-E/2, mGrp, true); // Tampo
+                    for(let i=1; i<=qPrat; i++) criarCurva(mW-0.01, mH, matCaixa, espacoPrat*i, mGrp); // Prateleiras
+                    
+                    // Fechamento traseiro do curvo
+                    criarPlaca(mW, mH, 0.006, matCaixa, mW/2, mH/2, 0, mGrp);
+                    criarPlaca(0.006, mH, mW, matCaixa, 0, mH/2, mW/2, mGrp);
+                } else {
+                    // CAIXA RETA PADRÃO
+                    criarPlaca(mW, E, mD, matCaixa, 0, E/2, mD/2, mGrp, true); 
+                    criarPlaca(E, mH, mD, matCaixa, -mW/2+E/2, mH/2, mD/2, mGrp, true); 
+                    criarPlaca(E, mH, mD, matCaixa, mW/2-E/2, mH/2, mD/2, mGrp, true); 
+                    
+                    // O tampo pode ser o Granito se a IA escolheu cor escura, a gente respeita a caixa
+                    criarPlaca(mW, E, mD, matCaixa, 0, mH-E/2, mD/2, mGrp, true); 
+                    
+                    let altFundo = mH - E*2, baseFundo = mH/2, altPortas = mH - E*2, startYPortas = E, startYPrat = E; 
+
+                    if (mod.tem_nicho_aberto) {
+                        const hNicho = (mod.altura_nicho || 400)/1000;
+                        criarPlaca(mW-E*2, E, mD-E, matCaixa, 0, E + hNicho + E/2, mD/2, mGrp); 
+                        altPortas = mH - E*2 - hNicho - E; startYPortas = E + hNicho + E; 
+                        altFundo = altPortas; baseFundo = startYPortas + altFundo/2; startYPrat = E + hNicho + E;
+                    }
+                    
+                    criarPlaca(mW-E*2, altFundo, 0.006, matCaixa, 0, baseFundo, 0.01, mGrp); 
+
+                    if (qPrat > 0 && altPortas > 0) {
+                        const espPratInterna = altPortas / (qPrat + 1);
+                        for(let i=1; i<=qPrat; i++) criarPlaca(mW - E*2, E, mD - E - 0.01, matCaixa, 0, startYPrat + (espPratInterna * i), mD/2 - 0.005, mGrp);
+                    }
+
+                    // ABERTURAS (Só coloca porta se não for "Aberto")
+                    if (altPortas > 0.1 && mod.tipo_abertura !== "aberto") {
+                        const nPortas = mod.portas || 1;
+                        if (mod.tipo_abertura === "basculante") {
+                            const hInd = altPortas / nPortas;
+                            for(let i=0; i<nPortas; i++) {
+                                const bGrp = new THREE.Group(); 
+                                bGrp.position.set(0, startYPortas + (i*hInd) + hInd, mD+E/2); 
+                                const pMesh = criarPlaca(mW-E*2-F*2, hInd-F, E, matPorta, 0, -hInd/2, 0, bGrp, true);
+                                pMesh.userData.grupoPai = bGrp;
+                                criarPlaca(mW-E*4, 0.02, 0.02, matPux, 0, -hInd+0.03, E/2+0.01, bGrp); 
+                                bGrp.userData = { animavel: true, tipo: 'basculante', aberto: false, rotAbre: -Math.PI/2.2 };
+                                mGrp.add(bGrp);
+                            }
+                        } else {
+                            const wInd = (mW - E*2 - F*(nPortas+1)) / nPortas;
+                            const startXP = -mW/2 + E + F + wInd/2;
+                            for(let i=0; i<nPortas; i++) {
+                                const bGrp = new THREE.Group(); const esq = i < nPortas/2;
+                                bGrp.position.set(startXP + i*(wInd+F) + (esq?-wInd/2:wInd/2), startYPortas + altPortas/2, mD+E/2);
+                                const deslocX = esq ? wInd/2 : -wInd/2;
+                                const pMesh = criarPlaca(wInd, altPortas-F, E, matPorta, deslocX, 0, 0, bGrp, true);
+                                pMesh.userData.grupoPai = bGrp;
+                                criarPlaca(0.02, 0.15, 0.02, matPux, esq? deslocX+wInd/2-0.03 : deslocX-wInd/2+0.03, 0, E/2+0.01, bGrp); 
+                                bGrp.userData = { animavel: true, tipo: 'giro', aberto: false, rotAbre: esq ? -Math.PI/1.8 : Math.PI/1.8 };
+                                mGrp.add(bGrp);
+                            }
                         }
                     }
                 }
                 
-                grupoCozinha.add(mGrp); currentX += mW; 
+                grupoCozinha.add(mGrp); 
+                if(!usaLayoutLivre) currentX += mW; 
             });
 
             calcularPlanoDeCorteRealTime();
@@ -894,7 +935,7 @@ JSON ESTRITO:
         }
 
         // ==========================================
-        // AUTO-ENCAIXE IA (MATCH PHOTO SUPREMO)
+        // AUTO-ENCAIXE IA (MATCH PHOTO COVER)
         // ==========================================
         function alternarModoAR() {
             if (!base64ImagemGlobal) { alert("Envie uma foto do local primeiro!"); return; }
@@ -913,7 +954,7 @@ JSON ESTRITO:
                 document.getElementById('info3D').style.display = 'none';
                 document.getElementById('instrucao3D').style.display = 'none';
                 
-                // A IA JÁ CALULOU A PERSPECTIVA E POSIÇÃO, APLICAMOS DIRETAMENTE!
+                // MÁGICA DE AUTO-ENCAIXE IA ABSOLUTA
                 const posIA = projetoGlobal.posicionamento_auto_ar;
                 if(posIA) {
                     rootNode.scale.set(posIA.escala, posIA.escala, posIA.escala);
@@ -922,7 +963,10 @@ JSON ESTRITO:
                     camera3D.position.set(posIA.pos_x, posIA.pos_y, 4); 
                     controles3D.target.set(posIA.pos_x, posIA.pos_y, 0); 
                     
+                    // Popula o HUD manual com os dados da IA
                     document.getElementById('camScale').value = posIA.escala;
+                    document.getElementById('camPosX').value = posIA.pos_x;
+                    document.getElementById('camPosY').value = posIA.pos_y;
                     document.getElementById('camRotX').value = posIA.rot_x;
                     document.getElementById('camRotY').value = posIA.rot_y;
                 } else {
@@ -940,10 +984,11 @@ JSON ESTRITO:
                 document.getElementById('info3D').style.display = 'block';
                 document.getElementById('instrucao3D').style.display = 'block';
                 
-                // Reseta a parede e os eixos
                 rootNode.rotation.set(0,0,0); rootNode.scale.set(1,1,1);
+                
                 if(grupoCozinha) { 
-                    camera3D.position.set(0, -0.5, 3); controles3D.target.set(0, -0.5, 0); controles3D.update(); 
+                    let T_H = 1; 
+                    camera3D.position.set(0, -T_H/2, 3); controles3D.target.set(0, -T_H/2, 0); controles3D.update(); 
                 }
             }
             setTimeout(ajustarTamanho3D, 50);
