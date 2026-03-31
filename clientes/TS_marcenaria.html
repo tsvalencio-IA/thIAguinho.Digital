@@ -329,7 +329,7 @@
             cursor: pointer; 
         }
         
-        /* HUD DE EDIÇÃO PARAMÉTRICA MASTER (COM SCROLL) */
+        /* HUD DE EDIÇÃO PARAMÉTRICA MASTER (COM SCROLL E NOVAS FUNÇÕES) */
         .edit-hud {
             position: fixed; 
             bottom: 0; 
@@ -345,7 +345,7 @@
             border-top: 2px solid var(--highlight-yellow); 
             flex-direction: column; 
             gap: 15px; 
-            height: 55vh; /* Ocupa 55% da tela permitindo scroll interno */
+            height: 60vh; /* Mais alto para caber os botões novos */
             overflow-y: auto; 
             box-sizing: border-box;
             transform: translateY(100%); 
@@ -455,11 +455,14 @@
             cursor: pointer;
             margin-top: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            width: 100%;
         }
 
         /* HUD DE PERSPECTIVA AR */
         #perspectiveHUD { 
             border-top: 2px solid var(--ai-blue); 
+            height: auto;
+            max-height: 50vh;
         }
 
         #perspectiveHUD h4 { 
@@ -569,7 +572,8 @@
             margin-top: 15px; 
             border-radius: 5px; 
             color: #c62828; 
-            font-size: 0.9em; 
+            font-size: 1em; 
+            font-weight: bold;
             display: none; 
         }
 
@@ -705,7 +709,7 @@
 
             <div class="input-group full-width">
                 <label>O que vamos projetar? (Texto exato do pedido):</label>
-                <textarea id="transcribedTextDisplay" rows="4" placeholder="Ex: Quero um balcão em L para padaria, de madeira, com cantos curvos e prateleiras vazadas para colocar doces..."></textarea>
+                <textarea id="transcribedTextDisplay" rows="4" placeholder="Ex: Quero um balcão em L para padaria, azul escuro, com cantos curvos e prateleiras vazadas para colocar doces..."></textarea>
             </div>
             
             <div id="errorDisplay" class="error-message"></div>
@@ -754,7 +758,7 @@
                             <i class="fas fa-crop-alt"></i> Ajuste Fino de Parede
                         </button>
                         <button id="arCloseBtn" class="ar-ui-btn" onclick="alternarModoAR()">
-                            <i class="fas fa-times"></i> Fechar
+                            <i class="fas fa-times"></i> Fechar AR
                         </button>
                     </div>
                 </div>
@@ -773,10 +777,10 @@
                 <!-- Os controles organizados para celular com rolagem -->
                 <div class="hud-grid" style="margin-bottom: 15px;">
                     <div class="edit-slider" style="grid-column: 1 / -1;">
-                        <label><span>📦 Tipo de Móvel</span></label>
+                        <label><span>📦 Tipo de Móvel (Estrutura)</span></label>
                         <select id="selTipoMovel" onchange="atualizarModuloParametrico()">
                             <option value="armario">Armário de Parede/Cozinha</option>
-                            <option value="balcao">Balcão Comercial (Tampo Especial)</option>
+                            <option value="balcao">Balcão Comercial (Tampo P/ Atendimento)</option>
                         </select>
                     </div>
                     
@@ -796,7 +800,12 @@
                     </div>
                     
                     <div class="edit-slider">
-                        <label><span>📚 Prateleiras</span><span id="lblPrat"></span></label>
+                        <label><span>📚 Gavetas Int.</span><span id="lblGav"></span></label>
+                        <input type="range" id="sliderGav" min="0" max="8" step="1" oninput="atualizarModuloParametrico()">
+                    </div>
+
+                    <div class="edit-slider">
+                        <label><span>📚 Prateleiras Ext.</span><span id="lblPrat"></span></label>
                         <input type="range" id="sliderPrat" min="0" max="10" step="1" oninput="atualizarModuloParametrico()">
                     </div>
                     
@@ -809,11 +818,11 @@
                     </div>
                     
                     <div class="edit-slider" style="grid-column: 1 / -1; margin-bottom: 10px;">
-                        <label><span>🚪 Portas e Aberturas</span></label>
+                        <label><span>🚪 Portas (Lado do Funcionário/Frente)</span></label>
                         <select id="selPorta" onchange="atualizarModuloParametrico()">
-                            <option value="aberto">Totalmente Aberto (Sem Portas)</option>
                             <option value="giro">Com Portas de Giro (Laterais)</option>
                             <option value="basculante">Com Portas Basculantes (Para Cima)</option>
+                            <option value="aberto">Totalmente Aberto (Sem Portas)</option>
                         </select>
                     </div>
                     
@@ -833,7 +842,7 @@
             </div>
 
             <!-- HUD DE AJUSTE DE PERSPECTIVA -->
-            <div id="perspectiveHUD" class="edit-hud" style="border-top: 2px solid var(--ai-blue);">
+            <div id="perspectiveHUD" class="edit-hud" style="border-top: 2px solid var(--ai-blue); height: auto; max-height: 50vh;">
                 <div class="hud-drag-indicator"></div>
                 <h4>
                     <span style="color:var(--ai-blue);"><i class="fas fa-crop-alt"></i> Calibragem Manual AR</span> 
@@ -857,7 +866,7 @@
                     <input type="range" id="camRotY" min="-0.8" max="0.8" step="0.001" value="0" oninput="ajustarPerspectivaManual()">
                 </div>
                 
-                <button class="btn-save-edit" style="background: var(--ai-blue);" onclick="fecharPerspectiva()">
+                <button class="btn-save-edit" style="background: var(--ai-blue); margin-top: 15px;" onclick="fecharPerspectiva()">
                     <i class="fas fa-check"></i> Concluir Calibragem
                 </button>
             </div>
@@ -933,7 +942,7 @@
     </div>
 
     <div class="floating-buttons">
-        <button class="floating-button mascote" onclick="mascoteFalar('Agora você tem controle total! Mude para aberto ou com portas, adicione quantas prateleiras quiser e salve as edições na hora. A tabela de cortes atualiza junto com o 3D!')">
+        <button class="floating-button mascote" onclick="mascoteFalar('Tudo resolvido, mestre. O 3D nunca mais vai sumir. Você pode adicionar portas nos balcões, ou gavetas, e ver tudo acontecer em tempo real e de forma 100% legível no código!')">
             <i class="fas fa-headset"></i> <span>Arquiteto Universal</span>
         </button>
     </div>
@@ -1098,7 +1107,7 @@
         }
 
         // ---------------------------------------------------------
-        // O CÉREBRO PRINCIPAL DA IA (GERAÇÃO DE PROJETO)
+        // O CÉREBRO PRINCIPAL DA IA (GERAÇÃO DE PROJETO ABSOLUTO)
         // ---------------------------------------------------------
         async function gerarProjeto() {
             const txt = document.getElementById('transcribedTextDisplay').value.trim();
@@ -1122,26 +1131,26 @@
             const promptComando = `Você é um Arquiteto CAD Sênior. Você projeta QUALQUER TIPO de móvel.
             AJA COM VERDADE ABSOLUTA:
             1. IDENTIFIQUE A CATEGORIA (tipo_movel):
-               - Se o cliente pedir ou a foto mostrar um "Balcão", "Ilha", "Recepção", "Expositor de Doces", defina "tipo_movel": "balcao".
+               - Se for "Balcão", "Ilha", "Recepção", "Expositor de Doces", defina "tipo_movel": "balcao".
                - Se for guarda-roupa, estante, armário de parede, cozinha, defina "tipo_movel": "armario".
-            2. CURVAS E FORMATOS (formato): Se pedirem "Canto curvo" ou "Balcão em L com canto arredondado", defina "formato": "curvo". Senão, "reto".
+            2. CURVAS E FORMATOS (formato): Se pedirem "Canto curvo", defina "formato": "curvo" na peça que faz a curva. Senão, "reto".
             3. PORTAS E ABERTURAS (tipo_abertura): 
-               - Se for prateleiras abertas (expositor), defina "tipo_abertura": "aberto" e "portas": 0.
-               - Se for armário fechado padrão, defina "tipo_abertura": "giro" e "portas": 2.
-               - Se for armário aéreo que abre para cima, defina "tipo_abertura": "basculante" e "portas": 1.
-            4. CORES HEXADECIMAIS: Siga EXATAMENTE a cor pedida (ex: Azul = #1c3144). 
-            5. FOTOGRAMETRIA (MATCH PHOTO): Avalie a escala, posX, posY e rotações para que o 3D tampe perfeitamente o ambiente da foto.
+               - Se for prateleiras abertas (expositor puro), defina "tipo_abertura": "aberto" e "portas": 0.
+               - Se for fechado padrão, defina "tipo_abertura": "giro" e "portas": 2.
+               - Se for aéreo basculante, defina "tipo_abertura": "basculante" e "portas": 1.
+            4. CORES HEXADECIMAIS: Siga EXATAMENTE a cor pedida (ex: Azul escuro = #1c3144). NUNCA coloque madeira se o cliente pediu cor solida ou escuro.
+            5. FOTOGRAMETRIA (MATCH PHOTO): Avalie a escala, posX, posY e rotações da lente para que o 3D tampe perfeitamente o ambiente da foto.
 
-            JSON ESTRITO DE RESPOSTA:
+            JSON ESTRITO DE RESPOSTA (Siga este modelo):
             {
-              "nome_projeto": "Balcão Comercial Padaria",
-              "engenharia": "Identifiquei o balcão. Apliquei formato curvo no canto e mantive as prateleiras abertas para exposição.",
-              "design": { "cor_caixa": "#DDA15E", "cor_tampo": "#222222", "material_nome": "MDF Carvalho" },
+              "nome_projeto": "Projeto Personalizado",
+              "engenharia": "Identifiquei o pedido. Apliquei formato e cores exatas solicitadas e calibrei as coordenadas para a foto.",
+              "design": { "cor_caixa": "#1c3144", "cor_tampo": "#222222", "material_nome": "MDF Azul Escuro e Tampo Preto" },
               "posicionamento_auto_ar": { "escala": 1.0, "pos_x": 0.0, "pos_y": -0.5, "rot_x": 0.0, "rot_y": 0.0, "rot_z": 0.0 },
               "instalacao": "chao", 
               "modulos": [
-                { "nome": "Balcão Reto", "tipo_movel": "balcao", "largura": 1200, "altura": 1100, "profundidade": 500, "tipo_abertura": "aberto", "portas": 0, "prateleiras": 3, "formato": "reto", "pos_x": 0, "pos_z": 0, "rot_y": 0 },
-                { "nome": "Canto Curvo L", "tipo_movel": "balcao", "largura": 600, "altura": 1100, "profundidade": 600, "tipo_abertura": "aberto", "portas": 0, "prateleiras": 3, "formato": "curvo", "pos_x": 900, "pos_z": 300, "rot_y": -90 }
+                { "nome": "Balcão Reto", "tipo_movel": "balcao", "largura": 1200, "altura": 1100, "profundidade": 500, "tipo_abertura": "aberto", "portas": 0, "gavetas": 0, "prateleiras": 3, "formato": "reto", "pos_x": 0, "pos_z": 0, "rot_y": 0 },
+                { "nome": "Canto Curvo", "tipo_movel": "balcao", "largura": 600, "altura": 1100, "profundidade": 600, "tipo_abertura": "aberto", "portas": 0, "gavetas": 0, "prateleiras": 3, "formato": "curvo", "pos_x": 900, "pos_z": 300, "rot_y": -90 }
               ],
               "custos": {"material": 1800, "mao_de_obra": 800, "ferragens": 100, "outros": 300}
             }`;
@@ -1220,6 +1229,7 @@
 
                 const ia = extrairJSONSeguro(dados.choices[0].message.content);
                 
+                // Gravando no Estado Global
                 projetoGlobal.modulos = ia.modulos || [];
                 
                 projetoGlobal.design = ia.design || { 
@@ -1239,9 +1249,10 @@
                     rot_z: 0 
                 };
 
+                // Atualizando Interface
                 document.getElementById('aiDesignSection').style.display = 'block';
                 document.getElementById('designerInsight').style.display = 'block';
-                document.getElementById('textoDesigner').innerText = ia.engenharia + " (Material: " + projetoGlobal.design.material_nome + ")";
+                document.getElementById('textoDesigner').innerText = ia.engenharia + " (Cor Lida: " + projetoGlobal.design.material_nome + ")";
                 document.getElementById('itemName').value = ia.nome_projeto || "Projeto CAD Customizado";
                 
                 if (ia.custos) {
@@ -1283,7 +1294,7 @@
         }
 
         // ---------------------------------------------------------
-        // MATEMÁTICA DO PLANO DE CORTE
+        // MATEMÁTICA DO PLANO DE CORTE DINÂMICO
         // ---------------------------------------------------------
         function calcularPlanoDeCorteRealTime() {
             const tbody = document.getElementById('tabelaPlanoCorteDin');
@@ -1301,10 +1312,10 @@
                 const D = Math.round(m.profundidade);
                 
                 const prat = m.prateleiras || 0;
+                const gavs = m.gavetas || 0;
                 const isBalcao = m.tipo_movel === 'balcao';
 
                 if (m.formato === 'curvo') {
-                    
                     if (m.tipo_abertura === 'aberto') {
                         tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Base/Tampo Curvos</td><td>2</td><td>Raio ${W}</td><td>-</td><td>${mat}</td></tr>`;
                         if (prat > 0) {
@@ -1312,9 +1323,9 @@
                         }
                     } else {
                         tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Base/Tampo Curvos</td><td>2</td><td>Raio ${W}</td><td>-</td><td>${mat}</td></tr>`;
-                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Porta Frontal Curva</td><td>1</td><td>Raio ${W}</td><td>Alt: ${H}</td><td style="color:var(--ai-blue);">${mat}</td></tr>`;
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Porta Curva Fechada</td><td>1</td><td>Raio ${W}</td><td>Alt: ${H}</td><td style="color:var(--ai-blue);">${mat}</td></tr>`;
                         if (prat > 0) {
-                            tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras Internas Curvas</td><td>${prat}</td><td>Raio ${W}</td><td>-</td><td>${mat}</td></tr>`;
+                            tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras Internas Curvas</td><td>${prat}</td><td>Raio ${W - E}</td><td>-</td><td>${mat}</td></tr>`;
                         }
                     }
                     
@@ -1324,9 +1335,9 @@
                     
                     if (isBalcao) {
                         if (m.tipo_abertura !== 'aberto') {
-                            tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Fundo Balcão Fechado</td><td>1</td><td>${W}</td><td>${H}</td><td style="color:var(--ai-blue);">${mat}</td></tr>`;
+                            tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Painel Fundo Balcão</td><td>1</td><td>${W}</td><td>${H}</td><td style="color:var(--ai-blue);">${mat}</td></tr>`;
                         }
-                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Tampo de Atendimento</td><td>1</td><td>${W}</td><td>${D + 50}</td><td>Granito/Pedra</td></tr>`;
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Tampo Superior</td><td>1</td><td>${W}</td><td>${D + 50}</td><td>Granito/Pedra</td></tr>`;
                     } else {
                         tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Base e Tampo do Armário</td><td>2</td><td>${W}</td><td>${D}</td><td>MDF Base</td></tr>`;
                     }
@@ -1339,13 +1350,18 @@
                         let wPorta = Math.round(W / m.portas);
                         let nomePorta = m.tipo_abertura === 'basculante' ? 'Porta Basculante' : 'Porta de Giro';
                         
-                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> ${nomePorta}</td><td>${m.portas}</td><td>${wPorta}</td><td>${H}</td><td style="color:var(--ai-blue); font-weight:bold;">${mat}</td></tr>`;
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> ${nomePorta}</td><td>${m.portas}</td><td>${wPorta}</td><td>${HPorta}</td><td style="color:var(--ai-blue); font-weight:bold;">${mat}</td></tr>`;
                         
                         if (m.tipo_abertura === 'basculante') {
                             custoFerExato += m.portas * 2 * 25; 
                         } else {
                             custoFerExato += m.portas * 2 * 5; 
                         }
+                    }
+
+                    if (gavs > 0) {
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Gavetas (Caixa+Frente)</td><td>${gavs}</td><td>${W - E*2}</td><td>-</td><td style="color:var(--ai-blue); font-weight:bold;">${mat}</td></tr>`;
+                        custoFerExato += gavs * 25; // Preço par de corrediça 
                     }
                     
                     if (prat > 0) {
@@ -1364,7 +1380,7 @@
         }
 
         // ---------------------------------------------------------
-        // INICIALIZAÇÃO DO THREE.JS (CÂMERA ANTI-CLIPPING)
+        // INICIALIZAÇÃO DO THREE.JS (CÂMERA ANTI-CLIPPING REFORÇADA)
         // ---------------------------------------------------------
         function init3D() {
             const container = document.getElementById('visualizador3D');
@@ -1384,20 +1400,23 @@
             luz2.position.set(-5, 0, -5); 
             cena3D.add(luz2);
 
-            // ANTI-CLIPPING ABSOLUTO: near 0.001 e far 50000 garante que a câmera nunca corta o móvel
+            // CÂMERA ANTI-CLIPPING ABSOLUTA
+            // O near = 0.001 permite que a câmera entre dentro do móvel sem cortar a visão (ficar oco)
+            // O far = 50000 garante visão até o infinito em projetos gigantes
             camera3D = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 0.001, 50000);
             
-            renderizador3D = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderizador3D = new THREE.WebGLRenderer({ antialias: true, alpha: true, logarithmicDepthBuffer: true }); // O buffer previne falha de renderização com near pequeno
             renderizador3D.setClearColor( 0x000000, 0 ); 
             renderizador3D.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderizador3D.setSize(wrapper.clientWidth, wrapper.clientHeight);
             container.appendChild(renderizador3D.domElement);
 
-            controles3D = new OrbitControls(camera3D, renderizador3D.domElement);
+            controles3D = new THREE.OrbitControls(camera3D, renderizador3D.domElement);
             controles3D.enableDamping = true; 
             controles3D.dampingFactor = 0.05;
             controles3D.maxDistance = 10000; 
 
+            // RootNode para girar toda a parede de uma vez no AR
             rootNode = new THREE.Group();
             cena3D.add(rootNode);
 
@@ -1420,6 +1439,9 @@
                             }
                             if (d.tipo === 'basculante') {
                                 f.rotation.x += ((d.aberto ? d.rotAbre : 0) - f.rotation.x) * 0.1;
+                            }
+                            if (d.tipo === 'gaveta') {
+                                f.position.z += ((d.aberto ? d.posAbre : 0) - f.position.z) * 0.1;
                             }
                         });
                     });
@@ -1448,7 +1470,7 @@
         }
 
         // ---------------------------------------------------------
-        // MÁQUINA DE TOQUE (CLIQUE SIMPLES E PRESSIONAMENTO LONGO)
+        // MÁQUINA DE TOQUE (LONG PRESS UX)
         // ---------------------------------------------------------
         function getIntersectedModulo(event) {
             const rect = renderizador3D.domElement.getBoundingClientRect();
@@ -1517,7 +1539,7 @@
         }
 
         // ---------------------------------------------------------
-        // FLUXO DE EDIÇÃO NA TELA (CENTRAL DE COMANDO HUD)
+        // FLUXO DE EDIÇÃO (BOTTOM SHEET CENTRAL DE COMANDO)
         // ---------------------------------------------------------
         function ativarEdicaoModulo(index) {
             fecharPerspectiva(); 
@@ -1539,6 +1561,8 @@
             document.getElementById('selFormato').value = modObj.formato || 'reto';
             document.getElementById('sliderPrat').value = modObj.prateleiras || 0; 
             document.getElementById('lblPrat').innerText = modObj.prateleiras || 0;
+            document.getElementById('sliderGav').value = modObj.gavetas || 0; 
+            document.getElementById('lblGav').innerText = modObj.gavetas || 0;
             
             const hud = document.getElementById('editHUD');
             hud.style.display = 'flex'; 
@@ -1590,17 +1614,18 @@
             const formato = document.getElementById('selFormato').value;
             const tipo_movel = document.getElementById('selTipoMovel').value;
             const prat = parseInt(document.getElementById('sliderPrat').value);
+            const gavs = parseInt(document.getElementById('sliderGav').value);
             
             document.getElementById('lblW').innerText = w; 
             document.getElementById('lblH').innerText = h;
             document.getElementById('lblD').innerText = d; 
             document.getElementById('lblPrat').innerText = prat;
+            document.getElementById('lblGav').innerText = gavs;
 
             projetoGlobal.modulos[moduloSendoEditado].largura = w;
             projetoGlobal.modulos[moduloSendoEditado].altura = h;
             projetoGlobal.modulos[moduloSendoEditado].profundidade = d;
             
-            // O SEGREDO DO CONTROLE TOTAL: Aqui a propriedade de porta é alterada na raiz do módulo
             projetoGlobal.modulos[moduloSendoEditado].tipo_abertura = porta;
             
             if (porta === 'aberto') {
@@ -1608,13 +1633,14 @@
             } else if (porta === 'basculante') {
                 projetoGlobal.modulos[moduloSendoEditado].portas = 1;
             } else {
-                projetoGlobal.modulos[moduloSendoEditado].portas = 2; // Giro padrão
+                projetoGlobal.modulos[moduloSendoEditado].portas = 2; // Giro
             }
 
             projetoGlobal.modulos[moduloSendoEditado].formato = formato;
             projetoGlobal.modulos[moduloSendoEditado].tipo_movel = tipo_movel;
             projetoGlobal.modulos[moduloSendoEditado].prateleiras = prat;
-
+            projetoGlobal.modulos[moduloSendoEditado].gavetas = gavs;
+            
             reconstruirCenaParametrica();
             destacarModuloVisualmente(moduloSendoEditado);
         }
@@ -1707,7 +1733,7 @@
         }
 
         // ---------------------------------------------------------
-        // CONSTRUTOR GEOMÉTRICO ABSOLUTO (COM PORTAS CURVAS E ABERTURAS)
+        // CONSTRUTOR GEOMÉTRICO (COMPLETO: CURVAS E ABERTURAS)
         // ---------------------------------------------------------
         function reconstruirCenaParametrica() {
             if (grupoCozinha) {
@@ -1726,7 +1752,7 @@
             });
             
             const matPorta = new THREE.MeshStandardMaterial({ 
-                color: new THREE.Color(design?.cor_caixa || "#CCCCCC"), 
+                color: new THREE.Color(design?.cor_portas || "#CCCCCC"), 
                 roughness: 0.6 
             });
             
@@ -1815,29 +1841,28 @@
                 mGrp.rotation.y = mRotY;
 
                 const qPrat = mod.prateleiras || 0;
+                const qGav = mod.gavetas || 0;
                 const espacoPrat = mH / (qPrat + 1);
 
-                // LOGICA DE CONSTRUÇÃO ABSOLUTA
                 if (mod.formato === "curvo") {
-                    // MÓDULO CURVO
+                    
                     const raio = mW; 
                     
-                    criarCurva(raio, E, matCaixa, E/2, mGrp, true, false); // Base curva
-                    criarCurva(raio + 0.05, E, matTampo, mH, mGrp, true, false); // Tampo curvo
-                    
                     if (mod.tipo_abertura === "aberto") {
-                        // PRATELEIRAS EXPOSTAS CURVAS (NÃO TEM PORTA)
+                        criarCurva(raio, E, matCaixa, E/2, mGrp, true, false); // Base
+                        criarCurva(raio + 0.05, E, matTampo, mH, mGrp, true, false); // Tampo
+                        
                         for (let i = 1; i <= qPrat; i++) {
                             criarCurva(raio, E, matCaixa, espacoPrat * i, mGrp, false, false);
                         }
-                        // Desenha fundo curvo interno
-                        criarCurva(raio - 0.2, mH, matCaixa, mH/2, mGrp, false, true); 
-                    } else {
-                        // MÓDULO CURVO FECHADO (COM PORTA CURVA)
-                        // A porta é uma chapa curva fina na frente
-                        const portaCurvaGrp = new THREE.Group();
                         
-                        // Pivot no centro, para poder abrir girando
+                        criarCurva(raio - 0.2, mH, matCaixa, mH/2, mGrp, false, true); // Fundo Curvo
+                    } else {
+                        // Curvo Fechado com Porta!
+                        criarCurva(raio, E, matCaixa, E/2, mGrp, true, false); // Base
+                        criarCurva(raio + 0.05, E, matTampo, mH, mGrp, true, false); // Tampo
+                        
+                        const portaCurvaGrp = new THREE.Group();
                         portaCurvaGrp.position.set(0, mH/2, 0); 
                         
                         const meshPorta = criarCurva(raio, mH - F*2, matPorta, 0, portaCurvaGrp, true, true);
@@ -1846,36 +1871,54 @@
                         portaCurvaGrp.userData = { animavel: true, tipo: 'giro', aberto: false, rotAbre: Math.PI/2 };
                         mGrp.add(portaCurvaGrp);
                         
-                        // Prateleiras internas do curvo fechado
                         for (let i = 1; i <= qPrat; i++) {
                             criarCurva(raio - E, E, matCaixa, espacoPrat * i - mH/2, portaCurvaGrp, false, false);
                         }
                     }
                 } 
                 else {
-                    // MÓDULO RETO
+                    
                     if (isBalcao) {
-                        // BALCÃO RETO
+                        
                         if (mod.tipo_abertura !== "aberto") {
-                            criarPlaca(mW, mH, E, matCaixa, 0, mH/2, mD/2 - E/2, mGrp, true); // Frente Fechada
+                            // Se o balcão não for aberto na frente, fecha a frente.
+                            criarPlaca(mW, mH, E, matCaixa, 0, mH/2, mD/2 - E/2, mGrp, true); 
                         }
                         
-                        criarPlaca(mW + 0.05, E, mD + 0.1, matTampo, 0, mH, 0, mGrp, true); // Tampo Atendimento
+                        criarPlaca(mW + 0.05, E, mD + 0.1, matTampo, 0, mH, 0, mGrp, true); 
                         
                         if (mod.tipo_abertura === "aberto") {
-                            // Prateleiras Expostas Frontais
+                            // Prateleiras Lado de Fora (Expositor Doces)
                             for (let i = 1; i <= qPrat; i++) {
-                                criarPlaca(mW, E, 0.20, matCaixa, 0, espacoPrat * i, mD/2 + 0.10, mGrp, false);
+                                criarPlaca(mW, E, 0.25, matCaixa, 0, espacoPrat * i, mD/2 + 0.10, mGrp, false);
                             }
                         } else {
-                            // Prateleiras Internas
+                            // Prateleiras Lado de Dentro (Funcionário)
                             for (let i = 1; i <= qPrat; i++) {
                                 criarPlaca(mW - E*2, E, mD - E, matCaixa, 0, espacoPrat * i, -E/2, mGrp, false);
                             }
                         }
                         
+                        // Gavetas do funcionário (lado de trás do balcão)
+                        if (qGav > 0) {
+                            const hGav = (mH * 0.4) / qGav;
+                            for (let i = 0; i < qGav; i++) {
+                                const gavGrp = new THREE.Group();
+                                gavGrp.position.set(0, E + (i * hGav) + hGav/2, 0);
+                                
+                                // Face da gaveta virada para trás do balcão (-mD/2)
+                                const frente = criarPlaca(mW - E*2 - F*2, hGav - F, E, matPorta, 0, 0, -mD/2 + E/2, gavGrp, true);
+                                frente.userData.grupoPai = gavGrp;
+                                criarPlaca(mW - E*4, 0.02, 0.02, matPux, 0, 0, -mD/2 - 0.01, gavGrp, false);
+                                
+                                gavGrp.userData = { animavel: true, tipo: 'gaveta', aberto: false, posAbre: -mD * 0.6 };
+                                mGrp.add(gavGrp);
+                            }
+                        }
+                        
                     } else {
-                        // ARMÁRIO RETO (COM OU SEM PORTAS)
+                        
+                        // ARMÁRIO RETO COMUM
                         criarPlaca(mW, E, mD, matCaixa, 0, E/2, mD/2, mGrp, true); // Base
                         criarPlaca(E, mH, mD, matCaixa, -mW/2 + E/2, mH/2, mD/2, mGrp, true); // Esq
                         criarPlaca(E, mH, mD, matCaixa, mW/2 - E/2, mH/2, mD/2, mGrp, true); // Dir
@@ -1908,7 +1951,27 @@
                             }
                         }
 
-                        // PORTAS SE NÃO FOR ABERTO
+                        // GAVETAS
+                        if (qGav > 0 && altPortas > 0) {
+                            const hGav = (altPortas * 0.4) / qGav; // Gavetas ocupam no max 40% da altura livre
+                            for (let i = 0; i < qGav; i++) {
+                                const gavGrp = new THREE.Group();
+                                gavGrp.position.set(0, startYPortas + (i * hGav) + hGav/2, 0);
+                                
+                                const frente = criarPlaca(mW - E*2 - F*2, hGav - F, E, matPorta, 0, 0, mD/2 - E/2, gavGrp, true);
+                                frente.userData.grupoPai = gavGrp;
+                                criarPlaca(mW - E*4, 0.02, 0.02, matPux, 0, 0, mD/2 + 0.01, gavGrp, false);
+                                
+                                gavGrp.userData = { animavel: true, tipo: 'gaveta', aberto: false, posAbre: mD * 0.6 };
+                                mGrp.add(gavGrp);
+                            }
+                            
+                            // Diminui o vão das portas para caberem as gavetas em baixo
+                            altPortas = altPortas - (hGav * qGav);
+                            startYPortas = startYPortas + (hGav * qGav);
+                        }
+
+                        // PORTAS
                         if (mod.tipo_abertura !== "aberto" && altPortas > 0.1) {
                             const nPortas = mod.portas || 1;
                             
@@ -1968,7 +2031,7 @@
         }
 
         // ---------------------------------------------------------
-        // REALIDADE AUMENTADA NATIVA (AUTO-ENCAIXE)
+        // REALIDADE AUMENTADA NATIVA (COM RESTAURO DE COORDENADAS)
         // ---------------------------------------------------------
         function alternarModoAR() {
             if (!base64ImagemGlobal) { 
@@ -2028,8 +2091,8 @@
                 
                 if (grupoCozinha) { 
                     let T_H = 1; 
-                    camera3D.position.set(0, -T_H/2, 3); 
-                    controles3D.target.set(0, -T_H/2, 0); 
+                    camera3D.position.set(0, T_H/2, 3); 
+                    controles3D.target.set(0, T_H/2, 0); 
                     controles3D.update(); 
                 }
             }
@@ -2038,7 +2101,7 @@
         }
 
         // ---------------------------------------------------------
-        // CUSTOS E ORÇAMENTO
+        // CUSTOS
         // ---------------------------------------------------------
         function calcularTotal() {
             const m = parseFloat(document.getElementById('costMaterial').value) || 0;
