@@ -20,6 +20,7 @@
             --bg-light-panel: #EFEAE5;   /* Light Beige Grey for section panels */
             --bg-ai-section: #E6F0E0;    /* Very Light Greenish for AI output */
             --bg-summary: #F2E8DC;       /* Soft Warm Light Grey for Summary */
+            --warning-red: #dc3545;      /* Red for security warning */
 
             --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
             --border-radius-soft: 8px;
@@ -399,6 +400,50 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        .api-config-section {
+            background-color: var(--bg-light-panel);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--border-radius-soft);
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .api-config-section .warning-message {
+            background-color: #ffe0b2; /* Light orange */
+            border-left: 5px solid #ff9800; /* Darker orange bar */
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            color: #555;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .api-config-section .warning-message i {
+            color: #ff9800;
+            font-size: 1.5em;
+        }
+        .api-config-section .api-key-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .api-config-section .api-key-controls .input-group {
+            margin-bottom: 0;
+        }
+        .api-config-section .api-key-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+        }
+        .api-config-section .api-key-buttons button {
+            flex: 1; /* Distribute space evenly */
+            min-width: 150px; /* Minimum width for buttons */
+        }
+
         footer {
             text-align: center;
             margin-top: 60px;
@@ -451,6 +496,10 @@
             #feedbackModal > div {
                 padding: 20px;
             }
+            .api-config-section .api-key-buttons button {
+                flex: none; /* Disable flex growth */
+                width: 100%; /* Full width on small screens */
+            }
         }
     </style>
 </head>
@@ -470,6 +519,32 @@
                     <label for="clientName">Nome do Cliente:</label>
                     <input type="text" id="clientName" value="Cliente Exemplo" placeholder="Ex: João da Silva">
                 </div>
+            </div>
+        </section>
+
+        <section id="apiConfigSection" class="api-config-section">
+            <h2><i class="fas fa-cogs"></i> Configurações da IA</h2>
+            <div class="warning-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>Atenção:</strong> Para demonstração, você pode colar e salvar sua chave API do Google Gemini aqui.
+                    Em produção, NUNCA exponha chaves API no código front-end! Para o projeto thIAguinho Soluções, usamos um backend seguro para gerenciar chaves.
+                </div>
+            </div>
+            <div class="api-key-controls">
+                <div class="input-group full-width">
+                    <label for="geminiApiKeyInput">Chave da API Google Gemini:</label>
+                    <textarea id="geminiApiKeyInput" rows="2" placeholder="Cole sua chave API do Google Gemini (ex: AIzaSy...)"></textarea>
+                </div>
+                <div class="api-key-buttons">
+                    <button onclick="saveApiKeyToFirebase()" class="primary">
+                        <i class="fas fa-save"></i> Salvar Chave no Firebase
+                    </button>
+                    <button onclick="loadApiKeyFromFirebase()">
+                        <i class="fas fa-download"></i> Carregar Chave Atual
+                    </button>
+                </div>
+                <p class="info-text" style="margin-top: 15px; font-weight: 600;">Chave ativa (após carregar/salvar): <span id="currentApiKeyDisplay">Nenhuma</span></p>
             </div>
         </section>
 
@@ -572,7 +647,7 @@
     </div>
 
     <div class="floating-buttons">
-        <button class="floating-button mascote" onclick="falarComMascote('Olá! Eu sou seu assistente inteligente. Carregue o áudio do seu cliente, e eu o ajudarei a criar uma sugestão de design e orçamento. Posso ler o total atual para você a qualquer momento.')">
+        <button class="floating-button mascote" onclick="falarComMascote('Olá! Eu sou seu assistente inteligente. Carregue o áudio do seu cliente, e eu o ajudarei a criar uma sugestão de design e orçamento. Lembre-se de configurar a chave da IA! Posso ler o total atual para você a qualquer momento.')">
             <i class="fas fa-headset"></i> <span>Mascote</span>
         </button>
         <button class="floating-button feedback" onclick="openFeedbackModal()">
@@ -599,41 +674,113 @@
     </footer>
 
     <script>
-        // ==========================================================================================
-        // === ATENÇÃO THIAGO: PARA TESTE LOCAL COM SUA PRÓPRIA CHAVE GEMINI (Google AI Studio) ===
-        // Para que as funcionalidades de IA (Mascote de Voz e Geração de Design) funcionem
-        // no seu ambiente de teste local, você pode colar sua chave da API Gemini na variável abaixo.
-        //
-        // CUIDADO: NUNCA USE CHAVES DE API DIRETAMENTE NO CÓDIGO CLIENTE EM AMBIENTES DE PRODUÇÃO!
-        // O método mais seguro (e que será o padrão para implantações da thIAguinho Soluções)
-        // é buscar a chave de um backend seguro (como o Firebase, que já está configurado aqui).
-        //
-        // Se esta variável não for preenchida, o sistema tentará buscar a chave do nosso Firebase.
-        // ==========================================================================================
-        const LOCAL_GEMINI_API_KEY_OVERRIDE = "SUA_CHAVE_GEMINI_AQUI"; // <-- COLE SUA CHAVE AQUI PARA TESTE RÁPIDO
-
         // ID ÚNICO DO CLIENTE para feedbacks
         const PROJECT_ID = "-OooTYXk4lRdu1oi8jV9";
-        
+        const FIREBASE_ADMIN_CONFIG_URL = 'https://thiaguinho-40a14-default-rtdb.firebaseio.com/admin_config';
+        const FIREBASE_API_KEY_PATH = `${FIREBASE_ADMIN_CONFIG_URL}/gemini_api_key.json`;
+        const FIREBASE_VOICE_NAME_PATH = `${FIREBASE_ADMIN_CONFIG_URL}/gemini_voice_name.json`;
+
+        // Variável global para armazenar a chave API atualmente em uso
+        let currentGeminiApiKey = null;
+
+        // Função para carregar a chave API do Firebase
+        async function loadApiKeyFromFirebase() {
+            try {
+                const res = await fetch(FIREBASE_API_KEY_PATH);
+                if (!res.ok) {
+                    if (res.status === 401 || res.status === 403) {
+                         throw new Error(`Erro de autenticação/permissão ao acessar Firebase. Status: ${res.status}. Certifique-se de que as regras de segurança do Firebase permitem leitura.`);
+                    }
+                    throw new Error(`Erro HTTP! Status: ${res.status}`);
+                }
+                const apiKey = await res.json();
+                
+                if (apiKey && typeof apiKey === 'string') {
+                    currentGeminiApiKey = apiKey;
+                    document.getElementById('geminiApiKeyInput').value = apiKey;
+                    document.getElementById('currentApiKeyDisplay').textContent = apiKey.substring(0, 5) + '...' + apiKey.substring(apiKey.length - 5);
+                    alert('Chave API carregada com sucesso do Firebase!');
+                    console.log('Chave API carregada:', apiKey);
+                } else {
+                    currentGeminiApiKey = null;
+                    document.getElementById('geminiApiKeyInput').value = '';
+                    document.getElementById('currentApiKeyDisplay').textContent = 'Nenhuma';
+                    alert('Nenhuma chave API encontrada no Firebase ou formato inválido. Por favor, insira e salve uma.');
+                }
+            } catch (e) {
+                console.error('Erro ao carregar chave API do Firebase:', e);
+                alert('Erro ao carregar chave API do Firebase. Verifique sua conexão e permissões: ' + e.message);
+                currentGeminiApiKey = null;
+                document.getElementById('currentApiKeyDisplay').textContent = 'Erro ao carregar';
+            }
+        }
+
+        // Função para salvar a chave API no Firebase
+        async function saveApiKeyToFirebase() {
+            const apiKey = document.getElementById('geminiApiKeyInput').value.trim();
+            if (!apiKey) {
+                alert('Por favor, cole a chave API antes de salvar.');
+                return;
+            }
+
+            // Simple validation for Gemini key format (starts with AIzaSy)
+            if (!apiKey.startsWith('AIzaSy')) {
+                alert('A chave API do Gemini geralmente começa com "AIzaSy". Verifique se a chave está correta.');
+                return;
+            }
+
+            try {
+                const res = await fetch(FIREBASE_API_KEY_PATH, {
+                    method: 'PUT', // PUT sobrescreve o valor no caminho
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(apiKey) // Envia a string da chave
+                });
+
+                if (res.ok) {
+                    currentGeminiApiKey = apiKey;
+                    document.getElementById('currentApiKeyDisplay').textContent = apiKey.substring(0, 5) + '...' + apiKey.substring(apiKey.length - 5);
+                    alert('Chave API salva com sucesso no Firebase!');
+                    console.log('Chave API salva:', apiKey);
+                } else {
+                    const errorText = await res.text();
+                    throw new Error(`Erro HTTP! status: ${res.status}, detalhes: ${errorText}. Pode ser um problema de permissão no Firebase.`);
+                }
+            } catch (e) {
+                console.error('Erro ao salvar chave API no Firebase:', e);
+                alert('Erro ao salvar chave API no Firebase. Isso pode ser um problema de permissão (regras de segurança) ou conexão. Detalhes: ' + e.message);
+                currentGeminiApiKey = null;
+                document.getElementById('currentApiKeyDisplay').textContent = 'Erro ao salvar';
+            }
+        }
+
+        // Carregar a chave API ao iniciar a página
+        document.addEventListener('DOMContentLoaded', loadApiKeyFromFirebase);
+
+        // MASCOTE VOICE ENGINE - INÍCIO (NÃO MEXER)
         let globalAudioCtx = null;
         async function falarComMascote(textoParaFalar) {
             if (!globalAudioCtx) globalAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (globalAudioCtx.state === 'suspended') globalAudioCtx.resume();
             
-            try {
-                let geminiApiKey = LOCAL_GEMINI_API_KEY_OVERRIDE;
-                // Se a chave local não foi definida ou ainda está no valor padrão, tenta buscar do Firebase
-                if (!geminiApiKey || geminiApiKey === "SUA_CHAVE_GEMINI_AQUI") {
-                    const resKey = await fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/admin_config/gemini_api_key.json');
-                    geminiApiKey = await resKey.json();
-                }
+            if (!currentGeminiApiKey) {
+                console.warn("Chave Gemini não configurada. Mascote de voz não pode usar o motor Gemini. Ativando plano B local.");
+                const fallback = new SpeechSynthesisUtterance("Por favor, configure a chave da API Gemini para que eu possa usar minha voz neural completa. Ativando voz local.");
+                fallback.lang = 'pt-BR';
+                window.speechSynthesis.speak(fallback);
+                // Speak the original text with fallback after the warning
+                setTimeout(() => {
+                    const fallbackOriginal = new SpeechSynthesisUtterance(textoParaFalar);
+                    fallbackOriginal.lang = 'pt-BR';
+                    window.speechSynthesis.speak(fallbackOriginal);
+                }, 2000); // Give time for warning to be spoken
+                return;
+            }
 
-                const resVoice = await fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/admin_config/gemini_voice_name.json');
+            try {
+                const resVoice = await fetch(FIREBASE_VOICE_NAME_PATH);
                 const voiceName = await resVoice.json() || "Aoede";
 
-                if (!geminiApiKey) throw new Error("Chave do Admin não encontrada ou não configurada para o Gemini. Verifique a variável LOCAL_GEMINI_API_KEY_OVERRIDE ou a configuração no Firebase.");
-
-                const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + geminiApiKey;
+                const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + currentGeminiApiKey;
                 const payload = {
                     contents: [{ parts: [{ text: textoParaFalar }] }],
                     generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } } } }
@@ -812,6 +959,12 @@
             const aiDesignDescDiv = document.getElementById('aiDesignDescription');
             const designImage = document.getElementById('designImage');
 
+            if (!currentGeminiApiKey) {
+                alert('Por favor, configure a chave da API Gemini na seção "Configurações da IA" antes de gerar o design.');
+                document.getElementById('apiConfigSection').scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+
             processBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando Design...';
             processBtn.disabled = true;
             document.getElementById('aiDesignSection').style.display = 'block';
@@ -819,14 +972,7 @@
             designImage.src = 'https://thiaguinho.dev/loading.gif'; 
 
             try {
-                let geminiApiKey = LOCAL_GEMINI_API_KEY_OVERRIDE;
-                if (!geminiApiKey || geminiApiKey === "SUA_CHAVE_GEMINI_AQUI") {
-                    const resKey = await fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/admin_config/gemini_api_key.json');
-                    geminiApiKey = await resKey.json();
-                }
-                if (!geminiApiKey) throw new Error("Chave do Admin não encontrada ou não configurada para o Gemini.");
-
-                const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + geminiApiKey;
+                const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + currentGeminiApiKey;
 
                 const prompt = `Você é um designer de interiores e arquiteto de móveis altamente experiente, especializado em mobiliário funcional, estético e durável para lojas de óticas. Sua marcenaria parceira receberá esta descrição e precisará construir o móvel.
                 Analise a seguinte descrição de um cliente (proprietário de uma ótica) e forneça uma sugestão de design detalhada e construtiva para um único móvel. Inclua:
@@ -854,3 +1000,170 @@
                 - Justificativa de Design: [Explique brevemente as escolhas de design para a funcionalidade e estética de uma ótica.]
 
                 
+
+json
+{
+"nome_sugerido": "Balcão Atendimento Ótica Vision",
+"custos_estimados": {
+"estimativa_custo_material_total_reais": 1800.00,
+"estimativa_horas_mao_de_obra": 40,
+"custo_ferragens_acessorios_reais": 250.00,
+"outros_custos_reais": 50.00
+}
+}
+
+
+                
+                Descrição do cliente: "${descricaoCliente}"`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        temperature: 0.7,
+                        topK: 40,
+                        topP: 0.95,
+                        maxOutputTokens: 1500
+                    }
+                };
+
+                const res = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+                const data = await res.json();
+                
+                let geminiOutput = data.candidates[0].content.parts[0].text;
+                aiDesignDescDiv.innerHTML = geminiOutput; // Display the raw markdown output
+
+                const jsonMatch = geminiOutput.match(/
+
+json\n([\s\S]*?)\n```/);
+let suggestedItemData = {};
+if (jsonMatch && jsonMatch[1]) {
+try {
+suggestedItemData = JSON.parse(jsonMatch[1]);
+console.log("Dados sugeridos pela IA:", suggestedItemData);
+
+document.getElementById('itemName').value = suggestedItemData.nome_sugerido || 'Móvel Sugerido pela IA';
+
+const materialsMatch = geminiOutput.match(/- \*\*Materiais Sugeridos:\*\* \[(.*?)\]/);
+if (materialsMatch && materialsMatch[1]) {
+document.getElementById('itemMaterial').value = materialsMatch[1].replace(/\"/g, '');
+} else {
+document.getElementById('itemMaterial').value = '';
+}
+
+document.getElementById('costMaterial').value = suggestedItemData.custos_estimados?.estimativa_custo_material_total_reais || 0;
+document.getElementById('costLabor').value = (suggestedItemData.custos_estimados?.estimativa_horas_mao_de_obra * 50) || 0;
+document.getElementById('costHardware').value = suggestedItemData.custos_estimados?.custo_ferragens_acessorios_reais || 0;
+document.getElementById('costOther').value = suggestedItemData.custos_estimados?.outros_custos_reais || 0;
+document.getElementById('profitMargin').value = 20;
+
+const typeMatch = geminiOutput.match(/- \*\*Tipo:\*\* \[(.*?)\]/);
+if (typeMatch && typeMatch[1]) {
+const itemType = typeMatch[1].toLowerCase();
+if (itemType.includes('balcão') || itemType.includes('atendimento')) {
+designImage.src = 'https://thiaguinho.dev/balcao-otica-generico.webp'; // Placeholder de balcão
+} else if (itemType.includes('expositor') || itemType.includes('vitrine') || itemType.includes('display')) {
+designImage.src = 'https://thiaguinho.dev/expositor-otica-generico.webp'; // Placeholder de expositor
+} else if (itemType.includes('armário') || itemType.includes('gaveteiro') || itemType.includes('armazenamento')) {
+designImage.src = 'https://thiaguinho.dev/armario-otica-generico.webp'; // Placeholder de armário/gaveteiro
+} else {
+designImage.src = 'https://thiaguinho.dev/placeholder-furniture.webp';
+}
+} else {
+designImage.src = 'https://thiaguinho.dev/placeholder-furniture.webp';
+}
+
+} catch (e) {
+console.error("Erro ao parsear JSON de custos da IA:", e);
+alert("A IA gerou o design, mas houve um erro ao extrair os custos automaticamente. Por favor, preencha manualmente.");
+document.getElementById('itemName').value = 'Móvel Sugerido pela IA';
+document.getElementById('itemMaterial').value = 'Verificar descrição da IA';
+document.getElementById('costMaterial').value = '0';
+document.getElementById('costLabor').value = '0';
+document.getElementById('costHardware').value = '0';
+document.getElementById('costOther').value = '0';
+document.getElementById('profitMargin').value = '20';
+designImage.src = 'https://thiaguinho.dev/placeholder-furniture.webp';
+}
+} else {
+console.warn("JSON de custos não encontrado na saída da IA.");
+document.getElementById('itemName').value = 'Móvel Sugerido pela IA';
+document.getElementById('itemMaterial').value = 'Verificar descrição da IA';
+document.getElementById('costMaterial').value = '0';
+document.getElementById('costLabor').value = '0';
+document.getElementById('costHardware').value = '0';
+document.getElementById('costOther').value = '0';
+document.getElementById('profitMargin').value = '20';
+designImage.src = 'https://thiaguinho.dev/placeholder-furniture.webp';
+}
+
+processBtn.innerHTML = ' Gerar Design com IA';
+processBtn.disabled = false;
+falarComMascote('A inteligência artificial gerou uma sugestão de design e os custos iniciais. Revise e adicione ao orçamento.');
+document.getElementById('aiDesignSection').scrollIntoView({ behavior: 'smooth' });
+
+} catch (e) {
+console.error("Erro ao gerar design com Gemini:", e);
+alert("Houve um erro ao se comunicar com a IA. Por favor, verifique a chave de API na seção 'Configurações da IA' e tente novamente ou preencha os dados manualmente.");
+aiDesignDescDiv.innerHTML = 'Erro ao gerar design. Por favor, tente novamente.';
+designImage.src = 'https://thiaguinho.dev/error-placeholder.webp';
+processBtn.innerHTML = ' Gerar Design com IA';
+processBtn.disabled = false;
+}
+}
+
+async function processAudio() {
+const transcribedText = document.getElementById('transcribedTextDisplay').value.trim();
+if (!transcribedText || transcribedText.includes('carregado. Por favor, digite o conteúdo')) {
+alert('Por favor, digite o pedido do cliente no campo de texto para que a IA possa processá-lo.');
+return;
+}
+gerarDesignComGemini(transcribedText);
+}
+
+function addAiDesignToBudget() {
+addItem();
+falarComMascote('O design sugerido pela inteligência artificial foi adicionado ao seu orçamento. Você pode editar os detalhes ou adicionar mais itens.');
+}
+
+// Initialize rendering
+renderItems();
+
+// FEEDBACK BUTTON LOGIC
+function openFeedbackModal() {
+document.getElementById('feedbackModal').style.display = 'flex';
+}
+
+async function sendFeedback() {
+const feedbackText = document.getElementById('feedbackText').value.trim();
+if (!feedbackText) {
+alert('Por favor, digite seu feedback antes de enviar.');
+return;
+}
+
+try {
+const response = await fetch(`https://thiaguinho-40a14-default-rtdb.firebaseio.com/projetos_capturados/${PROJECT_ID}/feedbacks.json`, {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({
+texto: feedbackText,
+data: new Date().toISOString(),
+cliente_id: PROJECT_ID
+})
+});
+
+if (response.ok) {
+alert('Feedback enviado com sucesso! Obrigado!');
+document.getElementById('feedbackModal').style.display = 'none';
+document.getElementById('feedbackText').value = '';
+} else {
+alert('Houve um erro ao enviar o feedback. Tente novamente.');
+}
+} catch (error) {
+console.error('Erro ao enviar feedback:', error);
+alert('Houve um erro de conexão ao enviar o feedback.');
+}
+}
+
+
+
+```
