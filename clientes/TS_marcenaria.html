@@ -64,32 +64,37 @@
         .action-buttons button.ai-magic { background-color: var(--ai-blue); color: white; }
 
         /* Estilos do Visualizador 3D */
-        #container3DWrapper { width: 100%; height: 500px; position: relative; border-radius: var(--border-radius-soft); border: 2px solid var(--border-soft); overflow: hidden; background: radial-gradient(circle, #ffffff 0%, #EFEAE5 100%); touch-action: none; margin-bottom: 20px; transition: 0.3s ease; }
+        #container3DWrapper { width: 100%; height: 500px; position: relative; border-radius: var(--border-radius-soft); border: 2px solid var(--border-soft); overflow: hidden; background: radial-gradient(circle, #ffffff 0%, #EFEAE5 100%); touch-action: none; margin-bottom: 20px; transition: height 0.3s ease, transform 0.3s ease; }
         #visualizador3D { width: 100%; height: 100%; position: absolute; top:0; left:0; z-index: 2; display: block; }
         #info3D { position: absolute; top: 15px; left: 15px; background: rgba(74, 60, 48, 0.85); color: #FFF; padding: 8px 12px; border-radius: 6px; font-size: 0.85em; font-weight: bold; pointer-events: none; backdrop-filter: blur(4px); z-index: 5; }
         #instrucao3D { position: absolute; bottom: 15px; right: 15px; background: rgba(221, 161, 94, 0.9); color: var(--primary-dark); padding: 6px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; pointer-events: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 5;}
 
-        /* ESTILOS DA EXPERIÊNCIA MOBILE FULLSCREEN AR */
-        .fullscreen-ar { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 99999 !important; border-radius: 0 !important; border: none !important; background: #000 !important; }
+        /* ESTILOS DA EXPERIÊNCIA MOBILE FULLSCREEN AR (COM SISTEMA DE GAVETA/HUD) */
+        .fullscreen-ar { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 99990 !important; border-radius: 0 !important; border: none !important; background: #000 !important; }
+        /* Quando a edição abrir, a imagem e o 3D sobem para não tapar a visão */
+        .fullscreen-ar.hud-open { height: 55vh !important; border-bottom: 2px solid var(--highlight-yellow) !important; }
+        
         .ar-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; z-index: 1; display: none; }
+        
         .ar-ui-top { position: absolute; top: 20px; left: 20px; right: 20px; z-index: 10; display: none; justify-content: space-between; }
         .ar-ui-btn { background: var(--warning-red); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-size: 1em; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; }
         .ar-ui-magic { background: var(--ai-blue); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-size: 1em; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; }
         
-        /* O HUD DE EDIÇÃO PARAMÉTRICA (COMPACTO DE BASE) - RESOLVE O PROBLEMA DE TAMPA A TELA */
+        /* O HUD DE EDIÇÃO PARAMÉTRICA (BOTTOM SHEET PERFEITO) */
         .edit-hud {
-            position: absolute; bottom: 0; left: 0; width: 100%; z-index: 20; display: none;
-            background: rgba(15, 23, 42, 0.85); color: white; padding: 15px 20px 25px 20px; 
-            border-radius: 20px 20px 0 0; box-shadow: 0 -5px 30px rgba(0,0,0,0.5); 
-            border-top: 2px solid var(--highlight-yellow); backdrop-filter: blur(10px); 
-            flex-direction: column; gap: 10px; max-height: 45vh; overflow-y: auto; box-sizing: border-box;
+            position: fixed; bottom: 0; left: 0; width: 100vw; z-index: 99999; display: none;
+            background: rgba(15, 23, 42, 0.98); color: white; padding: 15px 20px 25px 20px; 
+            border-radius: 20px 20px 0 0; box-shadow: 0 -5px 30px rgba(0,0,0,0.8); 
+            border-top: 2px solid var(--highlight-yellow); 
+            flex-direction: column; gap: 10px; height: 45vh; overflow-y: auto; box-sizing: border-box;
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .edit-hud.show { transform: translateY(0); display: flex; }
         .edit-hud::-webkit-scrollbar { width: 4px; }
         .edit-hud::-webkit-scrollbar-thumb { background: var(--highlight-yellow); border-radius: 2px; }
         .hud-drag-indicator { width: 40px; height: 5px; background: rgba(255,255,255,0.3); border-radius: 5px; margin: 0 auto 10px auto; }
         .edit-hud h4 { margin: 0 0 5px 0; color: var(--highlight-yellow); font-size: 1.1em; display: flex; justify-content: space-between; align-items: center;}
         
-        /* Grid para deixar os controles menores e lado a lado */
         .hud-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .edit-slider { display: flex; flex-direction: column; gap: 2px; }
         .edit-slider label { display: flex; justify-content: space-between; font-size: 0.8em; color: #cbd5e1; font-weight: bold; margin:0;}
@@ -99,7 +104,7 @@
         .hud-action-row { display: flex; gap: 10px; margin-top: 5px; grid-column: 1 / -1;}
         .hud-action-row button { padding: 10px; font-size: 0.9em; flex: 1;}
 
-        /* HUD DE PERSPECTIVA (NOVO) */
+        /* HUD DE PERSPECTIVA E CALIBRAGEM MANUAL */
         #perspectiveHUD { border-top: 2px solid var(--ai-blue); }
         #perspectiveHUD h4 { color: var(--ai-blue); }
         #perspectiveHUD input[type="range"] { accent-color: var(--ai-blue); }
@@ -120,7 +125,7 @@
         .api-config-section { background-color: var(--bg-light-panel); border: 1px solid var(--border-soft); border-radius: var(--border-radius-soft); padding: 20px; margin-bottom: 30px; }
         
         .error-message { background-color: #ffebee; border-left: 5px solid #f44336; padding: 15px; margin-top: 15px; border-radius: 5px; color: #c62828; font-size: 0.9em; display: none; }
-        .designer-insight { background-color: #fff3e0; border-left: 5px solid #ff9800; padding: 15px; margin-top: 15px; border-radius: 4px; font-style: italic; color: #555; font-size: 0.95em; }
+        .designer-insight { background-color: #e3f2fd; border-left: 5px solid #2196F3; padding: 15px; margin-top: 15px; border-radius: 4px; font-style: italic; color: #0d47a1; font-size: 0.95em; }
         #imagePreviewContainer img { max-width: 100%; max-height: 250px; border-radius: 8px; border: 2px solid var(--border-soft); margin-top: 10px; display: none; object-fit: cover; }
 
         /* Rodapé e Botões Flutuantes */
@@ -142,7 +147,7 @@
 <body>
     <div class="container">
         <h1>🛠️ Gerador de Projetos e Orçamentos para Marcenaria</h1>
-        <p class="subtitle">Design CAD Paramétrico e Ajuste de Perspectiva (Anti-Parede Torta).</p>
+        <p class="subtitle">Design CAD Paramétrico e IA de Perspectiva (Anti-Parede Torta). Edição em tempo real perfeita.</p>
 
         <!-- 1. Configuração -->
         <section id="apiConfigSection" class="api-config-section">
@@ -160,8 +165,8 @@
 
         <!-- 2. Pedido e Foto do Ambiente -->
         <section id="audioInputSection" class="section-panel">
-            <h2 style="margin-top:0;"><i class="fas fa-camera-retro"></i> Leitura de Ambiente (Módulos Reais)</h2>
-            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">A IA varre a foto criando a estrutura. Depois, no AR, <b>use a IA para corrigir a perspectiva da foto!</b></p>
+            <h2 style="margin-top:0;"><i class="fas fa-camera-retro"></i> Fotogrametria e Pedido</h2>
+            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">A IA calculará os módulos e a <b>inclinação exata da parede</b> na sua foto para encaixar o 3D perfeitamente!</p>
             
             <div class="grid-layout">
                 <div class="input-group">
@@ -177,12 +182,12 @@
 
             <div class="input-group full-width">
                 <label>Diretrizes do Cliente:</label>
-                <textarea id="transcribedTextDisplay" rows="3" placeholder="Ex: Substituir os armários brancos por algo moderno..."></textarea>
+                <textarea id="transcribedTextDisplay" rows="3" placeholder="Ex: Substituir os armários brancos velhos. Colocar nicho para o micro-ondas..."></textarea>
             </div>
             <div id="errorDisplay" class="error-message"></div>
             <div class="action-buttons">
                 <button id="processAudioBtn" class="primary" onclick="gerarProjeto()" style="width: 100%;">
-                    <i class="fas fa-ruler-combined"></i> Mapear Módulos e Gerar 3D Paramétrico
+                    <i class="fas fa-ruler-combined"></i> Mapear Módulos, Perspectiva e Gerar 3D
                 </button>
             </div>
         </section>
@@ -192,24 +197,25 @@
             <h3 style="margin-top: 0;"><i class="fas fa-drafting-compass"></i> Projeto Modular Paramétrico</h3>
             
             <div id="designerInsight" class="designer-insight" style="display: none;">
-                <i class="fas fa-hard-hat"></i> <b>Engenheiro Chefe:</b> <span id="textoDesigner"></span>
+                <i class="fas fa-eye"></i> <b>IA de Fotogrametria:</b> <span id="textoDesigner"></span>
             </div>
 
             <!-- Visor 3D Modular e Tela Cheia AR -->
             <div style="margin-top: 30px;">
                 <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;">
-                    <i class="fas fa-cube"></i> 3D Editável e Correção de Parede (AR)
+                    <i class="fas fa-cube"></i> 3D Editável e Substituição Real
                 </h3>
                 
                 <div class="action-buttons" style="justify-content: flex-start; margin-bottom: 15px; margin-top: 0;">
                     <button id="btnAR" class="success" onclick="alternarModoAR()" style="display: none;">
-                        <i class="fas fa-expand-arrows-alt"></i> Encaixar na Foto do Cliente (AR)
+                        <i class="fas fa-expand-arrows-alt"></i> Substituir Móvel na Foto (AR Fullscreen)
                     </button>
                     <p style="font-size: 0.85em; color: var(--earth-green); margin-top: auto; margin-bottom: auto; padding-left: 10px;">
                         <i class="fas fa-hand-pointer"></i> Segure o dedo sobre um módulo para editar.
                     </p>
                 </div>
 
+                <!-- WRAPPER DO 3D QUE VAI ENCOLHER E SUBIR PARA NÃO TAMPAR A TELA DE EDIÇÃO -->
                 <div id="container3DWrapper">
                     <img id="arBackgroundImage" class="ar-bg-image" src="" alt="Fundo AR">
                     <div id="visualizador3D"></div>
@@ -219,70 +225,65 @@
                     
                     <!-- UIs Exclusivas do AR -->
                     <div id="arUITop" class="ar-ui-top">
-                        <button class="ar-ui-magic" onclick="abrirAjustePerspectiva()"><i class="fas fa-crop-alt"></i> Ajustar Parede (Perspectiva)</button>
+                        <button class="ar-ui-magic" onclick="abrirAjustePerspectiva()"><i class="fas fa-crop-alt"></i> Calibrar Lente / Parede</button>
                         <button id="arCloseBtn" class="ar-ui-btn" onclick="alternarModoAR()"><i class="fas fa-times"></i> Fechar</button>
                     </div>
+                </div>
+            </div>
+
+            <!-- HUD DE EDIÇÃO DE MÓDULO (Bottom Sheet Ouro Independente, não fica dentro do wrapper) -->
+            <div id="editHUD" class="edit-hud">
+                <div class="hud-drag-indicator"></div>
+                <h4><span id="hudTitle">Módulo</span> <button class="hud-btn-close" onclick="fecharEdicao()"><i class="fas fa-times-circle"></i></button></h4>
+                
+                <div class="hud-grid">
+                    <div class="edit-slider">
+                        <label><span>↔️ Larg. (mm)</span><span id="lblW"></span></label>
+                        <input type="range" id="sliderW" min="200" max="1500" step="10" oninput="atualizarModuloParametrico()">
+                    </div>
+                    <div class="edit-slider">
+                        <label><span>↕️ Alt. (mm)</span><span id="lblH"></span></label>
+                        <input type="range" id="sliderH" min="200" max="1500" step="10" oninput="atualizarModuloParametrico()">
+                    </div>
+                    <div class="edit-slider">
+                        <label><span>↘️ Prof. (mm)</span><span id="lblD"></span></label>
+                        <input type="range" id="sliderD" min="200" max="800" step="10" oninput="atualizarModuloParametrico()">
+                    </div>
+                    <div class="edit-slider">
+                        <label><span>📚 Prateleiras</span><span id="lblPrat"></span></label>
+                        <input type="range" id="sliderPrat" min="0" max="5" step="1" oninput="atualizarModuloParametrico()">
+                    </div>
+                    <div class="edit-slider" style="grid-column: 1 / -1;">
+                        <label><span>🚪 Tipo de Abertura</span></label>
+                        <select id="selPorta" onchange="atualizarModuloParametrico()">
+                            <option value="giro">Giro (Para o lado)</option>
+                            <option value="basculante">Basculante (Para cima)</option>
+                        </select>
+                    </div>
                     
-                    <!-- HUD DE EDIÇÃO DE MÓDULO (Bottom Sheet Ouro) -->
-                    <div id="editHUD" class="edit-hud">
-                        <div class="hud-drag-indicator"></div>
-                        <h4><span id="hudTitle">Módulo</span> <button class="hud-btn-close" onclick="fecharEdicao()"><i class="fas fa-times-circle"></i></button></h4>
-                        
-                        <div class="hud-grid">
-                            <div class="edit-slider">
-                                <label><span>↔️ Larg. (mm)</span><span id="lblW"></span></label>
-                                <input type="range" id="sliderW" min="200" max="1500" step="10" oninput="atualizarModuloParametrico()">
-                            </div>
-                            <div class="edit-slider">
-                                <label><span>↕️ Alt. (mm)</span><span id="lblH"></span></label>
-                                <input type="range" id="sliderH" min="200" max="1500" step="10" oninput="atualizarModuloParametrico()">
-                            </div>
-                            <div class="edit-slider">
-                                <label><span>↘️ Prof. (mm)</span><span id="lblD"></span></label>
-                                <input type="range" id="sliderD" min="200" max="800" step="10" oninput="atualizarModuloParametrico()">
-                            </div>
-                            <div class="edit-slider">
-                                <label><span>📚 Prateleiras</span><span id="lblPrat"></span></label>
-                                <input type="range" id="sliderPrat" min="0" max="5" step="1" oninput="atualizarModuloParametrico()">
-                            </div>
-                            <div class="edit-slider" style="grid-column: 1 / -1;">
-                                <label><span>🚪 Tipo de Abertura</span></label>
-                                <select id="selPorta" onchange="atualizarModuloParametrico()">
-                                    <option value="giro">Giro (Para o lado)</option>
-                                    <option value="basculante">Basculante (Para cima)</option>
-                                </select>
-                            </div>
-                            
-                            <div class="hud-action-row">
-                                <button class="primary" style="background: var(--success-green);" onclick="duplicarModuloParametrico()"><i class="fas fa-copy"></i> Duplicar</button>
-                                <button class="primary" style="background: var(--danger-red);" onclick="removerModuloParametrico()"><i class="fas fa-trash"></i> Excluir</button>
-                            </div>
-                        </div>
+                    <div class="hud-action-row">
+                        <button class="primary" style="background: var(--success-green);" onclick="duplicarModuloParametrico()"><i class="fas fa-copy"></i> Duplicar</button>
+                        <button class="primary" style="background: var(--danger-red);" onclick="removerModuloParametrico()"><i class="fas fa-trash"></i> Excluir</button>
                     </div>
+                </div>
+            </div>
 
-                    <!-- HUD DE AJUSTE DE PERSPECTIVA (Botton Sheet IA) -->
-                    <div id="perspectiveHUD" class="edit-hud">
-                        <div class="hud-drag-indicator"></div>
-                        <h4><span><i class="fas fa-crop-alt"></i> Perspectiva / Rotação da Parede</span> <button class="hud-btn-close" onclick="fecharPerspectiva()"><i class="fas fa-times-circle"></i></button></h4>
-                        
-                        <div class="hud-action-row" style="margin-bottom: 10px;">
-                            <button class="primary" style="background: var(--ai-blue); width: 100%;" onclick="autoEncaixarIA()"><i class="fas fa-magic"></i> Tentar Auto-Encaixe IA</button>
-                        </div>
-
-                        <div class="edit-slider">
-                            <label><span>Tombar / Levantar (Eixo X)</span></label>
-                            <input type="range" id="camRotX" min="-1" max="1" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
-                        </div>
-                        <div class="edit-slider">
-                            <label><span>Girar Parede Esq/Dir (Eixo Y)</span></label>
-                            <input type="range" id="camRotY" min="-1" max="1" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
-                        </div>
-                        <div class="edit-slider">
-                            <label><span>Inclinação Lateral (Eixo Z)</span></label>
-                            <input type="range" id="camRotZ" min="-0.5" max="0.5" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
-                        </div>
-                    </div>
-
+            <!-- HUD DE AJUSTE DE PERSPECTIVA (Botton Sheet IA) -->
+            <div id="perspectiveHUD" class="edit-hud" style="border-top: 2px solid var(--ai-blue);">
+                <div class="hud-drag-indicator"></div>
+                <h4><span style="color:var(--ai-blue);"><i class="fas fa-crop-alt"></i> Alinhamento Manual de Lente</span> <button class="hud-btn-close" onclick="fecharPerspectiva()"><i class="fas fa-times-circle"></i></button></h4>
+                
+                <div class="edit-slider" style="margin-top:15px;">
+                    <label><span>Tombar / Levantar (Eixo X)</span></label>
+                    <input type="range" id="camRotX" min="-0.8" max="0.8" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
+                </div>
+                <div class="edit-slider">
+                    <label><span>Girar Parede Esq/Dir (Eixo Y)</span></label>
+                    <input type="range" id="camRotY" min="-0.8" max="0.8" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
+                </div>
+                <div class="edit-slider">
+                    <label><span>Inclinação Lateral (Eixo Z)</span></label>
+                    <input type="range" id="camRotZ" min="-0.5" max="0.5" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
                 </div>
             </div>
 
@@ -337,20 +338,20 @@
     </div>
 
     <div class="floating-buttons">
-        <button class="floating-button mascote" onclick="mascoteFalar('A tela de edição agora sobe de baixo sem tampar sua visão do móvel! E no modo AR, use o botão Ajustar Parede para deitar ou girar o 3D e encaixar nas fotos com ângulo torto!')">
+        <button class="floating-button mascote" onclick="mascoteFalar('A tela de edição agora não tampa sua visão! A imagem sobe, o menu desce e a IA arruma a distorção da sua lente da câmera automaticamente!')">
             <i class="fas fa-headset"></i> <span>Mascote Promob Ouro</span>
         </button>
     </div>
 
     <footer>Powered by thIAguinho Soluções</footer>
 
-    <!-- SCRIPT MÁGICO - ENGENHARIA ABSOLUTA COM CAMERA SMART SHIFT & AUTO-FIT -->
+    <!-- SCRIPT MÁGICO - ENGENHARIA ABSOLUTA COM AUTO-FIT DE LENTE E UX GAVETA -->
     <script>
         let currentApiKey = localStorage.getItem('groqApiKeyLocal') || "";
         if(currentApiKey) document.getElementById('apiKeyInput').value = currentApiKey;
 
         // ESTADO GLOBAL
-        let projetoGlobal = { modulos: [], design: null, instalacao: "aereo" };
+        let projetoGlobal = { modulos: [], design: null, instalacao: "aereo", perspectiva: {x:0, y:0, z:0} };
         let moduloSendoEditado = null; 
         let boxHelper = null; 
 
@@ -360,7 +361,7 @@
         let raycaster = new THREE.Raycaster(), mouse = new THREE.Vector2();
         let objetosInterativos = [];
         let grupoCozinha = null; 
-        let rootNode = null; // O nó central para girar a perspectiva inteira
+        let rootNode = null; // O nó mestre para a inclinação da parede
         
         let base64ImagemGlobal = null;
         let modoARAtivo = false;
@@ -369,6 +370,7 @@
         let pressTimer;
         let startTouchX, startTouchY;
         let isEditingMode = false;
+        let isPerspectiveMode = false;
 
         function salvarChave() {
             currentApiKey = document.getElementById('apiKeyInput').value.trim();
@@ -428,7 +430,7 @@
         }
 
         // ==========================================
-        // PROMPT "ABSOLUTE TRUTH" 
+        // PROMPT FOTOGRAMETRIA (O Segredo do Encaixe)
         // ==========================================
         async function gerarProjeto() {
             const txt = document.getElementById('transcribedTextDisplay').value.trim();
@@ -439,22 +441,25 @@
             if (!currentApiKey) return alert("Cadastre a Chave da IA.");
 
             const btn = document.getElementById('processAudioBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> O Projetista Sênior está analisando...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A IA de Fotogrametria está lendo os ângulos da parede...';
             btn.disabled = true;
 
-            const promptComando = `Você é um Projetista Sênior (Promob). 
-AJA COM VERDADE ABSOLUTA: Analise a imagem DA EXTREMA ESQUERDA ATÉ A EXTREMA DIREITA.
-NÃO IGNORE NENHUM ARMÁRIO.
-Crie 1 'modulo' no JSON para CADA coluna vertical. Inclua "prateleiras": 1 (ou mais) por padrão.
+            const promptComando = `Você é um Engenheiro de Marcenaria (Promob) e Fotogrametria.
+AJA COM VERDADE ABSOLUTA: 
+1. Analise a imagem DA EXTREMA ESQUERDA ATÉ A EXTREMA DIREITA. Conte os módulos.
+2. CALCULE A PERSPECTIVA DA FOTO (Fotogrametria): A foto foi tirada de baixo para cima? A parede está deitada pra trás? Estime os ângulos X e Y da lente em radianos (ex: X negativo se olhada de baixo).
+
 JSON ESTRITO:
 {
   "nome_projeto": "Armários Modulares Ouro",
-  "engenharia": "Identifiquei todos os módulos de ponta a ponta.",
+  "engenharia": "Identifiquei todos os módulos e calculei a distorção da lente da câmera para encaixe perfeito do 3D.",
   "design": { "cor_caixa": "#FFFFFF", "cor_portas": "#d09d5c", "material_nome": "MDF Branco / Freijó Moderno" },
   "instalacao": "aereo",
+  "perspectiva_parede": { "eixo_x_rad": -0.15, "eixo_y_rad": 0.02, "eixo_z_rad": 0 },
   "modulos": [
     { "nome": "Mod Esq", "largura": 800, "altura": 400, "profundidade": 350, "tipo_abertura": "basculante", "tem_nicho_aberto": false, "altura_nicho": 0, "portas": 2, "prateleiras": 1 },
-    { "nome": "Torre Central", "largura": 650, "altura": 800, "profundidade": 400, "tipo_abertura": "basculante", "tem_nicho_aberto": true, "altura_nicho": 450, "portas": 1, "prateleiras": 0 }
+    { "nome": "Torre Central", "largura": 650, "altura": 800, "profundidade": 400, "tipo_abertura": "basculante", "tem_nicho_aberto": true, "altura_nicho": 450, "portas": 1, "prateleiras": 0 },
+    { "nome": "Mod Dir", "largura": 700, "altura": 500, "profundidade": 350, "tipo_abertura": "giro", "tem_nicho_aberto": false, "altura_nicho": 0, "portas": 2, "prateleiras": 2 }
   ],
   "custos": {"material": 1200, "mao_de_obra": 600, "ferragens": 300, "outros": 100}
 }`;
@@ -482,16 +487,18 @@ JSON ESTRITO:
                     } else { throw new Error(dados.error?.message || "Erro API."); }
                 }
 
+                // SALVA NO ESTADO GLOBAL
                 const ia = extrairJSONSeguro(dados.choices[0].message.content);
                 projetoGlobal.modulos = ia.modulos || [];
                 projetoGlobal.design = ia.design || { cor_caixa:"#FFF", cor_portas:"#CCC", material_nome:"MDF Padrão" };
                 projetoGlobal.instalacao = ia.instalacao || "aereo";
+                projetoGlobal.perspectiva = ia.perspectiva_parede || {eixo_x_rad: 0, eixo_y_rad: 0, eixo_z_rad: 0};
 
                 document.getElementById('aiDesignSection').style.display = 'block';
                 document.getElementById('designerInsight').style.display = 'block';
                 document.getElementById('textoDesigner').innerText = ia.engenharia;
 
-                document.getElementById('itemName').value = ia.nome_projeto || "Cozinha Modular";
+                document.getElementById('itemName').value = ia.nome_projeto || "Cozinha Modular Paramétrica";
                 if(ia.custos) {
                     document.getElementById('costMaterial').value = ia.custos.material||0;
                     document.getElementById('costLabor').value = ia.custos.mao_de_obra||0;
@@ -504,6 +511,13 @@ JSON ESTRITO:
                 setTimeout(() => {
                     fecharEdicao(); fecharPerspectiva();
                     reconstruirCenaParametrica(); 
+                    
+                    // APLICA A PERSPECTIVA DA IA AUTOMATICAMENTE NO ROOT
+                    rootNode.rotation.set(projetoGlobal.perspectiva.eixo_x_rad, projetoGlobal.perspectiva.eixo_y_rad, projetoGlobal.perspectiva.eixo_z_rad);
+                    document.getElementById('camRotX').value = projetoGlobal.perspectiva.eixo_x_rad;
+                    document.getElementById('camRotY').value = projetoGlobal.perspectiva.eixo_y_rad;
+                    document.getElementById('camRotZ').value = projetoGlobal.perspectiva.eixo_z_rad;
+
                     document.getElementById('btnAR').style.display = base64ImagemGlobal ? 'inline-flex' : 'none';
                     if(modoARAtivo) alternarModoAR(); 
                 }, 150);
@@ -511,7 +525,7 @@ JSON ESTRITO:
             } catch(e) { 
                 errorDiv.innerHTML = `<strong>Erro:</strong> ${e.message}`; errorDiv.style.display = 'block'; 
             } finally { 
-                btn.innerHTML = '<i class="fas fa-ruler-combined"></i> Mapear Módulos e Gerar 3D Paramétrico'; btn.disabled = false; 
+                btn.innerHTML = '<i class="fas fa-ruler-combined"></i> Mapear Módulos, Perspectiva e Gerar 3D'; btn.disabled = false; 
             }
         }
 
@@ -556,7 +570,7 @@ JSON ESTRITO:
         }
 
         // ==========================================
-        // MOTOR 3D
+        // MOTOR 3D E ESTRUTURA
         // ==========================================
         function init3D() {
             const container = document.getElementById('visualizador3D');
@@ -577,7 +591,7 @@ JSON ESTRITO:
             controles3D = new THREE.OrbitControls(camera3D, renderizador3D.domElement);
             controles3D.enableDamping = true; controles3D.dampingFactor = 0.05;
 
-            // ROOT NODE para rotacionar a perspectiva de TUDO junto
+            // ROOT NODE: Permite tombar toda a parede de uma vez
             rootNode = new THREE.Group();
             cena3D.add(rootNode);
 
@@ -643,7 +657,7 @@ JSON ESTRITO:
         function onPointerUp(event) {
             clearTimeout(pressTimer);
             if (Math.abs(event.clientX - startTouchX) < 10 && Math.abs(event.clientY - startTouchY) < 10) {
-                if(!isEditingMode) {
+                if(!isEditingMode && !isPerspectiveMode) {
                     const rect = renderizador3D.domElement.getBoundingClientRect();
                     mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
                     mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -658,10 +672,10 @@ JSON ESTRITO:
         }
 
         // ==========================================
-        // FLUXO DE EDIÇÃO PARAMÉTRICA (BOTTOM SHEET MAGICO)
+        // FLUXO DE EDIÇÃO (BOTTOM SHEET INTELIGENTE E ANTI-OCLUSÃO)
         // ==========================================
         function ativarEdicaoModulo(index) {
-            fecharPerspectiva(); // Se aberto
+            fecharPerspectiva(); 
             isEditingMode = true; moduloSendoEditado = index; controles3D.enabled = false; 
             const modObj = projetoGlobal.modulos[index];
             
@@ -672,30 +686,35 @@ JSON ESTRITO:
             document.getElementById('selPorta').value = modObj.tipo_abertura || 'giro';
             document.getElementById('sliderPrat').value = modObj.prateleiras || 0; document.getElementById('lblPrat').innerText = modObj.prateleiras || 0;
             
-            document.getElementById('editHUD').style.display = 'flex';
+            // Exibe a HUD animada
+            const hud = document.getElementById('editHUD');
+            hud.style.display = 'flex'; // Exibe para pegar altura
+            setTimeout(() => hud.classList.add('show'), 10);
+            
             destacarModuloVisualmente(index);
 
-            // MÁGICA DE UX: PAN PARA CIMA. Move o target da câmera pra descer a visão, subindo o móvel!
-            const t = controles3D.target;
-            const pos = camera3D.position;
-            // Desloca 0.5 em Y. O móvel foge do Bottom Sheet e vai pro centro superior.
-            controles3D.target.set(t.x, t.y - 0.8, t.z);
-            camera3D.position.set(pos.x, pos.y - 0.8, pos.z);
-            controles3D.update();
+            // SE ESTIVER EM AR, ENCOLHE A TELA PRA FOTO NÃO SUMIR EMBAIXO DO MENU!
+            if(modoARAtivo) {
+                document.getElementById('container3DWrapper').classList.add('hud-open');
+                setTimeout(ajustarTamanho3D, 300); // Recalcula quando CSS terminar animação
+            }
         }
 
         function fecharEdicao() {
             if(!isEditingMode) return;
             isEditingMode = false; moduloSendoEditado = null; controles3D.enabled = true; 
-            document.getElementById('editHUD').style.display = 'none';
+            
+            const hud = document.getElementById('editHUD');
+            hud.classList.remove('show');
+            setTimeout(() => hud.style.display = 'none', 300);
+
             if (boxHelper) { cena3D.remove(boxHelper); boxHelper = null; }
 
-            // MÁGICA DE UX: PAN PARA BAIXO. Devolve o móvel pro centro
-            const t = controles3D.target;
-            const pos = camera3D.position;
-            controles3D.target.set(t.x, t.y + 0.8, t.z);
-            camera3D.position.set(pos.x, pos.y + 0.8, pos.z);
-            controles3D.update();
+            // SE ESTAVA EM AR, DEVOLVE O TAMANHO DA TELA
+            if(modoARAtivo) {
+                document.getElementById('container3DWrapper').classList.remove('hud-open');
+                setTimeout(ajustarTamanho3D, 300);
+            }
         }
 
         function atualizarModuloParametrico() {
@@ -740,7 +759,45 @@ JSON ESTRITO:
         }
 
         // ==========================================
-        // O CORAÇÃO DO RENDER 
+        // PERSPECTIVA MANUAL DA PAREDE (Ajuste de Lente)
+        // ==========================================
+        function abrirAjustePerspectiva() {
+            fecharEdicao();
+            isPerspectiveMode = true; controles3D.enabled = false;
+            
+            const hud = document.getElementById('perspectiveHUD');
+            hud.style.display = 'flex';
+            setTimeout(() => hud.classList.add('show'), 10);
+
+            if(modoARAtivo) {
+                document.getElementById('container3DWrapper').classList.add('hud-open');
+                setTimeout(ajustarTamanho3D, 300);
+            }
+        }
+
+        function fecharPerspectiva() {
+            if(!isPerspectiveMode) return;
+            isPerspectiveMode = false; controles3D.enabled = true;
+            const hud = document.getElementById('perspectiveHUD');
+            hud.classList.remove('show');
+            setTimeout(() => hud.style.display = 'none', 300);
+
+            if(modoARAtivo) {
+                document.getElementById('container3DWrapper').classList.remove('hud-open');
+                setTimeout(ajustarTamanho3D, 300);
+            }
+        }
+
+        function ajustarPerspectivaManual() {
+            if(!rootNode) return;
+            const rX = parseFloat(document.getElementById('camRotX').value);
+            const rY = parseFloat(document.getElementById('camRotY').value);
+            const rZ = parseFloat(document.getElementById('camRotZ').value);
+            rootNode.rotation.set(rX, rY, rZ);
+        }
+
+        // ==========================================
+        // O CORAÇÃO DO RENDER
         // ==========================================
         function reconstruirCenaParametrica() {
             if (grupoCozinha) rootNode.remove(grupoCozinha);
@@ -782,15 +839,13 @@ JSON ESTRITO:
                 criarPlaca(E, mH, mD, matCaixa, mW/2-E/2, mH/2, mD/2, mGrp, true); 
                 criarPlaca(mW, E, mD, matCaixa, 0, mH-E/2, mD/2, mGrp, true); 
                 
-                let altFundo = mH - E*2, baseFundo = mH/2, altPortas = mH - E*2, startYPortas = E;
-                let startYPrat = E; 
+                let altFundo = mH - E*2, baseFundo = mH/2, altPortas = mH - E*2, startYPortas = E, startYPrat = E; 
 
                 if (mod.tem_nicho_aberto) {
                     const hNicho = (mod.altura_nicho || 400)/1000;
                     criarPlaca(mW-E*2, E, mD-E, matCaixa, 0, E + hNicho + E/2, mD/2, mGrp); 
                     altPortas = mH - E*2 - hNicho - E; startYPortas = E + hNicho + E; 
-                    altFundo = altPortas; baseFundo = startYPortas + altFundo/2;
-                    startYPrat = E + hNicho + E;
+                    altFundo = altPortas; baseFundo = startYPortas + altFundo/2; startYPrat = E + hNicho + E;
                 }
                 
                 criarPlaca(mW-E*2, altFundo, 0.006, matCaixa, 0, baseFundo, 0.01, mGrp); 
@@ -837,15 +892,14 @@ JSON ESTRITO:
 
             calcularPlanoDeCorteRealTime();
 
-            // Só centraliza se não for edição/AR, senão o user perde o lugar que puxou
-            if(!isEditingMode && !modoARAtivo && camera3D) {
+            if(!isEditingMode && !modoARAtivo && camera3D && !isPerspectiveMode) {
                 camera3D.position.set(0, -T_H/2, Math.max(T_W, T_H)*1.5);
                 controles3D.target.set(0, -T_H/2, 0); controles3D.update();
             }
         }
 
         // ==========================================
-        // AR E PERSPECTIVA (NOVO AUTO-ENCAIXE IA)
+        // AR FULLSCREEN NATIVO
         // ==========================================
         function alternarModoAR() {
             if (!base64ImagemGlobal) { alert("Envie uma foto do local primeiro!"); return; }
@@ -868,68 +922,17 @@ JSON ESTRITO:
                 camera3D.position.set(0, 0, 5); controles3D.update();
 
             } else {
-                fecharEdicao(); fecharPerspectiva();
+                fecharEdicao(); fecharPerspectiva(); 
                 wrapper.classList.remove('fullscreen-ar');
+                wrapper.classList.remove('hud-open'); // Prevenção
                 bgImg.style.display = 'none'; uiTop.style.display = 'none';
                 
                 document.getElementById('info3D').style.display = 'block';
                 document.getElementById('instrucao3D').style.display = 'block';
                 
-                // Reseta a parede se o cara bagunçou muito a perspectiva
-                rootNode.rotation.set(0,0,0);
-                document.getElementById('camRotX').value = 0;
-                document.getElementById('camRotY').value = 0;
-                document.getElementById('camRotZ').value = 0;
-
                 if(grupoCozinha) { controles3D.target.set(0, 0, 0); camera3D.position.set(0, 0, 4); controles3D.update(); }
             }
             setTimeout(ajustarTamanho3D, 50);
-        }
-
-        function abrirAjustePerspectiva() {
-            fecharEdicao();
-            document.getElementById('perspectiveHUD').style.display = 'flex';
-            
-            // Pan Câmera para baixo (sobe o móvel) pra não tapar
-            const t = controles3D.target; const pos = camera3D.position;
-            controles3D.target.set(t.x, t.y - 0.8, t.z); camera3D.position.set(pos.x, pos.y - 0.8, pos.z); controles3D.update();
-        }
-
-        function fecharPerspectiva() {
-            if(document.getElementById('perspectiveHUD').style.display === 'none') return;
-            document.getElementById('perspectiveHUD').style.display = 'none';
-            // Devolve Câmera
-            const t = controles3D.target; const pos = camera3D.position;
-            controles3D.target.set(t.x, t.y + 0.8, t.z); camera3D.position.set(pos.x, pos.y + 0.8, pos.z); controles3D.update();
-        }
-
-        function ajustarPerspectivaManual() {
-            if(!rootNode) return;
-            const rX = parseFloat(document.getElementById('camRotX').value);
-            const rY = parseFloat(document.getElementById('camRotY').value);
-            const rZ = parseFloat(document.getElementById('camRotZ').value);
-            
-            // Gira o nó mestre que segura toda a cozinha
-            rootNode.rotation.set(rX, rY, rZ);
-        }
-
-        function autoEncaixarIA() {
-            if(!rootNode) return;
-            // Simulação de ponto de fuga. Geralmente armários aéreos são tirados de baixo pra cima
-            // Então tombamos levemente o eixo X pra trás e recuamos a escala.
-            
-            // Animação leve
-            let startRotX = rootNode.rotation.x;
-            let endRotX = -0.15; // Tombo pra trás
-            
-            let frame = 0;
-            function animateFit() {
-                frame++;
-                rootNode.rotation.x += (endRotX - rootNode.rotation.x) * 0.1;
-                document.getElementById('camRotX').value = rootNode.rotation.x;
-                if(frame < 30) requestAnimationFrame(animateFit);
-            }
-            animateFit();
         }
 
         function calcularTotal() {
