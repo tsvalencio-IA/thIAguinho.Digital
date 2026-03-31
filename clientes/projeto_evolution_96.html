@@ -3,1962 +3,598 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evolution Motors - Sistema de Gestão</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <title>Gerador de Projetos para Marcenaria - thIAguinho Soluções</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
-            --bs-body-bg: #212529; /* Darker background */
-            --bs-body-color: #f8f9fa; /* Light text */
-            --bs-dark-card: #343a40; /* Darker card/nav */
-            --bs-accent: #e65100; /* Vibrant Orange */
-            --bs-primary-light: #0d6efd; /* For feedback button */
+            --primary-dark: #4A3C30;     
+            --secondary-wood: #7F5539;   
+            --accent-gold: #DDA15E;      
+            --light-cream: #FDFCF9;      
+            --soft-beige: #FBF8F4;       
+            --earth-green: #6B8E23;      
+            --text-color: #333333;       
+            --border-soft: #C6B6A5;      
+            --bg-light-panel: #EFEAE5;   
+            --bg-ai-section: #E6F0E0;    
+            --bg-summary: #F2E8DC;       
+            --warning-red: #dc3545;      
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-radius-soft: 8px;
         }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bs-body-bg);
-            color: var(--bs-body-color);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0; padding: 0;
+            background-color: var(--light-cream);
+            color: var(--text-color); line-height: 1.6;
         }
-        .navbar {
-            background-color: var(--bs-dark-card) !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        .container {
+            max-width: 960px; margin: 30px auto; padding: 30px;
+            background-color: var(--soft-beige);
+            border-radius: var(--border-radius-soft);
+            box-shadow: var(--shadow-subtle);
         }
-        .navbar-brand, .navbar-nav .nav-link {
-            color: var(--bs-body-color) !important;
+        h1, h2, h3 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--primary-dark); text-align: center; margin-bottom: 30px;
         }
-        .navbar-brand {
-            font-weight: bold;
+        h1 { font-size: 2.8em; margin-bottom: 10px; }
+        h2 {
+            font-size: 2em; border-bottom: 2px solid var(--border-soft);
+            padding-bottom: 15px; margin-top: 40px; color: var(--secondary-wood);
         }
-        .navbar-nav .nav-link.active {
-            color: var(--bs-accent) !important;
-            border-bottom: 2px solid var(--bs-accent);
+        .subtitle {
+            text-align: center; color: #6c757d; margin-bottom: 30px; font-size: 1.1em;
         }
-        .container-fluid {
-            padding-top: 20px;
-            flex-grow: 1;
+        .input-group { margin-bottom: 20px; display: flex; flex-direction: column; }
+        .input-group label {
+            display: block; margin-bottom: 8px; font-weight: 600;
+            color: var(--primary-dark); font-size: 0.95em;
         }
-        .card {
-            margin-bottom: 20px;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
-            border-radius: 0.75rem;
-            background-color: var(--bs-dark-card);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .input-group input[type="text"],
+        .input-group input[type="number"],
+        .input-group textarea,
+        .input-group input[type="file"] {
+            width: 100%; padding: 12px; border: 1px solid var(--border-soft);
+            border-radius: var(--border-radius-soft); font-size: 1em;
+            transition: all 0.3s ease; box-sizing: border-box; 
+            background-color: var(--light-cream); color: var(--text-color);
         }
-        .card-header {
-            background-color: var(--bs-accent);
-            color: white;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            border-top-left-radius: calc(0.75rem - 1px);
-            border-top-right-radius: calc(0.75rem - 1px);
+        .input-group input:focus, .input-group textarea:focus {
+            border-color: var(--secondary-wood); outline: none;
+            box-shadow: 0 0 0 3px rgba(127, 85, 57, 0.2);
         }
-        .btn-primary, .btn-success, .btn-warning, .btn-danger, .btn-info {
-            border-radius: 0.5rem;
+        textarea { resize: vertical; }
+
+        .section-panel {
+            padding: 25px; background-color: var(--bg-light-panel);
+            border-radius: var(--border-radius-soft); margin-bottom: 30px;
+            border: 1px solid var(--border-soft);
         }
-        .btn-primary {
-            background-color: var(--bs-accent);
-            border-color: var(--bs-accent);
+        .grid-layout {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;
         }
-        .btn-primary:hover {
-            background-color: #c94400; /* Slightly darker orange */
-            border-color: #c94400;
+        .grid-layout .full-width { grid-column: 1 / -1; }
+
+        button {
+            background-color: var(--accent-gold); color: var(--primary-dark);
+            padding: 12px 25px; border: none; border-radius: var(--border-radius-soft);
+            cursor: pointer; font-size: 1em; font-weight: 600;
+            transition: all 0.3s ease; display: inline-flex;
+            align-items: center; justify-content: center; gap: 8px;
         }
-        .form-control, .form-select, .form-control:focus, .form-select:focus {
-            background-color: #495057; /* Darker input fields */
-            color: var(--bs-body-color);
-            border-color: #6c757d;
+        button:hover { background-color: #C38C4B; transform: translateY(-2px); }
+        button:disabled { background-color: #cccccc; cursor: not-allowed; transform: none; color: #666; }
+
+        .action-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 25px; }
+        .action-buttons button.primary { background-color: var(--secondary-wood); color: white; }
+        .action-buttons button.primary:hover { background-color: #6a4933; }
+
+        #itemsList { margin-top: 30px; padding-top: 20px; }
+        .item-card {
+            background-color: var(--soft-beige); border: 1px solid var(--border-soft);
+            border-radius: var(--border-radius-soft); padding: 20px 25px; margin-bottom: 15px;
         }
-        .form-control::placeholder {
-            color: #ced4da;
+        .item-card h3 {
+            margin-top: 0; margin-bottom: 15px; color: var(--primary-dark);
+            text-align: left; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px;
+            font-size: 1.5em; display: flex; justify-content: space-between; align-items: center;
         }
-        label {
-            color: var(--bs-body-color);
+        .item-card h3 button {
+            padding: 8px 15px; font-size: 0.9em; border-radius: 6px; margin-left: 10px; color: white; 
         }
-        .table {
-            margin-top: 15px;
-            color: var(--bs-body-color);
+        .item-card .cost-details {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; margin-top: 15px;
+            padding-top: 15px; border-top: 1px dashed var(--border-soft);
         }
-        .table thead th {
-            background-color: #495057;
-            color: white;
-        }
-        .table-striped tbody tr:nth-of-type(odd) {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-        .table-hover tbody tr:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        .modal-content {
-            background-color: var(--bs-dark-card);
-            color: var(--bs-body-color);
-        }
-        .modal-header {
-            background-color: var(--bs-accent);
-            color: white;
-            border-bottom: none;
-        }
-        .modal-footer {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .btn-close {
-            filter: invert(1) grayscale(100%) brightness(200%); /* Make close button white */
+        .item-card .total-item-price {
+            font-weight: 700; color: var(--accent-gold); font-size: 1.3em;
+            margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-soft); text-align: right;
         }
 
-        /* Responsive Modals */
-        @media (max-width: 575.98px) {
-            .modal-dialog {
-                margin: 0;
-                width: 100vw;
-                max-width: 100vw;
-            }
-            .modal-content {
-                min-height: 100vh;
-                border-radius: 0;
-            }
-            .modal.fade .modal-dialog {
-                transform: translate(0,0);
-            }
-            .modal.show .modal-dialog {
-                transform: translate(0,0);
-            }
+        #summary {
+            margin-top: 40px; padding: 30px; background-color: var(--bg-summary);
+            border-radius: var(--border-radius-soft); border: 1px solid #dccca0; text-align: center;
+        }
+        #summary p { font-size: 1.6em; font-weight: 700; color: var(--primary-dark); margin: 15px 0; }
+        #summary button.warning { background-color: var(--secondary-wood); color: white;}
+
+        .ai-output-section {
+            margin-top: 30px; padding: 25px; background-color: var(--bg-ai-section); 
+            border-radius: var(--border-radius-soft); border: 1px solid #B0D7B0; 
+        }
+        .ai-output-section h3 { color: var(--earth-green); text-align: left; border: none; }
+        .description-box {
+            background-color: var(--light-cream); padding: 18px; border-radius: var(--border-radius-soft);
+            border: 1px solid var(--border-soft); white-space: pre-wrap; font-family: monospace; min-height: 150px;
         }
 
-        /* Status colors for Servicos */
-        .servico-card { 
-            border-left: 5px solid;
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 0.5rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
-            background-color: #3f464e; /* Slightly lighter dark for contrast */
+        .api-config-section {
+            background-color: var(--bg-light-panel); border: 1px solid var(--border-soft);
+            padding: 20px; border-radius: 8px; margin-bottom: 30px;
         }
-        .servico-card.status-agendado { border-color: #0d6efd; } /* Blue - for pending */
-        .servico-card.status-em-andamento { border-color: #ffc107; } /* Yellow - for in progress */
-        .servico-card.status-concluido { border-color: #28a745; } /* Green - for completed */
-        .servico-card.status-cancelado { border-color: #dc3545; } /* Red - for cancelled */
-
-        .servico-card h6 {
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: var(--bs-body-color);
+        .warning-message {
+            background-color: #ffe0b2; border-left: 5px solid #ff9800; padding: 15px; margin-bottom: 20px;
+            border-radius: 5px; color: #555; display: flex; align-items: center; gap: 10px;
         }
-        .servico-card small {
-            color: #ced4da;
+        footer { text-align: center; margin-top: 60px; padding: 25px; color: #777; font-size: 0.9em; }
+        
+        .floating-buttons {
+            position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 1000;
         }
-        .servico-card .actions {
-            margin-top: 10px;
-            text-align: right;
+        .floating-button {
+            background-color: #FFC107; color: var(--primary-dark); padding: 12px 20px; border-radius: 30px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); font-weight: 600; display: flex; align-items: center; gap: 10px; border: none; cursor: pointer;
         }
-
-        /* Financeiro summary cards */
-        .card.bg-primary { background-color: #0d6efd !important; border-color: #0d6efd !important; }
-        .card.bg-danger { background-color: #dc3545 !important; border-color: #dc3545 !important; }
-        .card.bg-success { background-color: #28a745 !important; border-color: #28a745 !important; }
-        .card.bg-info { background-color: #0dcaf0 !important; border-color: #0dcaf0 !important; }
-
-
-        /* Feedback Button */
-        .feedback-button {
-            position: fixed;
-            bottom: 80px; /* Adjusted to be above the footer */
-            right: 20px;
-            z-index: 1000;
-            background-color: var(--bs-primary-light); /* Bootstrap primary blue for distinctness */
-            color: white;
-            border-radius: 50px;
-            padding: 15px 20px;
-            font-size: 1.1em;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            border: none;
-            cursor: pointer;
-            text-decoration: none; /* For accessibility if it's an anchor */
-        }
-        .feedback-button:hover {
-            background-color: #0b5ed7; /* Darker blue on hover */
-            transform: scale(1.05);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-        }
-        .feedback-button .bi {
-            margin-right: 8px;
-        }
-        @media (max-width: 575.98px) {
-            .feedback-button {
-                bottom: 60px; /* Adjust for smaller screens to not clash with footer */
-                font-size: 0.9em;
-                padding: 10px 15px;
-                right: 15px;
-            }
-        }
-
-
-        /* Footer */
-        footer {
-            background-color: var(--bs-dark-card);
-            color: #ced4da;
-            padding: 15px 0;
-            text-align: center;
-            margin-top: auto; /* Push footer to the bottom */
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            width: 100%;
-            font-size: 0.9em;
-        }
-
-        /* Client Dashboard Specifics */
-        .moto-dashboard-card {
-            background-color: #3f464e;
-            padding: 15px;
-            border-radius: 0.5rem;
-            margin-bottom: 20px;
-            border-left: 5px solid var(--bs-accent);
-        }
-        .moto-dashboard-card h5 {
-            color: var(--bs-accent);
-            margin-bottom: 10px;
-        }
-        .moto-dashboard-card .badge {
-            font-size: 1em;
-            padding: 0.5em 0.7em;
-        }
-
-        .status-card {
-            text-align: center;
-            padding: 15px;
-            border-radius: 0.75rem;
-            margin-bottom: 15px;
-            color: white;
-        }
-        .status-card.bg-agendado { background-color: #0d6efd; }
-        .status-card.bg-em-andamento { background-color: #ffc107; color: #343a40; }
-        .status-card.bg-concluido { background-color: #28a745; }
-        .status-card.bg-cancelado { background-color: #dc3545; }
-        .status-card h4 {
-            margin-bottom: 0.5rem;
-        }
-        .status-card p {
-            font-size: 0.9em;
-            margin-bottom: 0;
-        }
-
-        .service-timeline {
-            border-left: 2px solid #6c757d;
-            padding-left: 20px;
-            margin-left: 10px;
-        }
-        .timeline-item {
-            position: relative;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-        }
-        .timeline-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -29px;
-            top: 0;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background-color: var(--bs-accent);
-            border: 2px solid var(--bs-dark-card);
-        }
-        .timeline-item-status-agendado::before { background-color: #0d6efd; }
-        .timeline-item-status-em-andamento::before { background-color: #ffc107; }
-        .timeline-item-status-concluido::before { background-color: #28a745; }
-        .timeline-item-status-cancelado::before { background-color: #dc3545; }
-
-        .timeline-item h6 {
-            color: var(--bs-body-color);
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .timeline-item small {
-            display: block;
-            color: #ced4da;
-        }
+        .floating-button:hover { transform: scale(1.05); }
     </style>
 </head>
 <body>
-    <!-- Admin Panel Structure -->
-    <div id="adminPanel" style="display:none;">
-        <nav class="navbar navbar-expand-lg">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">Evolution Motors - Admin</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAdmin" aria-controls="navbarNavAdmin" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+    <div class="container">
+        <h1>🛠️ Gerador de Projetos de Marcenaria</h1>
+        <p class="subtitle">Faça o upload do áudio do cliente, deixe a IA transcrever e gere o seu orçamento automaticamente.</p>
+
+        <!-- 1. Configuração da IA -->
+        <section id="apiConfigSection" class="api-config-section">
+            <h2><i class="fas fa-key"></i> 1. Chave da Inteligência Artificial</h2>
+            <div class="warning-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div><strong>Atenção:</strong> Cole a sua chave da API do Google Gemini abaixo para que o sistema consiga ouvir o áudio. Ela será guardada no seu navegador.</div>
+            </div>
+            <div class="input-group full-width">
+                <input type="password" id="geminiApiKeyInput" placeholder="Cole a sua chave API aqui (começa com AIza...)">
+            </div>
+            <div class="action-buttons" style="justify-content: flex-start; margin-top: 0;">
+                <button onclick="salvarChave(false)" class="primary" id="btnSalvarChave">
+                    <i class="fas fa-save"></i> Salvar Chave e Ativar
                 </button>
-                <div class="collapse navbar-collapse" id="navbarNavAdmin">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#" onclick="showAdminSection('estoque')"><i class="bi bi-box-seam me-1"></i>Estoque</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showAdminSection('clientesMotos')"><i class="bi bi-people-fill me-1"></i>Clientes & Motos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showAdminSection('funcionarios')"><i class="bi bi-person-badge-fill me-1"></i>Funcionários</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showAdminSection('fornecedores')"><i class="bi bi-truck me-1"></i>Fornecedores</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showAdminSection('agendamentos')"><i class="bi bi-calendar-check me-1"></i>Serviços</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showAdminSection('financeiro')"><i class="bi bi-currency-dollar me-1"></i>Financeiro</a>
-                        </li>
-                    </ul>
+            </div>
+            <p style="margin-top: 15px; font-weight: 600; font-size: 0.9em;">Status: <span id="currentApiKeyDisplay" style="color:red;">Nenhuma chave registada</span></p>
+        </section>
+
+        <!-- 2. Transcrição de Áudio -->
+        <section id="audioInputSection" class="section-panel">
+            <h2><i class="fas fa-microphone-alt"></i> 2. Áudio do Cliente</h2>
+            <p class="subtitle">Selecione o ficheiro de áudio (MP3, WAV). A IA vai escutar e escrever o que foi pedido.</p>
+            
+            <div class="input-group">
+                <input type="file" id="audioFileInput" accept="audio/*">
+                <small style="color:#666; margin-top:5px;">Para testes, envie áudios curtos (até 2 minutos).</small>
+            </div>
+            
+            <div class="input-group full-width">
+                <label>Texto do Pedido (Gerado pela IA):</label>
+                <textarea id="transcribedTextDisplay" rows="6" placeholder="Carregue o ficheiro de áudio acima. O texto aparecerá aqui..."></textarea>
+            </div>
+            
+            <div class="action-buttons">
+                <button id="processAudioBtn" class="primary" onclick="gerarProjeto()">
+                    <i class="fas fa-magic"></i> Analisar Texto e Gerar Projeto
+                </button>
+            </div>
+        </section>
+
+        <!-- 3. Proposta da IA -->
+        <section id="aiDesignSection" class="ai-output-section" style="display: none;">
+            <h2><i class="fas fa-lightbulb"></i> Proposta da IA</h2>
+            <div class="input-group full-width">
+                <div id="aiDesignDescription" class="description-box">Aguarde...</div>
+            </div>
+            <div class="action-buttons">
+                <button class="primary" onclick="transferirParaOrcamento()">
+                    <i class="fas fa-arrow-down"></i> Adicionar aos Custos do Orçamento
+                </button>
+            </div>
+        </section>
+
+        <!-- 4. Painel de Custos -->
+        <section id="addItemSection" class="section-panel">
+            <h2><i class="fas fa-cube"></i> Edição de Valores</h2>
+            <div class="grid-layout">
+                <div class="input-group full-width">
+                    <label>Nome do Item:</label>
+                    <input type="text" id="itemName" placeholder="Ex: Balcão de Atendimento">
+                </div>
+                <div class="input-group full-width">
+                    <label>Materiais e Características:</label>
+                    <input type="text" id="itemMaterial" placeholder="Ex: MDF Branco, Vidro 8mm">
+                </div>
+                <div class="input-group">
+                    <label>Custo Material (R$):</label>
+                    <input type="number" id="costMaterial" value="0" min="0" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Custo Mão de Obra (R$):</label>
+                    <input type="number" id="costLabor" value="0" min="0" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Ferragens/Acessórios (R$):</label>
+                    <input type="number" id="costHardware" value="0" min="0" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Outros Custos (R$):</label>
+                    <input type="number" id="costOther" value="0" min="0" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Margem de Lucro (%):</label>
+                    <input type="number" id="profitMargin" value="20" min="0" max="100" step="1">
+                </div>
+                <div class="input-group full-width action-buttons">
+                    <button class="primary" onclick="addItem()" id="btnSaveItem">
+                        <i class="fas fa-plus"></i> Confirmar Item na Lista
+                    </button>
                 </div>
             </div>
-        </nav>
+        </section>
 
-        <div class="container-fluid mt-3">
-            <!-- Estoque Section -->
-            <section id="estoque" class="admin-section">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5><i class="bi bi-box-seam me-2"></i>Controle de Estoque</h5>
-                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#estoqueModal" onclick="prepareEstoqueModal('add')">
-                            <i class="bi bi-plus-circle me-1"></i> Adicionar Peça/Produto
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th>Descrição</th>
-                                        <th>Custo</th>
-                                        <th>Venda</th>
-                                        <th>Qtd.</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="listaEstoque">
-                                    <!-- Estoque items will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
+        <!-- 5. Lista de Itens -->
+        <section id="itemsList">
+            <h2><i class="fas fa-list-alt"></i> Lista do Projeto</h2>
+            <div id="itemsContainer"></div>
+        </section>
 
-            <!-- Clientes & Motos Section -->
-            <section id="clientesMotos" class="admin-section" style="display:none;">
-                <div class="card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5><i class="bi bi-people-fill me-2"></i>Cadastro de Clientes</h5>
-                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#clienteModal" onclick="prepareClienteModal('add')">
-                            <i class="bi bi-person-plus me-1"></i> Adicionar Cliente
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th>Contato</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="listaClientes">
-                                    <!-- Clientes will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5><i class="bi bi-motorbike me-2"></i>Cadastro de Motos</h5>
-                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#motoModal" onclick="prepareMotoModal('add')">
-                            <i class="bi bi-plus-circle me-1"></i> Adicionar Moto
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Cliente</th>
-                                        <th>Modelo</th>
-                                        <th>Placa</th>
-                                        <th>KM Atual</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="listaMotos">
-                                    <!-- Motos will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Funcionários Section -->
-            <section id="funcionarios" class="admin-section" style="display:none;">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5><i class="bi bi-person-badge-fill me-2"></i>Cadastro de Funcionários</h5>
-                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#funcionarioModal" onclick="prepareFuncionarioModal('add')">
-                            <i class="bi bi-plus-circle me-1"></i> Adicionar Funcionário
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th>Contato</th>
-                                        <th>Função</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="listaFuncionarios">
-                                    <!-- Funcionários will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Fornecedores Section -->
-            <section id="fornecedores" class="admin-section" style="display:none;">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5><i class="bi bi-truck me-2"></i>Cadastro de Fornecedores</h5>
-                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#fornecedorModal" onclick="prepareFornecedorModal('add')">
-                            <i class="bi bi-plus-circle me-1"></i> Adicionar Fornecedor
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th>Contato</th>
-                                        <th>Categoria</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="listaFornecedores">
-                                    <!-- Fornecedores will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Serviços Section -->
-            <section id="agendamentos" class="admin-section" style="display:none;">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5><i class="bi bi-calendar-check me-2"></i>Gerenciamento de Serviços</h5>
-                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#servicoModal" onclick="prepareServicoModal('add')">
-                            <i class="bi bi-plus-circle me-1"></i> Registrar Serviço
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="row" id="listaAgendamentos">
-                            <!-- Serviços will be loaded here, organized by date -->
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Financeiro Section -->
-            <section id="financeiro" class="admin-section" style="display:none;">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5><i class="bi bi-currency-dollar me-2"></i>Controle Financeiro</h5>
-                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#financeiroModal" onclick="prepareFinanceiroModal('add')">
-                            <i class="bi bi-plus-circle me-1"></i> Adicionar Transação
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-4">
-                            <div class="col-md-4">
-                                <div class="card text-white bg-primary mb-3">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Entradas</h5>
-                                        <p class="card-text fs-4" id="totalEntradas">R$ 0,00</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card text-white bg-danger mb-3">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Saídas</h5>
-                                        <p class="card-text fs-4" id="totalSaidas">R$ 0,00</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card text-white bg-success mb-3">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Saldo</h5>
-                                        <p class="card-text fs-4" id="saldoTotal">R$ 0,00</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Tipo</th>
-                                        <th>Descrição</th>
-                                        <th>Valor</th>
-                                        <th>Data</th>
-                                        <th>Categoria</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="listaFinanceiro">
-                                    <!-- Financeiro items will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </div> <!-- End Admin Panel -->
-
-    <!-- Client Panel Dashboard Structure -->
-    <div id="clientPanel" style="display:none;" class="d-flex flex-column h-100">
-        <nav class="navbar navbar-expand-lg">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#"><i class="bi bi-speedometer2 me-2"></i>Evolution Motors - Meu Painel</a>
-            </div>
-        </nav>
-        <div class="container-fluid mt-3 flex-grow-1">
-            <div id="clientPanelContent">
-                <h2 class="mb-4" id="clientWelcomeMessage"></h2>
-
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5><i class="bi bi-motorbike me-2"></i>Minhas Motos</h5>
-                    </div>
-                    <div class="card-body" id="clientMotosList">
-                        <p class="text-muted">Nenhuma moto cadastrada para este cliente.</p>
-                    </div>
-                </div>
-
-                <h4 class="mt-4 mb-3"><i class="bi bi-gear me-2"></i>Status dos Serviços Atuais</h4>
-                <div id="clientCurrentServicesStatus" class="row">
-                    <div class="col-12"><p class="text-muted">Nenhum serviço em andamento ou agendado no momento.</p></div>
-                </div>
-
-                <h4 class="mt-4 mb-3"><i class="bi bi-journal-text me-2"></i>Histórico Detalhado de Serviços</h4>
-                <div id="clientServicesHistory">
-                    <p class="text-muted">Nenhum histórico de serviços encontrado.</p>
-                </div>
-
-                <h4 class="mt-4 mb-3"><i class="bi bi-wallet2 me-2"></i>Resumo de Gastos por Moto</h4>
-                <div id="clientSpendingSummary">
-                    <p class="text-muted">Nenhum gasto registrado para suas motos.</p>
-                </div>
-            </div>
-            <div id="clientPanelError" class="alert alert-danger mt-3" style="display:none;">
-                Ocorreu um erro ao carregar seus dados ou o cliente não foi encontrado.
-            </div>
-        </div>
-    </div> <!-- End Client Panel -->
-
-    <!-- Modals (shared) -->
-
-    <!-- Estoque Modal -->
-    <div class="modal fade" id="estoqueModal" tabindex="-1" aria-labelledby="estoqueModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="estoqueModalLabel">Adicionar/Editar Peça/Produto</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="estoqueForm">
-                        <input type="hidden" id="estoqueId">
-                        <div class="mb-3">
-                            <label for="estoqueNome" class="form-label">Nome</label>
-                            <input type="text" class="form-control" id="estoqueNome" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="estoqueDescricao" class="form-label">Descrição</label>
-                            <textarea class="form-control" id="estoqueDescricao" rows="2"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="estoqueCusto" class="form-label">Preço de Custo</label>
-                            <input type="number" step="0.01" class="form-control" id="estoqueCusto" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="estoqueVenda" class="form-label">Preço de Venda</label>
-                            <input type="number" step="0.01" class="form-control" id="estoqueVenda" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="estoqueQuantidade" class="form-label">Quantidade</label>
-                            <input type="number" class="form-control" id="estoqueQuantidade" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary mt-3 w-100">Salvar</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+        <!-- Resumo -->
+        <section id="summary">
+            <h2><i class="fas fa-file-invoice-dollar"></i> Total do Orçamento</h2>
+            <p><span id="totalProjectCost">R$ 0,00</span></p>
+            <button onclick="mascoteFalar('O valor total do projeto até agora é ' + document.getElementById('totalProjectCost').textContent)" class="warning">
+                <i class="fas fa-robot"></i> Ouvir Valor
+            </button>
+        </section>
     </div>
 
-    <!-- Cliente Modal -->
-    <div class="modal fade" id="clienteModal" tabindex="-1" aria-labelledby="clienteModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="clienteModalLabel">Adicionar/Editar Cliente</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="clienteForm">
-                        <input type="hidden" id="clienteId">
-                        <div class="mb-3">
-                            <label for="clienteNome" class="form-label">Nome do Cliente</label>
-                            <input type="text" class="form-control" id="clienteNome" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="clienteContato" class="form-label">Contato (Telefone/Email)</label>
-                            <input type="text" class="form-control" id="clienteContato" placeholder="Ex: (XX) 9XXXX-XXXX ou email@exemplo.com">
-                        </div>
-                        <div id="clienteLinkContainer" class="mt-4" style="display:none;">
-                            <button type="button" class="btn btn-info w-100" onclick="generateClientPanelLink()">
-                                <i class="bi bi-whatsapp me-1"></i> Gerar Link de Acesso & Enviar WhatsApp
-                            </button>
-                            <small class="text-muted d-block mt-2 text-center">O link será copiado para a área de transferência e uma opção de WhatsApp será exibida.</small>
-                        </div>
-                        <hr class="my-4">
-                        <button type="submit" class="btn btn-primary w-100">Salvar Cliente</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+    <!-- Mascote Flutuante -->
+    <div class="floating-buttons">
+        <button class="floating-button" onclick="mascoteFalar('Tudo certo! Cole a sua chave, envie o áudio e vamos começar a trabalhar!')">
+            <i class="fas fa-headset"></i> Mascote
+        </button>
     </div>
 
-    <!-- Moto Modal -->
-    <div class="modal fade" id="motoModal" tabindex="-1" aria-labelledby="motoModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="motoModalLabel">Adicionar/Editar Moto</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="motoForm">
-                        <input type="hidden" id="motoId">
-                        <div class="mb-3">
-                            <label for="motoClienteId" class="form-label">Cliente</label>
-                            <select class="form-select" id="motoClienteId" required>
-                                <!-- Clientes will be loaded here -->
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="motoModelo" class="form-label">Modelo</label>
-                            <input type="text" class="form-control" id="motoModelo" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="motoPlaca" class="form-label">Placa</label>
-                            <input type="text" class="form-control" id="motoPlaca" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="motoMarca" class="form-label">Marca</label>
-                            <input type="text" class="form-control" id="motoMarca">
-                        </div>
-                        <div class="mb-3">
-                            <label for="motoAno" class="form-label">Ano</label>
-                            <input type="number" class="form-control" id="motoAno">
-                        </div>
-                        <div class="mb-3">
-                            <label for="motoKmAtual" class="form-label">KM Atual</label>
-                            <input type="number" class="form-control" id="motoKmAtual">
-                        </div>
-                        <button type="submit" class="btn btn-primary mt-3 w-100">Salvar</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    <footer>Powered by thIAguinho Soluções</footer>
 
-    <!-- Funcionario Modal -->
-    <div class="modal fade" id="funcionarioModal" tabindex="-1" aria-labelledby="funcionarioModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="funcionarioModalLabel">Adicionar/Editar Funcionário</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="funcionarioForm">
-                        <input type="hidden" id="funcionarioId">
-                        <div class="mb-3">
-                            <label for="funcionarioNome" class="form-label">Nome</label>
-                            <input type="text" class="form-control" id="funcionarioNome" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="funcionarioContato" class="form-label">Contato</label>
-                            <input type="text" class="form-control" id="funcionarioContato" placeholder="Telefone ou Email">
-                        </div>
-                        <div class="mb-3">
-                            <label for="funcionarioFuncao" class="form-label">Função</label>
-                            <input type="text" class="form-control" id="funcionarioFuncao" placeholder="Ex: Mecânico, Atendente">
-                        </div>
-                        <button type="submit" class="btn btn-primary mt-3 w-100">Salvar</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Fornecedor Modal -->
-    <div class="modal fade" id="fornecedorModal" tabindex="-1" aria-labelledby="fornecedorModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="fornecedorModalLabel">Adicionar/Editar Fornecedor</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="fornecedorForm">
-                        <input type="hidden" id="fornecedorId">
-                        <div class="mb-3">
-                            <label for="fornecedorNome" class="form-label">Nome do Fornecedor</label>
-                            <input type="text" class="form-control" id="fornecedorNome" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="fornecedorContato" class="form-label">Contato</label>
-                            <input type="text" class="form-control" id="fornecedorContato" placeholder="Telefone ou Email">
-                        </div>
-                        <div class="mb-3">
-                            <label for="fornecedorCategoria" class="form-label">Categoria de Fornecimento</label>
-                            <input type="text" class="form-control" id="fornecedorCategoria" placeholder="Ex: Peças, Óleos, Equipamentos">
-                        </div>
-                        <button type="submit" class="btn btn-primary mt-3 w-100">Salvar</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Serviço Modal -->
-    <div class="modal fade" id="servicoModal" tabindex="-1" aria-labelledby="servicoModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="servicoModalLabel">Registrar/Editar Serviço</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="servicoForm">
-                        <input type="hidden" id="servicoId">
-                        <div class="mb-3">
-                            <label for="servicoClienteId" class="form-label">Cliente</label>
-                            <select class="form-select" id="servicoClienteId" required onchange="filterMotosByCliente()">
-                                <!-- Clientes will be loaded here -->
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="servicoMotoId" class="form-label">Moto</label>
-                            <select class="form-select" id="servicoMotoId" required>
-                                <!-- Motos will be loaded here (filtered by client) -->
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="servicoFuncionarioId" class="form-label">Funcionário Responsável</label>
-                            <select class="form-select" id="servicoFuncionarioId">
-                                <option value="">Não Atribuído</option>
-                                <!-- Funcionários will be loaded here -->
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="servicoDescricao" class="form-label">Descrição do Serviço</label>
-                            <textarea class="form-control" id="servicoDescricao" rows="2" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="servicoDataAgendamento" class="form-label">Data de Agendamento/Início</label>
-                            <input type="date" class="form-control" id="servicoDataAgendamento" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="servicoHoraAgendamento" class="form-label">Hora de Agendamento/Início</label>
-                            <input type="time" class="form-control" id="servicoHoraAgendamento" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="servicoStatus" class="form-label">Status</label>
-                            <select class="form-select" id="servicoStatus">
-                                <option value="Agendado">Agendado</option>
-                                <option value="Em Andamento">Em Andamento</option>
-                                <option value="Concluído">Concluído</option>
-                                <option value="Cancelado">Cancelado</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="servicoCustoTotal" class="form-label">Custo Total do Serviço (R$)</label>
-                            <input type="number" step="0.01" class="form-control" id="servicoCustoTotal" value="0">
-                        </div>
-                        <div class="mb-3">
-                            <label for="servicoDataConclusao" class="form-label">Data de Conclusão (se aplicável)</label>
-                            <input type="date" class="form-control" id="servicoDataConclusao">
-                        </div>
-                        <div class="mb-3">
-                            <label for="servicoObservacoes" class="form-label">Observações</label>
-                            <textarea class="form-control" id="servicoObservacoes" rows="2"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary mt-3 w-100">Salvar</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Financeiro Modal -->
-    <div class="modal fade" id="financeiroModal" tabindex="-1" aria-labelledby="financeiroModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="financeiroModalLabel">Adicionar/Editar Transação Financeira</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="financeiroForm">
-                        <input type="hidden" id="financeiroId">
-                        <div class="mb-3">
-                            <label for="financeiroTipo" class="form-label">Tipo</label>
-                            <select class="form-select" id="financeiroTipo" required>
-                                <option value="Entrada">Entrada</option>
-                                <option value="Saída">Saída</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="financeiroDescricao" class="form-label">Descrição</label>
-                            <input type="text" class="form-control" id="financeiroDescricao" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="financeiroValor" class="form-label">Valor</label>
-                            <input type="number" step="0.01" class="form-control" id="financeiroValor" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="financeiroData" class="form-label">Data</label>
-                            <input type="date" class="form-control" id="financeiroData" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="financeiroCategoria" class="form-label">Categoria</label>
-                            <input type="text" class="form-control" id="financeiroCategoria" placeholder="Ex: Venda de Peças, Salário, Aluguel">
-                        </div>
-                        <button type="submit" class="btn btn-primary mt-3 w-100">Salvar</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Feedback Button -->
-    <button class="feedback-button" data-bs-toggle="modal" data-bs-target="#feedbackModal">
-        <i class="bi bi-chat-dots-fill"></i> Fale com o Thiago!
-    </button>
-
-    <!-- Feedback Modal -->
-    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="feedbackModalLabel">Deixe seu Feedback para a thIAguinho Soluções!</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="feedbackForm">
-                        <div class="mb-3">
-                            <label for="feedbackMessage" class="form-label">Sua mensagem:</label>
-                            <textarea class="form-control" id="feedbackMessage" rows="5" placeholder="O que você achou do sistema? Sugestões? Críticas?" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary mt-3 w-100">Enviar Feedback</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <footer>
-        Powered by thIAguinho Soluções
-    </footer>
-
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const CLIENT_ID = '-Ooffu_5kkgNnpUlAW7K';
-        const FIREBASE_FEEDBACK_URL = `https://thiaguinho-40a14-default-rtdb.firebaseio.com/projetos_capturados/${CLIENT_ID}/feedbacks.json`;
+        let currentGeminiApiKey = null;
+        let listaDeItens = [];
+        let indexSendoEditado = -1;
+        const backticks = String.fromCharCode(96, 96, 96); 
 
-        // --- Global Helper Functions ---
-        function generateUniqueId() {
-            return '_' + Math.random().toString(36).substr(2, 9);
-        }
-
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return '-';
-            return new Date(dateString + 'T00:00:00').toLocaleDateString('pt-BR');
-        }
-
-        // --- LocalStorage Helpers ---
-        function saveData(key, data) {
-            localStorage.setItem(key, JSON.stringify(data));
-        }
-
-        function loadData(key) {
-            const data = localStorage.getItem(key);
-            return data ? JSON.parse(data) : [];
-        }
-
-        // --- Data Models (using LocalStorage) ---
-        let estoqueItems = loadData('estoqueItems');
-        let clientes = loadData('clientes');
-        let motos = loadData('motos');
-        let funcionarios = loadData('funcionarios'); // New data model
-        let fornecedores = loadData('fornecedores'); // New data model
-        let servicos = loadData('servicos');
-        let financeiroItems = loadData('financeiroItems');
-
-        // --- Admin Panel Section Switching ---
-        function showAdminSection(sectionId) {
-            document.querySelectorAll('.admin-section').forEach(section => {
-                section.style.display = 'none';
-            });
-            document.getElementById(sectionId).style.display = 'block';
-
-            document.querySelectorAll('#navbarNavAdmin .nav-link').forEach(link => {
-                link.classList.remove('active');
-                link.removeAttribute('aria-current');
-            });
-            const activeLink = document.querySelector(`#navbarNavAdmin .nav-link[onclick*="${sectionId}"]`);
-            if (activeLink) {
-                activeLink.classList.add('active');
-                activeLink.setAttribute('aria-current', 'page');
+        // Ao carregar a página, verifica se a chave já estava guardada no navegador
+        window.onload = function() {
+            atualizarTelaItens();
+            const chaveGuardada = localStorage.getItem('geminiApiKeyLocal');
+            if (chaveGuardada) {
+                document.getElementById('geminiApiKeyInput').value = chaveGuardada;
+                salvarChave(true); // O modo 'true' significa que foi carregado silenciosamente
             }
-            
-            // Refresh data when switching sections
-            if (sectionId === 'estoque') renderEstoque();
-            if (sectionId === 'clientesMotos') { renderClientes(); renderMotos(); }
-            if (sectionId === 'funcionarios') renderFuncionarios();
-            if (sectionId === 'fornecedores') renderFornecedores();
-            if (sectionId === 'agendamentos') renderServicos();
-            if (sectionId === 'financeiro') renderFinanceiro();
-        }
+        };
 
-        // --- Estoque Logic ---
-        function renderEstoque() {
-            const list = document.getElementById('listaEstoque');
-            list.innerHTML = '';
-            if (estoqueItems.length === 0) {
-                list.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Nenhum item no estoque.</td></tr>';
-                return;
-            }
-            estoqueItems.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.nome}</td>
-                    <td>${item.descricao}</td>
-                    <td>${formatCurrency(item.custo)}</td>
-                    <td>${formatCurrency(item.venda)}</td>
-                    <td>${item.quantidade}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning me-1" data-bs-toggle="modal" data-bs-target="#estoqueModal" onclick="prepareEstoqueModal('edit', '${item.id}')">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteEstoqueItem('${item.id}')">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                `;
-                list.appendChild(row);
-            });
-        }
-
-        function prepareEstoqueModal(mode, id = null) {
-            const modalLabel = document.getElementById('estoqueModalLabel');
-            const form = document.getElementById('estoqueForm');
-            const estoqueId = document.getElementById('estoqueId');
-            const estoqueNome = document.getElementById('estoqueNome');
-            const estoqueDescricao = document.getElementById('estoqueDescricao');
-            const estoqueCusto = document.getElementById('estoqueCusto');
-            const estoqueVenda = document.getElementById('estoqueVenda');
-            const estoqueQuantidade = document.getElementById('estoqueQuantidade');
-
-            if (mode === 'add') {
-                modalLabel.textContent = 'Adicionar Peça/Produto';
-                form.reset();
-                estoqueId.value = '';
-            } else if (mode === 'edit') {
-                modalLabel.textContent = 'Editar Peça/Produto';
-                const item = estoqueItems.find(i => i.id === id);
-                if (item) {
-                    estoqueId.value = item.id;
-                    estoqueNome.value = item.nome;
-                    estoqueDescricao.value = item.descricao;
-                    estoqueCusto.value = item.custo;
-                    estoqueVenda.value = item.venda;
-                    estoqueQuantidade.value = item.quantidade;
-                }
-            }
-        }
-
-        document.getElementById('estoqueForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const id = document.getElementById('estoqueId').value;
-            const nome = document.getElementById('estoqueNome').value;
-            const descricao = document.getElementById('estoqueDescricao').value;
-            const custo = parseFloat(document.getElementById('estoqueCusto').value);
-            const venda = parseFloat(document.getElementById('estoqueVenda').value);
-            const quantidade = parseInt(document.getElementById('estoqueQuantidade').value);
-
-            if (isNaN(custo) || isNaN(venda) || isNaN(quantidade)) {
-                alert('Por favor, insira valores numéricos válidos para Custo, Venda e Quantidade.');
-                return;
-            }
-
-            if (id) {
-                const index = estoqueItems.findIndex(item => item.id === id);
-                if (index !== -1) {
-                    estoqueItems[index] = { id, nome, descricao, custo, venda, quantidade };
-                }
-            } else {
-                estoqueItems.push({ id: generateUniqueId(), nome, descricao, custo, venda, quantidade });
-            }
-            saveData('estoqueItems', estoqueItems);
-            renderEstoque();
-            const modal = bootstrap.Modal.getInstance(document.getElementById('estoqueModal'));
-            modal.hide();
-        });
-
-        function deleteEstoqueItem(id) {
-            if (confirm('Tem certeza que deseja excluir este item do estoque?')) {
-                estoqueItems = estoqueItems.filter(item => item.id !== id);
-                saveData('estoqueItems', estoqueItems);
-                renderEstoque();
-            }
-        }
-
-        // --- Clientes Logic ---
-        function renderClientes() {
-            const list = document.getElementById('listaClientes');
-            list.innerHTML = '';
-            if (clientes.length === 0) {
-                list.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Nenhum cliente cadastrado.</td></tr>';
-                return;
-            }
-            clientes.forEach(cliente => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${cliente.nome}</td>
-                    <td>${cliente.contato || '-'}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning me-1" data-bs-toggle="modal" data-bs-target="#clienteModal" onclick="prepareClienteModal('edit', '${cliente.id}')">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteCliente('${cliente.id}')">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                `;
-                list.appendChild(row);
-            });
-            populateClienteSelects(); // Update client dropdowns in other modals
-        }
-
-        function prepareClienteModal(mode, id = null) {
-            const modalLabel = document.getElementById('clienteModalLabel');
-            const form = document.getElementById('clienteForm');
-            const clienteIdField = document.getElementById('clienteId');
-            const clienteNome = document.getElementById('clienteNome');
-            const clienteContato = document.getElementById('clienteContato');
-            const clienteLinkContainer = document.getElementById('clienteLinkContainer');
-
-            if (mode === 'add') {
-                modalLabel.textContent = 'Adicionar Cliente';
-                form.reset();
-                clienteIdField.value = '';
-                clienteLinkContainer.style.display = 'none'; // Hide link generation for new clients
-            } else if (mode === 'edit') {
-                modalLabel.textContent = 'Editar Cliente';
-                const item = clientes.find(i => i.id === id);
-                if (item) {
-                    clienteIdField.value = item.id;
-                    clienteNome.value = item.nome;
-                    clienteContato.value = item.contato;
-                    clienteLinkContainer.style.display = 'block'; // Show link generation for existing clients
-                }
-            }
-        }
-
-        document.getElementById('clienteForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const id = document.getElementById('clienteId').value;
-            const nome = document.getElementById('clienteNome').value;
-            const contato = document.getElementById('clienteContato').value;
-
-            if (id) {
-                const index = clientes.findIndex(item => item.id === id);
-                if (index !== -1) {
-                    clientes[index] = { id, nome, contato };
-                }
-            } else {
-                clientes.push({ id: generateUniqueId(), nome, contato });
-            }
-            saveData('clientes', clientes);
-            renderClientes();
-            const modal = bootstrap.Modal.getInstance(document.getElementById('clienteModal'));
-            modal.hide();
-        });
-
-        function deleteCliente(id) {
-            const hasMotos = motos.some(moto => moto.clienteId === id);
-            const hasServicos = servicos.some(servico => servico.clienteId === id);
-
-            if (hasMotos || hasServicos) {
-                alert('Não é possível excluir este cliente, pois ele possui motos cadastradas ou serviços agendados/realizados. Remova-os primeiro.');
-                return;
-            }
-
-            if (confirm('Tem certeza que deseja excluir este cliente?')) {
-                clientes = clientes.filter(item => item.id !== id);
-                saveData('clientes', clientes);
-                renderClientes();
-            }
-        }
-
-        function generateClientPanelLink() {
-            const clienteId = document.getElementById('clienteId').value;
-            const cliente = clientes.find(c => c.id === clienteId);
-            if (!cliente) {
-                alert('Cliente não encontrado para gerar o link.');
-                return;
-            }
-
-            const currentBaseUrl = window.location.origin + window.location.pathname;
-            const clientPanelUrl = `${currentBaseUrl}?clienteId=${clienteId}`;
-            
-            let whatsappMessage = `Olá ${cliente.nome}, acompanhe o status dos serviços da sua moto e o histórico completo na Evolution Motors através deste link: ${clientPanelUrl}`;
-            
-            let phoneNumber = '';
-            if (cliente.contato) {
-                const phoneMatch = cliente.contato.match(/\(?\d{2}\)?\s?\d{4,5}-?\d{4}/);
-                if (phoneMatch) {
-                    phoneNumber = phoneMatch[0].replace(/\D/g, ''); // Remove non-digits
-                    if (phoneNumber.length === 10) phoneNumber = '55' + phoneNumber; // Add country code for 10-digit numbers (like 1199999999)
-                    if (phoneNumber.length === 9) phoneNumber = '55' + phoneNumber; // Add country code for 9-digit numbers (like 999999999)
-                }
-            }
-
-            // Copy to clipboard
-            navigator.clipboard.writeText(clientPanelUrl).then(() => {
-                alert(`Link para o Painel do Cliente copiado para a área de transferência:\n\n${clientPanelUrl}`);
-                if (phoneNumber) {
-                    const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
-                    if (confirm('Deseja abrir o WhatsApp para enviar este link agora?')) {
-                        window.open(whatsappLink, '_blank');
-                    }
-                } else {
-                    alert('Nenhum número de telefone válido encontrado para abrir o WhatsApp.');
-                }
-            }).catch(err => {
-                alert('Falha ao copiar o link. Por favor, copie manualmente: ' + clientPanelUrl);
-            });
-        }
-
-        // --- Motos Logic ---
-        function renderMotos() {
-            const list = document.getElementById('listaMotos');
-            list.innerHTML = '';
-            if (motos.length === 0) {
-                list.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Nenhuma moto cadastrada.</td></tr>';
-                return;
-            }
-            motos.forEach(moto => {
-                const cliente = clientes.find(c => c.id === moto.clienteId);
-                const clienteNome = cliente ? cliente.nome : 'Cliente Desconhecido';
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${clienteNome}</td>
-                    <td>${moto.modelo}</td>
-                    <td>${moto.placa}</td>
-                    <td>${moto.kmAtual || '-'}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning me-1" data-bs-toggle="modal" data-bs-target="#motoModal" onclick="prepareMotoModal('edit', '${moto.id}')">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteMoto('${moto.id}')">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                `;
-                list.appendChild(row);
-            });
-        }
-
-        function populateClienteSelects() {
-            const selectClienteMoto = document.getElementById('motoClienteId');
-            const selectClienteServico = document.getElementById('servicoClienteId');
-            
-            selectClienteMoto.innerHTML = '<option value="">Selecione um Cliente</option>';
-            selectClienteServico.innerHTML = '<option value="">Selecione um Cliente</option>';
-
-            clientes.forEach(cliente => {
-                const optionMoto = document.createElement('option');
-                optionMoto.value = cliente.id;
-                optionMoto.textContent = cliente.nome;
-                selectClienteMoto.appendChild(optionMoto);
-
-                const optionServico = document.createElement('option');
-                optionServico.value = cliente.id;
-                optionServico.textContent = cliente.nome;
-                selectClienteServico.appendChild(optionServico);
-            });
-        }
-
-        function prepareMotoModal(mode, id = null) {
-            const modalLabel = document.getElementById('motoModalLabel');
-            const form = document.getElementById('motoForm');
-            const motoId = document.getElementById('motoId');
-            const motoClienteId = document.getElementById('motoClienteId');
-            const motoModelo = document.getElementById('motoModelo');
-            const motoPlaca = document.getElementById('motoPlaca');
-            const motoMarca = document.getElementById('motoMarca');
-            const motoAno = document.getElementById('motoAno');
-            const motoKmAtual = document.getElementById('motoKmAtual');
-
-            populateClienteSelects(); // Ensure clients are loaded
-
-            if (mode === 'add') {
-                modalLabel.textContent = 'Adicionar Moto';
-                form.reset();
-                motoId.value = '';
-            } else if (mode === 'edit') {
-                modalLabel.textContent = 'Editar Moto';
-                const item = motos.find(i => i.id === id);
-                if (item) {
-                    motoId.value = item.id;
-                    motoClienteId.value = item.clienteId;
-                    motoModelo.value = item.modelo;
-                    motoPlaca.value = item.placa;
-                    motoMarca.value = item.marca;
-                    motoAno.value = item.ano;
-                    motoKmAtual.value = item.kmAtual;
-                }
-            }
-        }
-
-        document.getElementById('motoForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const id = document.getElementById('motoId').value;
-            const clienteId = document.getElementById('motoClienteId').value;
-            const modelo = document.getElementById('motoModelo').value;
-            const placa = document.getElementById('motoPlaca').value.toUpperCase().replace(/[^A-Z0-9]/g, ''); // Normalize placa
-            const marca = document.getElementById('motoMarca').value;
-            const ano = parseInt(document.getElementById('motoAno').value);
-            const kmAtual = parseInt(document.getElementById('motoKmAtual').value);
-
-            if (!clienteId) { alert('Por favor, selecione um cliente.'); return; }
-            if (placa.length < 4) { alert('Placa inválida.'); return; }
-
-            if (id) {
-                const index = motos.findIndex(item => item.id === id);
-                if (index !== -1) {
-                    motos[index] = { id, clienteId, modelo, placa, marca, ano, kmAtual };
-                }
-            } else {
-                motos.push({ id: generateUniqueId(), clienteId, modelo, placa, marca, ano, kmAtual });
-            }
-            saveData('motos', motos);
-            renderMotos();
-            const modal = bootstrap.Modal.getInstance(document.getElementById('motoModal'));
-            modal.hide();
-        });
-
-        function deleteMoto(id) {
-            const hasServicos = servicos.some(servico => servico.motoId === id);
-            if (hasServicos) {
-                alert('Não é possível excluir esta moto, pois ela possui serviços agendados/realizados. Remova-os primeiro.');
-                return;
-            }
-            if (confirm('Tem certeza que deseja excluir esta moto?')) {
-                motos = motos.filter(item => item.id !== id);
-                saveData('motos', motos);
-                renderMotos();
-            }
-        }
-
-        // --- Funcionarios Logic --- (New Section)
-        function renderFuncionarios() {
-            const list = document.getElementById('listaFuncionarios');
-            list.innerHTML = '';
-            if (funcionarios.length === 0) {
-                list.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Nenhum funcionário cadastrado.</td></tr>';
-                return;
-            }
-            funcionarios.forEach(func => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${func.nome}</td>
-                    <td>${func.contato || '-'}</td>
-                    <td>${func.funcao || '-'}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning me-1" data-bs-toggle="modal" data-bs-target="#funcionarioModal" onclick="prepareFuncionarioModal('edit', '${func.id}')">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteFuncionario('${func.id}')">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                `;
-                list.appendChild(row);
-            });
-            populateFuncionarioSelects(); // Update dropdowns in other modals
-        }
-
-        function populateFuncionarioSelects() {
-            const selectFuncionarioServico = document.getElementById('servicoFuncionarioId');
-            selectFuncionarioServico.innerHTML = '<option value="">Não Atribuído</option>';
-
-            funcionarios.forEach(func => {
-                const option = document.createElement('option');
-                option.value = func.id;
-                option.textContent = func.nome;
-                selectFuncionarioServico.appendChild(option);
-            });
-        }
-
-        function prepareFuncionarioModal(mode, id = null) {
-            const modalLabel = document.getElementById('funcionarioModalLabel');
-            const form = document.getElementById('funcionarioForm');
-            const funcionarioId = document.getElementById('funcionarioId');
-            const funcionarioNome = document.getElementById('funcionarioNome');
-            const funcionarioContato = document.getElementById('funcionarioContato');
-            const funcionarioFuncao = document.getElementById('funcionarioFuncao');
-
-            if (mode === 'add') {
-                modalLabel.textContent = 'Adicionar Funcionário';
-                form.reset();
-                funcionarioId.value = '';
-            } else if (mode === 'edit') {
-                modalLabel.textContent = 'Editar Funcionário';
-                const item = funcionarios.find(i => i.id === id);
-                if (item) {
-                    funcionarioId.value = item.id;
-                    funcionarioNome.value = item.nome;
-                    funcionarioContato.value = item.contato;
-                    funcionarioFuncao.value = item.funcao;
-                }
-            }
-        }
-
-        document.getElementById('funcionarioForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const id = document.getElementById('funcionarioId').value;
-            const nome = document.getElementById('funcionarioNome').value;
-            const contato = document.getElementById('funcionarioContato').value;
-            const funcao = document.getElementById('funcionarioFuncao').value;
-
-            if (id) {
-                const index = funcionarios.findIndex(item => item.id === id);
-                if (index !== -1) {
-                    funcionarios[index] = { id, nome, contato, funcao };
-                }
-            } else {
-                funcionarios.push({ id: generateUniqueId(), nome, contato, funcao });
-            }
-            saveData('funcionarios', funcionarios);
-            renderFuncionarios();
-            const modal = bootstrap.Modal.getInstance(document.getElementById('funcionarioModal'));
-            modal.hide();
-        });
-
-        function deleteFuncionario(id) {
-             const hasServices = servicos.some(servico => servico.funcionarioId === id);
-            if (hasServices) {
-                alert('Não é possível excluir este funcionário, pois ele está atribuído a um ou mais serviços. Remova a atribuição primeiro.');
-                return;
-            }
-            if (confirm('Tem certeza que deseja excluir este funcionário?')) {
-                funcionarios = funcionarios.filter(item => item.id !== id);
-                saveData('funcionarios', funcionarios);
-                renderFuncionarios();
-            }
-        }
-
-        // --- Fornecedores Logic --- (New Section)
-        function renderFornecedores() {
-            const list = document.getElementById('listaFornecedores');
-            list.innerHTML = '';
-            if (fornecedores.length === 0) {
-                list.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Nenhum fornecedor cadastrado.</td></tr>';
-                return;
-            }
-            fornecedores.forEach(forn => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${forn.nome}</td>
-                    <td>${forn.contato || '-'}</td>
-                    <td>${forn.categoria || '-'}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning me-1" data-bs-toggle="modal" data-bs-target="#fornecedorModal" onclick="prepareFornecedorModal('edit', '${forn.id}')">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteFornecedor('${forn.id}')">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                `;
-                list.appendChild(row);
-            });
-        }
-
-        function prepareFornecedorModal(mode, id = null) {
-            const modalLabel = document.getElementById('fornecedorModalLabel');
-            const form = document.getElementById('fornecedorForm');
-            const fornecedorId = document.getElementById('fornecedorId');
-            const fornecedorNome = document.getElementById('fornecedorNome');
-            const fornecedorContato = document.getElementById('fornecedorContato');
-            const fornecedorCategoria = document.getElementById('fornecedorCategoria');
-
-            if (mode === 'add') {
-                modalLabel.textContent = 'Adicionar Fornecedor';
-                form.reset();
-                fornecedorId.value = '';
-            } else if (mode === 'edit') {
-                modalLabel.textContent = 'Editar Fornecedor';
-                const item = fornecedores.find(i => i.id === id);
-                if (item) {
-                    fornecedorId.value = item.id;
-                    fornecedorNome.value = item.nome;
-                    fornecedorContato.value = item.contato;
-                    fornecedorCategoria.value = item.categoria;
-                }
-            }
-        }
-
-        document.getElementById('fornecedorForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const id = document.getElementById('fornecedorId').value;
-            const nome = document.getElementById('fornecedorNome').value;
-            const contato = document.getElementById('fornecedorContato').value;
-            const categoria = document.getElementById('fornecedorCategoria').value;
-
-            if (id) {
-                const index = fornecedores.findIndex(item => item.id === id);
-                if (index !== -1) {
-                    fornecedores[index] = { id, nome, contato, categoria };
-                }
-            } else {
-                fornecedores.push({ id: generateUniqueId(), nome, contato, categoria });
-            }
-            saveData('fornecedores', fornecedores);
-            renderFornecedores();
-            const modal = bootstrap.Modal.getInstance(document.getElementById('fornecedorModal'));
-            modal.hide();
-        });
-
-        function deleteFornecedor(id) {
-            if (confirm('Tem certeza que deseja excluir este fornecedor?')) {
-                fornecedores = fornecedores.filter(item => item.id !== id);
-                saveData('fornecedores', fornecedores);
-                renderFornecedores();
-            }
-        }
-
-        // --- Serviços Logic ---
-        function renderServicos() {
-            const list = document.getElementById('listaAgendamentos');
-            list.innerHTML = '';
-
-            const groupedServicos = servicos.reduce((acc, item) => {
-                const date = item.dataAgendamento;
-                if (!acc[date]) {
-                    acc[date] = [];
-                }
-                acc[date].push(item);
-                return acc;
-            }, {});
-
-            const sortedDates = Object.keys(groupedServicos).sort((a, b) => new Date(a) - new Date(b));
-
-            if (sortedDates.length === 0) {
-                list.innerHTML = '<p class="text-muted text-center mt-3">Nenhum serviço registrado.</p>';
-                return;
-            }
-
-            sortedDates.forEach(date => {
-                const col = document.createElement('div');
-                col.className = 'col-md-6 col-lg-4 mb-4';
-                
-                const card = document.createElement('div');
-                card.className = 'card';
-                
-                const cardHeader = document.createElement('div');
-                cardHeader.className = 'card-header';
-                cardHeader.innerHTML = `<h5 class="mb-0">${new Date(date + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h5>`;
-                card.appendChild(cardHeader);
-
-                const cardBody = document.createElement('div');
-                cardBody.className = 'card-body';
-
-                const sortedServices = groupedServicos[date].sort((a, b) => a.horaAgendamento.localeCompare(b.horaAgendamento));
-
-                sortedServices.forEach(item => {
-                    const cliente = clientes.find(c => c.id === item.clienteId);
-                    const moto = motos.find(m => m.id === item.motoId);
-                    const funcionario = funcionarios.find(f => f.id === item.funcionarioId);
-
-                    const clienteNome = cliente ? cliente.nome : 'Cliente Desconhecido';
-                    const motoInfo = moto ? `${moto.modelo} (${moto.placa})` : 'Moto Desconhecida';
-                    const funcionarioNome = funcionario ? `Responsável: ${funcionario.nome}` : '';
-
-
-                    const servicoDiv = document.createElement('div');
-                    servicoDiv.className = `servico-card status-${item.status.toLowerCase().replace(/\s/g, '-')}`;
-                    servicoDiv.innerHTML = `
-                        <h6>${item.horaAgendamento} - ${clienteNome} (${motoInfo})</h6>
-                        <small>Serviço: ${item.descricaoServico}</small><br>
-                        <small>Status: <strong>${item.status}</strong></small><br>
-                        ${funcionarioNome ? `<small>${funcionarioNome}</small><br>` : ''}
-                        <div class="actions">
-                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#servicoModal" onclick="prepareServicoModal('edit', '${item.id}')">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteServico('${item.id}')">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                    cardBody.appendChild(servicoDiv);
-                });
-                card.appendChild(cardBody);
-                col.appendChild(card);
-                list.appendChild(col);
-            });
-        }
-
-        function populateMotoSelects(selectedClienteId = null, currentMotoId = null) {
-            const selectMoto = document.getElementById('servicoMotoId');
-            selectMoto.innerHTML = '<option value="">Selecione uma Moto</option>';
-            
-            const filteredMotos = selectedClienteId ? motos.filter(m => m.clienteId === selectedClienteId) : [];
-
-            filteredMotos.forEach(moto => {
-                const option = document.createElement('option');
-                option.value = moto.id;
-                option.textContent = `${moto.modelo} (${moto.placa})`;
-                if (moto.id === currentMotoId) {
-                    option.selected = true;
-                }
-                selectMoto.appendChild(option);
-            });
-        }
-
-        function filterMotosByCliente() {
-            const selectedClienteId = document.getElementById('servicoClienteId').value;
-            populateMotoSelects(selectedClienteId);
-        }
-
-        function prepareServicoModal(mode, id = null) {
-            const modalLabel = document.getElementById('servicoModalLabel');
-            const form = document.getElementById('servicoForm');
-            const servicoId = document.getElementById('servicoId');
-            const servicoClienteId = document.getElementById('servicoClienteId');
-            const servicoMotoId = document.getElementById('servicoMotoId');
-            const servicoFuncionarioId = document.getElementById('servicoFuncionarioId');
-            const servicoDescricao = document.getElementById('servicoDescricao');
-            const servicoDataAgendamento = document.getElementById('servicoDataAgendamento');
-            const servicoHoraAgendamento = document.getElementById('servicoHoraAgendamento');
-            const servicoStatus = document.getElementById('servicoStatus');
-            const servicoCustoTotal = document.getElementById('servicoCustoTotal');
-            const servicoDataConclusao = document.getElementById('servicoDataConclusao');
-            const servicoObservacoes = document.getElementById('servicoObservacoes');
-
-            populateClienteSelects(); // Popula os clientes no select
-            populateFuncionarioSelects(); // Popula os funcionários no select
-
-            if (mode === 'add') {
-                modalLabel.textContent = 'Registrar Serviço';
-                form.reset();
-                servicoId.value = '';
-                servicoStatus.value = 'Agendado';
-                servicoDataAgendamento.value = new Date().toISOString().split('T')[0];
-                servicoHoraAgendamento.value = new Date().toTimeString().split(' ')[0].substring(0, 5);
-                servicoCustoTotal.value = '0';
-                servicoDataConclusao.value = '';
-                servicoObservacoes.value = '';
-                servicoFuncionarioId.value = ''; // Reset funcionario selection
-                servicoMotoId.innerHTML = '<option value="">Selecione uma Moto</option>';
-            } else if (mode === 'edit') {
-                modalLabel.textContent = 'Editar Serviço';
-                const item = servicos.find(i => i.id === id);
-                if (item) {
-                    servicoId.value = item.id;
-                    servicoClienteId.value = item.clienteId;
-                    
-                    populateMotoSelects(item.clienteId, item.motoId); // Popula motos para o cliente selecionado e seleciona a moto do serviço
-                    
-                    servicoFuncionarioId.value = item.funcionarioId || '';
-                    servicoDescricao.value = item.descricaoServico;
-                    servicoDataAgendamento.value = item.dataAgendamento;
-                    servicoHoraAgendamento.value = item.horaAgendamento;
-                    servicoStatus.value = item.status;
-                    servicoCustoTotal.value = item.custoTotal;
-                    servicoDataConclusao.value = item.dataConclusao || '';
-                    servicoObservacoes.value = item.observacoes || '';
-                }
-            }
-        }
-
-        document.getElementById('servicoForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const id = document.getElementById('servicoId').value;
-            const clienteId = document.getElementById('servicoClienteId').value;
-            const motoId = document.getElementById('servicoMotoId').value;
-            const funcionarioId = document.getElementById('servicoFuncionarioId').value;
-            const descricaoServico = document.getElementById('servicoDescricao').value;
-            const dataAgendamento = document.getElementById('servicoDataAgendamento').value;
-            const horaAgendamento = document.getElementById('servicoHoraAgendamento').value;
-            const status = document.getElementById('servicoStatus').value;
-            const custoTotal = parseFloat(document.getElementById('servicoCustoTotal').value) || 0;
-            const dataConclusao = document.getElementById('servicoDataConclusao').value;
-            const observacoes = document.getElementById('servicoObservacoes').value;
-
-            if (!clienteId || !motoId) {
-                alert('Por favor, selecione o cliente e a moto.');
-                return;
-            }
-
-            if (id) {
-                const index = servicos.findIndex(item => item.id === id);
-                if (index !== -1) {
-                    servicos[index] = { id, clienteId, motoId, funcionarioId, descricaoServico, dataAgendamento, horaAgendamento, status, custoTotal, dataConclusao, observacoes };
-                }
-            } else {
-                servicos.push({ id: generateUniqueId(), clienteId, motoId, funcionarioId, descricaoServico, dataAgendamento, horaAgendamento, status, custoTotal, dataConclusao, observacoes });
-            }
-            saveData('servicos', servicos);
-            renderServicos();
-            const modal = bootstrap.Modal.getInstance(document.getElementById('servicoModal'));
-            modal.hide();
-        });
-
-        function deleteServico(id) {
-            if (confirm('Tem certeza que deseja excluir este serviço?')) {
-                servicos = servicos.filter(item => item.id !== id);
-                saveData('servicos', servicos);
-                renderServicos();
-            }
-        }
-
-        // --- Financeiro Logic ---
-        function renderFinanceiro() {
-            const list = document.getElementById('listaFinanceiro');
-            list.innerHTML = '';
-
-            let totalEntradas = 0;
-            let totalSaidas = 0;
-
-            if (financeiroItems.length === 0) {
-                list.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Nenhuma transação financeira registrada.</td></tr>';
-            }
-
-            const sortedFinanceiro = [...financeiroItems].sort((a, b) => new Date(b.data) - new Date(a.data));
-
-            sortedFinanceiro.forEach(item => {
-                if (item.tipo === 'Entrada') {
-                    totalEntradas += item.valor;
-                } else {
-                    totalSaidas += item.valor;
-                }
-
-                const row = document.createElement('tr');
-                const rowClass = item.tipo === 'Entrada' ? 'table-success' : 'table-danger';
-                row.className = rowClass;
-                row.innerHTML = `
-                    <td>${item.tipo}</td>
-                    <td>${item.descricao}</td>
-                    <td>${formatCurrency(item.valor)}</td>
-                    <td>${formatDate(item.data)}</td>
-                    <td>${item.categoria || '-'}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning me-1" data-bs-toggle="modal" data-bs-target="#financeiroModal" onclick="prepareFinanceiroModal('edit', '${item.id}')">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteFinanceiroItem('${item.id}')">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                `;
-                list.appendChild(row);
-            });
-
-            document.getElementById('totalEntradas').textContent = formatCurrency(totalEntradas);
-            document.getElementById('totalSaidas').textContent = formatCurrency(totalSaidas);
-            document.getElementById('saldoTotal').textContent = formatCurrency(totalEntradas - totalSaidas);
-        }
-
-        function prepareFinanceiroModal(mode, id = null) {
-            const modalLabel = document.getElementById('financeiroModalLabel');
-            const form = document.getElementById('financeiroForm');
-            const financeiroId = document.getElementById('financeiroId');
-            const financeiroTipo = document.getElementById('financeiroTipo');
-            const financeiroDescricao = document.getElementById('financeiroDescricao');
-            const financeiroValor = document.getElementById('financeiroValor');
-            const financeiroData = document.getElementById('financeiroData');
-            const financeiroCategoria = document.getElementById('financeiroCategoria');
-
-            if (mode === 'add') {
-                modalLabel.textContent = 'Adicionar Transação Financeira';
-                form.reset();
-                financeiroId.value = '';
-                financeiroTipo.value = 'Entrada';
-                financeiroData.value = new Date().toISOString().split('T')[0];
-            } else if (mode === 'edit') {
-                modalLabel.textContent = 'Editar Transação Financeira';
-                const item = financeiroItems.find(i => i.id === id);
-                if (item) {
-                    financeiroId.value = item.id;
-                    financeiroTipo.value = item.tipo;
-                    financeiroDescricao.value = item.descricao;
-                    financeiroValor.value = item.valor;
-                    financeiroData.value = item.data;
-                    financeiroCategoria.value = item.categoria;
-                }
-            }
-        }
-
-        document.getElementById('financeiroForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const id = document.getElementById('financeiroId').value;
-            const tipo = document.getElementById('financeiroTipo').value;
-            const descricao = document.getElementById('financeiroDescricao').value;
-            const valor = parseFloat(document.getElementById('financeiroValor').value);
-            const data = document.getElementById('financeiroData').value;
-            const categoria = document.getElementById('financeiroCategoria').value;
-
-            if (isNaN(valor) || valor <= 0) {
-                alert('Por favor, insira um valor numérico positivo para a transação.');
-                return;
-            }
-
-            if (id) {
-                const index = financeiroItems.findIndex(item => item.id === id);
-                if (index !== -1) {
-                    financeiroItems[index] = { id, tipo, descricao, valor, data, categoria };
-                }
-            } else {
-                financeiroItems.push({ id: generateUniqueId(), tipo, descricao, valor, data, categoria });
-            }
-            saveData('financeiroItems', financeiroItems);
-            renderFinanceiro();
-            const modal = bootstrap.Modal.getInstance(document.getElementById('financeiroModal'));
-            modal.hide();
-        });
-
-        function deleteFinanceiroItem(id) {
-            if (confirm('Tem certeza que deseja excluir esta transação financeira?')) {
-                financeiroItems = financeiroItems.filter(item => item.id !== id);
-                saveData('financeiroItems', financeiroItems);
-                renderFinanceiro();
-            }
-        }
-
-        // --- Client Panel Dashboard Logic ---
-        function loadClientPanel(clienteId) {
-            const client = clientes.find(c => c.id === clienteId);
-            if (!client) {
-                document.getElementById('clientPanelContent').style.display = 'none';
-                document.getElementById('clientPanelError').style.display = 'block';
-                return;
-            }
-
-            document.getElementById('clientWelcomeMessage').textContent = `Olá, ${client.nome}! Bem-vindo ao seu painel.`;
-            document.getElementById('clientPanelContent').style.display = 'block';
-            document.getElementById('clientPanelError').style.display = 'none';
-
-            const motosDoCliente = motos.filter(m => m.clienteId === client.id);
-
-            // Render Motos
-            const clientMotosList = document.getElementById('clientMotosList');
-            clientMotosList.innerHTML = '';
-            if (motosDoCliente.length === 0) {
-                clientMotosList.innerHTML = '<p class="text-muted">Você ainda não possui motos cadastradas conosco.</p>';
-            } else {
-                motosDoCliente.forEach(moto => {
-                    clientMotosList.innerHTML += `
-                        <div class="moto-dashboard-card mb-3">
-                            <h5><i class="bi bi-motorbike me-2"></i>${moto.modelo} <span class="badge bg-secondary">${moto.placa}</span></h5>
-                            <p class="mb-1"><i class="bi bi-tag me-1"></i>Marca: ${moto.marca || '-'}</p>
-                            <p class="mb-1"><i class="bi bi-calendar me-1"></i>Ano: ${moto.ano || '-'}</p>
-                            <p class="mb-0"><i class="bi bi-speedometer2 me-1"></i>KM Atual: ${moto.kmAtual || '-'}</p>
-                        </div>
-                    `;
-                });
-            }
-
-            // Render Status dos Serviços Atuais
-            const clientCurrentServicesStatus = document.getElementById('clientCurrentServicesStatus');
-            clientCurrentServicesStatus.innerHTML = '';
-            const servicesInProgressOrScheduled = servicos.filter(s => motosDoCliente.some(m => m.id === s.motoId) && (s.status === 'Agendado' || s.status === 'Em Andamento'));
-
-            if (servicesInProgressOrScheduled.length === 0) {
-                clientCurrentServicesStatus.innerHTML = '<div class="col-12"><p class="text-muted">Nenhum serviço em andamento ou agendado para suas motos no momento.</p></div>';
-            } else {
-                servicesInProgressOrScheduled.sort((a,b) => new Date(a.dataAgendamento) - new Date(b.dataAgendamento)).forEach(serv => {
-                    const moto = motosDoCliente.find(m => m.id === serv.motoId);
-                    const funcionario = funcionarios.find(f => f.id === serv.funcionarioId);
-                    const statusClass = serv.status === 'Agendado' ? 'bg-agendado' : 'bg-em-andamento';
-                    clientCurrentServicesStatus.innerHTML += `
-                        <div class="col-md-6 col-lg-4">
-                            <div class="status-card ${statusClass}">
-                                <h4><i class="bi bi-info-circle me-2"></i>${serv.status}</h4>
-                                <p>${moto.modelo} (${moto.placa})</p>
-                                <p>Serviço: ${serv.descricaoServico}</p>
-                                <p>Data: ${formatDate(serv.dataAgendamento)} às ${serv.horaAgendamento}</p>
-                                ${funcionario ? `<p>Responsável: ${funcionario.nome}</p>` : ''}
-                                ${serv.observacoes ? `<p>Obs: ${serv.observacoes}</p>` : ''}
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-
-            // Render Histórico Detalhado de Serviços
-            const clientServicesHistory = document.getElementById('clientServicesHistory');
-            clientServicesHistory.innerHTML = '';
-            let allServicesForClient = servicos.filter(s => motosDoCliente.some(m => m.id === s.motoId));
-
-            if (allServicesForClient.length === 0) {
-                clientServicesHistory.innerHTML = '<p class="text-muted">Nenhum histórico de serviços encontrado para suas motos.</p>';
-            } else {
-                const servicesByMoto = allServicesForClient.reduce((acc, service) => {
-                    if (!acc[service.motoId]) acc[service.motoId] = [];
-                    acc[service.motoId].push(service);
-                    return acc;
-                }, {});
-
-                for (const motoId in servicesByMoto) {
-                    const moto = motosDoCliente.find(m => m.id === motoId);
-                    if (!moto) continue;
-
-                    clientServicesHistory.innerHTML += `
-                        <h6 class="mt-4 mb-3 text-white"><i class="bi bi-speedometer2 me-2"></i>Serviços para ${moto.modelo} (${moto.placa})</h6>
-                        <div class="service-timeline">
-                    `;
-
-                    servicesByMoto[motoId].sort((a,b) => new Date(b.dataAgendamento) - new Date(a.dataAgendamento)).forEach(serv => {
-                        const funcionario = funcionarios.find(f => f.id === serv.funcionarioId);
-                        clientServicesHistory.innerHTML += `
-                            <div class="timeline-item timeline-item-status-${serv.status.toLowerCase().replace(/\s/g, '-')}">
-                                <h6>${formatDate(serv.dataAgendamento)} ${serv.horaAgendamento} - ${serv.descricaoServico}</h6>
-                                <small>Status: <strong>${serv.status}</strong></small>
-                                <small>Custo: ${formatCurrency(serv.custoTotal)}</small>
-                                ${serv.dataConclusao ? `<small>Concluído em: ${formatDate(serv.dataConclusao)}</small>` : ''}
-                                ${funcionario ? `<small>Responsável: ${funcionario.nome}</small>` : ''}
-                                ${serv.observacoes ? `<small>Obs: ${serv.observacoes}</small>` : ''}
-                            </div>
-                        `;
-                    });
-                    clientServicesHistory.innerHTML += `</div>`;
-                }
-            }
-
-            // Render Resumo de Gastos por Moto
-            const clientSpendingSummary = document.getElementById('clientSpendingSummary');
-            clientSpendingSummary.innerHTML = '';
-
-            if (motosDoCliente.length === 0) {
-                clientSpendingSummary.innerHTML = '<p class="text-muted">Nenhum gasto registrado para suas motos.</p>';
-            } else {
-                motosDoCliente.forEach(moto => {
-                    const servicosDaMotoConcluidos = servicos.filter(s => s.motoId === moto.id && s.status === 'Concluido');
-                    const totalGastos = servicosDaMotoConcluidos.reduce((sum, s) => sum + s.custoTotal, 0);
-
-                    clientSpendingSummary.innerHTML += `
-                        <div class="card bg-info text-white mb-3">
-                            <div class="card-body">
-                                <h5 class="card-title"><i class="bi bi-currency-dollar me-2"></i>Total Gastos para ${moto.modelo} (${moto.placa})</h5>
-                                <p class="card-text fs-4">${formatCurrency(totalGastos)}</p>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-        }
-
-        // --- Feedback Logic (Mandatory) ---
-        document.getElementById('feedbackForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const feedbackMessage = document.getElementById('feedbackMessage').value;
-
+        // 1. SALVAR A CHAVE API
+        function salvarChave(modoSilencioso = false) {
             try {
-                const response = await fetch(FIREBASE_FEEDBACK_URL, {
+                const inputChave = document.getElementById('geminiApiKeyInput');
+                const chave = inputChave.value.trim();
+                
+                if (chave === "") {
+                    if(!modoSilencioso) alert('Por favor, cole a sua chave da API na caixa de texto antes de clicar em salvar.');
+                    return;
+                }
+
+                currentGeminiApiKey = chave;
+                
+                // Guarda a chave no cofre do navegador (localStorage) para não perder ao dar F5
+                localStorage.setItem('geminiApiKeyLocal', chave);
+                
+                // Feedback visual de sucesso
+                const statusSpan = document.getElementById('currentApiKeyDisplay');
+                statusSpan.textContent = "Chave Ativada (Guardada no Navegador)";
+                statusSpan.style.color = "#6B8E23"; 
+
+                const botao = document.getElementById('btnSalvarChave');
+                const textoOriginal = '<i class="fas fa-save"></i> Salvar Chave e Ativar';
+                botao.innerHTML = '<i class="fas fa-check"></i> Ativada!';
+                botao.style.backgroundColor = "#6B8E23";
+                
+                setTimeout(function() {
+                    botao.innerHTML = textoOriginal;
+                    botao.style.backgroundColor = ""; 
+                }, 3000);
+
+                if(!modoSilencioso) mascoteFalar("Chave ativada e guardada com sucesso! Não vai precisar colar novamente.");
+
+            } catch (erro) {
+                alert("Ocorreu um erro ao salvar: " + erro.message);
+            }
+        }
+
+        // 2. FUNÇÃO DO MASCOTE (VOZ)
+        function mascoteFalar(texto) {
+            try {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel(); 
+                    const fala = new SpeechSynthesisUtterance(texto);
+                    fala.lang = 'pt-BR';
+                    window.speechSynthesis.speak(fala);
+                }
+            } catch (e) {
+                console.error("Erro na voz do mascote", e);
+            }
+        }
+
+        // Função auxiliar para transformar o áudio em dados legíveis
+        function converterArquivoParaBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // 3. OUVIR E TRANSCREVER O ÁUDIO REAL COM TRATAMENTO DE ERROS AVANÇADO
+        document.getElementById('audioFileInput').addEventListener('change', async function(evento) {
+            try {
+                const file = evento.target.files[0];
+                if (!file) return;
+
+                if (!currentGeminiApiKey) {
+                    alert("Atenção! Necessita colar e salvar a Chave da API (Passo 1).");
+                    document.getElementById('audioFileInput').value = '';
+                    return;
+                }
+
+                const caixaTexto = document.getElementById('transcribedTextDisplay');
+                caixaTexto.value = "⏳ A enviar o ficheiro de áudio para a IA... (Aguarde)";
+
+                const base64String = await converterArquivoParaBase64(file);
+                if (!base64String.includes(',')) {
+                    throw new Error("O navegador falhou a ler o ficheiro.");
+                }
+                
+                const base64Data = base64String.split(',')[1];
+                const mimeType = file.type || "audio/mp3";
+
+                const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + currentGeminiApiKey;
+                
+                const pacoteDeDados = {
+                    contents: [{
+                        parts: [
+                            { text: "Você é um assistente inteligente. Ouça este áudio e transcreva exatamente o que foi dito." },
+                            { inlineData: { mimeType: mimeType, data: base64Data } }
+                        ]
+                    }]
+                };
+
+                const resposta = await fetch(url, {
                     method: 'POST',
-                    body: JSON.stringify({
-                        texto: feedbackMessage,
-                        data: new Date().toISOString()
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(pacoteDeDados)
                 });
 
-                if (response.ok) {
-                    alert('Mensagem enviada para a thIAguinho Soluções!');
-                    document.getElementById('feedbackMessage').value = ''; // Clear form
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('feedbackModal'));
-                    modal.hide();
-                } else {
-                    alert('Erro ao enviar a mensagem. Por favor, tente novamente.');
-                    console.error('Firebase response not OK:', response.status, await response.text());
+                const dadosJson = await resposta.json();
+                
+                // NOVO DETETOR DE ERROS: Aqui capturamos o motivo exato de a chave falhar
+                if (!resposta.ok || dadosJson.error) {
+                    const msgGoogle = dadosJson.error ? dadosJson.error.message : resposta.statusText;
+                    throw new Error(`A Google rejeitou a chave ou o pedido. Motivo: ${msgGoogle}`);
                 }
-            } catch (error) {
-                alert('Erro ao enviar a mensagem. Verifique sua conexão ou tente novamente.');
-                console.error('Error sending feedback:', error);
+
+                if (dadosJson.candidates && dadosJson.candidates[0].content.parts[0].text) {
+                    caixaTexto.value = dadosJson.candidates[0].content.parts[0].text.trim();
+                    mascoteFalar("Áudio transcrito com sucesso.");
+                } else {
+                    caixaTexto.value = "A IA não conseguiu entender a fala.";
+                }
+
+            } catch (erro) {
+                console.error(erro);
+                // Imprime o erro diretamente na caixa de texto para sabermos o que falhou!
+                document.getElementById('transcribedTextDisplay').value = "❌ FALHA NA LIGAÇÃO À IA:\n\n" + erro.message + "\n\nVerifique se a chave que colou é válida e se não está a usar um ficheiro de áudio demasiado grande (mais de 5MB).";
+                mascoteFalar("Erro de comunicação com a chave da Inteligência Artificial.");
             }
         });
 
+        // 4. GERAR O PROJETO E CALCULAR VALORES
+        async function gerarProjeto() {
+            try {
+                const textoDoCliente = document.getElementById('transcribedTextDisplay').value.trim();
+                
+                if (!textoDoCliente || textoDoCliente.includes('FALHA') || textoDoCliente.includes('Aguarde')) {
+                    alert('Por favor, certifique-se que existe um texto válido do cliente na caixa.');
+                    return;
+                }
+                if (!currentGeminiApiKey) {
+                    alert('Configure a sua chave da API!');
+                    return;
+                }
 
-        // --- Initial Load Logic (Decide Admin or Client Panel) ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const clienteIdFromUrl = urlParams.get('clienteId');
+                const botaoGerar = document.getElementById('processAudioBtn');
+                botaoGerar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A criar Projeto...';
+                botaoGerar.disabled = true;
+                
+                document.getElementById('aiDesignSection').style.display = 'block';
+                document.getElementById('aiDesignDescription').innerText = "A elaborar o projeto de marcenaria. Aguarde...";
 
-            if (clienteIdFromUrl) {
-                document.getElementById('adminPanel').style.display = 'none';
-                document.getElementById('clientPanel').style.display = 'flex'; // Use flex for client panel
-                loadClientPanel(clienteIdFromUrl);
+                const textoComando = "Você é um arquiteto sênior especializado em móveis para Lojas de Óticas.\n" +
+                    "Leia o pedido do cliente: \"" + textoDoCliente + "\"\n\n" +
+                    "Crie uma proposta detalhada. No final, adicione OBRIGATORIAMENTE um bloco JSON com os custos.\n\n" +
+                    backticks + "json\n" +
+                    "{\n" +
+                    "  \"nome_projeto\": \"Ex: Balcão Ótica\",\n" +
+                    "  \"materiais_resumo\": \"Ex: MDF Branco, Vidro 8mm\",\n" +
+                    "  \"custo_material\": 1200.00,\n" +
+                    "  \"custo_mao_de_obra\": 800.00,\n" +
+                    "  \"custo_ferragens\": 350.00,\n" +
+                    "  \"outros_custos\": 100.00\n" +
+                    "}\n" +
+                    backticks;
+
+                const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + currentGeminiApiKey;
+                
+                const resposta = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: textoComando }] }] })
+                });
+
+                const dadosJson = await resposta.json();
+                
+                if (!resposta.ok || dadosJson.error) {
+                    const msgGoogle = dadosJson.error ? dadosJson.error.message : resposta.statusText;
+                    throw new Error(`A Google rejeitou a chave ou o pedido. Motivo: ${msgGoogle}`);
+                }
+
+                const textoIA = dadosJson.candidates[0].content.parts[0].text;
+                const regexParaLimparTexto = new RegExp(backticks + "(?:json)?[\\s\\S]*?" + backticks, "i");
+                const regexParaExtrairDados = new RegExp(backticks + "(?:json)?\\n?([\\s\\S]*?)\\n?" + backticks, "i");
+
+                document.getElementById('aiDesignDescription').innerText = textoIA.replace(regexParaLimparTexto, ''); 
+                
+                const parteDoJson = textoIA.match(regexParaExtrairDados);
+                
+                if (parteDoJson && parteDoJson[1]) {
+                    try {
+                        const dadosMovel = JSON.parse(parteDoJson[1]);
+                        document.getElementById('itemName').value = dadosMovel.nome_projeto || "Projeto IA";
+                        document.getElementById('itemMaterial').value = dadosMovel.materiais_resumo || "";
+                        document.getElementById('costMaterial').value = dadosMovel.custo_material || 0;
+                        document.getElementById('costLabor').value = dadosMovel.custo_mao_de_obra || 0;
+                        document.getElementById('costHardware').value = dadosMovel.custo_ferragens || 0;
+                        document.getElementById('costOther').value = dadosMovel.outros_custos || 0;
+                        mascoteFalar("O projeto foi gerado com sucesso.");
+                    } catch(err) {
+                        console.error("Erro no JSON:", err);
+                    }
+                }
+
+            } catch(erro) {
+                console.error(erro);
+                document.getElementById('aiDesignDescription').innerText = "❌ FALHA NA LIGAÇÃO À IA:\n\n" + erro.message;
+            } finally {
+                const botaoGerar = document.getElementById('processAudioBtn');
+                botaoGerar.innerHTML = '<i class="fas fa-magic"></i> Analisar Texto e Gerar Projeto';
+                botaoGerar.disabled = false;
+            }
+        }
+
+        function transferirParaOrcamento() {
+            document.getElementById('addItemSection').scrollIntoView({behavior: 'smooth'});
+        }
+
+        // 5. GESTÃO DE CUSTOS E LISTA DE ITENS
+        function atualizarTelaItens() {
+            const container = document.getElementById('itemsContainer');
+            container.innerHTML = '';
+            let somaTotal = 0;
+
+            if (listaDeItens.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#888;">Você ainda não adicionou nenhum móvel.</p>';
+                document.getElementById('totalProjectCost').textContent = "R$ 0,00";
+                return;
+            }
+
+            listaDeItens.forEach((item, index) => {
+                const somaCustosBrutos = item.costMaterial + item.costLabor + item.costHardware + item.costOther;
+                const valorVenda = somaCustosBrutos * (1 + (item.profitMargin / 100));
+                somaTotal += valorVenda;
+
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.innerHTML = `
+                    <h3>${item.name} 
+                        <div>
+                            <button onclick="editarItem(${index})" style="background-color: var(--secondary-wood)"><i class="fas fa-edit"></i></button>
+                            <button onclick="deletarItem(${index})" style="background-color: var(--warning-red)"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </h3>
+                    <p><strong>Descrição:</strong> ${item.material}</p>
+                    <div class="cost-details">
+                        <p>Material/Ferragens: R$ ${(item.costMaterial + item.costHardware).toFixed(2)}</p>
+                        <p>Mão de Obra/Outros: R$ ${(item.costLabor + item.costOther).toFixed(2)}</p>
+                        <p>Lucro da Empresa: ${item.profitMargin}%</p>
+                    </div>
+                    <p class="total-item-price">Valor de Venda do Item: R$ ${valorVenda.toFixed(2)}</p>
+                `;
+                container.appendChild(card);
+            });
+
+            document.getElementById('totalProjectCost').textContent = `R$ ${somaTotal.toFixed(2)}`;
+        }
+
+        function addItem() {
+            const item = {
+                name: document.getElementById('itemName').value || "Peça do Projeto",
+                material: document.getElementById('itemMaterial').value || "Não especificado",
+                costMaterial: parseFloat(document.getElementById('costMaterial').value) || 0,
+                costLabor: parseFloat(document.getElementById('costLabor').value) || 0,
+                costHardware: parseFloat(document.getElementById('costHardware').value) || 0,
+                costOther: parseFloat(document.getElementById('costOther').value) || 0,
+                profitMargin: parseFloat(document.getElementById('profitMargin').value) || 0
+            };
+
+            if (indexSendoEditado === -1) {
+                listaDeItens.push(item);
             } else {
-                document.getElementById('adminPanel').style.display = 'flex'; // Use flex for admin panel
-                document.getElementById('clientPanel').style.display = 'none';
-                showAdminSection('estoque'); // Default admin section
+                listaDeItens[indexSendoEditado] = item;
             }
-        });
+
+            limparFormulario();
+            atualizarTelaItens();
+        }
+
+        function editarItem(index) {
+            const item = listaDeItens[index];
+            document.getElementById('itemName').value = item.name;
+            document.getElementById('itemMaterial').value = item.material;
+            document.getElementById('costMaterial').value = item.costMaterial;
+            document.getElementById('costLabor').value = item.costLabor;
+            document.getElementById('costHardware').value = item.costHardware;
+            document.getElementById('costOther').value = item.costOther;
+            document.getElementById('profitMargin').value = item.profitMargin;
+            indexSendoEditado = index;
+            document.getElementById('btnSaveItem').innerHTML = '<i class="fas fa-sync"></i> Atualizar Item Modificado';
+            document.getElementById('addItemSection').scrollIntoView({behavior: 'smooth'});
+        }
+
+        function deletarItem(index) {
+            if(confirm("Deseja realmente apagar este item do projeto?")) {
+                listaDeItens.splice(index, 1);
+                atualizarTelaItens();
+            }
+        }
+
+        function limparFormulario() {
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemMaterial').value = '';
+            document.getElementById('costMaterial').value = '0';
+            document.getElementById('costLabor').value = '0';
+            document.getElementById('costHardware').value = '0';
+            document.getElementById('costOther').value = '0';
+            document.getElementById('profitMargin').value = '20';
+            indexSendoEditado = -1;
+            document.getElementById('btnSaveItem').innerHTML = '<i class="fas fa-plus"></i> Confirmar Item na Lista';
+        }
     </script>
 </body>
 </html>
