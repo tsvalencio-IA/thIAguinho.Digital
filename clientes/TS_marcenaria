@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gerador de Projetos e Orçamentos para Marcenaria - thIAguinho Soluções</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Bibliotecas 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <style>
+        :root {
+            /* Marcenaria Palette Original thIAguinho Soluções */
+            --primary-dark: #4A3C30;     /* Dark Coffee Brown */
+            --secondary-wood: #7F5539;   /* Warm Medium Brown */
+            --accent-gold: #DDA15E;      /* Muted Gold / Brass */
+            --light-cream: #FDFCF9;      /* Off-white Cream */
+            --soft-beige: #FBF8F4;       /* Soft Beige for Cards */
+            --earth-green: #6B8E23;      /* Olive Green (for AI section details) */
+            --text-color: #333333;       /* Dark Grey for Text */
+            --border-soft: #C6B6A5;      /* Soft Brown Grey for Borders */
+            --bg-light-panel: #EFEAE5;   /* Light Beige Grey for section panels */
+            --bg-ai-section: #E6F0E0;    /* Very Light Greenish for AI output */
+            --bg-summary: #F2E8DC;       /* Soft Warm Light Grey for Summary */
+            --warning-red: #dc3545;      /* Red for security warning */
+
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-radius-soft: 8px;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-cream);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 960px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: var(--soft-beige);
+            border-radius: var(--border-radius-soft);
+            box-shadow: var(--shadow-subtle);
+        }
+        h1, h2, h3 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--primary-dark);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 2em;
+            border-bottom: 2px solid var(--border-soft);
+            padding-bottom: 15px;
+            margin-top: 40px;
+            color: var(--secondary-wood);
+        }
+        .subtitle {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            font-size: 0.95em;
+        }
+        .input-group input[type="text"],
+        .input-group input[type="number"],
+        .input-group textarea,
+        .input-group input[type="password"],
+        .input-group input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-soft);
+            border-radius: var(--border-radius-soft);
+            font-size: 1em;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box;
+            background-color: var(--light-cream);
+            color: var(--text-color);
+        }
+        .input-group input:focus, .input-group textarea:focus {
+            border-color: var(--secondary-wood);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(127, 85, 57, 0.2);
+        }
+        textarea { resize: vertical; }
+
+        .section-panel {
+            padding: 25px;
+            background-color: var(--bg-light-panel);
+            border-radius: var(--border-radius-soft);
+            margin-bottom: 30px;
+            border: 1px solid var(--border-soft);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .grid-layout .full-width {
+            grid-column: 1 / -1;
+        }
+
+        button {
+            background-color: var(--accent-gold);
+            color: var(--primary-dark);
+            padding: 12px 25px;
+            border: none;
+            border-radius: var(--border-radius-soft);
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        }
+        button:hover {
+            background-color: #C38C4B;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            color: #666;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        .action-buttons button.primary { background-color: var(--secondary-wood); color: white; }
+        .action-buttons button.primary:hover { background-color: #6a4933; }
+
+        /* Estilos do Visualizador 3D */
+        #container3DWrapper {
+            width: 100%; height: 500px; position: relative;
+            border-radius: var(--border-radius-soft);
+            border: 2px solid var(--border-soft);
+            overflow: hidden; background: radial-gradient(circle, #ffffff 0%, #EFEAE5 100%);
+            touch-action: none;
+            margin-bottom: 20px;
+        }
+        #visualizador3D { width: 100%; height: 100%; display: block; cursor: pointer; }
+        #info3D {
+            position: absolute; top: 15px; left: 15px;
+            background: rgba(74, 60, 48, 0.85); color: #FFF;
+            padding: 8px 12px; border-radius: 6px;
+            font-size: 0.85em; font-weight: bold; pointer-events: none;
+            backdrop-filter: blur(4px);
+        }
+        #instrucao3D {
+            position: absolute; bottom: 15px; right: 15px;
+            background: rgba(221, 161, 94, 0.9); color: var(--primary-dark);
+            padding: 6px 12px; border-radius: 20px;
+            font-size: 0.8em; font-weight: 600; pointer-events: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Tabela Plano de Corte */
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-soft); }
+        th { background-color: var(--secondary-wood); color: white; font-weight: 600; white-space: nowrap; }
+        tr:hover { background-color: var(--soft-beige); }
+
+        #summary {
+            margin-top: 40px; padding: 30px; background-color: var(--bg-summary);
+            border-radius: var(--border-radius-soft); border: 1px solid #dccca0; text-align: center;
+            box-shadow: inset 0 1px 5px rgba(0,0,0,0.03);
+        }
+        #summary p { font-size: 1.6em; font-weight: 700; color: var(--primary-dark); margin: 15px 0; }
+        #summary button.warning { background-color: var(--secondary-wood); }
+        #summary button.warning:hover { background-color: #6a4933; }
+
+        .ai-output-section {
+            margin-top: 30px; padding: 25px; background-color: var(--bg-ai-section);
+            border-radius: var(--border-radius-soft); border: 1px solid #B0D7B0;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .ai-output-section h3 { color: var(--earth-green); text-align: left; font-size: 1.6em; border-bottom: none; padding-bottom: 0;}
+        .description-box {
+            background-color: var(--light-cream); padding: 18px; border-radius: var(--border-radius-soft);
+            border: 1px solid var(--border-soft); white-space: pre-wrap; font-family: 'Roboto', monospace;
+            font-size: 0.95em; color: var(--text-color); margin-top: 15px; min-height: 100px;
+            line-height: 1.5; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .api-config-section {
+            background-color: var(--bg-light-panel); border: 1px solid var(--border-soft);
+            border-radius: var(--border-radius-soft); padding: 20px; margin-bottom: 30px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .warning-message {
+            background-color: #ffe0b2; border-left: 5px solid #ff9800; padding: 15px;
+            margin-bottom: 20px; border-radius: 5px; color: #555; font-size: 0.9em;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        /* Rodapé Original Restaurado */
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 25px;
+            color: #777;
+            font-size: 0.9em;
+            border-top: 1px solid var(--border-soft);
+            background-color: var(--bg-light-panel);
+            border-radius: 0 0 var(--border-radius-soft) var(--border-radius-soft);
+        }
+
+        .floating-buttons {
+            position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 1000;
+        }
+        .floating-button {
+            background-color: var(--secondary-wood); color: white; padding: 12px 20px; border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); font-size: 1em; font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            display: flex; align-items: center; justify-content: center; gap: 10px; border: none; cursor: pointer;
+        }
+        .floating-button:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25); background-color: #6a4933; }
+        .floating-button.mascote { background-color: #FFC107; color: var(--primary-dark); }
+        .floating-button.mascote:hover { background-color: #e0a800; }
+
+        @media (max-width: 768px) {
+            .container { margin: 20px 15px; padding: 20px; }
+            h1 { font-size: 2.2em; }
+            h2 { font-size: 1.6em; }
+            .grid-layout { grid-template-columns: 1fr; }
+            #container3DWrapper { height: 350px; }
+        }
+        
+        /* Thumbnail de imagem */
+        #imagePreviewContainer img {
+            max-width: 100%; max-height: 200px; border-radius: 8px; border: 2px solid var(--border-soft);
+            margin-top: 10px; display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛠️ Gerador de Projetos e Orçamentos para Marcenaria</h1>
+        <p class="subtitle">Transforme as ideias do seu cliente em designs visuais, planos de corte e orçamentos precisos.</p>
+
+        <!-- 1. Configuração da IA -->
+        <section id="apiConfigSection" class="api-config-section">
+            <h2 style="margin-top:0;"><i class="fas fa-cogs"></i> Configurações da IA (Groq)</h2>
+            <div class="warning-message">
+                <i class="fas fa-exclamation-triangle" style="color:#ff9800; font-size:1.5em;"></i>
+                <div>
+                    <strong>Atenção:</strong> Insira a sua chave da Groq API para ativar a transcrição de áudio, leitura de imagens e geração de projetos 3D.
+                </div>
+            </div>
+            <div class="input-group full-width">
+                <label>Chave da API:</label>
+                <input type="password" id="apiKeyInput" placeholder="Cole a sua chave API da Groq aqui (gsk_...)">
+            </div>
+            <div class="action-buttons" style="justify-content: flex-start; margin-top: 0;">
+                <button onclick="salvarChave(false)" class="primary" id="btnSalvarChave">
+                    <i class="fas fa-save"></i> Salvar Chave e Ativar
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. Pedido do Cliente (NOVO: Suporte a Imagem) -->
+        <section id="audioInputSection" class="section-panel">
+            <h2 style="margin-top:0;"><i class="fas fa-comment-dots"></i> Pedido do Cliente</h2>
+            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">Envie uma foto da parede ou um áudio para a IA projetar o móvel perfeito.</p>
+            
+            <div class="grid-layout">
+                <div class="input-group">
+                    <label><i class="fas fa-camera"></i> Foto do Ambiente (Opcional):</label>
+                    <input type="file" id="imageFileInput" accept="image/*" onchange="previewImagem(event)">
+                    <div id="imagePreviewContainer"><img id="previewImg" src="" alt="Pré-visualização da Parede"></div>
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-microphone-alt"></i> Carregar Áudio:</label>
+                    <input type="file" id="audioFileInput" accept="audio/*">
+                </div>
+            </div>
+
+            <div class="input-group full-width">
+                <label>Texto do Pedido (Revise ou Digite):</label>
+                <textarea id="transcribedTextDisplay" rows="4" placeholder="Descreva o móvel (ex: Quero um guarda-roupa de casal com 4 portas e 6 gavetas) ou carregue um áudio..."></textarea>
+            </div>
+            <div class="action-buttons">
+                <button id="processAudioBtn" class="primary" onclick="gerarProjeto()" style="width: 100%;">
+                    <i class="fas fa-magic"></i> Analisar com IA e Gerar 3D
+                </button>
+            </div>
+        </section>
+
+        <!-- 3. Projeto Técnico (3D + Medidas) -->
+        <section id="aiDesignSection" class="ai-output-section" style="display: none;">
+            <h3 style="margin-top: 0;"><i class="fas fa-lightbulb"></i> Projeto de Engenharia</h3>
+            <p class="subtitle" style="text-align: left;">O assistente IA interpretou o pedido e calculou todas as ferragens e cortes:</p>
+            
+            <div class="input-group full-width">
+                <label>Descrição Detalhada e Estrutura:</label>
+                <div id="descricaoProjeto" class="description-box">A calcular metragens para a fábrica...</div>
+            </div>
+
+            <!-- Visor 3D Profissional Dinâmico -->
+            <div style="margin-top: 30px;">
+                <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;">
+                    <i class="fas fa-cube"></i> Visualização 3D Dinâmica
+                </h3>
+                <p style="font-size: 0.85em; color: var(--earth-green); margin-bottom: 10px;">
+                    <i class="fas fa-info-circle"></i> <b>Interativo:</b> Clique nas portas e gavetas do móvel 3D abaixo para abri-las.
+                </p>
+                <div id="container3DWrapper">
+                    <div id="visualizador3D"></div>
+                    <div id="info3D">A processar medidas...</div>
+                    <div id="instrucao3D"><i class="fas fa-hand-pointer"></i> Arraste e Clique</div>
+                </div>
+            </div>
+
+            <!-- Tabela de Corte -->
+            <div style="margin-top: 30px;">
+                <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;"><i class="fas fa-ruler-combined"></i> Plano de Corte e Ferragens</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Peça / Componente</th>
+                                <th>Qtd</th>
+                                <th>C (mm)</th>
+                                <th>L (mm)</th>
+                                <th>Mat/Esp.</th>
+                                <th>Fita Borda</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaPlanoCorte">
+                            <!-- Preenchido pela IA -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="primary" onclick="transferirParaOrcamento()">
+                    <i class="fas fa-arrow-down"></i> Revisar Custos
+                </button>
+            </div>
+        </section>
+
+        <!-- 4. Orçamento Parametrizado -->
+        <section id="addItemSection" class="section-panel">
+            <h2><i class="fas fa-file-invoice-dollar"></i> Custos e Precificação</h2>
+            <div class="grid-layout">
+                <div class="input-group full-width">
+                    <label>Nome do Projeto:</label>
+                    <input type="text" id="itemName" placeholder="Ex: Guarda-Roupa Casal">
+                </div>
+                <div class="input-group">
+                    <label>Custo Material (MDF) (R$):</label>
+                    <input type="number" id="costMaterial" value="0" min="0" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Custo Mão de Obra (R$):</label>
+                    <input type="number" id="costLabor" value="0" min="0" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Ferragens Calculadas (R$):</label>
+                    <input type="number" id="costHardware" value="0" min="0" step="0.01" title="Soma de dobradiças, corrediças, puxadores, etc.">
+                </div>
+                <div class="input-group">
+                    <label>Outros Custos (R$):</label>
+                    <input type="number" id="costOther" value="0" min="0" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Margem de Lucro (%):</label>
+                    <input type="number" id="profitMargin" value="30" min="0" max="100" step="1">
+                </div>
+                <div class="input-group full-width action-buttons">
+                    <button class="primary" onclick="calcularTotal()" id="btnSaveItem">
+                        <i class="fas fa-calculator"></i> Calcular Valor Final
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="summary">
+            <h2><i class="fas fa-check-circle"></i> Valor Final do Projeto</h2>
+            <p><span id="totalProjectCost">R$ 0,00</span></p>
+            <button onclick="mascoteFalar('O orçamento finalizado sugerido pela inteligência artificial para o seu cliente é de ' + document.getElementById('totalProjectCost').textContent)" class="warning">
+                <i class="fas fa-bullhorn"></i> Anunciar Valor
+            </button>
+        </section>
+    </div>
+
+    <!-- Botões Flutuantes Originais Restaurados -->
+    <div class="floating-buttons">
+        <button class="floating-button mascote" onclick="mascoteFalar('Olá! Eu sou o assistente mestre marceneiro. Me diga o que o cliente quer, ou me mostre uma foto, e eu calculo todas as chapas, gavetas, portas e ferragens para o seu projeto em 3D!')">
+            <i class="fas fa-headset"></i> <span>Mascote</span>
+        </button>
+    </div>
+
+    <!-- RODAPÉ OFICIAL RESTAURADO -->
+    <footer>
+        Powered by thIAguinho Soluções
+    </footer>
+
+    <!-- Script de Programação -->
+    <script>
+        let currentApiKey = null;
+        let cena3D, camera3D, renderizador3D, controles3D;
+        let motor3DIniciado = false;
+        
+        // Variáveis para a Interatividade 3D (O Segredo das Portas e Gavetas)
+        let raycaster = new THREE.Raycaster();
+        let mouse = new THREE.Vector2();
+        let objetosInterativos = []; // Guarda tudo que pode ser clicado
+        let grupoMovelAtual = null;
+        let base64ImagemGlobal = null;
+
+        window.onload = function() {
+            const chaveGuardada = localStorage.getItem('groqApiKeyLocal');
+            if (chaveGuardada) {
+                document.getElementById('apiKeyInput').value = chaveGuardada;
+                salvarChave(true); 
+            }
+        };
+
+        function salvarChave(modoSilencioso = false) {
+            const inputChave = document.getElementById('apiKeyInput');
+            const chave = inputChave.value.trim();
+            if (chave === "") return;
+            
+            currentApiKey = chave;
+            localStorage.setItem('groqApiKeyLocal', chave);
+            if(!modoSilencioso) {
+                const btn = document.getElementById('btnSalvarChave');
+                btn.innerHTML = "<i class='fas fa-check'></i> Chave Salva!";
+                btn.style.backgroundColor = "var(--earth-green)";
+            }
+        }
+
+        // ==========================================
+        // IMAGEM, ÁUDIO E VOZ
+        // ==========================================
+        function mascoteFalar(texto) {
+            try {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel(); 
+                    const fala = new SpeechSynthesisUtterance(texto);
+                    fala.lang = 'pt-BR';
+                    window.speechSynthesis.speak(fala);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function previewImagem(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('previewImg');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    base64ImagemGlobal = e.target.result; // Salva para enviar pra IA
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        document.getElementById('audioFileInput').addEventListener('change', async function(evento) {
+            try {
+                const file = evento.target.files[0];
+                if (!file) return;
+                if (!currentApiKey) { alert("Configure a Chave da IA primeiro!"); return; }
+
+                document.getElementById('transcribedTextDisplay').value = "⏳ A transcrever áudio...";
+                
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("model", "whisper-large-v3");
+                formData.append("language", "pt");
+
+                const resposta = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
+                    method: 'POST',
+                    headers: { "Authorization": `Bearer ${currentApiKey}` },
+                    body: formData
+                });
+
+                const dadosJson = await resposta.json();
+                if (!resposta.ok) throw new Error(dadosJson.error.message);
+
+                document.getElementById('transcribedTextDisplay').value = dadosJson.text.trim();
+
+            } catch (erro) {
+                alert("Erro ao ler áudio: " + erro.message);
+            }
+        });
+
+        // ==========================================
+        // PROJETO TÉCNICO E IA (Agora com cálculo real)
+        // ==========================================
+        async function gerarProjeto() {
+            try {
+                const textoDoCliente = document.getElementById('transcribedTextDisplay').value.trim();
+                if (!textoDoCliente && !base64ImagemGlobal) { 
+                    alert("Escreva o que deseja ou anexe uma foto do ambiente."); return; 
+                }
+                if (!currentApiKey) { alert("Chave API ausente."); return; }
+
+                const botaoGerar = document.getElementById('processAudioBtn');
+                botaoGerar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Desenhando e Calculando Ferragens...';
+                botaoGerar.disabled = true;
+                
+                const secaoDesign = document.getElementById('aiDesignSection');
+                secaoDesign.style.display = 'block';
+                document.getElementById('descricaoProjeto').innerText = "A calcular metragens, dobradiças e corrediças para a fábrica...";
+
+                // O Prompt mestre: Obriga a IA a pensar como marceneiro real
+                const promptComando = `Você é um Mestre Marceneiro e Engenheiro de Projetos. 
+O cliente pediu o seguinte móvel: "${textoDoCliente}".
+Se uma imagem foi enviada, projete um móvel que caiba perfeitamente no ambiente da imagem.
+
+AJA COM VERDADE ABSOLUTA: 
+- Calcule as medidas de forma coerente (ex: Profundidade padrão de guarda-roupa é 600mm, balcão 500mm).
+- Se tiver gavetas, OBRIGATORIAMENTE calcule 1 par de corrediça por gaveta.
+- Se tiver portas, OBRIGATORIAMENTE calcule dobradiças (2 por porta baixa, 3 a 4 por porta alta).
+- Calcule os parafusos (média de 12 por gaveta, 4 por dobradiça, mais a estrutura).
+
+Responda OBRIGATORIAMENTE em JSON estrito com esta exata estrutura:
+{
+  "nome_projeto": "Ex: Guarda-roupa Inteligente",
+  "descricao_projeto": "Descreva o projeto e explique a estrutura escolhida...",
+  "dimensoes_mm": { "largura": 1500, "altura": 2200, "profundidade": 600 },
+  "estrutura": { "portas": 3, "gavetas": 4 },
+  "plano_de_corte": [
+    {"peca": "Laterais", "qtde": 2, "comprimento": 2200, "largura": 600, "espessura": "MDF 15mm", "fita_borda": "Frontal/Base"},
+    {"peca": "Frente Gaveta", "qtde": 4, "comprimento": 480, "largura": 200, "espessura": "MDF 15mm", "fita_borda": "4 Lados"}
+  ],
+  "ferragens_reais": {
+    "dobradicas": 12,
+    "corredicas_pares": 4,
+    "puxadores": 7,
+    "parafusos": 150
+  },
+  "custos": {
+    "material": 850,
+    "mao_de_obra": 600,
+    "ferragens": 250,
+    "outros": 100
+  }
+}`;
+
+                let mensagens = [];
+                
+                // Se tiver imagem, tenta usar o modelo de visão, senão, modelo normal de texto
+                let modeloSelecionado = "llama-3.3-70b-versatile"; 
+
+                if (base64ImagemGlobal) {
+                    modeloSelecionado = "llama-3.2-11b-vision-preview";
+                    mensagens = [
+                        {
+                            role: "user",
+                            content: [
+                                { type: "text", text: promptComando },
+                                { type: "image_url", image_url: { url: base64ImagemGlobal } }
+                            ]
+                        }
+                    ];
+                } else {
+                    mensagens = [{ role: "user", content: promptComando }];
+                }
+
+                let projetoIA = null;
+
+                try {
+                    const resposta = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                        method: 'POST',
+                        headers: { "Authorization": `Bearer ${currentApiKey}`, "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            model: modeloSelecionado, 
+                            messages: mensagens,
+                            response_format: { type: "json_object" }, 
+                            temperature: 0.1 // Temperatura baixa para focar em matemática exata
+                        })
+                    });
+
+                    const dados = await resposta.json();
+                    if (!resposta.ok) {
+                        throw new Error(dados.error?.message || "Erro desconhecido na API.");
+                    }
+                    projetoIA = JSON.parse(dados.choices[0].message.content);
+                } catch (err) { 
+                    console.error("Falha na chamada principal da IA:", err);
+                    // Fallback para modelo básico se o vision falhar ou cota exceder
+                    if (base64ImagemGlobal) {
+                        alert("O modelo de Visão falhou. Tentando apenas com o texto...");
+                        const fallbackReq = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                            method: 'POST',
+                            headers: { "Authorization": `Bearer ${currentApiKey}`, "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                model: "llama-3.3-70b-versatile", 
+                                messages: [{ role: "user", content: promptComando }],
+                                response_format: { type: "json_object" }, temperature: 0.1
+                            })
+                        });
+                        const dadosFB = await fallbackReq.json();
+                        projetoIA = JSON.parse(dadosFB.choices[0].message.content);
+                    } else {
+                        throw err;
+                    }
+                }
+
+                if (!projetoIA) throw new Error("A Inteligência Artificial não conseguiu estruturar os dados. Tente novamente.");
+
+                // 1. Tabela e Textos
+                const textoRelatorio = `
+${projetoIA.descricao_projeto}
+
+🔍 **Engenharia de Ferragens Calculada:**
+- Dobradiças: ${projetoIA.ferragens_reais?.dobradicas || 0} unidades
+- Corrediças: ${projetoIA.ferragens_reais?.corredicas_pares || 0} pares
+- Puxadores: ${projetoIA.ferragens_reais?.puxadores || 0} unidades
+- Parafusos: ${projetoIA.ferragens_reais?.parafusos || 0} unidades aproximadas.
+                `;
+                document.getElementById('descricaoProjeto').innerHTML = textoRelatorio.replace(/\n/g, '<br>');
+                
+                const tbody = document.getElementById('tabelaPlanoCorte');
+                tbody.innerHTML = '';
+                if(projetoIA.plano_de_corte) {
+                    projetoIA.plano_de_corte.forEach(peca => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td><strong>${peca.peca}</strong></td>
+                                <td>${peca.qtde}</td>
+                                <td>${peca.comprimento}</td>
+                                <td>${peca.largura}</td>
+                                <td style="color: var(--secondary-wood); font-weight:600;">${peca.espessura}</td>
+                                <td><span style="background:var(--bg-light-panel); padding:4px 8px; border-radius:4px; font-size:0.85em;">${peca.fita_borda}</span></td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                // 2. Orçamento (Inputs da seção 4 preenchidos automaticamente)
+                document.getElementById('itemName').value = projetoIA.nome_projeto || "Móvel Inteligente";
+                if(projetoIA.custos) {
+                    document.getElementById('costMaterial').value = projetoIA.custos.material || 0;
+                    document.getElementById('costLabor').value = projetoIA.custos.mao_de_obra || 0;
+                    document.getElementById('costHardware').value = projetoIA.custos.ferragens || 0;
+                    document.getElementById('costOther').value = projetoIA.custos.outros || 0;
+                    calcularTotal();
+                }
+
+                // 3. INICIAR 3D APENAS APÓS A TELA FICAR VISÍVEL
+                if (!motor3DIniciado) {
+                    init3D();
+                    motor3DIniciado = true;
+                }
+                
+                const med = projetoIA.dimensoes_mm || { largura: 1000, altura: 800, profundidade: 500 };
+                const est = projetoIA.estrutura || { portas: 0, gavetas: 0 };
+                
+                setTimeout(() => {
+                    ajustarTamanho3D();
+                    // Agora chamamos o construtor paramétrico que lê portas e gavetas!
+                    desenharMovelParametrico(med.largura, med.altura, med.profundidade, est.portas, est.gavetas);
+                }, 100);
+
+            } catch(erro) {
+                alert("Erro ao processar: " + erro.message);
+            } finally {
+                const botaoGerar = document.getElementById('processAudioBtn');
+                botaoGerar.innerHTML = '<i class="fas fa-magic"></i> Analisar com IA e Gerar 3D';
+                botaoGerar.disabled = false;
+            }
+        }
+
+        // ==========================================
+        // MOTOR 3D PROFISSIONAL E INTERATIVO
+        // ==========================================
+        function init3D() {
+            const container = document.getElementById('visualizador3D');
+            const wrapper = document.getElementById('container3DWrapper');
+            
+            cena3D = new THREE.Scene();
+
+            const luzAmbiente = new THREE.AmbientLight(0xffffff, 0.7);
+            cena3D.add(luzAmbiente);
+            
+            const luzSpot = new THREE.DirectionalLight(0xffffff, 1.0);
+            luzSpot.position.set(5, 10, 5);
+            cena3D.add(luzSpot);
+
+            // Luz suave lateral para volume
+            const luzTras = new THREE.DirectionalLight(0xDDA15E, 0.4); 
+            luzTras.position.set(-5, 5, -5);
+            cena3D.add(luzTras);
+
+            camera3D = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 0.1, 1000);
+            
+            renderizador3D = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderizador3D.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
+            renderizador3D.setSize(wrapper.clientWidth, wrapper.clientHeight);
+            container.appendChild(renderizador3D.domElement);
+
+            controles3D = new THREE.OrbitControls(camera3D, renderizador3D.domElement);
+            controles3D.enableDamping = true;
+            controles3D.dampingFactor = 0.05;
+
+            const gridHelper = new THREE.GridHelper(10, 20, 0xC6B6A5, 0xEFEAE5);
+            gridHelper.position.y = -0.01;
+            cena3D.add(gridHelper);
+
+            // EVENTO DE CLIQUE PARA INTERATIVIDADE (Raycaster)
+            renderizador3D.domElement.addEventListener('pointerdown', onClick3D, false);
+
+            function animar() {
+                requestAnimationFrame(animar);
+                
+                // Animação Paramétrica (Abre gavetas e portas suavemente)
+                if (grupoMovelAtual) {
+                    grupoMovelAtual.children.forEach(filho => {
+                        const data = filho.userData;
+                        if (!data) return;
+                        
+                        const vel = 0.1; // Velocidade da animação
+
+                        if (data.tipo === 'porta') {
+                            const alvo = data.aberto ? data.rotacaoAberta : data.rotacaoFechada;
+                            filho.rotation.y += (alvo - filho.rotation.y) * vel;
+                        } 
+                        else if (data.tipo === 'gaveta') {
+                            const alvoZ = data.aberto ? data.posAberta : data.posFechada;
+                            filho.position.z += (alvoZ - filho.position.z) * vel;
+                        }
+                    });
+                }
+
+                controles3D.update();
+                renderizador3D.render(cena3D, camera3D);
+            }
+            animar();
+
+            window.addEventListener('resize', ajustarTamanho3D);
+        }
+
+        function ajustarTamanho3D() {
+            if(!camera3D || !renderizador3D) return;
+            const wrapper = document.getElementById('container3DWrapper');
+            if(wrapper.clientWidth === 0) return; 
+            
+            camera3D.aspect = wrapper.clientWidth / wrapper.clientHeight;
+            camera3D.updateProjectionMatrix();
+            renderizador3D.setSize(wrapper.clientWidth, wrapper.clientHeight);
+        }
+
+        // LÓGICA DE CLIQUE NO 3D
+        function onClick3D(event) {
+            const rect = renderizador3D.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera3D);
+
+            const intersects = raycaster.intersectObjects(objetosInterativos, false);
+            
+            if (intersects.length > 0) {
+                // Ao invés de pegar a malha (chapa), pegamos o PAI (o Pivot da Porta ou o Grupo da Gaveta)
+                const malhaClicada = intersects[0].object;
+                const grupoAnimavel = malhaClicada.userData.grupoPai;
+                
+                if (grupoAnimavel) {
+                    grupoAnimavel.userData.aberto = !grupoAnimavel.userData.aberto;
+                }
+            }
+        }
+
+        // CONSTRUTOR PARAMÉTRICO DE QUALQUER MÓVEL
+        function desenharMovelParametrico(largura_mm, altura_mm, profundidade_mm, numPortas, numGavetas) {
+            if (grupoMovelAtual) cena3D.remove(grupoMovelAtual);
+            objetosInterativos = []; // Limpa objetos clicáveis antigos
+
+            grupoMovelAtual = new THREE.Group();
+            cena3D.add(grupoMovelAtual);
+
+            // Conversão para metros no Three.js
+            const L = largura_mm / 1000;
+            const A = altura_mm / 1000;
+            const P = profundidade_mm / 1000;
+            const E = 0.015; // Espessura do MDF 15mm
+            const F = 0.003; // Folga de 3mm entre frentes
+
+            // Paleta Oficial thIAguinho
+            const matMDFClaro = new THREE.MeshStandardMaterial({ color: 0xFDFCF9, roughness: 0.8 }); // --light-cream
+            const matMDFMadeira = new THREE.MeshStandardMaterial({ color: 0x7F5539, roughness: 0.9 }); // --secondary-wood
+            const matPuxador = new THREE.MeshStandardMaterial({ color: 0x4A3C30, metalness: 0.6, roughness: 0.4 }); // --primary-dark
+            
+            // Materiais mesclados para simular a borda
+            const matBordaMDF = new THREE.MeshStandardMaterial({ color: 0xEFEAE5, roughness: 0.9 });
+            const materiaisChapa = [matBordaMDF, matBordaMDF, matMDFClaro, matMDFClaro, matBordaMDF, matBordaMDF];
+            const materiaisPorta = [matBordaMDF, matBordaMDF, matMDFMadeira, matMDFClaro, matBordaMDF, matBordaMDF]; // Frente madeira, interno claro
+
+            function criarChapa(larg, alt, prof, materiais, x, y, z, interativo = false) {
+                const geo = new THREE.BoxGeometry(larg, alt, prof);
+                const mesh = new THREE.Mesh(geo, materiais);
+                mesh.position.set(x, y, z);
+                if (interativo) objetosInterativos.push(mesh); // Adiciona na lista do Raycaster
+                return mesh;
+            }
+
+            // 1. ESTRUTURA PRINCIPAL (Caixa)
+            const grupoCaixa = new THREE.Group();
+            
+            // Base
+            grupoCaixa.add(criarChapa(L - E*2, E, P, materiaisChapa, 0, E/2, 0));
+            // Laterais
+            grupoCaixa.add(criarChapa(E, A, P, materiaisChapa, -L/2 + E/2, A/2, 0));
+            grupoCaixa.add(criarChapa(E, A, P, materiaisChapa, L/2 - E/2, A/2, 0));
+            // Tampo Superior
+            grupoCaixa.add(criarChapa(L - E*2, E, P, materiaisChapa, 0, A - E/2, 0));
+            // Fundo (Recuado e mais fino)
+            grupoCaixa.add(criarChapa(L - E*2, A - E*2, 0.006, materiaisChapa, 0, A/2, -P/2 + 0.01));
+
+            grupoMovelAtual.add(grupoCaixa);
+
+            // 2. CÁLCULO DE DIVISÃO (Gavetas em baixo, Portas em cima, ou vice-versa dependendo do móvel)
+            // Lógica padrão: Gavetas ficam na base.
+            let altGavetasTotal = 0;
+            let altGavetaUnica = 0;
+            
+            if (numGavetas > 0) {
+                altGavetasTotal = Math.min(A * 0.4, numGavetas * 0.25); // Max 40% da altura do móvel, ou 25cm por gaveta
+                altGavetaUnica = altGavetasTotal / numGavetas;
+                
+                // Prateleira divisória acima das gavetas
+                grupoCaixa.add(criarChapa(L - E*2, E, P - E, materiaisChapa, 0, E + altGavetasTotal + E/2, E/2));
+            }
+
+            // 3. CONSTRUIR GAVETAS INTERATIVAS
+            if (numGavetas > 0) {
+                const largGaveta = L - E*2 - F*2; // Largura livre menos folga
+                const profGaveta = P - 0.05; // Gaveta não bate no fundo
+
+                for (let i = 0; i < numGavetas; i++) {
+                    const posY = E + (i * altGavetaUnica) + (altGavetaUnica / 2);
+                    
+                    const gavetaCorredica = new THREE.Group();
+                    gavetaCorredica.position.set(0, posY, 0);
+                    
+                    // Frente da Gaveta (Interativa)
+                    const altFrente = altGavetaUnica - F;
+                    const frenteMesh = criarChapa(largura_mm < 600 ? largGaveta : largGaveta, altFrente, E, materiaisPorta, 0, 0, P/2 - E/2, true);
+                    frenteMesh.userData.grupoPai = gavetaCorredica; // Link para o Raycaster saber quem animar
+                    gavetaCorredica.add(frenteMesh);
+
+                    // Puxador da Gaveta
+                    const puxador = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.15, 16), matPuxador);
+                    puxador.rotation.z = Math.PI / 2;
+                    puxador.position.set(0, 0, P/2 + 0.02);
+                    gavetaCorredica.add(puxador);
+
+                    // Caixa Interna da Gaveta (Simplificada)
+                    const largInt = largGaveta - 0.03; // Desconto das corrediças
+                    const altInt = altFrente - 0.04;
+                    gavetaCorredica.add(criarChapa(E, altInt, profGaveta - E, materiaisChapa, -largInt/2 + E/2, 0, P/2 - profGaveta/2 - E)); // Lateral Esq
+                    gavetaCorredica.add(criarChapa(E, altInt, profGaveta - E, materiaisChapa, largInt/2 - E/2, 0, P/2 - profGaveta/2 - E));  // Lateral Dir
+                    gavetaCorredica.add(criarChapa(largInt - E*2, E, profGaveta - E, materiaisChapa, 0, -altInt/2 + E/2, P/2 - profGaveta/2 - E)); // Fundo Interno
+
+                    // Configuração da Animação
+                    gavetaCorredica.userData = { tipo: 'gaveta', aberto: false, posFechada: 0, posAberta: profGaveta * 0.8 };
+                    
+                    grupoMovelAtual.add(gavetaCorredica);
+                }
+            }
+
+            // 4. CONSTRUIR PORTAS INTERATIVAS (Pivotantes)
+            const altPortasVao = A - E*2 - (numGavetas > 0 ? altGavetasTotal + E : 0);
+            
+            if (numPortas > 0 && altPortasVao > 0.1) {
+                const altPorta = altPortasVao - F;
+                const largPorta = (L - E*2 - (F * (numPortas + 1))) / numPortas;
+                
+                const inicioX = -L/2 + E + F + largPorta/2;
+                const posYPorta = E + (numGavetas > 0 ? altGavetasTotal + E : 0) + altPorta/2;
+
+                for (let i = 0; i < numPortas; i++) {
+                    const centroX = inicioX + (i * (largPorta + F));
+                    
+                    // Lógica de abertura: metade da esquerda abre pra esquerda, metade da direita abre pra direita
+                    const abreEsquerda = i < numPortas / 2;
+                    
+                    // O Pivot é a dobradiça imaginária
+                    const pivotX = abreEsquerda ? centroX - largPorta/2 : centroX + largPorta/2;
+                    const portaPivot = new THREE.Group();
+                    portaPivot.position.set(pivotX, posYPorta, P/2 - E/2);
+                    
+                    // A malha deslocada em relação à dobradiça
+                    const deslocamentoX = abreEsquerda ? largPorta/2 : -largPorta/2;
+                    const portaMesh = criarChapa(largPorta, altPorta, E, materiaisPorta, deslocamentoX, 0, 0, true);
+                    portaMesh.userData.grupoPai = portaPivot;
+                    portaPivot.add(portaMesh);
+
+                    // Puxador da Porta
+                    const puxador = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.15, 16), matPuxador);
+                    const posXpuxador = abreEsquerda ? deslocamentoX + largPorta/2 - 0.04 : deslocamentoX - largPorta/2 + 0.04;
+                    puxador.position.set(posXpuxador, 0, E/2 + 0.02);
+                    portaPivot.add(puxador);
+
+                    // Configuração da Animação
+                    portaPivot.userData = { 
+                        tipo: 'porta', 
+                        aberto: false, 
+                        rotacaoFechada: 0, 
+                        rotacaoAberta: abreEsquerda ? -Math.PI / 2 : Math.PI / 2 // Abre 90 graus
+                    };
+
+                    grupoMovelAtual.add(portaPivot);
+                }
+            }
+
+            // Centraliza a Câmera e Ajusta Visão
+            const maxDim = Math.max(L, A, P);
+            camera3D.position.set(0, A * 1.5, maxDim * 2.2); 
+            controles3D.target.set(0, A / 2, 0); 
+            controles3D.update();
+
+            document.getElementById('info3D').innerHTML = `<i class="fas fa-check-circle" style="color:var(--earth-green);"></i> Parametrizado: ${largura_mm}x${altura_mm}x${profundidade_mm}mm | ${numPortas} Pts | ${numGavetas} Gav`;
+        }
+
+        // ==========================================
+        // CÁLCULO FINANCEIRO
+        // ==========================================
+        function transferirParaOrcamento() {
+            document.getElementById('addItemSection').scrollIntoView({behavior: 'smooth'});
+        }
+
+        function calcularTotal() {
+            const mat = parseFloat(document.getElementById('costMaterial').value) || 0;
+            const mao = parseFloat(document.getElementById('costLabor').value) || 0;
+            const fer = parseFloat(document.getElementById('costHardware').value) || 0;
+            const out = parseFloat(document.getElementById('costOther').value) || 0;
+            const margem = parseFloat(document.getElementById('profitMargin').value) || 0;
+
+            const custoFabrica = mat + mao + fer + out;
+            const precoVenda = custoFabrica / (1 - (margem / 100));
+
+            document.getElementById('totalProjectCost').innerText = 
+                new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(precoVenda);
+        }
+
+    </script>
+</body>
+</html>
