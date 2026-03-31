@@ -222,13 +222,7 @@
             border: 1px solid #B0D7B0; 
         }
         .ai-output-section h3 { color: var(--earth-green); text-align: left; border: none; }
-        .ai-output-section img {
-            max-width: 100%;
-            border-radius: var(--border-radius-soft);
-            margin: 20px auto;
-            border: 1px solid var(--border-soft);
-            display: block;
-        }
+        
         .description-box {
             background-color: var(--light-cream);
             padding: 18px;
@@ -265,24 +259,6 @@
         .floating-button.mascote { background-color: #FFC107; color: var(--primary-dark); }
         .floating-button.feedback { background-color: #17a2b8; }
 
-        #feedbackModal {
-            display: none; 
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-        #feedbackModal > div {
-            background: var(--soft-beige);
-            padding: 30px;
-            border-radius: var(--border-radius-soft);
-            width: 90%; max-width: 500px;
-        }
-        #feedbackModal textarea { width: 100%; box-sizing: border-box; }
-        #feedbackModal button.cancel { background-color: #6c757d; color: white;}
-
         .api-config-section {
             background-color: var(--bg-light-panel);
             border: 1px solid var(--border-soft);
@@ -299,27 +275,21 @@
             text-align: center; margin-top: 60px; padding: 25px;
             color: #777; font-size: 0.9em;
         }
+
+        /* Estilo para a animação de "gravando/ouvindo" */
+        .listening-animation {
+            color: #d35400;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🛠️ Gerador de Projetos para Marcenaria</h1>
-        <p class="subtitle">Transforme as ideias do seu cliente em designs visuais e orçamentos precisos.</p>
-
-        <!-- Detalhes do Projeto -->
-        <section id="projectDetails" class="section-panel">
-            <h2><i class="fas fa-folder"></i> Detalhes do Projeto</h2>
-            <div class="grid-layout">
-                <div class="input-group full-width">
-                    <label for="projectName">Nome do Projeto:</label>
-                    <input type="text" id="projectName" value="Projeto Nova Loja" placeholder="Ex: Reforma Loja Centro">
-                </div>
-                <div class="input-group full-width">
-                    <label for="clientName">Nome do Cliente:</label>
-                    <input type="text" id="clientName" value="Cliente Exemplo" placeholder="Ex: João da Silva">
-                </div>
-            </div>
-        </section>
+        <p class="subtitle">Transforme os áudios do seu cliente em designs visuais e orçamentos precisos usando Inteligência Artificial real.</p>
 
         <!-- Configuração da IA -->
         <section id="apiConfigSection" class="api-config-section">
@@ -327,7 +297,7 @@
             <div class="warning-message">
                 <i class="fas fa-exclamation-triangle"></i>
                 <div>
-                    <strong>Atenção:</strong> Cole sua chave da API do Google Gemini aqui para ativar a Inteligência Artificial.
+                    <strong>Obrigatório:</strong> Insira e salve sua chave de API do Google Gemini para ativar as funções de transcrição de áudio e geração de projetos.
                 </div>
             </div>
             <div class="input-group full-width">
@@ -336,33 +306,31 @@
             </div>
             <div class="action-buttons" style="justify-content: flex-start; margin-top: 0;">
                 <button onclick="saveApiKeyToFirebase()" class="primary">
-                    <i class="fas fa-save"></i> Salvar Chave
-                </button>
-                <button onclick="loadApiKeyFromFirebase()">
-                    <i class="fas fa-download"></i> Carregar Chave Atual
+                    <i class="fas fa-save"></i> Salvar Chave e Ativar
                 </button>
             </div>
-            <p style="margin-top: 15px; font-weight: 600; font-size: 0.9em;">Chave ativa: <span id="currentApiKeyDisplay" style="color:#6B8E23;">Nenhuma</span></p>
+            <p style="margin-top: 15px; font-weight: 600; font-size: 0.9em;">Chave ativa na sessão: <span id="currentApiKeyDisplay" style="color:#6B8E23;">Nenhuma</span></p>
         </section>
 
-        <!-- Pedido do Cliente -->
+        <!-- Pedido do Cliente (ÁUDIO REAL) -->
         <section id="audioInputSection" class="section-panel">
-            <h2><i class="fas fa-microphone-alt"></i> Pedido do Cliente</h2>
-            <p class="subtitle">Descreva o que o cliente quer (simulando a transcrição de um áudio).</p>
+            <h2><i class="fas fa-microphone-alt"></i> Pedido do Cliente (Áudio Real)</h2>
+            <p class="subtitle">Faça o upload do arquivo de áudio (MP3, WAV, OGG, etc.). A IA vai escutar e transcrever para você.</p>
             
             <div class="input-group">
-                <label for="audioFileInput">Carregar Áudio (Simulação):</label>
+                <label for="audioFileInput">Carregar Arquivo de Áudio:</label>
                 <input type="file" id="audioFileInput" accept="audio/*">
             </div>
             
             <div class="input-group full-width">
-                <label for="transcribedTextDisplay">Texto do Pedido:</label>
-                <textarea id="transcribedTextDisplay" rows="5" placeholder="Ex: O cliente quer um balcão de atendimento para a ótica dele, feito em MDF branco com detalhes amadeirados, frente de vidro para expor óculos e iluminação em fita LED. O tamanho deve ser uns 2 metros de largura."></textarea>
+                <label for="transcribedTextDisplay">Transcrição do Áudio (Gerado pela IA):</label>
+                <textarea id="transcribedTextDisplay" rows="6" placeholder="Faça o upload do áudio acima. A transcrição aparecerá aqui para você revisar antes de gerar o projeto."></textarea>
             </div>
             
             <div class="action-buttons">
-                <button id="processAudioBtn" class="primary" onclick="processAudio()">
-                    <i class="fas fa-magic"></i> Gerar Design com IA
+                <!-- Alterado: Só pode clicar depois que a transcrição estiver pronta ou se digitar manualmente -->
+                <button id="processAudioBtn" class="primary" onclick="gerarProjeto()">
+                    <i class="fas fa-magic"></i> Analisar Texto e Gerar Projeto
                 </button>
             </div>
         </section>
@@ -371,25 +339,20 @@
         <section id="aiDesignSection" class="ai-output-section" style="display: none;">
             <h2><i class="fas fa-lightbulb"></i> Proposta de Design Inteligente</h2>
             <div class="input-group full-width">
-                <label>Descrição Detalhada do Móvel (Gerado por IA):</label>
+                <label>Descrição Detalhada do Móvel e Justificativas:</label>
                 <div id="aiDesignDescription" class="description-box">Aguarde, a IA está gerando o design...</div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 30px;">
-                <h3><i class="fas fa-image"></i> Visualização Conceitual:</h3>
-                <img id="designImage" src="" alt="Visualização do Móvel Sugerido" style="display:none;">
             </div>
             
             <div class="action-buttons">
                 <button class="add-item-btn primary" onclick="addAiDesignToBudget()">
-                    <i class="fas fa-plus-circle"></i> Adicionar ao Orçamento
+                    <i class="fas fa-arrow-down"></i> Adicionar aos Custos do Orçamento
                 </button>
             </div>
         </section>
 
         <!-- Formulário de Itens -->
         <section id="addItemSection" class="section-panel">
-            <h2><i class="fas fa-cube"></i> Editar Item Manualmente</h2>
+            <h2><i class="fas fa-cube"></i> Itens do Orçamento</h2>
             <div class="grid-layout">
                 <div class="input-group full-width">
                     <label>Nome do Item:</label>
@@ -421,7 +384,7 @@
                 </div>
                 <div class="input-group full-width action-buttons">
                     <button class="primary" onclick="addItem()" id="btnSaveItem">
-                        <i class="fas fa-plus"></i> Adicionar/Atualizar Item
+                        <i class="fas fa-plus"></i> Adicionar/Atualizar Item na Lista
                     </button>
                 </div>
             </div>
@@ -429,7 +392,7 @@
 
         <!-- Lista de Itens -->
         <section id="itemsList">
-            <h2><i class="fas fa-list-alt"></i> Itens do Orçamento</h2>
+            <h2><i class="fas fa-list-alt"></i> Lista de Itens</h2>
             <div id="itemsContainer"></div>
         </section>
 
@@ -445,24 +408,9 @@
 
     <!-- Botões Flutuantes -->
     <div class="floating-buttons">
-        <button class="floating-button mascote" onclick="falarComMascote('Olá! Eu sou seu assistente. Preencha o pedido e gere seu design.')">
+        <button class="floating-button mascote" onclick="falarComMascote('Olá! Eu sou sua inteligência artificial. Salve sua chave, suba um áudio e deixe o resto comigo!')">
             <i class="fas fa-headset"></i> Mascote
         </button>
-        <button class="floating-button feedback" onclick="document.getElementById('feedbackModal').style.display='flex'">
-            <i class="fas fa-comment-dots"></i> Feedback
-        </button>
-    </div>
-
-    <!-- Modal Feedback -->
-    <div id="feedbackModal">
-        <div>
-            <h3>Seu Feedback é Importante!</h3>
-            <textarea id="feedbackText" rows="5" placeholder="O que achou do sistema?"></textarea>
-            <div style="margin-top:15px; display:flex; gap:10px;">
-                <button class="primary" onclick="alert('Feedback enviado! Obrigado.'); document.getElementById('feedbackModal').style.display='none';">Enviar</button>
-                <button class="cancel" onclick="document.getElementById('feedbackModal').style.display='none'">Cancelar</button>
-            </div>
-        </div>
     </div>
 
     <footer>
@@ -471,55 +419,27 @@
 
     <script>
         /* ---------------------------------------------------
-           LÓGICA PRINCIPAL DO SISTEMA
+           1. CONTROLE DA CHAVE API DO GEMINI
         --------------------------------------------------- */
-        
-        // 1. Controle da Chave API
         let currentGeminiApiKey = null;
-        const FIREBASE_URL = 'https://thiaguinho-40a14-default-rtdb.firebaseio.com/admin_config/gemini_api_key.json';
 
-        async function loadApiKeyFromFirebase() {
-            try {
-                const res = await fetch(FIREBASE_URL);
-                if (!res.ok) throw new Error("Erro ao acessar servidor");
-                const apiKey = await res.json();
-                
-                if (apiKey && typeof apiKey === 'string') {
-                    currentGeminiApiKey = apiKey;
-                    document.getElementById('geminiApiKeyInput').value = apiKey;
-                    document.getElementById('currentApiKeyDisplay').textContent = apiKey.substring(0, 5) + '...' + apiKey.substring(apiKey.length - 5);
-                }
-            } catch (e) {
-                console.warn('Firebase não acessível ou sem chave configurada. Use o campo para adicionar a chave.');
-            }
-        }
-
-        async function saveApiKeyToFirebase() {
+        function saveApiKeyToFirebase() {
             const apiKey = document.getElementById('geminiApiKeyInput').value.trim();
             if (!apiKey) {
                 alert('Por favor, cole a chave API antes de salvar.');
                 return;
             }
             currentGeminiApiKey = apiKey;
-            document.getElementById('currentApiKeyDisplay').textContent = apiKey.substring(0, 5) + '...' + apiKey.substring(apiKey.length - 5);
-            alert("Chave configurada com sucesso para esta sessão!");
-            // Nota: Removi o PUT forçado no firebase para evitar erros de CORS/Permissão no navegador do usuário final. A chave funciona em memória.
+            document.getElementById('currentApiKeyDisplay').textContent = "Ativada: " + apiKey.substring(0, 5) + '...' + apiKey.substring(apiKey.length - 5);
+            falarComMascote("Pronto! Chave ativada. Agora você pode me enviar arquivos de áudio.");
         }
 
-        document.addEventListener('DOMContentLoaded', loadApiKeyFromFirebase);
-
-        // 2. Simulação de Leitura de Áudio
-        document.getElementById('audioFileInput').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                document.getElementById('transcribedTextDisplay').value = `[Áudio "${file.name}" recebido. Digite os detalhes manualmente aqui para simular a transcrição...]`;
-                falarComMascote('Áudio carregado! Por favor, ajuste o texto se necessário.');
-            }
-        });
-
-        // 3. Mascote de Voz (Fallback nativo do navegador para garantir estabilidade)
+        /* ---------------------------------------------------
+           2. MASCOTE DE VOZ NATIVO (Texto para Voz)
+        --------------------------------------------------- */
         function falarComMascote(texto) {
             if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Para falas anteriores
                 const utterance = new SpeechSynthesisUtterance(texto);
                 utterance.lang = 'pt-BR';
                 window.speechSynthesis.speak(utterance);
@@ -528,43 +448,120 @@
             }
         }
 
-        // 4. Integração com IA (Gemini)
-        async function processAudio() {
+        /* ---------------------------------------------------
+           3. TRANSCRIÇÃO DE ÁUDIO VERDADEIRA
+        --------------------------------------------------- */
+        // Escuta o momento em que o usuário escolhe um arquivo
+        document.getElementById('audioFileInput').addEventListener('change', async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!currentGeminiApiKey) {
+                alert("Por favor, cole e salve a chave da API do Gemini na seção acima primeiro!");
+                document.getElementById('audioFileInput').value = ''; // Reseta o arquivo
+                document.getElementById('apiConfigSection').scrollIntoView({behavior: "smooth"});
+                return;
+            }
+
+            const textArea = document.getElementById('transcribedTextDisplay');
+            textArea.value = "⚠️ Enviando áudio para a Inteligência Artificial. Isso pode levar alguns segundos, por favor aguarde...";
+            falarComMascote("Estou ouvindo o áudio. Aguarde um instante.");
+
+            try {
+                // Passo A: Converter o arquivo de áudio para Base64 (Texto)
+                const base64String = await convertFileToBase64(file);
+                // O formato do base64 gerado pelo navegador é "data:audio/mp3;base64,ASDASDASD..."
+                // Nós precisamos apenas da parte depois da vírgula para a API do Gemini.
+                const base64Data = base64String.split(',')[1];
+                
+                // Pegar o tipo correto do arquivo (ex: audio/mp3, audio/wav, audio/mpeg)
+                const mimeType = file.type || "audio/mp3";
+
+                // Passo B: Enviar para o Gemini pedindo a transcrição
+                const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + currentGeminiApiKey, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: "Você é um assistente de uma marcenaria. Por favor, transcreva exatamente o que foi dito neste áudio. Retorne APENAS o texto falado no áudio, sem introduções ou comentários." },
+                                {
+                                    inlineData: {
+                                        mimeType: mimeType,
+                                        data: base64Data
+                                    }
+                                }
+                            ]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) throw new Error(data.error.message);
+
+                // Passo C: Mostrar a transcrição verdadeira
+                const transcricao = data.candidates[0].content.parts[0].text;
+                textArea.value = transcricao.trim();
+                falarComMascote("Terminei de ouvir. O texto já está na tela para sua revisão.");
+
+            } catch (error) {
+                console.error("Erro na transcrição:", error);
+                textArea.value = "Houve um erro ao processar o áudio: " + error.message;
+                falarComMascote("Desculpe, não consegui processar este áudio. Verifique se o formato é válido.");
+            }
+        });
+
+        // Função auxiliar para converter Arquivos em Base64 usando o navegador
+        function convertFileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        /* ---------------------------------------------------
+           4. GERAÇÃO DE PROJETO (TEXTO -> JSON DE ORÇAMENTO)
+        --------------------------------------------------- */
+        async function gerarProjeto() {
             const text = document.getElementById('transcribedTextDisplay').value.trim();
-            if (!text || text.includes('Digite os detalhes')) {
-                alert('Preencha o pedido do cliente na caixa de texto.');
+            if (!text || text.includes('aguarde...')) {
+                alert('O texto do pedido está vazio ou ainda sendo processado.');
                 return;
             }
             if (!currentGeminiApiKey) {
-                alert('Configure a chave da API do Gemini na seção acima.');
-                document.getElementById('apiConfigSection').scrollIntoView();
+                alert('Configure a chave da API do Gemini primeiro!');
                 return;
             }
 
             const btn = document.getElementById('processAudioBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando Projeto...';
             btn.disabled = true;
             document.getElementById('aiDesignSection').style.display = 'block';
-            document.getElementById('aiDesignDescription').innerText = "Analisando pedido...";
+            document.getElementById('aiDesignDescription').innerText = "Avaliando medidas, materiais e calculando custos para óticas...";
 
-            // PROMPT CORRIGIDO: Sem quebras de linha estranhas que quebravam o Javascript original
-            const promptStr = `Você é um marceneiro e designer focado em óticas. 
-Leia este pedido de cliente: "${text}"
-Crie um design de móvel e retorne o resultado em formato Markdown seguido de um bloco JSON OBRIGATÓRIO no final.
+            const promptStr = `Você é um arquiteto e marceneiro sênior especializado em móveis para Lojas de Óticas.
+Analise a transcrição deste pedido de cliente: "${text}"
 
-Formato Markdown:
-## Proposta: [Nome do Móvel]
-- Materiais: [Lista]
-- Descrição: [Detalhes]
+Crie uma proposta detalhada. No final da sua resposta, adicione OBRIGATORIAMENTE um bloco JSON com os custos extraídos ou sugeridos de forma realista.
 
-Formato JSON OBRIGATÓRIO NO FINAL DA RESPOSTA:
+Formato da Resposta:
+## Nome da Peça: [Crie um nome]
+**Tipo:** [Ex: Balcão, Expositor, etc.]
+**Materiais Ideais:** [Sua sugestão]
+**Detalhes Técnicos:** [Descrição rica do móvel, prateleiras, vidros, LED, etc.]
+**Justificativa:** [Por que isso é bom para uma ótica?]
+
 \`\`\`json
 {
-  "nome": "Nome do Móvel",
-  "materiais": "Descrição dos materiais",
-  "custo_material": 1000.00,
-  "mao_de_obra": 500.00,
-  "ferragens": 200.00
+  "nome_projeto": "Nome do Móvel",
+  "materiais_resumo": "Ex: MDF Branco, Vidro 8mm, Fita LED",
+  "custo_material_estimado": 1200.00,
+  "custo_mao_de_obra_estimado": 800.00,
+  "custo_ferragens_acessorios": 350.00,
+  "outros_custos": 100.00
 }
 \`\`\``;
 
@@ -581,131 +578,7 @@ Formato JSON OBRIGATÓRIO NO FINAL DA RESPOSTA:
                 if(data.error) throw new Error(data.error.message);
 
                 const iaText = data.candidates[0].content.parts[0].text;
-                document.getElementById('aiDesignDescription').innerText = iaText;
+                document.getElementById('aiDesignDescription').innerText = iaText.replace(/```json[\s\S]*?```/i, ''); // Mostra o texto sem mostrar o bloco json feio
 
-                // CORREÇÃO DO REGEX para extrair JSON sem quebrar a tela
-                const jsonRegex = /```json\n([\s\S]*?)\n```/i;
-                const match = iaText.match(jsonRegex);
-                
-                if (match && match[1]) {
-                    const iaData = JSON.parse(match[1]);
-                    // Preencher formulário de adição
-                    document.getElementById('itemName').value = iaData.nome || "Móvel IA";
-                    document.getElementById('itemMaterial').value = iaData.materiais || "Material IA";
-                    document.getElementById('costMaterial').value = iaData.custo_material || 0;
-                    document.getElementById('costLabor').value = iaData.mao_de_obra || 0;
-                    document.getElementById('costHardware').value = iaData.ferragens || 0;
-                    falarComMascote("Uau! Eu terminei de projetar. Verifique os valores calculados.");
-                } else {
-                    falarComMascote("Gerei o texto, mas não consegui separar os custos. Preencha os valores de orçamento manualmente.");
-                }
-            } catch(e) {
-                document.getElementById('aiDesignDescription').innerText = "Erro ao conectar com a IA: " + e.message;
-            } finally {
-                btn.innerHTML = '<i class="fas fa-magic"></i> Gerar Design com IA';
-                btn.disabled = false;
-            }
-        }
-
-        function addAiDesignToBudget() {
-            document.getElementById('addItemSection').scrollIntoView({behavior: 'smooth'});
-            falarComMascote('Dados transferidos! Confira os preços e clique em Adicionar.');
-        }
-
-        // 5. Gestão de Orçamento (CRUD)
-        let items = [];
-        let editingIndex = -1;
-
-        function renderItems() {
-            const container = document.getElementById('itemsContainer');
-            container.innerHTML = '';
-            let total = 0;
-
-            if (items.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#888;">Nenhum item adicionado.</p>';
-                document.getElementById('totalProjectCost').textContent = "R$ 0,00";
-                return;
-            }
-
-            items.forEach((item, index) => {
-                const sumCosts = item.costMaterial + item.costLabor + item.costHardware + item.costOther;
-                const finalPrice = sumCosts * (1 + (item.profitMargin / 100));
-                total += finalPrice;
-
-                const card = document.createElement('div');
-                card.className = 'item-card';
-                card.innerHTML = `
-                    <h3>${item.name} 
-                        <div>
-                            <button onclick="editItem(${index})" style="background-color: var(--secondary-wood)"><i class="fas fa-edit"></i></button>
-                            <button onclick="deleteItem(${index})" style="background-color: var(--warning-red)"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </h3>
-                    <p><strong>Material:</strong> ${item.material}</p>
-                    <div class="cost-details">
-                        <p>Material: R$ ${item.costMaterial.toFixed(2)}</p>
-                        <p>Mão de Obra: R$ ${item.costLabor.toFixed(2)}</p>
-                        <p>Lucro: ${item.profitMargin}%</p>
-                    </div>
-                    <p class="total-item-price">Total do Item: R$ ${finalPrice.toFixed(2)}</p>
-                `;
-                container.appendChild(card);
-            });
-
-            document.getElementById('totalProjectCost').textContent = `R$ ${total.toFixed(2)}`;
-        }
-
-        function addItem() {
-            const item = {
-                name: document.getElementById('itemName').value || "Móvel Sem Nome",
-                material: document.getElementById('itemMaterial').value || "-",
-                costMaterial: parseFloat(document.getElementById('costMaterial').value) || 0,
-                costLabor: parseFloat(document.getElementById('costLabor').value) || 0,
-                costHardware: parseFloat(document.getElementById('costHardware').value) || 0,
-                costOther: parseFloat(document.getElementById('costOther').value) || 0,
-                profitMargin: parseFloat(document.getElementById('profitMargin').value) || 0
-            };
-
-            if (editingIndex === -1) items.push(item);
-            else items[editingIndex] = item;
-
-            clearForm();
-            renderItems();
-        }
-
-        function editItem(index) {
-            const item = items[index];
-            document.getElementById('itemName').value = item.name;
-            document.getElementById('itemMaterial').value = item.material;
-            document.getElementById('costMaterial').value = item.costMaterial;
-            document.getElementById('costLabor').value = item.costLabor;
-            document.getElementById('costHardware').value = item.costHardware;
-            document.getElementById('costOther').value = item.costOther;
-            document.getElementById('profitMargin').value = item.profitMargin;
-            editingIndex = index;
-            document.getElementById('btnSaveItem').innerHTML = '<i class="fas fa-sync"></i> Atualizar Item';
-        }
-
-        function deleteItem(index) {
-            if(confirm("Excluir este item?")) {
-                items.splice(index, 1);
-                renderItems();
-            }
-        }
-
-        function clearForm() {
-            document.getElementById('itemName').value = '';
-            document.getElementById('itemMaterial').value = '';
-            document.getElementById('costMaterial').value = '0';
-            document.getElementById('costLabor').value = '0';
-            document.getElementById('costHardware').value = '0';
-            document.getElementById('costOther').value = '0';
-            document.getElementById('profitMargin').value = '20';
-            editingIndex = -1;
-            document.getElementById('btnSaveItem').innerHTML = '<i class="fas fa-plus"></i> Adicionar Item';
-        }
-
-        renderItems();
-    </script>
-</body>
-</html>
+                // Captura os dados do JSON que a IA gerou no final
+                const jsonRegex = /
