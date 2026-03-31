@@ -69,9 +69,8 @@
         #info3D { position: absolute; top: 15px; left: 15px; background: rgba(74, 60, 48, 0.85); color: #FFF; padding: 8px 12px; border-radius: 6px; font-size: 0.85em; font-weight: bold; pointer-events: none; backdrop-filter: blur(4px); z-index: 5; }
         #instrucao3D { position: absolute; bottom: 15px; right: 15px; background: rgba(221, 161, 94, 0.9); color: var(--primary-dark); padding: 6px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; pointer-events: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 5;}
 
-        /* ESTILOS DA EXPERIÊNCIA MOBILE FULLSCREEN AR (COM SISTEMA DE GAVETA/HUD) */
+        /* ESTILOS DA EXPERIÊNCIA MOBILE FULLSCREEN AR */
         .fullscreen-ar { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 99990 !important; border-radius: 0 !important; border: none !important; background: #000 !important; }
-        /* Quando a edição abrir, a imagem e o 3D sobem para não tapar a visão */
         .fullscreen-ar.hud-open { height: 55vh !important; border-bottom: 2px solid var(--highlight-yellow) !important; }
         
         .ar-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; z-index: 1; display: none; }
@@ -80,7 +79,7 @@
         .ar-ui-btn { background: var(--warning-red); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-size: 1em; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; }
         .ar-ui-magic { background: var(--ai-blue); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-size: 1em; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; }
         
-        /* O HUD DE EDIÇÃO PARAMÉTRICA (BOTTOM SHEET PERFEITO) */
+        /* O HUD DE EDIÇÃO PARAMÉTRICA */
         .edit-hud {
             position: fixed; bottom: 0; left: 0; width: 100vw; z-index: 99999; display: none;
             background: rgba(15, 23, 42, 0.98); color: white; padding: 15px 20px 25px 20px; 
@@ -104,7 +103,7 @@
         .hud-action-row { display: flex; gap: 10px; margin-top: 5px; grid-column: 1 / -1;}
         .hud-action-row button { padding: 10px; font-size: 0.9em; flex: 1;}
 
-        /* HUD DE PERSPECTIVA E CALIBRAGEM MANUAL */
+        /* HUD DE PERSPECTIVA */
         #perspectiveHUD { border-top: 2px solid var(--ai-blue); }
         #perspectiveHUD h4 { color: var(--ai-blue); }
         #perspectiveHUD input[type="range"] { accent-color: var(--ai-blue); }
@@ -147,7 +146,7 @@
 <body>
     <div class="container">
         <h1>🛠️ Gerador de Projetos e Orçamentos para Marcenaria</h1>
-        <p class="subtitle">Design CAD Paramétrico e IA de Perspectiva (Anti-Parede Torta). Edição em tempo real perfeita.</p>
+        <p class="subtitle">Design CAD Paramétrico e Auto-Encaixe IA Absoluto. Edição e substituição em tempo real.</p>
 
         <!-- 1. Configuração -->
         <section id="apiConfigSection" class="api-config-section">
@@ -166,7 +165,7 @@
         <!-- 2. Pedido e Foto do Ambiente -->
         <section id="audioInputSection" class="section-panel">
             <h2 style="margin-top:0;"><i class="fas fa-camera-retro"></i> Fotogrametria e Pedido</h2>
-            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">A IA calculará os módulos e a <b>inclinação exata da parede</b> na sua foto para encaixar o 3D perfeitamente!</p>
+            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">A IA não só calcula os módulos, mas <b>calcula a posição exata da foto (Match Photo)</b> para substituir o armário velho automaticamente!</p>
             
             <div class="grid-layout">
                 <div class="input-group">
@@ -182,12 +181,12 @@
 
             <div class="input-group full-width">
                 <label>Diretrizes do Cliente:</label>
-                <textarea id="transcribedTextDisplay" rows="3" placeholder="Ex: Substituir os armários brancos velhos. Colocar nicho para o micro-ondas..."></textarea>
+                <textarea id="transcribedTextDisplay" rows="3" placeholder="Ex: Substituir os armários velhos da foto por algo moderno..."></textarea>
             </div>
             <div id="errorDisplay" class="error-message"></div>
             <div class="action-buttons">
                 <button id="processAudioBtn" class="primary" onclick="gerarProjeto()" style="width: 100%;">
-                    <i class="fas fa-ruler-combined"></i> Mapear Módulos, Perspectiva e Gerar 3D
+                    <i class="fas fa-ruler-combined"></i> Mapear Módulos, Posição e Gerar 3D
                 </button>
             </div>
         </section>
@@ -203,19 +202,18 @@
             <!-- Visor 3D Modular e Tela Cheia AR -->
             <div style="margin-top: 30px;">
                 <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;">
-                    <i class="fas fa-cube"></i> 3D Editável e Substituição Real
+                    <i class="fas fa-cube"></i> 3D Editável e Substituição Automática
                 </h3>
                 
                 <div class="action-buttons" style="justify-content: flex-start; margin-bottom: 15px; margin-top: 0;">
                     <button id="btnAR" class="success" onclick="alternarModoAR()" style="display: none;">
-                        <i class="fas fa-expand-arrows-alt"></i> Substituir Móvel na Foto (AR Fullscreen)
+                        <i class="fas fa-expand-arrows-alt"></i> Ver Instalado na Foto (Auto-Encaixe)
                     </button>
                     <p style="font-size: 0.85em; color: var(--earth-green); margin-top: auto; margin-bottom: auto; padding-left: 10px;">
                         <i class="fas fa-hand-pointer"></i> Segure o dedo sobre um módulo para editar.
                     </p>
                 </div>
 
-                <!-- WRAPPER DO 3D QUE VAI ENCOLHER E SUBIR PARA NÃO TAMPAR A TELA DE EDIÇÃO -->
                 <div id="container3DWrapper">
                     <img id="arBackgroundImage" class="ar-bg-image" src="" alt="Fundo AR">
                     <div id="visualizador3D"></div>
@@ -231,7 +229,7 @@
                 </div>
             </div>
 
-            <!-- HUD DE EDIÇÃO DE MÓDULO (Bottom Sheet Ouro Independente, não fica dentro do wrapper) -->
+            <!-- HUD DE EDIÇÃO DE MÓDULO (Bottom Sheet Ouro) -->
             <div id="editHUD" class="edit-hud">
                 <div class="hud-drag-indicator"></div>
                 <h4><span id="hudTitle">Módulo</span> <button class="hud-btn-close" onclick="fecharEdicao()"><i class="fas fa-times-circle"></i></button></h4>
@@ -268,29 +266,30 @@
                 </div>
             </div>
 
-            <!-- HUD DE AJUSTE DE PERSPECTIVA (Botton Sheet IA) -->
+            <!-- HUD DE AJUSTE DE PERSPECTIVA -->
             <div id="perspectiveHUD" class="edit-hud" style="border-top: 2px solid var(--ai-blue);">
                 <div class="hud-drag-indicator"></div>
-                <h4><span style="color:var(--ai-blue);"><i class="fas fa-crop-alt"></i> Alinhamento Manual de Lente</span> <button class="hud-btn-close" onclick="fecharPerspectiva()"><i class="fas fa-times-circle"></i></button></h4>
+                <h4><span style="color:var(--ai-blue);"><i class="fas fa-crop-alt"></i> Calibragem Manual de Foto</span> <button class="hud-btn-close" onclick="fecharPerspectiva()"><i class="fas fa-times-circle"></i></button></h4>
                 
-                <div class="edit-slider" style="margin-top:15px;">
-                    <label><span>Tombar / Levantar (Eixo X)</span></label>
+                <p style="font-size:0.8em; color:#ccc; margin-top:0;">O sistema já aplicou as coordenadas da IA. Faça o ajuste fino aqui se precisar.</p>
+
+                <div class="edit-slider">
+                    <label><span>Tamanho na Foto (Zoom)</span></label>
+                    <input type="range" id="camScale" min="0.3" max="2.5" step="0.01" value="1.0" oninput="ajustarPerspectivaManual()">
+                </div>
+                <div class="edit-slider">
+                    <label><span>Tombar / Levantar Teto (Eixo X)</span></label>
                     <input type="range" id="camRotX" min="-0.8" max="0.8" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
                 </div>
                 <div class="edit-slider">
                     <label><span>Girar Parede Esq/Dir (Eixo Y)</span></label>
                     <input type="range" id="camRotY" min="-0.8" max="0.8" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
                 </div>
-                <div class="edit-slider">
-                    <label><span>Inclinação Lateral (Eixo Z)</span></label>
-                    <input type="range" id="camRotZ" min="-0.5" max="0.5" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
-                </div>
             </div>
 
             <!-- Tabela de Corte Dinâmica -->
             <div style="margin-top: 30px;">
                 <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;"><i class="fas fa-calculator"></i> Plano de Corte Dinâmico Absoluto</h3>
-                <p style="font-size: 0.85em; color: var(--earth-green); margin-bottom: 10px;">* As peças e prateleiras atualizam automaticamente ao editar o 3D.</p>
                 <div class="table-responsive">
                     <table>
                         <thead>
@@ -338,20 +337,23 @@
     </div>
 
     <div class="floating-buttons">
-        <button class="floating-button mascote" onclick="mascoteFalar('A tela de edição agora não tampa sua visão! A imagem sobe, o menu desce e a IA arruma a distorção da sua lente da câmera automaticamente!')">
+        <button class="floating-button mascote" onclick="mascoteFalar('A IA agora faz o Auto-Encaixe! Ela mapeia as coordenadas da sua foto, deita o 3D e tampa o armário antigo pra você não ter trabalho na casa do cliente!')">
             <i class="fas fa-headset"></i> <span>Mascote Promob Ouro</span>
         </button>
     </div>
 
     <footer>Powered by thIAguinho Soluções</footer>
 
-    <!-- SCRIPT MÁGICO - ENGENHARIA ABSOLUTA COM AUTO-FIT DE LENTE E UX GAVETA -->
+    <!-- SCRIPT MÁGICO - ENGENHARIA DE AUTO-ENCAIXE (MATCH PHOTO IA) -->
     <script>
         let currentApiKey = localStorage.getItem('groqApiKeyLocal') || "";
         if(currentApiKey) document.getElementById('apiKeyInput').value = currentApiKey;
 
-        // ESTADO GLOBAL
-        let projetoGlobal = { modulos: [], design: null, instalacao: "aereo", perspectiva: {x:0, y:0, z:0} };
+        // ESTADO GLOBAL DO PROJETO COM POSICIONAMENTO IA
+        let projetoGlobal = { 
+            modulos: [], design: null, instalacao: "aereo", 
+            posicionamento_auto_ar: { escala: 1.0, pos_x: 0, pos_y: 0, rot_x: 0, rot_y: 0, rot_z: 0 } 
+        };
         let moduloSendoEditado = null; 
         let boxHelper = null; 
 
@@ -361,7 +363,7 @@
         let raycaster = new THREE.Raycaster(), mouse = new THREE.Vector2();
         let objetosInterativos = [];
         let grupoCozinha = null; 
-        let rootNode = null; // O nó mestre para a inclinação da parede
+        let rootNode = null; // O nó mestre para mover TUDO no AR
         
         let base64ImagemGlobal = null;
         let modoARAtivo = false;
@@ -430,7 +432,7 @@
         }
 
         // ==========================================
-        // PROMPT FOTOGRAMETRIA (O Segredo do Encaixe)
+        // PROMPT FOTOGRAMETRIA + AUTO ENCAIXE
         // ==========================================
         async function gerarProjeto() {
             const txt = document.getElementById('transcribedTextDisplay').value.trim();
@@ -441,21 +443,21 @@
             if (!currentApiKey) return alert("Cadastre a Chave da IA.");
 
             const btn = document.getElementById('processAudioBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A IA de Fotogrametria está lendo os ângulos da parede...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculando Auto-Encaixe de Módulos...';
             btn.disabled = true;
 
-            const promptComando = `Você é um Engenheiro de Marcenaria (Promob) e Fotogrametria.
+            // O CÉREBRO: Pede módulos E posicionamento automático
+            const promptComando = `Você é um Projetista Sênior (Promob). 
 AJA COM VERDADE ABSOLUTA: 
-1. Analise a imagem DA EXTREMA ESQUERDA ATÉ A EXTREMA DIREITA. Conte os módulos.
-2. CALCULE A PERSPECTIVA DA FOTO (Fotogrametria): A foto foi tirada de baixo para cima? A parede está deitada pra trás? Estime os ângulos X e Y da lente em radianos (ex: X negativo se olhada de baixo).
+1. Analise a imagem DA EXTREMA ESQUERDA ATÉ A EXTREMA DIREITA. Crie módulos completos sem omitir as pontas.
+2. CALCULE O POSICIONAMENTO 2D/3D (MATCH PHOTO): Em qual posição da foto os armários antigos estão? Retorne a Escala ideal e a Rotação (ex: teto parece cair para trás, rot_x=-0.1) para que o 3D caia EXATAMENTE em cima dos armários originais da foto ao abrir a simulação (lembre-se que armários aéreos ficam no alto, logo pos_y é positivo como 1.5 ou 2.0).
 
 JSON ESTRITO:
 {
-  "nome_projeto": "Armários Modulares Ouro",
-  "engenharia": "Identifiquei todos os módulos e calculei a distorção da lente da câmera para encaixe perfeito do 3D.",
+  "nome_projeto": "Armários Modulares Auto-Fit",
+  "engenharia": "Identifiquei os módulos de ponta a ponta e calculei as coordenadas espaciais para substituir o armário antigo perfeitamente na sua tela.",
   "design": { "cor_caixa": "#FFFFFF", "cor_portas": "#d09d5c", "material_nome": "MDF Branco / Freijó Moderno" },
-  "instalacao": "aereo",
-  "perspectiva_parede": { "eixo_x_rad": -0.15, "eixo_y_rad": 0.02, "eixo_z_rad": 0 },
+  "posicionamento_auto_ar": { "escala": 0.9, "pos_x": 0.0, "pos_y": 1.2, "rot_x": -0.05, "rot_y": 0.0, "rot_z": 0.0 },
   "modulos": [
     { "nome": "Mod Esq", "largura": 800, "altura": 400, "profundidade": 350, "tipo_abertura": "basculante", "tem_nicho_aberto": false, "altura_nicho": 0, "portas": 2, "prateleiras": 1 },
     { "nome": "Torre Central", "largura": 650, "altura": 800, "profundidade": 400, "tipo_abertura": "basculante", "tem_nicho_aberto": true, "altura_nicho": 450, "portas": 1, "prateleiras": 0 },
@@ -492,13 +494,15 @@ JSON ESTRITO:
                 projetoGlobal.modulos = ia.modulos || [];
                 projetoGlobal.design = ia.design || { cor_caixa:"#FFF", cor_portas:"#CCC", material_nome:"MDF Padrão" };
                 projetoGlobal.instalacao = ia.instalacao || "aereo";
-                projetoGlobal.perspectiva = ia.perspectiva_parede || {eixo_x_rad: 0, eixo_y_rad: 0, eixo_z_rad: 0};
+                
+                // Salva os cálculos de Posicionamento Auto-Encaixe
+                projetoGlobal.posicionamento_auto_ar = ia.posicionamento_auto_ar || { escala: 1.0, pos_x: 0, pos_y: 1.5, rot_x: -0.05, rot_y: 0, rot_z: 0 };
 
                 document.getElementById('aiDesignSection').style.display = 'block';
                 document.getElementById('designerInsight').style.display = 'block';
                 document.getElementById('textoDesigner').innerText = ia.engenharia;
 
-                document.getElementById('itemName').value = ia.nome_projeto || "Cozinha Modular Paramétrica";
+                document.getElementById('itemName').value = ia.nome_projeto || "Cozinha Modular";
                 if(ia.custos) {
                     document.getElementById('costMaterial').value = ia.custos.material||0;
                     document.getElementById('costLabor').value = ia.custos.mao_de_obra||0;
@@ -512,20 +516,14 @@ JSON ESTRITO:
                     fecharEdicao(); fecharPerspectiva();
                     reconstruirCenaParametrica(); 
                     
-                    // APLICA A PERSPECTIVA DA IA AUTOMATICAMENTE NO ROOT
-                    rootNode.rotation.set(projetoGlobal.perspectiva.eixo_x_rad, projetoGlobal.perspectiva.eixo_y_rad, projetoGlobal.perspectiva.eixo_z_rad);
-                    document.getElementById('camRotX').value = projetoGlobal.perspectiva.eixo_x_rad;
-                    document.getElementById('camRotY').value = projetoGlobal.perspectiva.eixo_y_rad;
-                    document.getElementById('camRotZ').value = projetoGlobal.perspectiva.eixo_z_rad;
-
                     document.getElementById('btnAR').style.display = base64ImagemGlobal ? 'inline-flex' : 'none';
-                    if(modoARAtivo) alternarModoAR(); 
+                    if(modoARAtivo) alternarModoAR(); // Desliga pra resetar visualmente
                 }, 150);
 
             } catch(e) { 
                 errorDiv.innerHTML = `<strong>Erro:</strong> ${e.message}`; errorDiv.style.display = 'block'; 
             } finally { 
-                btn.innerHTML = '<i class="fas fa-ruler-combined"></i> Mapear Módulos, Perspectiva e Gerar 3D'; btn.disabled = false; 
+                btn.innerHTML = '<i class="fas fa-ruler-combined"></i> Mapear Módulos, Posição e Gerar 3D'; btn.disabled = false; 
             }
         }
 
@@ -591,7 +589,7 @@ JSON ESTRITO:
             controles3D = new THREE.OrbitControls(camera3D, renderizador3D.domElement);
             controles3D.enableDamping = true; controles3D.dampingFactor = 0.05;
 
-            // ROOT NODE: Permite tombar toda a parede de uma vez
+            // ROOT NODE: Ele quem vai assumir o posicionamento da IA (Encaixe Perfeito)
             rootNode = new THREE.Group();
             cena3D.add(rootNode);
 
@@ -672,7 +670,7 @@ JSON ESTRITO:
         }
 
         // ==========================================
-        // FLUXO DE EDIÇÃO (BOTTOM SHEET INTELIGENTE E ANTI-OCLUSÃO)
+        // FLUXO DE EDIÇÃO (ANTI-TELA TAMPADA)
         // ==========================================
         function ativarEdicaoModulo(index) {
             fecharPerspectiva(); 
@@ -686,17 +684,15 @@ JSON ESTRITO:
             document.getElementById('selPorta').value = modObj.tipo_abertura || 'giro';
             document.getElementById('sliderPrat').value = modObj.prateleiras || 0; document.getElementById('lblPrat').innerText = modObj.prateleiras || 0;
             
-            // Exibe a HUD animada
             const hud = document.getElementById('editHUD');
-            hud.style.display = 'flex'; // Exibe para pegar altura
+            hud.style.display = 'flex'; 
             setTimeout(() => hud.classList.add('show'), 10);
             
             destacarModuloVisualmente(index);
 
-            // SE ESTIVER EM AR, ENCOLHE A TELA PRA FOTO NÃO SUMIR EMBAIXO DO MENU!
             if(modoARAtivo) {
                 document.getElementById('container3DWrapper').classList.add('hud-open');
-                setTimeout(ajustarTamanho3D, 300); // Recalcula quando CSS terminar animação
+                setTimeout(ajustarTamanho3D, 300); 
             }
         }
 
@@ -710,7 +706,6 @@ JSON ESTRITO:
 
             if (boxHelper) { cena3D.remove(boxHelper); boxHelper = null; }
 
-            // SE ESTAVA EM AR, DEVOLVE O TAMANHO DA TELA
             if(modoARAtivo) {
                 document.getElementById('container3DWrapper').classList.remove('hud-open');
                 setTimeout(ajustarTamanho3D, 300);
@@ -759,7 +754,7 @@ JSON ESTRITO:
         }
 
         // ==========================================
-        // PERSPECTIVA MANUAL DA PAREDE (Ajuste de Lente)
+        // PERSPECTIVA MANUAL DA PAREDE
         // ==========================================
         function abrirAjustePerspectiva() {
             fecharEdicao();
@@ -790,9 +785,12 @@ JSON ESTRITO:
 
         function ajustarPerspectivaManual() {
             if(!rootNode) return;
+            const s = parseFloat(document.getElementById('camScale').value);
             const rX = parseFloat(document.getElementById('camRotX').value);
             const rY = parseFloat(document.getElementById('camRotY').value);
             const rZ = parseFloat(document.getElementById('camRotZ').value);
+            
+            rootNode.scale.set(s, s, s);
             rootNode.rotation.set(rX, rY, rZ);
         }
 
@@ -814,6 +812,8 @@ JSON ESTRITO:
 
             const T_W = largTotal_mm / 1000, T_H = alturaMaxima_mm / 1000;
             const baseElevacao = (projetoGlobal.instalacao === "aereo") ? 1.5 : 0;
+            
+            // ATENÇÃO: Centraliza a cozinha INTEIRA no rootNode para o giro de parede funcionar direito
             grupoCozinha.position.y = baseElevacao;
 
             let currentX = -T_W / 2;
@@ -893,13 +893,14 @@ JSON ESTRITO:
             calcularPlanoDeCorteRealTime();
 
             if(!isEditingMode && !modoARAtivo && camera3D && !isPerspectiveMode) {
+                // Modo estúdio normal: Câmera centralizada olhando pro meio do móvel
                 camera3D.position.set(0, -T_H/2, Math.max(T_W, T_H)*1.5);
                 controles3D.target.set(0, -T_H/2, 0); controles3D.update();
             }
         }
 
         // ==========================================
-        // AR FULLSCREEN NATIVO
+        // AUTO-ENCAIXE IA (MATCH PHOTO) - A MÁGICA
         // ==========================================
         function alternarModoAR() {
             if (!base64ImagemGlobal) { alert("Envie uma foto do local primeiro!"); return; }
@@ -918,19 +919,47 @@ JSON ESTRITO:
                 document.getElementById('info3D').style.display = 'none';
                 document.getElementById('instrucao3D').style.display = 'none';
                 
-                controles3D.target.set(0, 0, 0);
-                camera3D.position.set(0, 0, 5); controles3D.update();
+                // MÁGICA DE AUTO-ENCAIXE IA
+                // A IA leu o deslocamento na imagem e o passa no projetoGlobal.posicionamento_auto_ar
+                const posIA = projetoGlobal.posicionamento_auto_ar;
+                if(posIA) {
+                    // Aplica a escala, deslocamento (usando Panning da câmera para mover no ecrã) e rotação calculadas
+                    rootNode.scale.set(posIA.escala, posIA.escala, posIA.escala);
+                    rootNode.rotation.set(posIA.rot_x, posIA.rot_y, posIA.rot_z);
+                    
+                    // A câmera fica de frente, mas o alvo é deslocado para alinhar com o fundo
+                    camera3D.position.set(posIA.pos_x, posIA.pos_y, 4); 
+                    controles3D.target.set(posIA.pos_x, posIA.pos_y, 0); 
+                    
+                    // Atualiza o menu manual caso o cara abra para calibrar
+                    document.getElementById('camScale').value = posIA.escala;
+                    document.getElementById('camRotX').value = posIA.rot_x;
+                    document.getElementById('camRotY').value = posIA.rot_y;
+                    document.getElementById('camRotZ').value = posIA.rot_z;
+                } else {
+                    camera3D.position.set(0, 0, 5); controles3D.target.set(0, 0, 0); 
+                }
+                
+                controles3D.update();
+                document.getElementById('info3D').innerText = "IA: Auto-Encaixe Concluído!";
 
             } else {
                 fecharEdicao(); fecharPerspectiva(); 
                 wrapper.classList.remove('fullscreen-ar');
-                wrapper.classList.remove('hud-open'); // Prevenção
+                wrapper.classList.remove('hud-open'); 
                 bgImg.style.display = 'none'; uiTop.style.display = 'none';
                 
                 document.getElementById('info3D').style.display = 'block';
                 document.getElementById('instrucao3D').style.display = 'block';
                 
-                if(grupoCozinha) { controles3D.target.set(0, 0, 0); camera3D.position.set(0, 0, 4); controles3D.update(); }
+                // Reseta tudo pro modo Estúdio limpinho
+                rootNode.rotation.set(0,0,0);
+                rootNode.scale.set(1,1,1);
+                
+                if(grupoCozinha) { 
+                    let T_H = 1; // Pega a altura média rápida
+                    camera3D.position.set(0, -T_H/2, 3); controles3D.target.set(0, -T_H/2, 0); controles3D.update(); 
+                }
             }
             setTimeout(ajustarTamanho3D, 50);
         }
