@@ -73,7 +73,8 @@
         .fullscreen-ar { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 99990 !important; border-radius: 0 !important; border: none !important; background: #000 !important; }
         .fullscreen-ar.hud-open { height: 55vh !important; border-bottom: 2px solid var(--highlight-yellow) !important; }
         
-        .ar-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; z-index: 1; display: none; }
+        /* Modificado para COVER: Preenche a tela toda do celular (Anti-bordas) */
+        .ar-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none; }
         
         .ar-ui-top { position: absolute; top: 20px; left: 20px; right: 20px; z-index: 10; display: none; justify-content: space-between; }
         .ar-ui-btn { background: var(--warning-red); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-size: 1em; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; }
@@ -146,7 +147,7 @@
 <body>
     <div class="container">
         <h1>🛠️ Gerador de Projetos e Orçamentos para Marcenaria</h1>
-        <p class="subtitle">Design CAD Paramétrico e Auto-Encaixe IA Absoluto. Edição e substituição em tempo real.</p>
+        <p class="subtitle">Oráculo CAD: A IA respeita estritamente o seu pedido de cores e sobrepõe o armário cirurgicamente.</p>
 
         <!-- 1. Configuração -->
         <section id="apiConfigSection" class="api-config-section">
@@ -164,12 +165,12 @@
 
         <!-- 2. Pedido e Foto do Ambiente -->
         <section id="audioInputSection" class="section-panel">
-            <h2 style="margin-top:0;"><i class="fas fa-camera-retro"></i> Fotogrametria e Pedido</h2>
-            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">A IA não só calcula os módulos, mas <b>calcula a posição exata da foto (Match Photo)</b> para substituir o armário velho automaticamente!</p>
+            <h2 style="margin-top:0;"><i class="fas fa-camera-retro"></i> O Oráculo de Design (Módulos & Cores)</h2>
+            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">Envie a foto. Peça uma cor específica (ex: "armário azul escuro"). A IA vai gerar a paleta exata e encaixar no mesmo lugar da foto!</p>
             
             <div class="grid-layout">
                 <div class="input-group">
-                    <label><i class="fas fa-camera"></i> Foto da Cozinha/Ambiente:</label>
+                    <label><i class="fas fa-camera"></i> Foto da Parede/Cozinha:</label>
                     <input type="file" id="imageFileInput" accept="image/*" onchange="previewEComprimirImagem(event)">
                     <div id="imagePreviewContainer"><img id="previewImg" src="" alt="Sua Parede"></div>
                 </div>
@@ -180,34 +181,34 @@
             </div>
 
             <div class="input-group full-width">
-                <label>Diretrizes do Cliente:</label>
-                <textarea id="transcribedTextDisplay" rows="3" placeholder="Ex: Substituir os armários velhos da foto por algo moderno..."></textarea>
+                <label>Diretrizes do Cliente (Especifique cores!):</label>
+                <textarea id="transcribedTextDisplay" rows="3" placeholder="Ex: Substituir por um armário azul escuro, mantendo espaço para o micro-ondas..."></textarea>
             </div>
             <div id="errorDisplay" class="error-message"></div>
             <div class="action-buttons">
                 <button id="processAudioBtn" class="primary" onclick="gerarProjeto()" style="width: 100%;">
-                    <i class="fas fa-ruler-combined"></i> Mapear Módulos, Posição e Gerar 3D
+                    <i class="fas fa-ruler-combined"></i> Mapear Cores, Posição e Gerar 3D CAD
                 </button>
             </div>
         </section>
 
         <!-- 3. Projeto Técnico AutoCAD / Promob -->
         <section id="aiDesignSection" class="ai-output-section" style="display: none;">
-            <h3 style="margin-top: 0;"><i class="fas fa-drafting-compass"></i> Projeto Modular Paramétrico</h3>
+            <h3 style="margin-top: 0;"><i class="fas fa-drafting-compass"></i> Projeto Modular Diamante</h3>
             
             <div id="designerInsight" class="designer-insight" style="display: none;">
-                <i class="fas fa-eye"></i> <b>IA de Fotogrametria:</b> <span id="textoDesigner"></span>
+                <i class="fas fa-eye"></i> <b>O Oráculo do Design:</b> <span id="textoDesigner"></span>
             </div>
 
             <!-- Visor 3D Modular e Tela Cheia AR -->
             <div style="margin-top: 30px;">
                 <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;">
-                    <i class="fas fa-cube"></i> 3D Editável e Substituição Automática
+                    <i class="fas fa-cube"></i> Substituição Cirúrgica Inteligente
                 </h3>
                 
                 <div class="action-buttons" style="justify-content: flex-start; margin-bottom: 15px; margin-top: 0;">
                     <button id="btnAR" class="success" onclick="alternarModoAR()" style="display: none;">
-                        <i class="fas fa-expand-arrows-alt"></i> Ver Instalado na Foto (Auto-Encaixe)
+                        <i class="fas fa-expand-arrows-alt"></i> Ver Instalado na Foto (Auto-Encaixe Real)
                     </button>
                     <p style="font-size: 0.85em; color: var(--earth-green); margin-top: auto; margin-bottom: auto; padding-left: 10px;">
                         <i class="fas fa-hand-pointer"></i> Segure o dedo sobre um módulo para editar.
@@ -218,12 +219,12 @@
                     <img id="arBackgroundImage" class="ar-bg-image" src="" alt="Fundo AR">
                     <div id="visualizador3D"></div>
                     
-                    <div id="info3D">Renderizando motor paramétrico...</div>
+                    <div id="info3D">Renderizando motor CAD paramétrico...</div>
                     <div id="instrucao3D"><i class="fas fa-magic"></i> Segure num módulo para editá-lo!</div>
                     
                     <!-- UIs Exclusivas do AR -->
                     <div id="arUITop" class="ar-ui-top">
-                        <button class="ar-ui-magic" onclick="abrirAjustePerspectiva()"><i class="fas fa-crop-alt"></i> Calibrar Lente / Parede</button>
+                        <button class="ar-ui-magic" onclick="abrirAjustePerspectiva()"><i class="fas fa-crop-alt"></i> Ajuste Fino Manual</button>
                         <button id="arCloseBtn" class="ar-ui-btn" onclick="alternarModoAR()"><i class="fas fa-times"></i> Fechar</button>
                     </div>
                 </div>
@@ -269,20 +270,20 @@
             <!-- HUD DE AJUSTE DE PERSPECTIVA -->
             <div id="perspectiveHUD" class="edit-hud" style="border-top: 2px solid var(--ai-blue);">
                 <div class="hud-drag-indicator"></div>
-                <h4><span style="color:var(--ai-blue);"><i class="fas fa-crop-alt"></i> Calibragem Manual de Foto</span> <button class="hud-btn-close" onclick="fecharPerspectiva()"><i class="fas fa-times-circle"></i></button></h4>
+                <h4><span style="color:var(--ai-blue);"><i class="fas fa-crop-alt"></i> Calibragem Manual AR</span> <button class="hud-btn-close" onclick="fecharPerspectiva()"><i class="fas fa-times-circle"></i></button></h4>
                 
-                <p style="font-size:0.8em; color:#ccc; margin-top:0;">O sistema já aplicou as coordenadas da IA. Faça o ajuste fino aqui se precisar.</p>
+                <p style="font-size:0.8em; color:#ccc; margin-top:0;">O Auto-Encaixe IA já foi aplicado. Use isso para refinamento fino.</p>
 
                 <div class="edit-slider">
-                    <label><span>Tamanho na Foto (Zoom)</span></label>
+                    <label><span>Tamanho na Foto (Escala)</span></label>
                     <input type="range" id="camScale" min="0.3" max="2.5" step="0.01" value="1.0" oninput="ajustarPerspectivaManual()">
                 </div>
                 <div class="edit-slider">
-                    <label><span>Tombar / Levantar Teto (Eixo X)</span></label>
+                    <label><span>Tombar Teto (Eixo X)</span></label>
                     <input type="range" id="camRotX" min="-0.8" max="0.8" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
                 </div>
                 <div class="edit-slider">
-                    <label><span>Girar Parede Esq/Dir (Eixo Y)</span></label>
+                    <label><span>Girar Parede (Eixo Y)</span></label>
                     <input type="range" id="camRotY" min="-0.8" max="0.8" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
                 </div>
             </div>
@@ -330,26 +331,26 @@
         <section id="summary">
             <h2><i class="fas fa-handshake"></i> Valor do Projeto Otimizado</h2>
             <p>Total Sugerido: <span id="totalProjectCost">R$ 0,00</span></p>
-            <button onclick="mascoteFalar('O total atualizado para esses módulos com ferragens, portas e prateleiras é ' + document.getElementById('totalProjectCost').textContent)" class="warning">
+            <button onclick="mascoteFalar('O total atualizado para esses módulos com as cores reais escolhidas é ' + document.getElementById('totalProjectCost').textContent)" class="warning">
                 <i class="fas fa-robot"></i> Perguntar ao Mascote
             </button>
         </section>
     </div>
 
     <div class="floating-buttons">
-        <button class="floating-button mascote" onclick="mascoteFalar('A IA agora faz o Auto-Encaixe! Ela mapeia as coordenadas da sua foto, deita o 3D e tampa o armário antigo pra você não ter trabalho na casa do cliente!')">
-            <i class="fas fa-headset"></i> <span>Mascote Promob Ouro</span>
+        <button class="floating-button mascote" onclick="mascoteFalar('O Oráculo do Design chegou. Peça armários em tons escuros e eu gerarei cores sólidas! O 3D nunca mais vai sumir da sua tela na hora de dar zoom!')">
+            <i class="fas fa-headset"></i> <span>Mascote Oráculo</span>
         </button>
     </div>
 
     <footer>Powered by thIAguinho Soluções</footer>
 
-    <!-- SCRIPT MÁGICO - ENGENHARIA DE AUTO-ENCAIXE (MATCH PHOTO IA) -->
+    <!-- SCRIPT MÁGICO - ENGENHARIA ABSOLUTA (ORÁCULO + ANTI-CLIPPING + AUTO-MATCH) -->
     <script>
         let currentApiKey = localStorage.getItem('groqApiKeyLocal') || "";
         if(currentApiKey) document.getElementById('apiKeyInput').value = currentApiKey;
 
-        // ESTADO GLOBAL DO PROJETO COM POSICIONAMENTO IA
+        // ESTADO GLOBAL
         let projetoGlobal = { 
             modulos: [], design: null, instalacao: "aereo", 
             posicionamento_auto_ar: { escala: 1.0, pos_x: 0, pos_y: 0, rot_x: 0, rot_y: 0, rot_z: 0 } 
@@ -363,7 +364,7 @@
         let raycaster = new THREE.Raycaster(), mouse = new THREE.Vector2();
         let objetosInterativos = [];
         let grupoCozinha = null; 
-        let rootNode = null; // O nó mestre para mover TUDO no AR
+        let rootNode = null; 
         
         let base64ImagemGlobal = null;
         let modoARAtivo = false;
@@ -432,7 +433,7 @@
         }
 
         // ==========================================
-        // PROMPT FOTOGRAMETRIA + AUTO ENCAIXE
+        // PROMPT DO ORÁCULO DE DESIGN (CORES ABSOLUTAS)
         // ==========================================
         async function gerarProjeto() {
             const txt = document.getElementById('transcribedTextDisplay').value.trim();
@@ -443,32 +444,30 @@
             if (!currentApiKey) return alert("Cadastre a Chave da IA.");
 
             const btn = document.getElementById('processAudioBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculando Auto-Encaixe de Módulos...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> O Oráculo está gerando Cores e Auto-Encaixe...';
             btn.disabled = true;
 
-            // O CÉREBRO: Pede módulos E posicionamento automático
-            const promptComando = `Você é um Projetista Sênior (Promob). 
-AJA COM VERDADE ABSOLUTA: 
-1. Analise a imagem DA EXTREMA ESQUERDA ATÉ A EXTREMA DIREITA. Crie módulos completos sem omitir as pontas.
-2. CALCULE O POSICIONAMENTO 2D/3D (MATCH PHOTO): Em qual posição da foto os armários antigos estão? Retorne a Escala ideal e a Rotação (ex: teto parece cair para trás, rot_x=-0.1) para que o 3D caia EXATAMENTE em cima dos armários originais da foto ao abrir a simulação (lembre-se que armários aéreos ficam no alto, logo pos_y é positivo como 1.5 ou 2.0).
-
+            // CÉREBRO DEFINITIVO: Trava de cores + Auto-Fit
+            const promptComando = `Você é um ORÁCULO do Design de Interiores e Projetista Sênior. 
+AJA COM VERDADE ABSOLUTA NA FOTO DA ESQUERDA PARA A DIREITA.
+1. LEIA O PEDIDO ATENTAMENTE PARA AS CORES: Se o cliente pedir "tons azuis", "armário escuro", "preto", OBRIGATORIAMENTE use hexadecimais sólidos correspondentes no JSON (ex: #1c3144, #2c3e50). NUNCA use textura de madeira se não for pedido!
+2. AUTO-ENCAIXE (MATCH PHOTO): Defina escala, pos_x e pos_y para que o 3D tampe perfeitamente o móvel velho da foto.
 JSON ESTRITO:
 {
-  "nome_projeto": "Armários Modulares Auto-Fit",
-  "engenharia": "Identifiquei os módulos de ponta a ponta e calculei as coordenadas espaciais para substituir o armário antigo perfeitamente na sua tela.",
-  "design": { "cor_caixa": "#FFFFFF", "cor_portas": "#d09d5c", "material_nome": "MDF Branco / Freijó Moderno" },
-  "posicionamento_auto_ar": { "escala": 0.9, "pos_x": 0.0, "pos_y": 1.2, "rot_x": -0.05, "rot_y": 0.0, "rot_z": 0.0 },
+  "nome_projeto": "Substituição Perfeita",
+  "engenharia": "Li seu pedido. Gerei as cores exatas solicitadas e ajustei os eixos para o 3D cobrir o armário velho.",
+  "design": { "cor_caixa": "<Sua_Cor_Aqui>", "cor_portas": "<Sua_Cor_Aqui>", "material_nome": "<Nome do Material baseado no pedido>" },
+  "posicionamento_auto_ar": { "escala": 1.0, "pos_x": 0.0, "pos_y": 1.0, "rot_x": -0.05, "rot_y": 0.0, "rot_z": 0.0 },
+  "instalacao": "aereo",
   "modulos": [
-    { "nome": "Mod Esq", "largura": 800, "altura": 400, "profundidade": 350, "tipo_abertura": "basculante", "tem_nicho_aberto": false, "altura_nicho": 0, "portas": 2, "prateleiras": 1 },
-    { "nome": "Torre Central", "largura": 650, "altura": 800, "profundidade": 400, "tipo_abertura": "basculante", "tem_nicho_aberto": true, "altura_nicho": 450, "portas": 1, "prateleiras": 0 },
-    { "nome": "Mod Dir", "largura": 700, "altura": 500, "profundidade": 350, "tipo_abertura": "giro", "tem_nicho_aberto": false, "altura_nicho": 0, "portas": 2, "prateleiras": 2 }
+    { "nome": "Mod Esq", "largura": 800, "altura": 400, "profundidade": 350, "tipo_abertura": "basculante", "tem_nicho_aberto": false, "altura_nicho": 0, "portas": 2, "prateleiras": 1 }
   ],
   "custos": {"material": 1200, "mao_de_obra": 600, "ferragens": 300, "outros": 100}
 }`;
 
             let mensagens = base64ImagemGlobal ? 
-                [{ role: "user", content: [{ type: "text", text: promptComando }, { type: "image_url", image_url: { url: base64ImagemGlobal } }] }] : 
-                [{ role: "user", content: promptComando }];
+                [{ role: "user", content: [{ type: "text", text: `Pedido: ${txt}\n${promptComando}` }, { type: "image_url", image_url: { url: base64ImagemGlobal } }] }] : 
+                [{ role: "user", content: `Pedido: ${txt}\n${promptComando}` }];
 
             try {
                 const url = "https://api.groq.com/openai/v1/chat/completions";
@@ -482,7 +481,7 @@ JSON ESTRITO:
                 let dados = await res.json();
                 if (!res.ok) {
                     if(base64ImagemGlobal) {
-                        mensagens = [{ role: "user", content: promptComando }];
+                        mensagens = [{ role: "user", content: `Pedido: ${txt}\n${promptComando}` }];
                         res = await fetch(url, { method: 'POST', headers: { "Authorization": `Bearer ${currentApiKey}`, "Content-Type": "application/json" }, body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: mensagens, temperature: 0.1, response_format: { type: "json_object" } }) });
                         dados = await res.json();
                         if(!res.ok) throw new Error(dados.error?.message || "Erro API.");
@@ -492,15 +491,13 @@ JSON ESTRITO:
                 // SALVA NO ESTADO GLOBAL
                 const ia = extrairJSONSeguro(dados.choices[0].message.content);
                 projetoGlobal.modulos = ia.modulos || [];
-                projetoGlobal.design = ia.design || { cor_caixa:"#FFF", cor_portas:"#CCC", material_nome:"MDF Padrão" };
+                projetoGlobal.design = ia.design || { cor_caixa:"#2c3e50", cor_portas:"#1a252f", material_nome:"MDF Azul Petróleo" }; // Fallback seguro escuro
                 projetoGlobal.instalacao = ia.instalacao || "aereo";
-                
-                // Salva os cálculos de Posicionamento Auto-Encaixe
-                projetoGlobal.posicionamento_auto_ar = ia.posicionamento_auto_ar || { escala: 1.0, pos_x: 0, pos_y: 1.5, rot_x: -0.05, rot_y: 0, rot_z: 0 };
+                projetoGlobal.posicionamento_auto_ar = ia.posicionamento_auto_ar || { escala: 1.0, pos_x: 0, pos_y: 1.0, rot_x: -0.05, rot_y: 0, rot_z: 0 };
 
                 document.getElementById('aiDesignSection').style.display = 'block';
                 document.getElementById('designerInsight').style.display = 'block';
-                document.getElementById('textoDesigner').innerText = ia.engenharia;
+                document.getElementById('textoDesigner').innerText = ia.engenharia + " (Cores: " + projetoGlobal.design.material_nome + ")";
 
                 document.getElementById('itemName').value = ia.nome_projeto || "Cozinha Modular";
                 if(ia.custos) {
@@ -523,7 +520,7 @@ JSON ESTRITO:
             } catch(e) { 
                 errorDiv.innerHTML = `<strong>Erro:</strong> ${e.message}`; errorDiv.style.display = 'block'; 
             } finally { 
-                btn.innerHTML = '<i class="fas fa-ruler-combined"></i> Mapear Módulos, Posição e Gerar 3D'; btn.disabled = false; 
+                btn.innerHTML = '<i class="fas fa-ruler-combined"></i> Mapear Cores, Posição e Gerar 3D CAD'; btn.disabled = false; 
             }
         }
 
@@ -541,20 +538,20 @@ JSON ESTRITO:
                 const W = Math.round(m.largura), H = Math.round(m.altura), D = Math.round(m.profundidade);
                 const prat = m.prateleiras || 0;
 
-                tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Base/Tampo</td><td>2</td><td>${W}</td><td>${D}</td><td>MDF Br</td></tr>`;
-                tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Laterais</td><td>2</td><td>${H}</td><td>${D}</td><td>MDF Br</td></tr>`;
+                tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Base/Tampo</td><td>2</td><td>${W}</td><td>${D}</td><td>Branco</td></tr>`;
+                tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Laterais</td><td>2</td><td>${H}</td><td>${D}</td><td>Branco</td></tr>`;
                 
                 let HPorta = m.tem_nicho_aberto ? H - (m.altura_nicho||0) : H;
                 if(m.portas > 0) {
                     let wPorta = Math.round(W / m.portas);
                     let nomePorta = m.tipo_abertura === 'basculante' ? 'Frente Basculante' : 'Frente Giro';
-                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> ${nomePorta}</td><td>${m.portas}</td><td>${wPorta}</td><td>${HPorta}</td><td style="color:var(--secondary-wood); font-weight:bold;">${mat}</td></tr>`;
+                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> ${nomePorta}</td><td>${m.portas}</td><td>${wPorta}</td><td>${HPorta}</td><td style="color:var(--ai-blue); font-weight:bold;">${mat}</td></tr>`;
                     if(m.tipo_abertura === 'basculante') custoFerExato += m.portas * 2 * 25; 
                     else custoFerExato += m.portas * 2 * 5; 
                 }
                 
                 if(prat > 0) {
-                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras Int.</td><td>${prat}</td><td>${W - E*2}</td><td>${D - E - 10}</td><td>MDF Br</td></tr>`;
+                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras Int.</td><td>${prat}</td><td>${W - E*2}</td><td>${D - E - 10}</td><td>Branco</td></tr>`;
                     custoMatExato += (((W - E*2) * (D - E) * prat) / 1000000) * 80;
                 }
 
@@ -568,7 +565,7 @@ JSON ESTRITO:
         }
 
         // ==========================================
-        // MOTOR 3D E ESTRUTURA
+        // MOTOR 3D: CÂMERA ANTI-CLIPPING ABSOLUTA
         // ==========================================
         function init3D() {
             const container = document.getElementById('visualizador3D');
@@ -579,7 +576,10 @@ JSON ESTRITO:
             const luz = new THREE.DirectionalLight(0xffffff, 0.6); luz.position.set(5, 10, 8); cena3D.add(luz);
             const luz2 = new THREE.DirectionalLight(0xDDA15E, 0.3); luz2.position.set(-5, 0, -5); cena3D.add(luz2);
 
-            camera3D = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 0.1, 1000);
+            // O SEGREDO DO ANTI-CLIPPING (Sumir uma parte):
+            // Near = 0.01 (MUITO perto), Far = 10000 (MUITO longe)
+            camera3D = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 0.01, 10000);
+            
             renderizador3D = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderizador3D.setClearColor( 0x000000, 0 ); 
             renderizador3D.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -588,8 +588,8 @@ JSON ESTRITO:
 
             controles3D = new THREE.OrbitControls(camera3D, renderizador3D.domElement);
             controles3D.enableDamping = true; controles3D.dampingFactor = 0.05;
+            controles3D.maxDistance = 5000; // Permite zoom infinito para trás
 
-            // ROOT NODE: Ele quem vai assumir o posicionamento da IA (Encaixe Perfeito)
             rootNode = new THREE.Group();
             cena3D.add(rootNode);
 
@@ -670,7 +670,7 @@ JSON ESTRITO:
         }
 
         // ==========================================
-        // FLUXO DE EDIÇÃO (ANTI-TELA TAMPADA)
+        // FLUXO DE EDIÇÃO (O BOTTON SHEET MAGICO)
         // ==========================================
         function ativarEdicaoModulo(index) {
             fecharPerspectiva(); 
@@ -685,11 +685,10 @@ JSON ESTRITO:
             document.getElementById('sliderPrat').value = modObj.prateleiras || 0; document.getElementById('lblPrat').innerText = modObj.prateleiras || 0;
             
             const hud = document.getElementById('editHUD');
-            hud.style.display = 'flex'; 
-            setTimeout(() => hud.classList.add('show'), 10);
-            
+            hud.style.display = 'flex'; setTimeout(() => hud.classList.add('show'), 10);
             destacarModuloVisualmente(index);
 
+            // TELA DESLIZA PARA CIMA (Para não ocluir o 3D)
             if(modoARAtivo) {
                 document.getElementById('container3DWrapper').classList.add('hud-open');
                 setTimeout(ajustarTamanho3D, 300); 
@@ -703,7 +702,6 @@ JSON ESTRITO:
             const hud = document.getElementById('editHUD');
             hud.classList.remove('show');
             setTimeout(() => hud.style.display = 'none', 300);
-
             if (boxHelper) { cena3D.remove(boxHelper); boxHelper = null; }
 
             if(modoARAtivo) {
@@ -761,8 +759,7 @@ JSON ESTRITO:
             isPerspectiveMode = true; controles3D.enabled = false;
             
             const hud = document.getElementById('perspectiveHUD');
-            hud.style.display = 'flex';
-            setTimeout(() => hud.classList.add('show'), 10);
+            hud.style.display = 'flex'; setTimeout(() => hud.classList.add('show'), 10);
 
             if(modoARAtivo) {
                 document.getElementById('container3DWrapper').classList.add('hud-open');
@@ -774,8 +771,7 @@ JSON ESTRITO:
             if(!isPerspectiveMode) return;
             isPerspectiveMode = false; controles3D.enabled = true;
             const hud = document.getElementById('perspectiveHUD');
-            hud.classList.remove('show');
-            setTimeout(() => hud.style.display = 'none', 300);
+            hud.classList.remove('show'); setTimeout(() => hud.style.display = 'none', 300);
 
             if(modoARAtivo) {
                 document.getElementById('container3DWrapper').classList.remove('hud-open');
@@ -795,7 +791,7 @@ JSON ESTRITO:
         }
 
         // ==========================================
-        // O CORAÇÃO DO RENDER
+        // O CORAÇÃO DO RENDER (Material Ouro)
         // ==========================================
         function reconstruirCenaParametrica() {
             if (grupoCozinha) rootNode.remove(grupoCozinha);
@@ -813,7 +809,6 @@ JSON ESTRITO:
             const T_W = largTotal_mm / 1000, T_H = alturaMaxima_mm / 1000;
             const baseElevacao = (projetoGlobal.instalacao === "aereo") ? 1.5 : 0;
             
-            // ATENÇÃO: Centraliza a cozinha INTEIRA no rootNode para o giro de parede funcionar direito
             grupoCozinha.position.y = baseElevacao;
 
             let currentX = -T_W / 2;
@@ -893,14 +888,13 @@ JSON ESTRITO:
             calcularPlanoDeCorteRealTime();
 
             if(!isEditingMode && !modoARAtivo && camera3D && !isPerspectiveMode) {
-                // Modo estúdio normal: Câmera centralizada olhando pro meio do móvel
                 camera3D.position.set(0, -T_H/2, Math.max(T_W, T_H)*1.5);
                 controles3D.target.set(0, -T_H/2, 0); controles3D.update();
             }
         }
 
         // ==========================================
-        // AUTO-ENCAIXE IA (MATCH PHOTO) - A MÁGICA
+        // AUTO-ENCAIXE IA (MATCH PHOTO SUPREMO)
         // ==========================================
         function alternarModoAR() {
             if (!base64ImagemGlobal) { alert("Envie uma foto do local primeiro!"); return; }
@@ -919,29 +913,23 @@ JSON ESTRITO:
                 document.getElementById('info3D').style.display = 'none';
                 document.getElementById('instrucao3D').style.display = 'none';
                 
-                // MÁGICA DE AUTO-ENCAIXE IA
-                // A IA leu o deslocamento na imagem e o passa no projetoGlobal.posicionamento_auto_ar
+                // A IA JÁ CALULOU A PERSPECTIVA E POSIÇÃO, APLICAMOS DIRETAMENTE!
                 const posIA = projetoGlobal.posicionamento_auto_ar;
                 if(posIA) {
-                    // Aplica a escala, deslocamento (usando Panning da câmera para mover no ecrã) e rotação calculadas
                     rootNode.scale.set(posIA.escala, posIA.escala, posIA.escala);
                     rootNode.rotation.set(posIA.rot_x, posIA.rot_y, posIA.rot_z);
                     
-                    // A câmera fica de frente, mas o alvo é deslocado para alinhar com o fundo
                     camera3D.position.set(posIA.pos_x, posIA.pos_y, 4); 
                     controles3D.target.set(posIA.pos_x, posIA.pos_y, 0); 
                     
-                    // Atualiza o menu manual caso o cara abra para calibrar
                     document.getElementById('camScale').value = posIA.escala;
                     document.getElementById('camRotX').value = posIA.rot_x;
                     document.getElementById('camRotY').value = posIA.rot_y;
-                    document.getElementById('camRotZ').value = posIA.rot_z;
                 } else {
                     camera3D.position.set(0, 0, 5); controles3D.target.set(0, 0, 0); 
                 }
                 
                 controles3D.update();
-                document.getElementById('info3D').innerText = "IA: Auto-Encaixe Concluído!";
 
             } else {
                 fecharEdicao(); fecharPerspectiva(); 
@@ -952,13 +940,10 @@ JSON ESTRITO:
                 document.getElementById('info3D').style.display = 'block';
                 document.getElementById('instrucao3D').style.display = 'block';
                 
-                // Reseta tudo pro modo Estúdio limpinho
-                rootNode.rotation.set(0,0,0);
-                rootNode.scale.set(1,1,1);
-                
+                // Reseta a parede e os eixos
+                rootNode.rotation.set(0,0,0); rootNode.scale.set(1,1,1);
                 if(grupoCozinha) { 
-                    let T_H = 1; // Pega a altura média rápida
-                    camera3D.position.set(0, -T_H/2, 3); controles3D.target.set(0, -T_H/2, 0); controles3D.update(); 
+                    camera3D.position.set(0, -0.5, 3); controles3D.target.set(0, -0.5, 0); controles3D.update(); 
                 }
             }
             setTimeout(ajustarTamanho3D, 50);
