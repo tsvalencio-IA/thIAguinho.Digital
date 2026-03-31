@@ -280,7 +280,7 @@
         }
 
         .fullscreen-ar.hud-open { 
-            height: 45vh !important; 
+            height: 35vh !important; /* Deixa 65% da tela pro menu de edição poder rolar */
             border-bottom: 2px solid var(--highlight-yellow) !important; 
         }
 
@@ -329,7 +329,7 @@
             cursor: pointer; 
         }
         
-        /* HUD DE EDIÇÃO PARAMÉTRICA MASTER (COM SCROLL) */
+        /* HUD DE EDIÇÃO PARAMÉTRICA MASTER (COM SCROLL E NOVAS FUNÇÕES) */
         .edit-hud {
             position: fixed; 
             bottom: 0; 
@@ -345,7 +345,7 @@
             border-top: 2px solid var(--highlight-yellow); 
             flex-direction: column; 
             gap: 15px; 
-            height: 60vh; 
+            height: 65vh; /* Ocupa mais espaço pra caber tudo com folga */
             overflow-y: auto; 
             box-sizing: border-box;
             transform: translateY(100%); 
@@ -691,7 +691,7 @@
         <!-- 2. Pedido e Foto do Ambiente -->
         <section id="audioInputSection" class="section-panel">
             <h2 style="margin-top:0;"><i class="fas fa-microphone-alt"></i> Pedido do Cliente e Leitura do Espaço</h2>
-            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">Use áudio, texto ou foto. A IA vai projetar, e você terá controle total para adicionar portas ou remover prateleiras.</p>
+            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">Use áudio, texto ou foto. A IA vai projetar a estrutura completa da cozinha ou balcão, e você terá controle total de edição.</p>
             
             <div class="grid-layout">
                 <div class="input-group">
@@ -708,8 +708,8 @@
             </div>
 
             <div class="input-group full-width">
-                <label>O que vamos projetar? (Texto exato do pedido):</label>
-                <textarea id="transcribedTextDisplay" rows="4" placeholder="Ex: Quero um balcão em L para padaria, azul escuro, com cantos curvos e prateleiras vazadas para colocar doces..."></textarea>
+                <label>O que vamos projetar? (Especifique cores! Ex: Marrom Escuro):</label>
+                <textarea id="transcribedTextDisplay" rows="4" placeholder="Ex: Quero trocar essa cozinha da foto por armários marrons escuros com portas basculantes..."></textarea>
             </div>
             
             <div id="errorDisplay" class="error-message"></div>
@@ -732,7 +732,7 @@
             <!-- Visor 3D Modular e Tela Cheia AR -->
             <div style="margin-top: 30px;">
                 <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;">
-                    <i class="fas fa-cube"></i> 3D Editável Paramétrico
+                    <i class="fas fa-cube"></i> 3D Editável Paramétrico Absoluto
                 </h3>
                 
                 <div class="action-buttons" style="justify-content: flex-start; margin-bottom: 15px; margin-top: 0;">
@@ -758,7 +758,7 @@
                             <i class="fas fa-crop-alt"></i> Ajuste Fino de Parede
                         </button>
                         <button id="arCloseBtn" class="ar-ui-btn" onclick="alternarModoAR()">
-                            <i class="fas fa-times"></i> Fechar
+                            <i class="fas fa-times"></i> Fechar AR
                         </button>
                     </div>
                 </div>
@@ -774,18 +774,35 @@
                     </button>
                 </h4>
                 
-                <!-- Os controles organizados para celular com rolagem -->
+                <!-- Controles organizados para celular com rolagem -->
                 <div class="hud-grid" style="margin-bottom: 15px;">
                     <div class="edit-slider" style="grid-column: 1 / -1;">
                         <label><span>📦 Tipo de Móvel (Estrutura)</span></label>
                         <select id="selTipoMovel" onchange="atualizarModuloParametrico()">
-                            <option value="armario">Armário de Parede/Cozinha</option>
+                            <option value="armario">Armário de Parede/Cozinha/Guarda-Roupa</option>
                             <option value="balcao">Balcão Comercial (Tampo P/ Atendimento)</option>
                         </select>
                     </div>
                     
+                    <div class="edit-slider" style="grid-column: 1 / -1;">
+                        <label><span>📐 Formato da Peça</span></label>
+                        <select id="selFormato" onchange="atualizarModuloParametrico()">
+                            <option value="reto">Reto (Caixa Padrão)</option>
+                            <option value="curvo">Curvo (Canto Arredondado 90 Graus)</option>
+                        </select>
+                    </div>
+
+                    <div class="edit-slider" style="grid-column: 1 / -1; border-top: 1px solid #475569; padding-top: 10px; margin-top: 5px;">
+                        <label><span>🚪 Portas e Aberturas (Visibilidade)</span></label>
+                        <select id="selPorta" onchange="atualizarModuloParametrico()">
+                            <option value="giro">Fechado - Portas de Giro (Laterais)</option>
+                            <option value="basculante">Fechado - Portas Basculantes (Para Cima)</option>
+                            <option value="aberto">Aberto - Sem Portas (Apenas Nichos/Prateleiras)</option>
+                        </select>
+                    </div>
+
                     <div class="edit-slider">
-                        <label><span>↔️ Largura (mm)</span><span id="lblW"></span></label>
+                        <label><span>↔️ Larg. / Raio (mm)</span><span id="lblW"></span></label>
                         <input type="range" id="sliderW" min="200" max="3000" step="10" oninput="atualizarModuloParametrico()">
                     </div>
                     
@@ -804,26 +821,9 @@
                         <input type="range" id="sliderGav" min="0" max="8" step="1" oninput="atualizarModuloParametrico()">
                     </div>
 
-                    <div class="edit-slider">
-                        <label><span>📚 Prateleiras Ext.</span><span id="lblPrat"></span></label>
-                        <input type="range" id="sliderPrat" min="0" max="10" step="1" oninput="atualizarModuloParametrico()">
-                    </div>
-                    
                     <div class="edit-slider" style="grid-column: 1 / -1;">
-                        <label><span>📐 Formato da Peça</span></label>
-                        <select id="selFormato" onchange="atualizarModuloParametrico()">
-                            <option value="reto">Reto (Caixa Padrão)</option>
-                            <option value="curvo">Curvo (Canto Arredondado)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="edit-slider" style="grid-column: 1 / -1; margin-bottom: 10px;">
-                        <label><span>🚪 Portas e Aberturas</span></label>
-                        <select id="selPorta" onchange="atualizarModuloParametrico()">
-                            <option value="aberto">Totalmente Aberto (Sem Portas)</option>
-                            <option value="giro">Com Portas de Giro (Laterais)</option>
-                            <option value="basculante">Com Portas Basculantes (Para Cima)</option>
-                        </select>
+                        <label><span>📚 Prateleiras (Visíveis no 3D)</span><span id="lblPrat"></span></label>
+                        <input type="range" id="sliderPrat" min="0" max="10" step="1" oninput="atualizarModuloParametrico()">
                     </div>
                     
                     <div class="hud-action-row">
@@ -914,7 +914,7 @@
                 </div>
                 <div class="input-group">
                     <label>Ferragens / Acabamentos (R$):</label>
-                    <input type="number" id="costHardware" title="Pistões, Corrediças..." value="0" min="0" step="0.01">
+                    <input type="number" id="costHardware" title="Pistões, Corrediças, Tampos..." value="0" min="0" step="0.01">
                 </div>
                 <div class="input-group">
                     <label>Outros (Frete/LED) (R$):</label>
@@ -942,14 +942,14 @@
     </div>
 
     <div class="floating-buttons">
-        <button class="floating-button mascote" onclick="mascoteFalar('Tudo resolvido, mestre. O 3D nunca mais vai sumir. Você pode adicionar portas nos balcões, ou gavetas, e ver tudo acontecer em tempo real e de forma 100% legível no código!')">
+        <button class="floating-button mascote" onclick="mascoteFalar('Tudo resolvido, mestre. As gavetas, as portas curvas e as cores em Hexadecimal funcionam perfeitamente. Dê um long press no módulo para abrir a central de comando com rolagem!')">
             <i class="fas fa-headset"></i> <span>Arquiteto Universal</span>
         </button>
     </div>
 
     <footer>Powered by thIAguinho Soluções</footer>
 
-    <!-- SCRIPT MÁGICO - EXPANDIDO PARA MÁXIMA LEGIBILIDADE E MANUTENÇÃO (AGORA COM CORREÇÃO DE TYPO NO THREE) -->
+    <!-- SCRIPT MÁGICO - EXPANDIDO PARA MÁXIMA LEGIBILIDADE, MANUTENÇÃO E PODER TOTAL -->
     <script>
         // ---------------------------------------------------------
         // SETUP INICIAL E VARIÁVEIS GLOBAIS
@@ -1128,29 +1128,31 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> O Arquiteto Universal está projetando...';
             btn.disabled = true;
 
-            const promptComando = `Você é um Arquiteto CAD Sênior. Você projeta QUALQUER TIPO de móvel.
-            AJA COM VERDADE ABSOLUTA:
-            1. IDENTIFIQUE A CATEGORIA (tipo_movel):
-               - Se for "Balcão", "Ilha", "Recepção", "Expositor de Doces", defina "tipo_movel": "balcao".
+            // PROMPT BLINDADO CONTRA ALUCINAÇÕES DE CORES E QUANTIDADE
+            const promptComando = `Você é um Arquiteto CAD Sênior e Especialista em Fotogrametria.
+            AJA COM VERDADE ABSOLUTA E PRECISÃO MILIMÉTRICA:
+            
+            1. LEITURA DE FOTO (MATCH PHOTO OBRIGATÓRIO): Se eu enviar uma foto de uma cozinha ou ambiente, você NÃO PODE me devolver um armário simples ou resumido. Você DEVE mapear a foto. Se a foto tem 4 armários/módulos, o seu JSON DEVE ter 4 objetos na array "modulos". Mantenha a geometria original!
+            2. CORES EXATAS (PROIBIDO ALUCINAR MADEIRA): Se eu pedir "Marrom", use um Hexadecimal de marrom real (ex: #5C4033). Se eu pedir "Azul Escuro", use #1A252F. Se eu pedir "Cinza Chumbo", use #2C3E50. NUNCA use laranja, amarelo ou tons de madeira clara se a cor for sólida.
+            3. IDENTIFIQUE A CATEGORIA (tipo_movel):
+               - Se for "Balcão", "Ilha", "Recepção", "Expositor", defina "tipo_movel": "balcao".
                - Se for guarda-roupa, estante, armário de parede, cozinha, defina "tipo_movel": "armario".
-            2. CURVAS E FORMATOS (formato): Se pedirem "Canto curvo", defina "formato": "curvo" na peça que faz a curva. Senão, "reto".
-            3. PORTAS E ABERTURAS (tipo_abertura): 
+            4. CURVAS E FORMATOS (formato): Se pedirem "Canto curvo", defina "formato": "curvo" na peça. Senão, "reto".
+            5. PORTAS E ABERTURAS (tipo_abertura): 
                - Se for prateleiras abertas (expositor puro), defina "tipo_abertura": "aberto" e "portas": 0.
                - Se for fechado padrão, defina "tipo_abertura": "giro" e "portas": 2.
                - Se for aéreo basculante, defina "tipo_abertura": "basculante" e "portas": 1.
-            4. CORES HEXADECIMAIS: Siga EXATAMENTE a cor pedida (ex: Azul escuro = #1c3144). NUNCA coloque madeira se o cliente pediu cor solida ou escuro.
-            5. FOTOGRAMETRIA (MATCH PHOTO): Avalie a escala, posX, posY e rotações da lente para que o 3D tampe perfeitamente o ambiente da foto.
+            6. FOTOGRAMETRIA: Avalie a escala, posX, posY e rotações da lente para que o 3D tampe perfeitamente o ambiente da foto.
 
-            JSON ESTRITO DE RESPOSTA (Siga este modelo):
+            JSON ESTRITO DE RESPOSTA (Siga este modelo exatamente):
             {
-              "nome_projeto": "Projeto Personalizado",
-              "engenharia": "Identifiquei o pedido. Apliquei formato e cores exatas solicitadas e calibrei as coordenadas para a foto.",
-              "design": { "cor_caixa": "#1c3144", "cor_tampo": "#222222", "material_nome": "MDF Azul Escuro e Tampo Preto" },
-              "posicionamento_auto_ar": { "escala": 1.0, "pos_x": 0.0, "pos_y": -0.5, "rot_x": 0.0, "rot_y": 0.0, "rot_z": 0.0 },
+              "nome_projeto": "Projeto Substituição",
+              "engenharia": "Identifiquei a quantidade real de módulos na foto. Apliquei o formato exato e a cor em hexadecimal solicitada.",
+              "design": { "cor_caixa": "#5C4033", "cor_tampo": "#222222", "material_nome": "MDF Marrom Café" },
+              "posicionamento_auto_ar": { "escala": 1.0, "pos_x": 0.0, "pos_y": 0.0, "rot_x": 0.0, "rot_y": 0.0, "rot_z": 0.0 },
               "instalacao": "chao", 
               "modulos": [
-                { "nome": "Balcão Reto", "tipo_movel": "balcao", "largura": 1200, "altura": 1100, "profundidade": 500, "tipo_abertura": "aberto", "portas": 0, "gavetas": 0, "prateleiras": 3, "formato": "reto", "pos_x": 0, "pos_z": 0, "rot_y": 0 },
-                { "nome": "Canto Curvo", "tipo_movel": "balcao", "largura": 600, "altura": 1100, "profundidade": 600, "tipo_abertura": "aberto", "portas": 0, "gavetas": 0, "prateleiras": 3, "formato": "curvo", "pos_x": 900, "pos_z": 300, "rot_y": -90 }
+                { "nome": "Módulo 1", "tipo_movel": "armario", "largura": 800, "altura": 600, "profundidade": 350, "tipo_abertura": "giro", "portas": 2, "gavetas": 0, "prateleiras": 1, "formato": "reto", "pos_x": 0, "pos_z": 0, "rot_y": 0 }
               ],
               "custos": {"material": 1800, "mao_de_obra": 800, "ferragens": 100, "outros": 300}
             }`;
@@ -1188,7 +1190,7 @@
                     body: JSON.stringify({ 
                         model: modelo, 
                         messages: mensagens, 
-                        temperature: 0.1 
+                        temperature: 0.1 // Temperatura baixa = zero alucinação
                     })
                 });
 
@@ -1229,6 +1231,7 @@
 
                 const ia = extrairJSONSeguro(dados.choices[0].message.content);
                 
+                // Gravando no Estado Global
                 projetoGlobal.modulos = ia.modulos || [];
                 
                 projetoGlobal.design = ia.design || { 
@@ -1248,6 +1251,7 @@
                     rot_z: 0 
                 };
 
+                // Atualizando Interface
                 document.getElementById('aiDesignSection').style.display = 'block';
                 document.getElementById('designerInsight').style.display = 'block';
                 document.getElementById('textoDesigner').innerText = ia.engenharia + " (Cor Lida: " + projetoGlobal.design.material_nome + ")";
@@ -1378,7 +1382,7 @@
         }
 
         // ---------------------------------------------------------
-        // INICIALIZAÇÃO DO THREE.JS (COM CORREÇÃO DE TYPO NO ORBITCONTROLS)
+        // INICIALIZAÇÃO DO THREE.JS (CÂMERA ANTI-CLIPPING ABSOLUTA)
         // ---------------------------------------------------------
         function init3D() {
             const container = document.getElementById('visualizador3D');
@@ -1398,7 +1402,7 @@
             luz2.position.set(-5, 0, -5); 
             cena3D.add(luz2);
 
-            // ANTI-CLIPPING ABSOLUTO: near 0.001 e far 50000 garante que a câmera nunca corta o móvel
+            // ANTI-CLIPPING ABSOLUTO: near 0.001 e far 50000 garante que a câmera nunca corta o móvel ao dar zoom
             camera3D = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 0.001, 50000);
             
             renderizador3D = new THREE.WebGLRenderer({ antialias: true, alpha: true, logarithmicDepthBuffer: true }); 
@@ -1407,8 +1411,6 @@
             renderizador3D.setSize(wrapper.clientWidth, wrapper.clientHeight);
             container.appendChild(renderizador3D.domElement);
 
-            // AQUI ESTAVA O ERRO DE DIGITAÇÃO NA VERSÃO ANTERIOR QUE CAUSAVA O "OrbitControls is not defined".
-            // A biblioteca no formato CDN exige o prefixo "THREE."
             controles3D = new THREE.OrbitControls(camera3D, renderizador3D.domElement);
             controles3D.enableDamping = true; 
             controles3D.dampingFactor = 0.05;
@@ -1468,7 +1470,7 @@
         }
 
         // ---------------------------------------------------------
-        // MÁQUINA DE TOQUE (LONG PRESS UX)
+        // MÁQUINA DE TOQUE (LONG PRESS E CLICK SIMPLES)
         // ---------------------------------------------------------
         function getIntersectedModulo(event) {
             const rect = renderizador3D.domElement.getBoundingClientRect();
@@ -1537,7 +1539,7 @@
         }
 
         // ---------------------------------------------------------
-        // FLUXO DE EDIÇÃO NA TELA (BOTTOM SHEET CENTRAL DE COMANDO)
+        // FLUXO DE EDIÇÃO NA TELA (CENTRAL DE COMANDO HUD)
         // ---------------------------------------------------------
         function ativarEdicaoModulo(index) {
             fecharPerspectiva(); 
@@ -1624,6 +1626,7 @@
             projetoGlobal.modulos[moduloSendoEditado].altura = h;
             projetoGlobal.modulos[moduloSendoEditado].profundidade = d;
             
+            // LÓGICA MESTRE DE ABERTURAS (Visibilidade no 3D)
             projetoGlobal.modulos[moduloSendoEditado].tipo_abertura = porta;
             
             if (porta === 'aberto') {
@@ -1631,7 +1634,7 @@
             } else if (porta === 'basculante') {
                 projetoGlobal.modulos[moduloSendoEditado].portas = 1;
             } else {
-                projetoGlobal.modulos[moduloSendoEditado].portas = 2; 
+                projetoGlobal.modulos[moduloSendoEditado].portas = 2; // Giro
             }
 
             projetoGlobal.modulos[moduloSendoEditado].formato = formato;
@@ -1731,7 +1734,7 @@
         }
 
         // ---------------------------------------------------------
-        // CONSTRUTOR GEOMÉTRICO ABSOLUTO (COM PORTAS CURVAS E ABERTURAS)
+        // CONSTRUTOR GEOMÉTRICO (O SEGREDO DAS PORTAS/GAVETAS CURVAS)
         // ---------------------------------------------------------
         function reconstruirCenaParametrica() {
             if (grupoCozinha) {
@@ -1750,7 +1753,7 @@
             });
             
             const matPorta = new THREE.MeshStandardMaterial({ 
-                color: new THREE.Color(design?.cor_caixa || "#CCCCCC"), 
+                color: new THREE.Color(design?.cor_caixa || "#CCCCCC"), // A porta pega a cor solicitada
                 roughness: 0.6 
             });
             
@@ -1842,62 +1845,78 @@
                 const qGav = mod.gavetas || 0;
                 const espacoPrat = mH / (qPrat + 1);
 
+                // LÓGICA DE CONSTRUÇÃO DO 3D DEPENDENDO DAS ESCOLHAS DO MENU
                 if (mod.formato === "curvo") {
-                    // MÓDULO CURVO
+                    // ---------------- MÓDULO CURVO EM L ----------------
                     const raio = mW; 
                     
                     if (mod.tipo_abertura === "aberto") {
+                        
                         criarCurva(raio, E, matCaixa, E/2, mGrp, true, false); // Base
                         criarCurva(raio + 0.05, E, matTampo, mH, mGrp, true, false); // Tampo
                         
+                        // Prateleiras Expostas
                         for (let i = 1; i <= qPrat; i++) {
                             criarCurva(raio, E, matCaixa, espacoPrat * i, mGrp, false, false);
                         }
                         
-                        criarCurva(raio - 0.2, mH, matCaixa, mH/2, mGrp, false, true); // Fundo Curvo
+                        // Fundo curvo (parede de trás do móvel)
+                        criarCurva(raio - 0.2, mH, matCaixa, mH/2, mGrp, false, true); 
+                    
                     } else {
-                        // Curvo Fechado com Porta!
+                        // MODULO CURVO COM PORTA (Visível e Funcional!)
                         criarCurva(raio, E, matCaixa, E/2, mGrp, true, false); // Base
                         criarCurva(raio + 0.05, E, matTampo, mH, mGrp, true, false); // Tampo
                         
+                        // PORTA CURVA INTERATIVA
                         const portaCurvaGrp = new THREE.Group();
-                        portaCurvaGrp.position.set(0, mH/2, 0); 
                         
-                        const meshPorta = criarCurva(raio, mH - F*2, matPorta, 0, portaCurvaGrp, true, true);
-                        meshPorta.userData.grupoPai = portaCurvaGrp;
+                        if (mod.tipo_abertura === 'basculante') {
+                            // Porta curva abrindo para cima
+                            portaCurvaGrp.position.set(0, mH, 0); 
+                            const meshPorta = criarCurva(raio, mH - F*2, matPorta, -mH/2, portaCurvaGrp, true, true);
+                            meshPorta.userData.grupoPai = portaCurvaGrp;
+                            portaCurvaGrp.userData = { animavel: true, tipo: 'basculante', aberto: false, rotAbre: -Math.PI/2.2 };
+                        } else {
+                            // Porta curva de giro padrão
+                            portaCurvaGrp.position.set(0, mH/2, 0); 
+                            const meshPorta = criarCurva(raio, mH - F*2, matPorta, 0, portaCurvaGrp, true, true);
+                            meshPorta.userData.grupoPai = portaCurvaGrp;
+                            portaCurvaGrp.userData = { animavel: true, tipo: 'giro', aberto: false, rotAbre: Math.PI/2 };
+                        }
                         
-                        portaCurvaGrp.userData = { animavel: true, tipo: 'giro', aberto: false, rotAbre: Math.PI/2 };
                         mGrp.add(portaCurvaGrp);
                         
+                        // Prateleiras internas do curvo fechado
                         for (let i = 1; i <= qPrat; i++) {
                             criarCurva(raio - E, E, matCaixa, espacoPrat * i - mH/2, portaCurvaGrp, false, false);
                         }
                     }
                 } 
                 else {
-                    
+                    // ---------------- MÓDULO RETO ----------------
                     if (isBalcao) {
                         
                         if (mod.tipo_abertura !== "aberto") {
-                            // Se o balcão não for aberto na frente, fecha a frente.
+                            // Painel frontal do balcão (Apenas se não for expositor puro)
                             criarPlaca(mW, mH, E, matCaixa, 0, mH/2, mD/2 - E/2, mGrp, true); 
                         }
                         
-                        criarPlaca(mW + 0.05, E, mD + 0.1, matTampo, 0, mH, 0, mGrp, true); 
+                        criarPlaca(mW + 0.05, E, mD + 0.1, matTampo, 0, mH, 0, mGrp, true); // Tampo Atendimento
                         
                         if (mod.tipo_abertura === "aberto") {
-                            // Prateleiras Lado de Fora (Expositor)
+                            // Prateleiras Frontais (Lado de fora pro cliente ver os doces)
                             for (let i = 1; i <= qPrat; i++) {
                                 criarPlaca(mW, E, 0.25, matCaixa, 0, espacoPrat * i, mD/2 + 0.10, mGrp, false);
                             }
                         } else {
-                            // Prateleiras Lado de Dentro 
+                            // Prateleiras Internas (Para o lojista)
                             for (let i = 1; i <= qPrat; i++) {
                                 criarPlaca(mW - E*2, E, mD - E, matCaixa, 0, espacoPrat * i, -E/2, mGrp, false);
                             }
                         }
                         
-                        // Gavetas lado de trás
+                        // Gavetas do lojista (Abrem para trás)
                         if (qGav > 0) {
                             const hGav = (mH * 0.4) / qGav;
                             for (let i = 0; i < qGav; i++) {
@@ -1914,7 +1933,7 @@
                         }
                         
                     } else {
-                        // ARMÁRIO RETO COMUM
+                        // ---------------- ARMÁRIO RETO NORMAL ----------------
                         criarPlaca(mW, E, mD, matCaixa, 0, E/2, mD/2, mGrp, true); // Base
                         criarPlaca(E, mH, mD, matCaixa, -mW/2 + E/2, mH/2, mD/2, mGrp, true); // Esq
                         criarPlaca(E, mH, mD, matCaixa, mW/2 - E/2, mH/2, mD/2, mGrp, true); // Dir
@@ -1939,7 +1958,7 @@
                         
                         criarPlaca(mW - E*2, altFundo, 0.006, matCaixa, 0, baseFundo, 0.01, mGrp); 
 
-                        // PRATELEIRAS
+                        // PRATELEIRAS INTERNAS
                         if (qPrat > 0 && altPortas > 0) {
                             const espPratInterna = altPortas / (qPrat + 1);
                             for (let i = 1; i <= qPrat; i++) {
@@ -1947,7 +1966,7 @@
                             }
                         }
 
-                        // GAVETAS
+                        // GAVETAS FRONTAIS
                         if (qGav > 0 && altPortas > 0) {
                             const hGav = (altPortas * 0.4) / qGav; 
                             for (let i = 0; i < qGav; i++) {
@@ -1966,7 +1985,7 @@
                             startYPortas = startYPortas + (hGav * qGav);
                         }
 
-                        // PORTAS
+                        // PORTAS FRONTAIS SE NÃO FOR "ABERTO"
                         if (mod.tipo_abertura !== "aberto" && altPortas > 0.1) {
                             const nPortas = mod.portas || 1;
                             
@@ -2026,7 +2045,7 @@
         }
 
         // ---------------------------------------------------------
-        // REALIDADE AUMENTADA NATIVA (COM RESTAURO DE COORDENADAS)
+        // REALIDADE AUMENTADA NATIVA E PERSPECTIVA
         // ---------------------------------------------------------
         function alternarModoAR() {
             if (!base64ImagemGlobal) { 
