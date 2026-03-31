@@ -34,7 +34,7 @@
             --border-radius-soft: 8px;
         }
 
-        body { font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; background-color: var(--light-cream); color: var(--text-color); line-height: 1.6; }
+        body { font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; background-color: var(--light-cream); color: var(--text-color); line-height: 1.6; overflow-x: hidden; }
         .container { max-width: 960px; margin: 30px auto; padding: 30px; background-color: var(--soft-beige); border-radius: var(--border-radius-soft); box-shadow: var(--shadow-subtle); position: relative; }
         h1, h2, h3 { font-family: 'Poppins', sans-serif; color: var(--primary-dark); text-align: center; margin-bottom: 30px; }
         h1 { font-size: 2.8em; margin-bottom: 10px; }
@@ -65,7 +65,7 @@
 
         /* Estilos do Visualizador 3D */
         #container3DWrapper { width: 100%; height: 500px; position: relative; border-radius: var(--border-radius-soft); border: 2px solid var(--border-soft); overflow: hidden; background: radial-gradient(circle, #ffffff 0%, #EFEAE5 100%); touch-action: none; margin-bottom: 20px; transition: height 0.3s ease, transform 0.3s ease; }
-        #visualizador3D { width: 100%; height: 100%; position: absolute; top:0; left:0; z-index: 2; display: block; }
+        #visualizador3D { width: 100%; height: 100%; position: absolute; top:0; left:0; z-index: 2; display: block; outline: none; }
         #info3D { position: absolute; top: 15px; left: 15px; background: rgba(74, 60, 48, 0.85); color: #FFF; padding: 8px 12px; border-radius: 6px; font-size: 0.85em; font-weight: bold; pointer-events: none; backdrop-filter: blur(4px); z-index: 5; }
         #instrucao3D { position: absolute; bottom: 15px; right: 15px; background: rgba(221, 161, 94, 0.9); color: var(--primary-dark); padding: 6px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; pointer-events: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 5;}
 
@@ -145,7 +145,7 @@
 <body>
     <div class="container">
         <h1>🛠️ Gerador de Projetos e Orçamentos para Marcenaria</h1>
-        <p class="subtitle">Oráculo CAD: Design Universal, Curvas, Ambientes Completos e Auto-Encaixe AR.</p>
+        <p class="subtitle">Design CAD Profissional: Armários, Cozinhas, Balcões em L e Orçamentos Reais.</p>
 
         <!-- 1. Configuração -->
         <section id="apiConfigSection" class="api-config-section">
@@ -163,53 +163,53 @@
 
         <!-- 2. Pedido e Foto do Ambiente -->
         <section id="audioInputSection" class="section-panel">
-            <h2 style="margin-top:0;"><i class="fas fa-camera-retro"></i> O Arquiteto Universal (Fotos e Áudio)</h2>
-            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">Peça qualquer coisa: "Balcão de padaria em L", "Armário azul escuro" ou "Área Gourmet". A IA projeta formas complexas e acha a posição exata da foto!</p>
+            <h2 style="margin-top:0;"><i class="fas fa-microphone-alt"></i> Pedido do Cliente e Leitura do Espaço</h2>
+            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">Use áudio, texto ou foto. A IA vai entender se é um armário de parede ou um "Balcão em L com expositor de doces" e projetar fielmente.</p>
             
             <div class="grid-layout">
                 <div class="input-group">
-                    <label><i class="fas fa-camera"></i> Foto da Parede/Ambiente:</label>
+                    <label><i class="fas fa-camera"></i> Foto da Cozinha/Ambiente (Opcional):</label>
                     <input type="file" id="imageFileInput" accept="image/*" onchange="previewEComprimirImagem(event)">
                     <div id="imagePreviewContainer"><img id="previewImg" src="" alt="Sua Parede"></div>
                 </div>
                 <div class="input-group">
-                    <label><i class="fas fa-microphone-alt"></i> Áudio do Cliente:</label>
+                    <label><i class="fas fa-microphone-alt"></i> Carregar Áudio do Cliente:</label>
                     <input type="file" id="audioFileInput" accept="audio/*">
                 </div>
             </div>
 
             <div class="input-group full-width">
-                <label>Diretrizes do Cliente (Especifique cores, formatos, etc):</label>
-                <textarea id="transcribedTextDisplay" rows="3" placeholder="Ex: Quero um balcão em L com cantos arredondados e prateleiras expostas... ou Armário azul escuro para substituir este..."></textarea>
+                <label>O que vamos projetar? (Texto exato do pedido):</label>
+                <textarea id="transcribedTextDisplay" rows="4" placeholder="Ex: Quero um balcão em L para padaria, de madeira, com cantos curvos e prateleiras vazadas para colocar doces..."></textarea>
             </div>
             <div id="errorDisplay" class="error-message"></div>
             <div class="action-buttons">
-                <button id="processAudioBtn" class="primary" onclick="gerarProjeto()" style="width: 100%;">
-                    <i class="fas fa-ruler-combined"></i> Analisar Foto, Design e Gerar CAD 3D
+                <button id="processAudioBtn" class="primary" onclick="gerarProjeto()" style="width: 100%; font-size: 1.1em; padding: 15px;">
+                    <i class="fas fa-hard-hat"></i> Analisar Foto/Texto e Gerar CAD 3D
                 </button>
             </div>
         </section>
 
         <!-- 3. Projeto Técnico AutoCAD / Promob -->
         <section id="aiDesignSection" class="ai-output-section" style="display: none;">
-            <h3 style="margin-top: 0;"><i class="fas fa-drafting-compass"></i> Projeto CAD Paramétrico Diamante</h3>
+            <h3 style="margin-top: 0;"><i class="fas fa-drafting-compass"></i> Engenharia e Design Aplicado</h3>
             
             <div id="designerInsight" class="designer-insight" style="display: none;">
-                <i class="fas fa-eye"></i> <b>Inteligência Espacial:</b> <span id="textoDesigner"></span>
+                <i class="fas fa-eye"></i> <b>Interpretação do Arquiteto IA:</b> <span id="textoDesigner"></span>
             </div>
 
             <!-- Visor 3D Modular e Tela Cheia AR -->
             <div style="margin-top: 30px;">
                 <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;">
-                    <i class="fas fa-cube"></i> Simulação 3D, Curvas e Auto-Encaixe
+                    <i class="fas fa-cube"></i> 3D Editável Paramétrico
                 </h3>
                 
                 <div class="action-buttons" style="justify-content: flex-start; margin-bottom: 15px; margin-top: 0;">
                     <button id="btnAR" class="success" onclick="alternarModoAR()" style="display: none;">
-                        <i class="fas fa-expand-arrows-alt"></i> Ver Instalado na Foto (Auto-Match)
+                        <i class="fas fa-expand-arrows-alt"></i> Ver Instalado na Foto (Auto-Encaixe)
                     </button>
                     <p style="font-size: 0.85em; color: var(--earth-green); margin-top: auto; margin-bottom: auto; padding-left: 10px;">
-                        <i class="fas fa-hand-pointer"></i> Segure o dedo sobre um módulo para editar.
+                        <i class="fas fa-hand-pointer"></i> Segure o dedo sobre o balcão/armário para editar.
                     </p>
                 </div>
 
@@ -222,47 +222,54 @@
                     
                     <!-- UIs Exclusivas do AR -->
                     <div id="arUITop" class="ar-ui-top">
-                        <button class="ar-ui-magic" onclick="abrirAjustePerspectiva()"><i class="fas fa-crop-alt"></i> Ajuste Fino Manual</button>
+                        <button class="ar-ui-magic" onclick="abrirAjustePerspectiva()"><i class="fas fa-crop-alt"></i> Ajuste Fino de Parede</button>
                         <button id="arCloseBtn" class="ar-ui-btn" onclick="alternarModoAR()"><i class="fas fa-times"></i> Fechar</button>
                     </div>
                 </div>
             </div>
 
-            <!-- HUD DE EDIÇÃO DE MÓDULO -->
+            <!-- HUD DE EDIÇÃO DE MÓDULO (Bottom Sheet Ouro) -->
             <div id="editHUD" class="edit-hud">
                 <div class="hud-drag-indicator"></div>
                 <h4><span id="hudTitle">Módulo</span> <button class="hud-btn-close" onclick="fecharEdicao()"><i class="fas fa-times-circle"></i></button></h4>
                 
                 <div class="hud-grid">
+                    <div class="edit-slider" style="grid-column: 1 / -1;">
+                        <label><span>📦 Tipo de Móvel</span></label>
+                        <select id="selTipoMovel" onchange="atualizarModuloParametrico()">
+                            <option value="armario">Armário (Caixa Fechada)</option>
+                            <option value="balcao">Balcão Comercial (Tampo + Expositor)</option>
+                        </select>
+                    </div>
                     <div class="edit-slider">
-                        <label><span>↔️ Larg. (mm)</span><span id="lblW"></span></label>
+                        <label><span>↔️ Larg. / Raio (mm)</span><span id="lblW"></span></label>
                         <input type="range" id="sliderW" min="200" max="3000" step="10" oninput="atualizarModuloParametrico()">
                     </div>
                     <div class="edit-slider">
                         <label><span>↕️ Alt. (mm)</span><span id="lblH"></span></label>
-                        <input type="range" id="sliderH" min="200" max="2500" step="10" oninput="atualizarModuloParametrico()">
+                        <input type="range" id="sliderH" min="200" max="1500" step="10" oninput="atualizarModuloParametrico()">
                     </div>
                     <div class="edit-slider">
                         <label><span>↘️ Prof. (mm)</span><span id="lblD"></span></label>
                         <input type="range" id="sliderD" min="200" max="1000" step="10" oninput="atualizarModuloParametrico()">
                     </div>
                     <div class="edit-slider">
-                        <label><span>📚 Prateleiras</span><span id="lblPrat"></span></label>
+                        <label><span>📚 Prateleiras Ext.</span><span id="lblPrat"></span></label>
                         <input type="range" id="sliderPrat" min="0" max="8" step="1" oninput="atualizarModuloParametrico()">
                     </div>
-                    <div class="edit-slider" style="grid-column: 1 / -1;">
-                        <label><span>🚪 Estrutura / Abertura</span></label>
-                        <select id="selPorta" onchange="atualizarModuloParametrico()">
-                            <option value="giro">Com Portas de Giro</option>
-                            <option value="basculante">Com Portas Basculantes</option>
-                            <option value="aberto">Aberto (Sem Portas, Apenas Prateleiras)</option>
+                    <div class="edit-slider">
+                        <label><span>📐 Formato</span></label>
+                        <select id="selFormato" onchange="atualizarModuloParametrico()">
+                            <option value="reto">Reto (Padrão)</option>
+                            <option value="curvo">Curvo (Canto em L)</option>
                         </select>
                     </div>
-                    <div class="edit-slider" style="grid-column: 1 / -1;">
-                        <label><span>📐 Formato da Peça</span></label>
-                        <select id="selFormato" onchange="atualizarModuloParametrico()">
-                            <option value="reto">Reto Padrão</option>
-                            <option value="curvo">Canto Curvo / Arredondado</option>
+                    <div class="edit-slider">
+                        <label><span>🚪 Abertura</span></label>
+                        <select id="selPorta" onchange="atualizarModuloParametrico()">
+                            <option value="giro">Portas de Giro</option>
+                            <option value="basculante">Portas Basculantes</option>
+                            <option value="aberto">Aberto (Apenas Expositor)</option>
                         </select>
                     </div>
                     
@@ -278,23 +285,19 @@
                 <div class="hud-drag-indicator"></div>
                 <h4><span style="color:var(--ai-blue);"><i class="fas fa-crop-alt"></i> Calibragem Manual AR</span> <button class="hud-btn-close" onclick="fecharPerspectiva()"><i class="fas fa-times-circle"></i></button></h4>
                 
-                <p style="font-size:0.8em; color:#ccc; margin-top:0;">A IA já encontrou as coordenadas da foto. Use aqui para refinamento fino.</p>
+                <p style="font-size:0.8em; color:#ccc; margin-top:0;">A IA já encontrou as coordenadas da foto. Use aqui para o refinamento fino do projeto real.</p>
 
                 <div class="edit-slider">
                     <label><span>Tamanho na Foto (Escala)</span></label>
                     <input type="range" id="camScale" min="0.3" max="3.5" step="0.01" value="1.0" oninput="ajustarPerspectivaManual()">
                 </div>
                 <div class="edit-slider">
-                    <label><span>Mover Horizontal (Eixo X)</span></label>
-                    <input type="range" id="camPosX" min="-15" max="15" step="0.1" value="0" oninput="ajustarPerspectivaManual()">
-                </div>
-                <div class="edit-slider">
-                    <label><span>Mover Vertical (Eixo Y)</span></label>
-                    <input type="range" id="camPosY" min="-15" max="15" step="0.1" value="0" oninput="ajustarPerspectivaManual()">
-                </div>
-                <div class="edit-slider">
-                    <label><span>Tombar / Inclinar Lente</span></label>
+                    <label><span>Tombar Parede (Eixo X)</span></label>
                     <input type="range" id="camRotX" min="-0.8" max="0.8" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
+                </div>
+                <div class="edit-slider">
+                    <label><span>Girar Parede (Eixo Y)</span></label>
+                    <input type="range" id="camRotY" min="-0.8" max="0.8" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
                 </div>
             </div>
 
@@ -307,8 +310,7 @@
                             <tr>
                                 <th>Peça / Componente</th>
                                 <th>Qtd</th>
-                                <th>Largura (mm)</th>
-                                <th>Prof / Alt (mm)</th>
+                                <th>Medidas / Raio (mm)</th>
                                 <th>Material</th>
                             </tr>
                         </thead>
@@ -326,13 +328,13 @@
 
         <!-- 4. Orçamento Parametrizado -->
         <section id="addItemSection" class="section-panel">
-            <h2><i class="fas fa-money-check-alt"></i> Precificação Final</h2>
+            <h2><i class="fas fa-money-check-alt"></i> Precificação Final Ouro</h2>
             <div class="grid-layout">
                 <div class="input-group full-width"><label>Nome do Projeto:</label><input type="text" id="itemName" placeholder="Cozinha / Balcão Modular"></div>
-                <div class="input-group"><label>MDF e Chapas (R$):</label><input type="number" id="costMaterial" value="0" min="0" step="0.01"></div>
+                <div class="input-group"><label>MDF, Granito e Chapas (R$):</label><input type="number" id="costMaterial" value="0" min="0" step="0.01"></div>
                 <div class="input-group"><label>Mão de Obra/Montagem (R$):</label><input type="number" id="costLabor" value="0" min="0" step="0.01"></div>
-                <div class="input-group"><label>Ferragens / Acabamentos (R$):</label><input type="number" id="costHardware" title="Pistões, Corrediças, Tampos..." value="0" min="0" step="0.01"></div>
-                <div class="input-group"><label>Outros (Frete/Vidro) (R$):</label><input type="number" id="costOther" value="0" min="0" step="0.01"></div>
+                <div class="input-group"><label>Ferragens / Acabamentos (R$):</label><input type="number" id="costHardware" title="Pistões, Corrediças..." value="0" min="0" step="0.01"></div>
+                <div class="input-group"><label>Outros (Frete/LED) (R$):</label><input type="number" id="costOther" value="0" min="0" step="0.01"></div>
                 <div class="input-group"><label>Margem Desejada (%):</label><input type="number" id="profitMargin" value="35" min="0" max="100" step="1"></div>
                 <div class="input-group full-width action-buttons"><button class="primary" onclick="calcularTotal()"><i class="fas fa-calculator"></i> Recalcular Valor</button></div>
             </div>
@@ -341,26 +343,26 @@
         <section id="summary">
             <h2><i class="fas fa-handshake"></i> Valor do Projeto Otimizado</h2>
             <p>Total Sugerido: <span id="totalProjectCost">R$ 0,00</span></p>
-            <button onclick="mascoteFalar('O total atualizado para o ambiente completo é ' + document.getElementById('totalProjectCost').textContent)" class="warning">
+            <button onclick="mascoteFalar('O total atualizado para o ambiente completo com todos os módulos, tampos e prateleiras é ' + document.getElementById('totalProjectCost').textContent)" class="warning">
                 <i class="fas fa-robot"></i> Perguntar ao Mascote
             </button>
         </section>
     </div>
 
     <div class="floating-buttons">
-        <button class="floating-button mascote" onclick="mascoteFalar('Seja armário de cozinha ou um balcão em L com curvas. Eu mapeio o ambiente na foto, trago a cor exata que você pedir e encaixo o 3D lá dentro. Pode dar zoom à vontade, o motor 3D não corta mais as imagens!')">
+        <button class="floating-button mascote" onclick="mascoteFalar('Agora eu sou um Engenheiro Universal. Se você pedir um balcão comercial de doces curvo, eu farei o tampo superior, a frente sólida e prateleiras expostas arredondadas no 3D! Sem vício em cozinha quadrada!')">
             <i class="fas fa-headset"></i> <span>Arquiteto Universal</span>
         </button>
     </div>
 
     <footer>Powered by thIAguinho Soluções</footer>
 
-    <!-- SCRIPT MÁGICO - ENGENHARIA UNIVERSAL ABSOLUTA (COR, CURVAS, LAYOUT E AR) -->
+    <!-- SCRIPT MÁGICO - ENGENHARIA DE BALCÕES COMERCIAIS, CURVAS E AUTO-AR -->
     <script>
         let currentApiKey = localStorage.getItem('groqApiKeyLocal') || "";
         if(currentApiKey) document.getElementById('apiKeyInput').value = currentApiKey;
 
-        // ESTADO GLOBAL
+        // ESTADO GLOBAL DO PROJETO
         let projetoGlobal = { 
             modulos: [], design: null, instalacao: "chao", 
             posicionamento_auto_ar: { escala: 1.0, pos_x: 0, pos_y: 0, rot_x: 0, rot_y: 0, rot_z: 0 } 
@@ -440,45 +442,47 @@
         }
 
         // ==========================================
-        // PROMPT ARQUITETO UNIVERSAL (Cores, Curvas e Auto-Match)
+        // PROMPT ARQUITETO COMERCIAL (Diferencia Balcão e Armário)
         // ==========================================
         async function gerarProjeto() {
             const txt = document.getElementById('transcribedTextDisplay').value.trim();
             const errorDiv = document.getElementById('errorDisplay');
             errorDiv.style.display = 'none';
 
-            if (!txt && !base64ImagemGlobal) return alert("Anexe a foto da cozinha/balcão.");
+            if (!txt && !base64ImagemGlobal) return alert("Anexe a foto ou descreva o projeto.");
             if (!currentApiKey) return alert("Cadastre a Chave da IA.");
 
             const btn = document.getElementById('processAudioBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> O Arquiteto Universal está analisando a foto...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> O Arquiteto Universal está projetando...';
             btn.disabled = true;
 
-            const promptComando = `Você é um Arquiteto Universal, Designer de Interiores e Mestre em Fotogrametria 3D.
+            const promptComando = `Você é um Arquiteto CAD Sênior. Você sabe projetar QUALQUER TIPO de móvel (não apenas cozinhas).
 AJA COM VERDADE ABSOLUTA:
-1. IDENTIFIQUE A CATEGORIA PELO PEDIDO E FOTO: É um armário de parede? É um "Balcão em L com cantos arredondados e aberto para doces"? Projete EXATAMENTE o que é. 
-2. CORES ABSOLUTAS: Se o cliente pedir uma cor ("armário azul", "preto", "escuro"), OBRIGATORIAMENTE gere a cor solicitada em HEXADECIMAL. Não use madeira se ele não pedir.
-3. FORMATOS E ABERTURAS: Se for um balcão com prateleiras de exposição, defina tipo_abertura como "aberto" e formato como "curvo" ou "reto".
-4. MAPA 3D (POS_X, POS_Z, ROT_Y): Você tem o poder de posicionar as peças. Se for um L, rotacione um módulo em rot_y: -90 e mude o pos_x/pos_z. Se não quiser layout complexo, deixe pos_x vazio para ficarem lado a lado.
-5. AUTO-ENCAIXE (MATCH PHOTO): Defina escala, pos_x e pos_y globais para o 3D tampar perfeitamente a posição do objeto velho na foto.
+1. IDENTIFIQUE A CATEGORIA (tipo_movel):
+   - Se o cliente pedir ou a foto mostrar um "Balcão", "Ilha", "Recepção", "Expositor de Doces", defina "tipo_movel": "balcao".
+   - Se for guarda-roupa, estante, cozinha superior, defina "tipo_movel": "armario".
+2. CURVAS E FORMATOS (formato): Se pedirem um "Canto curvo" ou "Balcão em L com canto arredondado", defina "formato": "curvo" na peça que faz a curva. Senão, "reto".
+3. PRATELEIRAS EXPOSITORAS (tipo_abertura): Se for um expositor de doces de padaria, a frente não tem porta, tem prateleiras expostas. Defina "tipo_abertura": "aberto" e "expositor_frontal": true.
+4. CORES HEXADECIMAIS: Siga EXATAMENTE a cor pedida (ex: Azul = #1c3144). Se pedir tampo de granito, gere a cor do granito (ex: Preto = #111).
+5. FOTOGRAMETRIA (MATCH PHOTO): Se enviou foto, avalie a escala, posX, posY e rotações para que o 3D tampe perfeitamente o ambiente.
 
-JSON ESTRITO DE RESPOSTA:
+JSON ESTRITO DE RESPOSTA (Siga este modelo):
 {
-  "nome_projeto": "Projeto Arquiteto",
-  "engenharia": "Analisei o ambiente. Detectei a categoria e apliquei as cores e perspectivas corretas para o match photo.",
-  "design": { "cor_caixa": "#SuaCorHex", "cor_portas": "#SuaCorHex", "material_nome": "Nome do Material" },
-  "posicionamento_auto_ar": { "escala": 1.0, "pos_x": 0.0, "pos_y": 0.0, "rot_x": 0.0, "rot_y": 0.0, "rot_z": 0.0 },
+  "nome_projeto": "Balcão Comercial Padaria",
+  "engenharia": "Identifiquei o pedido de um balcão comercial curvo para doces. Adicionei tampo reforçado e prateleiras frontais expostas.",
+  "design": { "cor_caixa": "#DDA15E", "cor_tampo": "#222222", "material_nome": "MDF Carvalho e Tampo Granito São Gabriel" },
+  "posicionamento_auto_ar": { "escala": 1.0, "pos_x": 0.0, "pos_y": -0.5, "rot_x": 0.0, "rot_y": 0.0, "rot_z": 0.0 },
   "instalacao": "chao", 
   "modulos": [
-    { "nome": "Frente Balcão", "largura": 1500, "altura": 1100, "profundidade": 600, "tipo_abertura": "aberto", "tem_nicho_aberto": false, "prateleiras": 4, "formato": "reto", "pos_x": 0, "pos_z": 0, "rot_y": 0 },
-    { "nome": "Canto Curvo", "largura": 600, "altura": 1100, "profundidade": 600, "tipo_abertura": "aberto", "prateleiras": 4, "formato": "curvo", "pos_x": 1050, "pos_z": 300, "rot_y": -90 }
+    { "nome": "Balcão Reto", "tipo_movel": "balcao", "expositor_frontal": true, "largura": 1200, "altura": 1100, "profundidade": 500, "tipo_abertura": "aberto", "prateleiras": 3, "formato": "reto", "pos_x": 0, "pos_z": 0, "rot_y": 0 },
+    { "nome": "Canto Curvo L", "tipo_movel": "balcao", "expositor_frontal": true, "largura": 600, "altura": 1100, "profundidade": 600, "tipo_abertura": "aberto", "prateleiras": 3, "formato": "curvo", "pos_x": 900, "pos_z": 300, "rot_y": -90 }
   ],
-  "custos": {"material": 1200, "mao_de_obra": 600, "ferragens": 300, "outros": 100}
+  "custos": {"material": 1800, "mao_de_obra": 800, "ferragens": 100, "outros": 300}
 }`;
 
             let mensagens = base64ImagemGlobal ? 
-                [{ role: "user", content: [{ type: "text", text: `Pedido: ${txt}\n${promptComando}` }, { type: "image_url", image_url: { url: base64ImagemGlobal } }] }] : 
-                [{ role: "user", content: `Pedido: ${txt}\n${promptComando}` }];
+                [{ role: "user", content: [{ type: "text", text: `Pedido:\n${txt}\n\n${promptComando}` }, { type: "image_url", image_url: { url: base64ImagemGlobal } }] }] : 
+                [{ role: "user", content: `Pedido:\n${txt}\n\n${promptComando}` }];
 
             try {
                 const url = "https://api.groq.com/openai/v1/chat/completions";
@@ -492,7 +496,7 @@ JSON ESTRITO DE RESPOSTA:
                 let dados = await res.json();
                 if (!res.ok) {
                     if(base64ImagemGlobal) {
-                        mensagens = [{ role: "user", content: `Pedido: ${txt}\n${promptComando}` }];
+                        mensagens = [{ role: "user", content: `Pedido:\n${txt}\n\n${promptComando}` }];
                         res = await fetch(url, { method: 'POST', headers: { "Authorization": `Bearer ${currentApiKey}`, "Content-Type": "application/json" }, body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: mensagens, temperature: 0.1, response_format: { type: "json_object" } }) });
                         dados = await res.json();
                         if(!res.ok) throw new Error(dados.error?.message || "Erro API.");
@@ -501,15 +505,15 @@ JSON ESTRITO DE RESPOSTA:
 
                 const ia = extrairJSONSeguro(dados.choices[0].message.content);
                 projetoGlobal.modulos = ia.modulos || [];
-                projetoGlobal.design = ia.design || { cor_caixa:"#FDFCF9", cor_portas:"#FDFCF9", material_nome:"MDF Padrão" }; 
-                projetoGlobal.instalacao = ia.instalacao || "aereo";
+                projetoGlobal.design = ia.design || { cor_caixa:"#FDFCF9", cor_tampo:"#333333", material_nome:"MDF Padrão" }; 
+                projetoGlobal.instalacao = ia.instalacao || "chao";
                 projetoGlobal.posicionamento_auto_ar = ia.posicionamento_auto_ar || { escala: 1.0, pos_x: 0, pos_y: 0, rot_x: 0, rot_y: 0, rot_z: 0 };
 
                 document.getElementById('aiDesignSection').style.display = 'block';
                 document.getElementById('designerInsight').style.display = 'block';
                 document.getElementById('textoDesigner').innerText = ia.engenharia + " (Material: " + projetoGlobal.design.material_nome + ")";
 
-                document.getElementById('itemName').value = ia.nome_projeto || "Projeto Sob Medida";
+                document.getElementById('itemName').value = ia.nome_projeto || "Projeto CAD Customizado";
                 if(ia.custos) {
                     document.getElementById('costMaterial').value = ia.custos.material||0;
                     document.getElementById('costLabor').value = ia.custos.mao_de_obra||0;
@@ -524,13 +528,13 @@ JSON ESTRITO DE RESPOSTA:
                     reconstruirCenaParametrica(); 
                     
                     document.getElementById('btnAR').style.display = base64ImagemGlobal ? 'inline-flex' : 'none';
-                    if(modoARAtivo) alternarModoAR(); // Desliga pra resetar e forçar o auto-encaixe novo
+                    if(modoARAtivo) alternarModoAR(); 
                 }, 150);
 
             } catch(e) { 
                 errorDiv.innerHTML = `<strong>Erro:</strong> ${e.message}`; errorDiv.style.display = 'block'; 
             } finally { 
-                btn.innerHTML = '<i class="fas fa-ruler-combined"></i> Mapear Cores, Posição e Gerar 3D CAD'; btn.disabled = false; 
+                btn.innerHTML = '<i class="fas fa-ruler-combined"></i> Analisar Foto/Texto e Gerar CAD 3D'; btn.disabled = false; 
             }
         }
 
@@ -547,30 +551,40 @@ JSON ESTRITO DE RESPOSTA:
             projetoGlobal.modulos.forEach((m, idx) => {
                 const W = Math.round(m.largura), H = Math.round(m.altura), D = Math.round(m.profundidade);
                 const prat = m.prateleiras || 0;
+                const isBalcao = m.tipo_movel === 'balcao';
 
                 if (m.formato === 'curvo') {
-                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras/Tampo Curvos</td><td>${prat + 2}</td><td>Raio ${W}</td><td>Raio ${W}</td><td>${mat}</td></tr>`;
-                    custoMatExato += (((W * W * (Math.PI/4)) * (prat+2)) / 1000000) * 90;
+                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Frente Curva (Raio)</td><td>1</td><td>R: ${W}</td><td>Alt: ${H}</td><td>${mat}</td></tr>`;
+                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Tampo Curvo</td><td>1</td><td>R: ${W}</td><td>-</td><td>Tampo</td></tr>`;
+                    if(prat > 0) tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras Curvas</td><td>${prat}</td><td>R: ${W}</td><td>-</td><td>${mat}</td></tr>`;
+                    custoMatExato += (((W * W * (Math.PI/4)) * (prat+2)) / 1000000) * 120; // Mais caro por ser curvo
                 } else {
-                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Base/Tampo</td><td>2</td><td>${W}</td><td>${D}</td><td>MDF Base</td></tr>`;
-                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Laterais</td><td>2</td><td>${H}</td><td>${D}</td><td>MDF Base</td></tr>`;
+                    // Reto
+                    if(isBalcao) {
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Frente Balcão</td><td>1</td><td>${W}</td><td>${H}</td><td style="color:var(--ai-blue);">${mat}</td></tr>`;
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Tampo Atendimento</td><td>1</td><td>${W}</td><td>${D + 50}</td><td>Granito/Madeira</td></tr>`;
+                    } else {
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Base/Tampo</td><td>2</td><td>${W}</td><td>${D}</td><td>MDF Base</td></tr>`;
+                    }
                     
-                    let HPorta = m.tem_nicho_aberto ? H - (m.altura_nicho||0) : H;
+                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Laterais Estruturais</td><td>2</td><td>${H}</td><td>${D}</td><td>MDF Base</td></tr>`;
                     
                     if (m.tipo_abertura !== 'aberto' && m.portas > 0) {
                         let wPorta = Math.round(W / m.portas);
-                        let nomePorta = m.tipo_abertura === 'basculante' ? 'Frente Basculante' : 'Frente Giro';
-                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> ${nomePorta}</td><td>${m.portas}</td><td>${wPorta}</td><td>${HPorta}</td><td style="color:var(--ai-blue); font-weight:bold;">${mat}</td></tr>`;
+                        let nomePorta = m.tipo_abertura === 'basculante' ? 'Porta Basculante' : 'Porta de Giro';
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> ${nomePorta}</td><td>${m.portas}</td><td>${wPorta}</td><td>${H}</td><td style="color:var(--ai-blue); font-weight:bold;">${mat}</td></tr>`;
                         if(m.tipo_abertura === 'basculante') custoFerExato += m.portas * 2 * 25; 
                         else custoFerExato += m.portas * 2 * 5; 
                     }
                     
                     if(prat > 0) {
-                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras Int.</td><td>${prat}</td><td>${W - E*2}</td><td>${D - E - 10}</td><td>MDF Base</td></tr>`;
-                        custoMatExato += (((W - E*2) * (D - E) * prat) / 1000000) * 80;
+                        let profP = isBalcao ? 250 : (D - E - 10); // Prateleira de balcão é mais rasa
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras/Expositores</td><td>${prat}</td><td>${W - E*2}</td><td>${profP}</td><td>${mat}</td></tr>`;
+                        custoMatExato += (((W - E*2) * profP * prat) / 1000000) * 80;
                     }
-                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Fundo Traseiro</td><td>1</td><td>${W - E*2}</td><td>${HPorta - E*2}</td><td>MDF 6mm</td></tr>`;
-                    custoMatExato += (((W*D*2) + (H*D*2) + (W*HPorta)) / 1000000) * 80;
+                    
+                    // Cálculo de área geral bruta
+                    custoMatExato += (((W*D*2) + (H*D*2) + (W*H)) / 1000000) * 80;
                 }
             });
 
@@ -588,11 +602,10 @@ JSON ESTRITO DE RESPOSTA:
             cena3D = new THREE.Scene(); cena3D.background = null;
 
             cena3D.add(new THREE.AmbientLight(0xffffff, 0.8));
-            const luz = new THREE.DirectionalLight(0xffffff, 0.6); luz.position.set(5, 10, 8); cena3D.add(luz);
-            const luz2 = new THREE.DirectionalLight(0xDDA15E, 0.3); luz2.position.set(-5, 0, -5); cena3D.add(luz2);
+            const luz = new THREE.DirectionalLight(0xffffff, 0.8); luz.position.set(5, 10, 8); cena3D.add(luz);
+            const luz2 = new THREE.DirectionalLight(0xDDA15E, 0.4); luz2.position.set(-5, 0, -5); cena3D.add(luz2);
 
-            // ANTI-CLIPPING (Nunca mais some a peça ao dar zoom): Near 0.01, Far 10000
-            camera3D = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 0.01, 10000);
+            camera3D = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 0.1, 10000);
             
             renderizador3D = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderizador3D.setClearColor( 0x000000, 0 ); 
@@ -692,6 +705,7 @@ JSON ESTRITO DE RESPOSTA:
             const modObj = projetoGlobal.modulos[index];
             
             document.getElementById('hudTitle').innerText = modObj.nome || `Módulo ${index+1}`;
+            document.getElementById('selTipoMovel').value = modObj.tipo_movel || 'armario';
             document.getElementById('sliderW').value = modObj.largura; document.getElementById('lblW').innerText = Math.round(modObj.largura);
             document.getElementById('sliderH').value = modObj.altura; document.getElementById('lblH').innerText = Math.round(modObj.altura);
             document.getElementById('sliderD').value = modObj.profundidade; document.getElementById('lblD').innerText = Math.round(modObj.profundidade);
@@ -731,6 +745,7 @@ JSON ESTRITO DE RESPOSTA:
             const d = parseFloat(document.getElementById('sliderD').value);
             const porta = document.getElementById('selPorta').value;
             const formato = document.getElementById('selFormato').value;
+            const tipo_movel = document.getElementById('selTipoMovel').value;
             const prat = parseInt(document.getElementById('sliderPrat').value);
             
             document.getElementById('lblW').innerText = w; document.getElementById('lblH').innerText = h;
@@ -741,7 +756,10 @@ JSON ESTRITO DE RESPOSTA:
             projetoGlobal.modulos[moduloSendoEditado].profundidade = d;
             projetoGlobal.modulos[moduloSendoEditado].tipo_abertura = porta;
             projetoGlobal.modulos[moduloSendoEditado].formato = formato;
+            projetoGlobal.modulos[moduloSendoEditado].tipo_movel = tipo_movel;
             projetoGlobal.modulos[moduloSendoEditado].prateleiras = prat;
+            // Se for comercial aberto, ativa expositor
+            projetoGlobal.modulos[moduloSendoEditado].expositor_frontal = (porta === "aberto" && tipo_movel === "balcao");
 
             reconstruirCenaParametrica();
             destacarModuloVisualmente(moduloSendoEditado);
@@ -751,6 +769,9 @@ JSON ESTRITO DE RESPOSTA:
             if (moduloSendoEditado === null) return;
             const novoMod = JSON.parse(JSON.stringify(projetoGlobal.modulos[moduloSendoEditado]));
             novoMod.nome = novoMod.nome + " (Cópia)";
+            // Se tinha pos fixa, limpa para não renderizar um dentro do outro
+            novoMod.pos_x = undefined; novoMod.pos_z = undefined;
+            
             projetoGlobal.modulos.splice(moduloSendoEditado + 1, 0, novoMod);
             fecharEdicao(); reconstruirCenaParametrica();
         }
@@ -793,25 +814,25 @@ JSON ESTRITO DE RESPOSTA:
             rootNode.scale.set(s, s, s);
             rootNode.rotation.set(rX, rY, 0);
             
-            // Move a câmera para simular deslocamento (pan) global
             camera3D.position.set(pX, pY, camera3D.position.z);
             controles3D.target.set(pX, pY, controles3D.target.z);
         }
 
         // ==========================================
-        // O CORAÇÃO DO RENDER (AGORA COM CURVAS E ABERTOS)
+        // O CORAÇÃO DO RENDER (BALCÕES COMERCIAIS & CURVAS)
         // ==========================================
         function reconstruirCenaParametrica() {
             if (grupoCozinha) rootNode.remove(grupoCozinha);
             objetosInterativos = []; grupoCozinha = new THREE.Group(); rootNode.add(grupoCozinha);
 
             const design = projetoGlobal.design;
-            const matCaixa = new THREE.MeshStandardMaterial({ color: new THREE.Color(design?.cor_caixa||"#FFF"), roughness: 0.8 });
-            const matPorta = new THREE.MeshStandardMaterial({ color: new THREE.Color(design?.cor_portas||"#CCC"), roughness: 0.5 });
+            const matCaixa = new THREE.MeshStandardMaterial({ color: new THREE.Color(design?.cor_caixa||"#FFF"), roughness: 0.9 });
+            const matPorta = new THREE.MeshStandardMaterial({ color: new THREE.Color(design?.cor_portas||"#CCC"), roughness: 0.6 });
+            const matTampo = new THREE.MeshStandardMaterial({ color: new THREE.Color(design?.cor_tampo||"#222"), roughness: 0.2, metalness:0.3 }); // Granito/Pedra
             const matPux = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.4 });
             const E = 0.018; const F = 0.003; 
 
-            // Para layout livre da IA (caso ela envie pos_x e pos_z de L-shapes)
+            // Se algum módulo tiver pos_x, usamos layout livre da IA
             let usaLayoutLivre = projetoGlobal.modulos.some(m => m.pos_x !== undefined && m.pos_x !== 0);
             
             let largTotal_mm = 0, alturaMaxima_mm = 0;
@@ -831,26 +852,31 @@ JSON ESTRITO DE RESPOSTA:
                 return m;
             }
             
-            function criarCurva(raio, h, mat, y, modGrp, isInt=false) {
-                const geo = new THREE.CylinderGeometry(raio, raio, E, 32, 1, false, 0, Math.PI/2);
+            function criarCurva(raio, h, mat, y, modGrp, isInt=false, open=false) {
+                // Cria uma fatia de cilindro de 90 graus
+                const geo = new THREE.CylinderGeometry(raio, raio, h, 32, 1, open, 0, Math.PI/2);
                 const m = new THREE.Mesh(geo, mat);
-                m.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({color:0x000, opacity:0.1, transparent:true})));
-                m.position.set(0, y, 0); modGrp.add(m);
+                // Posiciona para o eixo de rotação ficar na aresta correta
+                m.position.set(-raio/2, y, -raio/2); 
+                modGrp.add(m);
                 if(isInt) objetosInterativos.push(m);
                 return m;
             }
 
             projetoGlobal.modulos.forEach((mod, idx) => {
                 const mW = mod.largura/1000, mH = mod.altura/1000, mD = mod.profundidade/1000;
+                const isBalcao = mod.tipo_movel === 'balcao';
+                
                 const mGrp = new THREE.Group();
                 mGrp.userData = { isModulo: true, modIndex: idx }; 
                 
-                // Posição: Se a IA mandou coordenadas livres, usa. Senão, lado a lado.
                 let mX = usaLayoutLivre && mod.pos_x !== undefined ? mod.pos_x/1000 : currentX + mW/2;
                 let mZ = usaLayoutLivre && mod.pos_z !== undefined ? mod.pos_z/1000 : 0;
                 let mRotY = mod.rot_y !== undefined ? (mod.rot_y * Math.PI / 180) : 0;
                 
-                const topoY = 0; const baseModY = topoY - mH; 
+                // Armários são alinhados pelo topo. Balcões alinham pela base!
+                const baseModY = (projetoGlobal.instalacao === "aereo") ? (T_H - mH) : 0; 
+                
                 mGrp.position.set(mX, baseModY, mZ); 
                 mGrp.rotation.y = mRotY;
 
@@ -858,65 +884,80 @@ JSON ESTRITO DE RESPOSTA:
                 const espacoPrat = mH / (qPrat + 1);
 
                 if (mod.formato === "curvo") {
-                    // BALCÃO CURVO (Ex: Padaria)
-                    criarCurva(mW, mH, matCaixa, E/2, mGrp, true); // Base
-                    criarCurva(mW, mH, matCaixa, mH-E/2, mGrp, true); // Tampo
-                    for(let i=1; i<=qPrat; i++) criarCurva(mW-0.01, mH, matCaixa, espacoPrat*i, mGrp); // Prateleiras
+                    // BALCÃO CURVO (O "L" da Padaria)
+                    const raio = mW; 
                     
-                    // Fechamento traseiro do curvo
-                    criarPlaca(mW, mH, 0.006, matCaixa, mW/2, mH/2, 0, mGrp);
-                    criarPlaca(0.006, mH, mW, matCaixa, 0, mH/2, mW/2, mGrp);
-                } else {
-                    // CAIXA RETA PADRÃO
-                    criarPlaca(mW, E, mD, matCaixa, 0, E/2, mD/2, mGrp, true); 
-                    criarPlaca(E, mH, mD, matCaixa, -mW/2+E/2, mH/2, mD/2, mGrp, true); 
-                    criarPlaca(E, mH, mD, matCaixa, mW/2-E/2, mH/2, mD/2, mGrp, true); 
+                    // Frente Curva Solida
+                    criarCurva(raio, mH, matCaixa, mH/2, mGrp, true, true); 
+                    // Tampo Curvo Granito (levemente maior)
+                    criarCurva(raio + 0.05, E, matTampo, mH, mGrp, true, false); 
                     
-                    // O tampo pode ser o Granito se a IA escolheu cor escura, a gente respeita a caixa
-                    criarPlaca(mW, E, mD, matCaixa, 0, mH-E/2, mD/2, mGrp, true); 
-                    
-                    let altFundo = mH - E*2, baseFundo = mH/2, altPortas = mH - E*2, startYPortas = E, startYPrat = E; 
-
-                    if (mod.tem_nicho_aberto) {
-                        const hNicho = (mod.altura_nicho || 400)/1000;
-                        criarPlaca(mW-E*2, E, mD-E, matCaixa, 0, E + hNicho + E/2, mD/2, mGrp); 
-                        altPortas = mH - E*2 - hNicho - E; startYPortas = E + hNicho + E; 
-                        altFundo = altPortas; baseFundo = startYPortas + altFundo/2; startYPrat = E + hNicho + E;
+                    if(mod.tipo_abertura === "aberto" || mod.expositor_frontal) {
+                        // Prateleiras de doces saindo da curva
+                        for(let i=1; i<=qPrat; i++) {
+                            // Cria prateleiras como fatias de cilindro menores
+                            criarCurva(raio + 0.15, E, matCaixa, espacoPrat*i, mGrp, false, false);
+                        }
                     }
-                    
-                    criarPlaca(mW-E*2, altFundo, 0.006, matCaixa, 0, baseFundo, 0.01, mGrp); 
-
-                    if (qPrat > 0 && altPortas > 0) {
-                        const espPratInterna = altPortas / (qPrat + 1);
-                        for(let i=1; i<=qPrat; i++) criarPlaca(mW - E*2, E, mD - E - 0.01, matCaixa, 0, startYPrat + (espPratInterna * i), mD/2 - 0.005, mGrp);
-                    }
-
-                    // ABERTURAS (Só coloca porta se não for "Aberto")
-                    if (altPortas > 0.1 && mod.tipo_abertura !== "aberto") {
-                        const nPortas = mod.portas || 1;
-                        if (mod.tipo_abertura === "basculante") {
-                            const hInd = altPortas / nPortas;
-                            for(let i=0; i<nPortas; i++) {
-                                const bGrp = new THREE.Group(); 
-                                bGrp.position.set(0, startYPortas + (i*hInd) + hInd, mD+E/2); 
-                                const pMesh = criarPlaca(mW-E*2-F*2, hInd-F, E, matPorta, 0, -hInd/2, 0, bGrp, true);
-                                pMesh.userData.grupoPai = bGrp;
-                                criarPlaca(mW-E*4, 0.02, 0.02, matPux, 0, -hInd+0.03, E/2+0.01, bGrp); 
-                                bGrp.userData = { animavel: true, tipo: 'basculante', aberto: false, rotAbre: -Math.PI/2.2 };
-                                mGrp.add(bGrp);
+                } 
+                else {
+                    // BALCÃO OU ARMÁRIO RETO
+                    if (isBalcao) {
+                        // BALCÃO COMERCIAL (Oco por dentro para o vendedor, fechado na frente, tampo em cima)
+                        criarPlaca(mW, mH, E, matCaixa, 0, mH/2, mD/2 - E/2, mGrp, true); // Frente do Balcão
+                        criarPlaca(mW+0.05, E, mD+0.1, matTampo, 0, mH, 0, mGrp, true); // Tampo de Atendimento (Balanço)
+                        
+                        if(mod.tipo_abertura === "aberto" || mod.expositor_frontal) {
+                            // Expositor Frontal (Prateleiras de Doces projetadas pra fora)
+                            for(let i=1; i<=qPrat; i++) {
+                                criarPlaca(mW, E, 0.20, matCaixa, 0, espacoPrat*i, mD/2 + 0.10, mGrp, false);
                             }
                         } else {
-                            const wInd = (mW - E*2 - F*(nPortas+1)) / nPortas;
-                            const startXP = -mW/2 + E + F + wInd/2;
-                            for(let i=0; i<nPortas; i++) {
-                                const bGrp = new THREE.Group(); const esq = i < nPortas/2;
-                                bGrp.position.set(startXP + i*(wInd+F) + (esq?-wInd/2:wInd/2), startYPortas + altPortas/2, mD+E/2);
-                                const deslocX = esq ? wInd/2 : -wInd/2;
-                                const pMesh = criarPlaca(wInd, altPortas-F, E, matPorta, deslocX, 0, 0, bGrp, true);
-                                pMesh.userData.grupoPai = bGrp;
-                                criarPlaca(0.02, 0.15, 0.02, matPux, esq? deslocX+wInd/2-0.03 : deslocX-wInd/2+0.03, 0, E/2+0.01, bGrp); 
-                                bGrp.userData = { animavel: true, tipo: 'giro', aberto: false, rotAbre: esq ? -Math.PI/1.8 : Math.PI/1.8 };
-                                mGrp.add(bGrp);
+                            // Prateleiras internas pro vendedor
+                            for(let i=1; i<=qPrat; i++) criarPlaca(mW-E*2, E, mD-E, matCaixa, 0, espacoPrat*i, -E/2, mGrp, false);
+                        }
+                        
+                    } else {
+                        // ARMÁRIO PADRÃO CAIXA FECHADA
+                        criarPlaca(mW, E, mD, matCaixa, 0, E/2, mD/2, mGrp, true); 
+                        criarPlaca(E, mH, mD, matCaixa, -mW/2+E/2, mH/2, mD/2, mGrp, true); 
+                        criarPlaca(E, mH, mD, matCaixa, mW/2-E/2, mH/2, mD/2, mGrp, true); 
+                        criarPlaca(mW, E, mD, matCaixa, 0, mH-E/2, mD/2, mGrp, true); 
+                        
+                        let altPortas = mH - E*2, startYPortas = E; 
+                        criarPlaca(mW-E*2, altPortas, 0.006, matCaixa, 0, mH/2, 0.01, mGrp); // Fundo
+                        
+                        if (qPrat > 0) {
+                            const espPratInterna = altPortas / (qPrat + 1);
+                            for(let i=1; i<=qPrat; i++) criarPlaca(mW - E*2, E, mD - E - 0.01, matCaixa, 0, startYPortas + (espPratInterna * i), mD/2 - 0.005, mGrp);
+                        }
+
+                        if (mod.tipo_abertura !== "aberto" && altPortas > 0) {
+                            const nPortas = mod.portas || 1;
+                            if (mod.tipo_abertura === "basculante") {
+                                const hInd = altPortas / nPortas;
+                                for(let i=0; i<nPortas; i++) {
+                                    const bGrp = new THREE.Group(); 
+                                    bGrp.position.set(0, startYPortas + (i*hInd) + hInd, mD+E/2); 
+                                    const pMesh = criarPlaca(mW-E*2-F*2, hInd-F, E, matPorta, 0, -hInd/2, 0, bGrp, true);
+                                    pMesh.userData.grupoPai = bGrp;
+                                    criarPlaca(mW-E*4, 0.02, 0.02, matPux, 0, -hInd+0.03, E/2+0.01, bGrp); 
+                                    bGrp.userData = { animavel: true, tipo: 'basculante', aberto: false, rotAbre: -Math.PI/2.2 };
+                                    mGrp.add(bGrp);
+                                }
+                            } else {
+                                const wInd = (mW - E*2 - F*(nPortas+1)) / nPortas;
+                                const startXP = -mW/2 + E + F + wInd/2;
+                                for(let i=0; i<nPortas; i++) {
+                                    const bGrp = new THREE.Group(); const esq = i < nPortas/2;
+                                    bGrp.position.set(startXP + i*(wInd+F) + (esq?-wInd/2:wInd/2), startYPortas + altPortas/2, mD+E/2);
+                                    const deslocX = esq ? wInd/2 : -wInd/2;
+                                    const pMesh = criarPlaca(wInd, altPortas-F, E, matPorta, deslocX, 0, 0, bGrp, true);
+                                    pMesh.userData.grupoPai = bGrp;
+                                    criarPlaca(0.02, 0.15, 0.02, matPux, esq? deslocX+wInd/2-0.03 : deslocX-wInd/2+0.03, 0, E/2+0.01, bGrp); 
+                                    bGrp.userData = { animavel: true, tipo: 'giro', aberto: false, rotAbre: esq ? -Math.PI/1.8 : Math.PI/1.8 };
+                                    mGrp.add(bGrp);
+                                }
                             }
                         }
                     }
@@ -929,8 +970,8 @@ JSON ESTRITO DE RESPOSTA:
             calcularPlanoDeCorteRealTime();
 
             if(!isEditingMode && !modoARAtivo && camera3D && !isPerspectiveMode) {
-                camera3D.position.set(0, -T_H/2, Math.max(T_W, T_H)*1.5);
-                controles3D.target.set(0, -T_H/2, 0); controles3D.update();
+                camera3D.position.set(0, T_H/2, Math.max(T_W, T_H)*1.5);
+                controles3D.target.set(0, T_H/2, 0); controles3D.update();
             }
         }
 
@@ -954,16 +995,13 @@ JSON ESTRITO DE RESPOSTA:
                 document.getElementById('info3D').style.display = 'none';
                 document.getElementById('instrucao3D').style.display = 'none';
                 
-                // MÁGICA DE AUTO-ENCAIXE IA ABSOLUTA
                 const posIA = projetoGlobal.posicionamento_auto_ar;
                 if(posIA) {
                     rootNode.scale.set(posIA.escala, posIA.escala, posIA.escala);
                     rootNode.rotation.set(posIA.rot_x, posIA.rot_y, posIA.rot_z);
-                    
                     camera3D.position.set(posIA.pos_x, posIA.pos_y, 4); 
                     controles3D.target.set(posIA.pos_x, posIA.pos_y, 0); 
                     
-                    // Popula o HUD manual com os dados da IA
                     document.getElementById('camScale').value = posIA.escala;
                     document.getElementById('camPosX').value = posIA.pos_x;
                     document.getElementById('camPosY').value = posIA.pos_y;
@@ -972,7 +1010,6 @@ JSON ESTRITO DE RESPOSTA:
                 } else {
                     camera3D.position.set(0, 0, 5); controles3D.target.set(0, 0, 0); 
                 }
-                
                 controles3D.update();
 
             } else {
@@ -987,8 +1024,7 @@ JSON ESTRITO DE RESPOSTA:
                 rootNode.rotation.set(0,0,0); rootNode.scale.set(1,1,1);
                 
                 if(grupoCozinha) { 
-                    let T_H = 1; 
-                    camera3D.position.set(0, -T_H/2, 3); controles3D.target.set(0, -T_H/2, 0); controles3D.update(); 
+                    camera3D.position.set(0, 1, 3); controles3D.target.set(0, 1, 0); controles3D.update(); 
                 }
             }
             setTimeout(ajustarTamanho3D, 50);
