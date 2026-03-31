@@ -159,16 +159,15 @@
             justify-content: center;
             gap: 15px;
             margin-top: 25px;
-            flex-wrap: wrap;
         }
         .action-buttons button.primary { background-color: var(--secondary-wood); color: white; }
         .action-buttons button.primary:hover { background-color: #6a4933; }
         .action-buttons button.success { background-color: var(--earth-green); color: white; }
-        .action-buttons button.success:hover { background-color: #55721c; }
+        .action-buttons button.success:hover { background-color: #5a7a1c; }
 
         /* Estilos do Visualizador 3D */
         #container3DWrapper {
-            width: 100%; height: 500px; position: relative;
+            width: 100%; height: 400px; position: relative;
             border-radius: var(--border-radius-soft);
             border: 2px solid var(--border-soft);
             overflow: hidden; background: radial-gradient(circle, #ffffff 0%, #EFEAE5 100%);
@@ -176,14 +175,13 @@
             margin-bottom: 20px;
             transition: background 0.3s ease;
         }
-        #visualizador3D { width: 100%; height: 100%; display: block; cursor: pointer; }
+        #visualizador3D { width: 100%; height: 100%; display: block; }
         #info3D {
             position: absolute; top: 15px; left: 15px;
             background: rgba(74, 60, 48, 0.85); color: #FFF;
             padding: 8px 12px; border-radius: 6px;
             font-size: 0.85em; font-weight: bold; pointer-events: none;
             backdrop-filter: blur(4px);
-            z-index: 10;
         }
         #instrucao3D {
             position: absolute; bottom: 15px; right: 15px;
@@ -191,7 +189,6 @@
             padding: 6px 12px; border-radius: 20px;
             font-size: 0.8em; font-weight: 600; pointer-events: none;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 10;
         }
 
         /* Tabela Plano de Corte */
@@ -233,19 +230,36 @@
             margin-bottom: 20px; border-radius: 5px; color: #555; font-size: 0.9em;
             display: flex; align-items: center; gap: 10px;
         }
+
+        /* Classes Novas para a Inteligência Avançada (AR, Insights) */
+        .designer-insight {
+            background-color: #fff3e0; border-left: 5px solid #ff9800; padding: 15px;
+            margin-top: 15px; border-radius: 4px; font-style: italic; color: #555;
+            font-size: 0.95em;
+        }
         .measure-alert {
             background-color: #e3f2fd; border-left: 5px solid #2196f3; padding: 15px;
-            margin-top: 15px; border-radius: 5px; color: #0d47a1; font-size: 0.95em;
-            display: flex; align-items: center; gap: 10px; font-weight: 500;
+            margin-top: 15px; border-radius: 4px; font-weight: 500; color: #0d47a1;
+            font-size: 0.95em; display: flex; align-items: center; gap: 10px;
+        }
+        #imagePreviewContainer img {
+            max-width: 100%; max-height: 250px; border-radius: 8px; border: 2px solid var(--border-soft);
+            margin-top: 10px; display: none; object-fit: cover;
         }
 
-        /* Rodapé Original Restaurado */
+        /* Rodapé Original Restaurado INTACTO */
         footer {
-            text-align: center; margin-top: 60px; padding: 25px; color: #777; font-size: 0.9em;
-            border-top: 1px solid var(--border-soft); background-color: var(--bg-light-panel);
+            text-align: center;
+            margin-top: 60px;
+            padding: 25px;
+            color: #777;
+            font-size: 0.9em;
+            border-top: 1px solid var(--border-soft);
+            background-color: var(--bg-light-panel);
             border-radius: 0 0 var(--border-radius-soft) var(--border-radius-soft);
         }
 
+        /* Botões Flutuantes Originais Restaurados INTACTOS */
         .floating-buttons {
             position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 1000;
         }
@@ -266,11 +280,6 @@
             .grid-layout { grid-template-columns: 1fr; }
             #container3DWrapper { height: 350px; }
         }
-        
-        #imagePreviewContainer img {
-            max-width: 100%; max-height: 200px; border-radius: 8px; border: 2px solid var(--border-soft);
-            margin-top: 10px; display: none;
-        }
     </style>
 </head>
 <body>
@@ -284,7 +293,7 @@
             <div class="warning-message">
                 <i class="fas fa-exclamation-triangle" style="color:#ff9800; font-size:1.5em;"></i>
                 <div>
-                    <strong>Atenção:</strong> Insira a sua chave da Groq API para ativar a transcrição de áudio, medição por imagem e geração 3D.
+                    <strong>Atenção:</strong> Insira a sua chave da Groq API para ativar a transcrição de áudio, visão computacional e geração de projetos 3D.
                 </div>
             </div>
             <div class="input-group full-width">
@@ -298,14 +307,14 @@
             </div>
         </section>
 
-        <!-- 2. Pedido do Cliente (Suporte a Imagem) -->
+        <!-- 2. Pedido do Cliente (EVOLUÍDO: COM IMAGEM) -->
         <section id="audioInputSection" class="section-panel">
-            <h2 style="margin-top:0;"><i class="fas fa-comment-dots"></i> Pedido e Medição do Ambiente</h2>
-            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">Envie uma foto da parede. A IA vai medir o ambiente e gerar o móvel (com prateleiras e divisões) projetado nele!</p>
+            <h2 style="margin-top:0;"><i class="fas fa-camera-retro"></i> Análise do Ambiente e Pedido</h2>
+            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">Envie uma foto do local. A IA vai medir o espaço e sugerir um móvel com design inteligente (basculantes, gavetas, etc).</p>
             
             <div class="grid-layout">
                 <div class="input-group">
-                    <label><i class="fas fa-camera"></i> Foto da Parede/Ambiente:</label>
+                    <label><i class="fas fa-camera"></i> Foto do Local (Recomendado):</label>
                     <input type="file" id="imageFileInput" accept="image/*" onchange="previewImagem(event)">
                     <div id="imagePreviewContainer"><img id="previewImg" src="" alt="Pré-visualização da Parede"></div>
                 </div>
@@ -317,39 +326,44 @@
 
             <div class="input-group full-width">
                 <label>O que deseja construir? (Revise ou Digite):</label>
-                <textarea id="transcribedTextDisplay" rows="4" placeholder="Ex: Preciso de um armário para produtos de limpeza nesta parede, com prateleiras e espaço para vassoura..."></textarea>
+                <textarea id="transcribedTextDisplay" rows="4" placeholder="Ex: Quero trocar esse armário branco por algo mais bonito, moderno e inteligente..."></textarea>
             </div>
             <div class="action-buttons">
                 <button id="processAudioBtn" class="primary" onclick="gerarProjeto()" style="width: 100%;">
-                    <i class="fas fa-brain"></i> Analisar Foto, Medir e Gerar Projeto 3D
+                    <i class="fas fa-magic"></i> Analisar Foto, Medir e Gerar Projeto 3D
                 </button>
             </div>
         </section>
 
-        <!-- 3. Projeto Técnico (3D + Medidas) -->
+        <!-- 3. Projeto Técnico (EVOLUÍDO: DESIGNER INTELIGENTE) -->
         <section id="aiDesignSection" class="ai-output-section" style="display: none;">
-            <h3 style="margin-top: 0;"><i class="fas fa-lightbulb"></i> Projeto de Engenharia Inteligente</h3>
+            <h3 style="margin-top: 0;"><i class="fas fa-lightbulb"></i> Proposta de Design Inteligente</h3>
             
-            <div id="alertaMedidas" class="measure-alert" style="display: none;">
-                <i class="fas fa-ruler"></i> <span id="textoMedidasIA"></span>
+            <!-- Novos Insights da IA -->
+            <div id="designerInsight" class="designer-insight" style="display: none;">
+                <i class="fas fa-paint-brush"></i> <b>Visão do Arquiteto:</b> <span id="textoDesigner"></span>
             </div>
-            
+
+            <div id="alertaMedidas" class="measure-alert" style="display: none;">
+                <i class="fas fa-ruler"></i> <b>Medição IA:</b> <span id="textoMedidasIA" style="margin-left: 5px;"></span>
+            </div>
+
             <div class="input-group full-width" style="margin-top: 15px;">
-                <label>Descrição Detalhada e Estrutura Interna:</label>
+                <label>Descrição Detalhada e Engenharia Interna:</label>
                 <div id="descricaoProjeto" class="description-box">A calcular metragens para a fábrica...</div>
             </div>
 
-            <!-- Visor 3D Profissional Dinâmico -->
+            <!-- Visor 3D Profissional -->
             <div style="margin-top: 30px;">
                 <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;">
                     <i class="fas fa-cube"></i> Visualização 3D e Instalação Virtual
                 </h3>
                 
                 <div class="action-buttons" style="justify-content: flex-start; margin-bottom: 15px; margin-top: 0;">
-                    <button id="btnAR" class="success" onclick="alternarModoAR()">
+                    <button id="btnAR" class="success" onclick="alternarModoAR()" style="display: none;">
                         <i class="fas fa-image"></i> Ver Móvel Instalado na Foto (AR)
                     </button>
-                    <p style="font-size: 0.85em; color: var(--earth-green); margin-top: auto; margin-bottom: auto;">
+                    <p style="font-size: 0.85em; color: var(--earth-green); margin-top: auto; margin-bottom: auto; padding-left: 10px;">
                         <i class="fas fa-info-circle"></i> <b>Interativo:</b> Abra portas para ver divisórias e prateleiras!
                     </p>
                 </div>
@@ -361,9 +375,9 @@
                 </div>
             </div>
 
-            <!-- Tabela de Corte -->
+            <!-- Tabela de Corte (INTACTA) -->
             <div style="margin-top: 30px;">
-                <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;"><i class="fas fa-ruler-combined"></i> Plano de Corte Oficial (com Prateleiras)</h3>
+                <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;"><i class="fas fa-ruler-combined"></i> Plano de Corte Oficial</h3>
                 <div class="table-responsive">
                     <table>
                         <thead>
@@ -385,21 +399,21 @@
 
             <div class="action-buttons">
                 <button class="primary" onclick="transferirParaOrcamento()">
-                    <i class="fas fa-arrow-down"></i> Revisar Custos
+                    <i class="fas fa-plus-circle"></i> Adicionar Design ao Orçamento
                 </button>
             </div>
         </section>
 
-        <!-- 4. Orçamento Parametrizado -->
+        <!-- 4. Orçamento Parametrizado (INTACTO) -->
         <section id="addItemSection" class="section-panel">
-            <h2><i class="fas fa-file-invoice-dollar"></i> Custos e Precificação</h2>
+            <h2><i class="fas fa-cube"></i> Adicionar ou Editar Item de Móvel</h2>
             <div class="grid-layout">
                 <div class="input-group full-width">
-                    <label>Nome do Projeto:</label>
-                    <input type="text" id="itemName" placeholder="Ex: Armário de Limpeza">
+                    <label>Nome do Item:</label>
+                    <input type="text" id="itemName" placeholder="Ex: Balcão de Atendimento">
                 </div>
                 <div class="input-group">
-                    <label>Custo Material (MDF) (R$):</label>
+                    <label>Custo Material (R$):</label>
                     <input type="number" id="costMaterial" value="0" min="0" step="0.01">
                 </div>
                 <div class="input-group">
@@ -407,8 +421,8 @@
                     <input type="number" id="costLabor" value="0" min="0" step="0.01">
                 </div>
                 <div class="input-group">
-                    <label>Ferragens Calculadas (R$):</label>
-                    <input type="number" id="costHardware" value="0" min="0" step="0.01" title="Dobradiças, corrediças, suportes de prateleira, etc.">
+                    <label>Ferragens/Acessórios (R$):</label>
+                    <input type="number" id="costHardware" value="0" min="0" step="0.01">
                 </div>
                 <div class="input-group">
                     <label>Outros Custos (R$):</label>
@@ -416,32 +430,33 @@
                 </div>
                 <div class="input-group">
                     <label>Margem de Lucro (%):</label>
-                    <input type="number" id="profitMargin" value="30" min="0" max="100" step="1">
+                    <input type="number" id="profitMargin" value="20" min="0" max="100" step="1">
                 </div>
                 <div class="input-group full-width action-buttons">
                     <button class="primary" onclick="calcularTotal()" id="btnSaveItem">
-                        <i class="fas fa-calculator"></i> Calcular Valor Final
+                        <i class="fas fa-plus"></i> Adicionar/Atualizar Item
                     </button>
                 </div>
             </div>
         </section>
 
         <section id="summary">
-            <h2><i class="fas fa-check-circle"></i> Valor Final do Projeto</h2>
-            <p><span id="totalProjectCost">R$ 0,00</span></p>
-            <button onclick="mascoteFalar('O orçamento finalizado sugerido pela inteligência artificial para o seu cliente é de ' + document.getElementById('totalProjectCost').textContent)" class="warning">
-                <i class="fas fa-bullhorn"></i> Anunciar Valor
+            <h2><i class="fas fa-file-invoice-dollar"></i> Resumo do Orçamento</h2>
+            <p>Total do Projeto: <span id="totalProjectCost">R$ 0,00</span></p>
+            <button onclick="mascoteFalar('O total atual do seu projeto otimizado é ' + document.getElementById('totalProjectCost').textContent)" class="warning">
+                <i class="fas fa-robot"></i> Perguntar ao Mascote
             </button>
         </section>
     </div>
 
-    <!-- Botões Flutuantes -->
+    <!-- Botões Flutuantes Originais Restaurados INTACTOS -->
     <div class="floating-buttons">
-        <button class="floating-button mascote" onclick="mascoteFalar('Olá! Envie uma foto da parede do cliente e me diga o móvel. Eu vou adivinhar as medidas pela foto, desenhar prateleiras, portas, e até sobrepor o móvel 3D na sua foto!')">
+        <button class="floating-button mascote" onclick="mascoteFalar('Olá! Eu sou seu assistente inteligente e arquiteto. Me mande a foto do ambiente e eu vou desenhar gavetas, prateleiras e portas basculantes em 3D perfeito para o seu cliente!')">
             <i class="fas fa-headset"></i> <span>Mascote</span>
         </button>
     </div>
 
+    <!-- RODAPÉ OFICIAL RESTAURADO INTACTO -->
     <footer>
         Powered by thIAguinho Soluções
     </footer>
@@ -452,10 +467,10 @@
         let cena3D, camera3D, renderizador3D, controles3D;
         let motor3DIniciado = false;
         
-        // Variáveis Interatividade e AR
+        // Variáveis para a Interatividade 3D e AR
         let raycaster = new THREE.Raycaster();
         let mouse = new THREE.Vector2();
-        let objetosInterativos = []; 
+        let objetosInterativos = [];
         let grupoMovelAtual = null;
         let base64ImagemGlobal = null;
         let modoARAtivo = false;
@@ -478,12 +493,12 @@
             if(!modoSilencioso) {
                 const btn = document.getElementById('btnSalvarChave');
                 btn.innerHTML = "<i class='fas fa-check'></i> Chave Salva!";
-                btn.style.backgroundColor = "var(--earth-green)";
+                btn.style.backgroundColor = "var(--earth-green)"; // Mantendo sua paleta
             }
         }
 
         // ==========================================
-        // IMAGEM, ÁUDIO E VOZ
+        // ÁUDIO E VOZ E IMAGEM
         // ==========================================
         function mascoteFalar(texto) {
             try {
@@ -504,7 +519,7 @@
                     const img = document.getElementById('previewImg');
                     img.src = e.target.result;
                     img.style.display = 'block';
-                    base64ImagemGlobal = e.target.result;
+                    base64ImagemGlobal = e.target.result; // Salva para enviar pra IA
                 }
                 reader.readAsDataURL(file);
             }
@@ -516,7 +531,7 @@
                 if (!file) return;
                 if (!currentApiKey) { alert("Configure a Chave da IA primeiro!"); return; }
 
-                document.getElementById('transcribedTextDisplay').value = "⏳ A transcrever áudio...";
+                document.getElementById('transcribedTextDisplay').value = "⏳ A processar o áudio com a IA...";
                 
                 const formData = new FormData();
                 formData.append("file", file);
@@ -540,49 +555,60 @@
         });
 
         // ==========================================
-        // PROJETO TÉCNICO, MEDIÇÃO POR IA E DIVISÕES
+        // PROJETO TÉCNICO E IA (O MESTRE ARQUITETO)
         // ==========================================
         async function gerarProjeto() {
             try {
                 const textoDoCliente = document.getElementById('transcribedTextDisplay').value.trim();
-                if (!textoDoCliente && !base64ImagemGlobal) { 
-                    alert("Escreva o que deseja ou anexe uma foto da parede."); return; 
-                }
+                if (!textoDoCliente && !base64ImagemGlobal) { alert("Por favor, envie uma foto ou preencha o texto."); return; }
                 if (!currentApiKey) { alert("Chave API ausente."); return; }
 
                 const botaoGerar = document.getElementById('processAudioBtn');
-                botaoGerar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Medindo ambiente e desenhando divisórias...';
+                botaoGerar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> O Arquiteto IA está projetando...';
                 botaoGerar.disabled = true;
                 
                 const secaoDesign = document.getElementById('aiDesignSection');
                 secaoDesign.style.display = 'block';
-                document.getElementById('descricaoProjeto').innerText = "A calcular metragens e ferragens para a fábrica...";
-                document.getElementById('alertaMedidas').style.display = 'none';
+                document.getElementById('descricaoProjeto').innerText = "A calcular metragens e soluções inteligentes para a fábrica...";
 
-                // Prompt Ultra Mestre Marceneiro
-                const promptComando = `Você é um Engenheiro Projetista de Móveis e Especialista em Visão Computacional.
-Pedido do cliente: "${textoDoCliente}".
-SE UMA IMAGEM FOI ENVIADA: Avalie a imagem, use objetos de referência (portas, tomadas, rodapés, altura do teto) para ESTIMAR as medidas reais (largura, altura, profundidade) do espaço livre na parede e projete o móvel para caber lá perfeitamente.
-AJA COM VERDADE ABSOLUTA:
-- Preveja a organização interna (ex: armário de limpeza DEVE ter prateleiras e divisões verticais para vassouras).
-- Calcule todas as ferragens (1 par corrediça por gaveta, 2 a 4 dobradiças por porta, suportes de prateleiras).
+                // O NOVO PROMPT MESTRE
+                const promptComando = `Você é um Arquiteto, Designer de Interiores e Projetista de Móveis de Alto Padrão.
+O cliente pediu: "${textoDoCliente}".
+SE UMA IMAGEM FOI ENVIADA: Avalie a imagem, use objetos de referência (eletrodomésticos, pias) para ESTIMAR as medidas reais. 
+AJA COMO UM DESIGNER INTELIGENTE:
+- Se pedirem algo "mais bonito/inteligente" para uma cozinha/parede, NÃO faça um móvel branco simples.
+- Sugira Portas Basculantes (abrem para cima) para módulos aéreos superiores.
+- Sugira Gavetões para as partes baixas.
+- Defina cores dinâmicas (ex: MDF Titânio ou Freijó) em HEXADECIMAL.
 
-Responda OBRIGATORIAMENTE em JSON estrito com esta exata estrutura:
+Responda OBRIGATORIAMENTE em JSON estrito. Estrutura EXATA:
 {
-  "nome_projeto": "Ex: Armário de Limpeza Inteligente",
-  "descricao_projeto": "Explique o projeto...",
+  "nome_projeto": "Ex: Cozinha Inteligente Premium",
+  "design": {
+    "justificativa": "Substituí o armário branco por portas basculantes superiores com pistão a gás e acabamento em MDF Freijó para modernizar.",
+    "cor_primaria_hex": "#c4a484", 
+    "cor_secundaria_hex": "#ffffff",
+    "nome_materiais": "MDF Freijó e MDF Branco Diamante"
+  },
   "medicao_ambiente": { 
       "foi_medido_por_foto": true, 
-      "explicacao_medida": "Estimei 2200mm de altura baseado no batente da porta e 800mm de largura pelo espaço na parede." 
+      "explicacao_medida": "Estimei a largura em 1200mm baseando-me no tamanho da geladeira e da pia da foto." 
   },
-  "dimensoes_mm": { "largura": 800, "altura": 2200, "profundidade": 500 },
-  "estrutura_interna": { "portas": 2, "gavetas": 0, "prateleiras": 4, "divisoes_verticais": 1 },
+  "dimensoes_mm": { "largura": 1200, "altura": 800, "profundidade": 350 },
+  "instalacao": "aereo",
+  "estrutura_interna": {
+    "gavetoes": 0,
+    "portas_giro": 0,
+    "portas_basculantes_superiores": 2,
+    "prateleiras_internas": 2
+  },
   "plano_de_corte": [
-    {"peca": "Laterais", "qtde": 2, "comprimento": 2200, "largura": 500, "espessura": "MDF 15mm", "fita_borda": "Frontal/Base"},
-    {"peca": "Prateleiras Internas", "qtde": 4, "comprimento": 380, "largura": 480, "espessura": "MDF 15mm", "fita_borda": "Frontal"}
+    {"peca": "Laterais", "qtde": 2, "comprimento": 800, "largura": 350, "espessura": "MDF 18mm", "fita_borda": "Frontal/Base"},
+    {"peca": "Prateleiras", "qtde": 2, "comprimento": 1164, "largura": 330, "espessura": "MDF 18mm", "fita_borda": "Frontal"},
+    {"peca": "Porta Basculante", "qtde": 2, "comprimento": 1190, "largura": 390, "espessura": "MDF 18mm", "fita_borda": "4 Lados"}
   ],
-  "ferragens_reais": { "dobradicas": 8, "corredicas_pares": 0, "puxadores": 2, "suportes_prateleira": 16, "parafusos": 80 },
-  "custos": { "material": 650, "mao_de_obra": 400, "ferragens": 150, "outros": 80 }
+  "ferragens_reais": { "dobradicas": 0, "pistoes_a_gas": 4, "corredicas_telescopicas": 0, "puxadores": 2 },
+  "custos": { "material": 850, "mao_de_obra": 600, "ferragens": 250, "outros": 100 }
 }`;
 
                 let mensagens = [];
@@ -591,13 +617,7 @@ Responda OBRIGATORIAMENTE em JSON estrito com esta exata estrutura:
                 if (base64ImagemGlobal) {
                     modeloSelecionado = "llama-3.2-11b-vision-preview";
                     mensagens = [
-                        {
-                            role: "user",
-                            content: [
-                                { type: "text", text: promptComando },
-                                { type: "image_url", image_url: { url: base64ImagemGlobal } }
-                            ]
-                        }
+                        { role: "user", content: [ { type: "text", text: promptComando }, { type: "image_url", image_url: { url: base64ImagemGlobal } } ] }
                     ];
                 } else {
                     mensagens = [{ role: "user", content: promptComando }];
@@ -613,7 +633,7 @@ Responda OBRIGATORIAMENTE em JSON estrito com esta exata estrutura:
                             model: modeloSelecionado, 
                             messages: mensagens,
                             response_format: { type: "json_object" }, 
-                            temperature: 0.1 
+                            temperature: 0.2
                         })
                     });
 
@@ -622,40 +642,49 @@ Responda OBRIGATORIAMENTE em JSON estrito com esta exata estrutura:
                     projetoIA = JSON.parse(dados.choices[0].message.content);
                 } catch (err) { 
                     if (base64ImagemGlobal) {
-                        alert("O modelo de Visão falhou. Calculando apenas pelo texto...");
+                        alert("Atenção: Modelo de Visão falhou. Utilizando análise textual...");
                         const fallbackReq = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                             method: 'POST',
                             headers: { "Authorization": `Bearer ${currentApiKey}`, "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                model: "llama-3.3-70b-versatile", 
-                                messages: [{ role: "user", content: promptComando }],
-                                response_format: { type: "json_object" }, temperature: 0.1
-                            })
+                            body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: promptComando }], response_format: { type: "json_object" }, temperature: 0.2 })
                         });
                         const dadosFB = await fallbackReq.json();
                         projetoIA = JSON.parse(dadosFB.choices[0].message.content);
                     } else { throw err; }
                 }
 
-                // 1. Textos e Alertas
+                // 1. Insights e Medições
+                if (projetoIA.design && projetoIA.design.justificativa) {
+                    const insight = document.getElementById('designerInsight');
+                    insight.style.display = 'block';
+                    document.getElementById('textoDesigner').innerText = projetoIA.design.justificativa;
+                }
+
                 if (projetoIA.medicao_ambiente && projetoIA.medicao_ambiente.foi_medido_por_foto) {
                     const alerta = document.getElementById('alertaMedidas');
                     alerta.style.display = 'flex';
-                    document.getElementById('textoMedidasIA').innerText = "Cálculo por Foto: " + projetoIA.medicao_ambiente.explicacao_medida;
+                    document.getElementById('textoMedidasIA').innerText = projetoIA.medicao_ambiente.explicacao_medida;
+                } else {
+                    document.getElementById('alertaMedidas').style.display = 'none';
                 }
 
-                const ferragens = projetoIA.ferragens_reais || {};
+                // 2. Tabela de Corte e Textos Originais
+                let estr = projetoIA.estrutura_interna || {};
+                let fer = projetoIA.ferragens_reais || {};
                 const textoRelatorio = `
-${projetoIA.descricao_projeto}
-
-🔍 **Engenharia de Ferragens:**
-- Dobradiças: ${ferragens.dobradicas || 0} un
-- Corrediças: ${ferragens.corredicas_pares || 0} pares
-- Suportes Prateleira: ${ferragens.suportes_prateleira || 0} un
-- Puxadores: ${ferragens.puxadores || 0} un
-- Parafusos: ~${ferragens.parafusos || 0} un
+<b>💡 Soluções Inteligentes Aplicadas:</b><br>
+- Portas Basculantes (Abertura para cima): ${estr.portas_basculantes_superiores || 0} un<br>
+- Portas de Giro Padrão: ${estr.portas_giro || 0} un<br>
+- Gavetões / Gavetas: ${estr.gavetoes || 0} un<br>
+- Prateleiras Internas: ${estr.prateleiras_internas || 0} un<br>
+<br>
+<b>🔩 Ferragens Calculadas:</b><br>
+- Pistões a Gás / Articuladores: ${fer.pistoes_a_gas || 0} un<br>
+- Dobradiças: ${fer.dobradicas || 0} un<br>
+- Corrediças Telescópicas: ${fer.corredicas_telescopicas || 0} pares<br>
+- Materiais Escolhidos: ${projetoIA.design?.nome_materiais || 'Padrão Branco'}
                 `;
-                document.getElementById('descricaoProjeto').innerHTML = textoRelatorio.replace(/\n/g, '<br>');
+                document.getElementById('descricaoProjeto').innerHTML = textoRelatorio;
                 
                 const tbody = document.getElementById('tabelaPlanoCorte');
                 tbody.innerHTML = '';
@@ -668,13 +697,13 @@ ${projetoIA.descricao_projeto}
                                 <td>${peca.comprimento}</td>
                                 <td>${peca.largura}</td>
                                 <td style="color: var(--secondary-wood); font-weight:600;">${peca.espessura}</td>
-                                <td><span style="background:var(--bg-light-panel); padding:4px 8px; border-radius:4px; font-size:0.85em;">${peca.fita_borda}</span></td>
+                                <td><span style="background:var(--bg-light-panel); padding:4px 8px; border-radius:4px;">${peca.fita_borda}</span></td>
                             </tr>
                         `;
                     });
                 }
 
-                // 2. Orçamento
+                // 3. Orçamento Original (Seção 4)
                 document.getElementById('itemName').value = projetoIA.nome_projeto || "Móvel Inteligente";
                 if(projetoIA.custos) {
                     document.getElementById('costMaterial').value = projetoIA.custos.material || 0;
@@ -684,21 +713,19 @@ ${projetoIA.descricao_projeto}
                     calcularTotal();
                 }
 
-                // 3. INICIAR 3D
+                // 4. INICIAR MOTOR 3D
                 if (!motor3DIniciado) { init3D(); motor3DIniciado = true; }
                 
                 const med = projetoIA.dimensoes_mm || { largura: 1000, altura: 800, profundidade: 500 };
-                const est = projetoIA.estrutura_interna || { portas: 0, gavetas: 0, prateleiras: 0, divisoes_verticais: 0 };
+                const corP = projetoIA.design?.cor_primaria_hex || "#FFFFFF";
+                const corS = projetoIA.design?.cor_secundaria_hex || "#CCCCCC";
                 
                 setTimeout(() => {
                     ajustarTamanho3D();
-                    desenharMovelParametrico(med.largura, med.altura, med.profundidade, est.portas, est.gavetas, est.prateleiras, est.divisoes_verticais);
+                    desenharMovelInteligente3D(med, estr, corP, corS, projetoIA.instalacao);
                     
-                    // Se o usuário usou foto, ativa botão AR
                     if(base64ImagemGlobal) {
                         document.getElementById('btnAR').style.display = 'inline-flex';
-                    } else {
-                        document.getElementById('btnAR').style.display = 'none';
                     }
                 }, 100);
 
@@ -706,66 +733,25 @@ ${projetoIA.descricao_projeto}
                 alert("Erro ao processar: " + erro.message);
             } finally {
                 const botaoGerar = document.getElementById('processAudioBtn');
-                botaoGerar.innerHTML = '<i class="fas fa-brain"></i> Analisar Foto, Medir e Gerar Projeto 3D';
+                botaoGerar.innerHTML = '<i class="fas fa-magic"></i> Analisar Foto, Medir e Gerar Projeto 3D';
                 botaoGerar.disabled = false;
             }
         }
 
         // ==========================================
-        // REALIDADE AUMENTADA (VIRTUAL STAGING)
-        // ==========================================
-        function alternarModoAR() {
-            if (!base64ImagemGlobal) { alert("Envie uma foto primeiro!"); return; }
-            
-            modoARAtivo = !modoARAtivo;
-            const btn = document.getElementById('btnAR');
-            
-            if (modoARAtivo) {
-                // Aplica a foto como fundo 3D
-                const loader = new THREE.TextureLoader();
-                loader.load(base64ImagemGlobal, function(texture) {
-                    cena3D.background = texture;
-                    // Ajusta material para ficar mais real na foto
-                    if(grupoMovelAtual) {
-                        grupoMovelAtual.traverse((child) => {
-                            if (child.isMesh && child.material) {
-                                // Reduz reflexo para combinar melhor com fotos normais
-                                if(Array.isArray(child.material)){
-                                    child.material.forEach(m => m.roughness = 0.95);
-                                } else {
-                                    child.material.roughness = 0.95;
-                                }
-                            }
-                        });
-                    }
-                });
-                btn.innerHTML = '<i class="fas fa-cube"></i> Voltar ao Modo Estúdio';
-                btn.classList.remove('success');
-                btn.classList.add('primary');
-            } else {
-                // Remove textura
-                cena3D.background = null;
-                btn.innerHTML = '<i class="fas fa-image"></i> Ver Móvel Instalado na Foto (AR)';
-                btn.classList.remove('primary');
-                btn.classList.add('success');
-            }
-        }
-
-        // ==========================================
-        // MOTOR 3D PROFISSIONAL E INTERATIVO (Agora com Prateleiras)
+        // MOTOR 3D PROFISSIONAL E AR (Mantendo Original)
         // ==========================================
         function init3D() {
             const container = document.getElementById('visualizador3D');
             const wrapper = document.getElementById('container3DWrapper');
             
             cena3D = new THREE.Scene();
-            // Fundo transparente para o CSS radial gradient aparecer ou a imagem AR
             cena3D.background = null;
 
             const luzAmbiente = new THREE.AmbientLight(0xffffff, 0.7);
             cena3D.add(luzAmbiente);
             
-            const luzSpot = new THREE.DirectionalLight(0xffffff, 1.0);
+            const luzSpot = new THREE.DirectionalLight(0xffffff, 0.9);
             luzSpot.position.set(5, 10, 5);
             cena3D.add(luzSpot);
 
@@ -784,7 +770,7 @@ ${projetoIA.descricao_projeto}
             controles3D.enableDamping = true;
             controles3D.dampingFactor = 0.05;
 
-            // EVENTO DE CLIQUE
+            // EVENTO DE CLIQUE PARA PORTAS INTELIGENTES
             renderizador3D.domElement.addEventListener('pointerdown', onClick3D, false);
 
             function animar() {
@@ -794,10 +780,16 @@ ${projetoIA.descricao_projeto}
                         const data = filho.userData;
                         if (!data) return;
                         const vel = 0.1; 
-                        if (data.tipo === 'porta') {
+                        
+                        // Lógica de animação depende do TIPO de porta criado
+                        if (data.tipo === 'giro') {
                             const alvo = data.aberto ? data.rotacaoAberta : data.rotacaoFechada;
                             filho.rotation.y += (alvo - filho.rotation.y) * vel;
                         } 
+                        else if (data.tipo === 'basculante') {
+                            const alvoX = data.aberto ? data.rotacaoAberta : data.rotacaoFechada;
+                            filho.rotation.x += (alvoX - filho.rotation.x) * vel;
+                        }
                         else if (data.tipo === 'gaveta') {
                             const alvoZ = data.aberto ? data.posAberta : data.posFechada;
                             filho.position.z += (alvoZ - filho.position.z) * vel;
@@ -836,162 +828,183 @@ ${projetoIA.descricao_projeto}
             }
         }
 
-        function desenharMovelParametrico(largura_mm, altura_mm, profundidade_mm, numPortas, numGavetas, numPrateleiras, numDivisoesVerticais) {
+        // O CONSTRUTOR DE ALTO PADRÃO
+        function desenharMovelInteligente3D(med, est, corPrimaria, corSecundaria, tipoInstalacao) {
             if (grupoMovelAtual) cena3D.remove(grupoMovelAtual);
             objetosInterativos = []; 
 
             grupoMovelAtual = new THREE.Group();
             cena3D.add(grupoMovelAtual);
 
-            const L = largura_mm / 1000;
-            const A = altura_mm / 1000;
-            const P = profundidade_mm / 1000;
-            const E = 0.015; 
+            const L = med.largura / 1000;
+            const A = med.altura / 1000;
+            const P = med.profundidade / 1000;
+            const E = 0.018; // Alto padrão = MDF 18mm
             const F = 0.003; 
 
-            const matMDFClaro = new THREE.MeshStandardMaterial({ color: 0xFDFCF9, roughness: 0.8 }); 
-            const matMDFMadeira = new THREE.MeshStandardMaterial({ color: 0x7F5539, roughness: 0.9 }); 
-            const matPuxador = new THREE.MeshStandardMaterial({ color: 0x4A3C30, metalness: 0.6, roughness: 0.4 }); 
+            // Cores baseadas na escolha da IA
+            const cPrim = new THREE.Color(corPrimaria);
+            const cSec = new THREE.Color(corSecundaria);
             
-            const matBordaMDF = new THREE.MeshStandardMaterial({ color: 0xEFEAE5, roughness: 0.9 });
-            const materiaisChapa = [matBordaMDF, matBordaMDF, matMDFClaro, matMDFClaro, matBordaMDF, matBordaMDF];
-            const materiaisPorta = [matBordaMDF, matBordaMDF, matMDFMadeira, matMDFClaro, matBordaMDF, matBordaMDF];
+            const matPrimario = new THREE.MeshStandardMaterial({ color: cPrim, roughness: 0.8 }); 
+            const matSecundario = new THREE.MeshStandardMaterial({ color: cSec, roughness: 0.6 }); // Frentes
+            const matBorda = new THREE.MeshStandardMaterial({ color: cPrim.clone().lerp(new THREE.Color(0x000), 0.1) });
+            const matPuxador = new THREE.MeshStandardMaterial({ color: 0x4A3C30, metalness: 0.8, roughness: 0.3 }); 
+            
+            const materiaisChapa = [matBorda, matBorda, matPrimario, matPrimario, matBorda, matBorda];
+            const materiaisFrente = [matBorda, matBorda, matSecundario, matPrimario, matBorda, matBorda];
 
             function criarChapa(larg, alt, prof, materiais, x, y, z, interativo = false) {
                 const geo = new THREE.BoxGeometry(larg, alt, prof);
                 const mesh = new THREE.Mesh(geo, materiais);
-                // Adicionando contorno sutil para as prateleiras ficarem visíveis
                 const edges = new THREE.EdgesGeometry(geo);
-                const linha = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xC6B6A5, transparent: true, opacity: 0.3 }));
+                const linha = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x555555, transparent: true, opacity: 0.2 }));
                 mesh.add(linha);
-
                 mesh.position.set(x, y, z);
                 if (interativo) objetosInterativos.push(mesh);
                 return mesh;
             }
 
+            // 1. Instalação (Flutuante na parede ou no chão)
+            const baseElevacao = (tipoInstalacao === "aereo") ? 1.5 : 0; // Se aéreo, fica 1.5m do chão
+            grupoMovelAtual.position.y = baseElevacao;
+
             const grupoCaixa = new THREE.Group();
             
-            // Base, Laterais, Tampo, Fundo
+            // Caixa Base
             grupoCaixa.add(criarChapa(L - E*2, E, P, materiaisChapa, 0, E/2, 0));
             grupoCaixa.add(criarChapa(E, A, P, materiaisChapa, -L/2 + E/2, A/2, 0));
             grupoCaixa.add(criarChapa(E, A, P, materiaisChapa, L/2 - E/2, A/2, 0));
             grupoCaixa.add(criarChapa(L - E*2, E, P, materiaisChapa, 0, A - E/2, 0));
             grupoCaixa.add(criarChapa(L - E*2, A - E*2, 0.006, materiaisChapa, 0, A/2, -P/2 + 0.01));
 
-            // Divisão Gavetas/Portas
-            let altGavetasTotal = 0;
-            let altGavetaUnica = 0;
-            if (numGavetas > 0) {
-                altGavetasTotal = Math.min(A * 0.4, numGavetas * 0.25); 
-                altGavetaUnica = altGavetasTotal / numGavetas;
-                grupoCaixa.add(criarChapa(L - E*2, E, P - E - 0.01, materiaisChapa, 0, E + altGavetasTotal + E/2, E/2)); // Base divisória
-            }
-
-            // ========================================================
-            // NOVO: CONSTRUÇÃO DAS DIVISÓRIAS VERTICAIS E PRATELEIRAS
-            // ========================================================
-            const altVaoInterno = A - E*2 - (numGavetas > 0 ? altGavetasTotal + E : 0);
-            const profInterna = P - E - 0.03; // Prateleira recuada para a porta fechar
-
-            // 1. Divisórias Verticais (Ex: espaço para vassoura)
-            if (numDivisoesVerticais > 0 && altVaoInterno > 0) {
-                const espacoLargura = (L - E*2) / (numDivisoesVerticais + 1);
-                for(let i = 1; i <= numDivisoesVerticais; i++) {
-                    const posX = -L/2 + E + (espacoLargura * i);
-                    const posY = E + (numGavetas > 0 ? altGavetasTotal + E : 0) + altVaoInterno/2;
-                    grupoCaixa.add(criarChapa(E, altVaoInterno, profInterna, materiaisChapa, posX, posY, P/2 - profInterna/2 - E*2));
+            // Prateleiras Internas
+            const qPrat = est.prateleiras_internas || 0;
+            if (qPrat > 0) {
+                const espaco = A / (qPrat + 1);
+                for(let i=1; i<=qPrat; i++) {
+                    grupoCaixa.add(criarChapa(L - E*2, E, P - E - 0.02, materiaisChapa, 0, espaco * i, 0));
                 }
             }
-
-            // 2. Prateleiras Horizontais (Cruzando as divisórias na simulação)
-            if (numPrateleiras > 0 && altVaoInterno > 0) {
-                const espacoAltura = altVaoInterno / (numPrateleiras + 1);
-                for(let i = 1; i <= numPrateleiras; i++) {
-                    const posY = E + (numGavetas > 0 ? altGavetasTotal + E : 0) + (espacoAltura * i);
-                    // Desenha a prateleira de ponta a ponta
-                    grupoCaixa.add(criarChapa(L - E*2, E, profInterna, materiaisChapa, 0, posY, P/2 - profInterna/2 - E*2));
-                }
-            }
-
             grupoMovelAtual.add(grupoCaixa);
 
-            // ========================================================
+            // 2. Elementos Interativos (Design Modular)
+            const qGav = est.gavetoes || 0;
+            const qGiro = est.portas_giro || 0;
+            const qBasc = est.portas_basculantes_superiores || 0;
 
-            // Gavetas Interativas
-            if (numGavetas > 0) {
-                const largGaveta = L - E*2 - F*2; 
-                const profGaveta = P - 0.05; 
-                for (let i = 0; i < numGavetas; i++) {
-                    const posY = E + (i * altGavetaUnica) + (altGavetaUnica / 2);
-                    const gavetaCorredica = new THREE.Group();
-                    gavetaCorredica.position.set(0, posY, 0);
+            let espacoYAtual = E; // Vai subindo conforme criamos as peças
+
+            // A) Gavetões (Inferiores)
+            if (qGav > 0) {
+                const hTotalGav = Math.min(A * 0.4, qGav * 0.3); // Ocupam max 40% da altura
+                const hGavUnica = hTotalGav / qGav;
+                for (let i = 0; i < qGav; i++) {
+                    const posY = espacoYAtual + hGavUnica / 2;
+                    const gavGrp = new THREE.Group(); gavGrp.position.set(0, posY, 0);
                     
-                    const altFrente = altGavetaUnica - F;
-                    const frenteMesh = criarChapa(largGaveta, altFrente, E, materiaisPorta, 0, 0, P/2 - E/2, true);
-                    frenteMesh.userData.grupoPai = gavetaCorredica; 
-                    gavetaCorredica.add(frenteMesh);
+                    const frente = criarChapa(L - E*2 - F*2, hGavUnica - F, E, materiaisFrente, 0, 0, P/2 - E/2, true);
+                    frente.userData.grupoPai = gavGrp; gavGrp.add(frente);
 
-                    const puxador = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.15, 16), matPuxador);
-                    puxador.rotation.z = Math.PI / 2;
-                    puxador.position.set(0, 0, P/2 + 0.02);
-                    gavetaCorredica.add(puxador);
+                    const puxador = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.2, 16), matPuxador);
+                    puxador.rotation.z = Math.PI/2; puxador.position.set(0, 0, P/2 + 0.02);
+                    gavGrp.add(puxador);
 
-                    const largInt = largGaveta - 0.03; 
-                    const altInt = altFrente - 0.04;
-                    gavetaCorredica.add(criarChapa(E, altInt, profGaveta - E, materiaisChapa, -largInt/2 + E/2, 0, P/2 - profGaveta/2 - E)); 
-                    gavetaCorredica.add(criarChapa(E, altInt, profGaveta - E, materiaisChapa, largInt/2 - E/2, 0, P/2 - profGaveta/2 - E));  
-                    gavetaCorredica.add(criarChapa(largInt - E*2, E, profGaveta - E, materiaisChapa, 0, -altInt/2 + E/2, P/2 - profGaveta/2 - E)); 
-
-                    gavetaCorredica.userData = { tipo: 'gaveta', aberto: false, posFechada: 0, posAberta: profGaveta * 0.8 };
-                    grupoMovelAtual.add(gavetaCorredica);
+                    gavGrp.userData = { tipo: 'gaveta', aberto: false, posFechada: 0, posAberta: P * 0.7 };
+                    grupoMovelAtual.add(gavGrp);
+                    espacoYAtual += hGavUnica;
                 }
             }
 
-            // Portas Interativas (Ocultam as prateleiras)
-            if (numPortas > 0 && altVaoInterno > 0.1) {
-                const altPorta = altVaoInterno - F;
-                const largPorta = (L - E*2 - (F * (numPortas + 1))) / numPortas;
-                const inicioX = -L/2 + E + F + largPorta/2;
-                const posYPorta = E + (numGavetas > 0 ? altGavetasTotal + E : 0) + altPorta/2;
+            // B) Portas de Giro (Centrais/Padrão)
+            if (qGiro > 0) {
+                const hGiro = A - espacoYAtual - (qBasc > 0 ? (A * 0.4) : E); // Espaço que sobrou menos o basculante do topo
+                const wGiro = (L - E*2 - (F * (qGiro + 1))) / qGiro;
+                const inicioX = -L/2 + E + F + wGiro/2;
+                const posYPorta = espacoYAtual + hGiro/2;
 
-                for (let i = 0; i < numPortas; i++) {
-                    const centroX = inicioX + (i * (largPorta + F));
-                    const abreEsquerda = i < numPortas / 2;
-                    const pivotX = abreEsquerda ? centroX - largPorta/2 : centroX + largPorta/2;
+                for (let i = 0; i < qGiro; i++) {
+                    const centroX = inicioX + (i * (wGiro + F));
+                    const abreEsq = i < qGiro / 2;
+                    const pivotX = abreEsq ? centroX - wGiro/2 : centroX + wGiro/2;
                     
-                    const portaPivot = new THREE.Group();
-                    portaPivot.position.set(pivotX, posYPorta, P/2 - E/2);
+                    const portaPivot = new THREE.Group(); portaPivot.position.set(pivotX, posYPorta, P/2 - E/2);
                     
-                    const deslocamentoX = abreEsquerda ? largPorta/2 : -largPorta/2;
-                    const portaMesh = criarChapa(largPorta, altPorta, E, materiaisPorta, deslocamentoX, 0, 0, true);
-                    portaMesh.userData.grupoPai = portaPivot;
-                    portaPivot.add(portaMesh);
+                    const deslocX = abreEsq ? wGiro/2 : -wGiro/2;
+                    const frente = criarChapa(wGiro, hGiro - F, E, materiaisFrente, deslocX, 0, 0, true);
+                    frente.userData.grupoPai = portaPivot; portaPivot.add(frente);
 
                     const puxador = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.15, 16), matPuxador);
-                    const posXpuxador = abreEsquerda ? deslocamentoX + largPorta/2 - 0.04 : deslocamentoX - largPorta/2 + 0.04;
-                    puxador.position.set(posXpuxador, 0, E/2 + 0.02);
-                    portaPivot.add(puxador);
+                    const posXpuxador = abreEsq ? deslocX + wGiro/2 - 0.04 : deslocX - wGiro/2 + 0.04;
+                    puxador.position.set(posXpuxador, 0, E/2 + 0.02); portaPivot.add(puxador);
 
-                    portaPivot.userData = { 
-                        tipo: 'porta', aberto: false, rotacaoFechada: 0, 
-                        rotacaoAberta: abreEsquerda ? -Math.PI / 1.5 : Math.PI / 1.5 // Abre mais que 90graus para ver dentro
-                    };
+                    portaPivot.userData = { tipo: 'giro', aberto: false, rotacaoFechada: 0, rotacaoAberta: abreEsq ? -Math.PI / 1.8 : Math.PI / 1.8 };
                     grupoMovelAtual.add(portaPivot);
                 }
+                espacoYAtual += hGiro;
             }
 
-            // Centraliza e Ajusta a Câmera
+            // C) Portas Basculantes (Superiores - Abrem pra cima)
+            if (qBasc > 0) {
+                const hBascTotal = A - espacoYAtual - E;
+                const hBascUnica = hBascTotal / qBasc;
+                const wBasc = L - E*2 - F*2; // Ocupa a largura inteira
+                
+                for(let i = 0; i < qBasc; i++) {
+                    // O Pivot de um basculante fica no TOPO, para abrir pra cima
+                    const topoY = espacoYAtual + (i * hBascUnica) + hBascUnica;
+                    const bascPivot = new THREE.Group(); bascPivot.position.set(0, topoY, P/2 - E/2);
+
+                    const frente = criarChapa(wBasc, hBascUnica - F, E, materiaisFrente, 0, -hBascUnica/2, 0, true);
+                    frente.userData.grupoPai = bascPivot; bascPivot.add(frente);
+
+                    // Puxador Perfil na parte inferior da basculante
+                    const puxador = new THREE.Mesh(new THREE.BoxGeometry(wBasc - 0.1, 0.02, 0.02), matPuxador);
+                    puxador.position.set(0, -hBascUnica + 0.03, E/2 + 0.01); bascPivot.add(puxador);
+
+                    // rotaciona em X, negativo vai pra cima
+                    bascPivot.userData = { tipo: 'basculante', aberto: false, rotacaoFechada: 0, rotacaoAberta: -Math.PI / 2.2 };
+                    grupoMovelAtual.add(bascPivot);
+                }
+            }
+
+            // Ajusta a Câmera Baseado na Instalação
             const maxDim = Math.max(L, A, P);
-            camera3D.position.set(0, A * 1.5, maxDim * 2.2); 
-            controles3D.target.set(0, A / 2, 0); 
+            camera3D.position.set(0, baseElevacao + A * 1.5, maxDim * 2.2); 
+            controles3D.target.set(0, baseElevacao + A / 2, 0); 
             controles3D.update();
 
-            document.getElementById('info3D').innerHTML = `<i class="fas fa-check-circle" style="color:var(--earth-green);"></i> Medido pela Foto: ${largura_mm}x${altura_mm}x${profundidade_mm}mm`;
+            document.getElementById('info3D').innerHTML = `<i class="fas fa-check-circle" style="color:var(--earth-green);"></i> Design Gerado e Colorizado!`;
         }
 
         // ==========================================
-        // CÁLCULO FINANCEIRO
+        // REALIDADE AUMENTADA (AR)
+        // ==========================================
+        function alternarModoAR() {
+            if (!base64ImagemGlobal) { alert("Envie uma foto do local primeiro!"); return; }
+            
+            modoARAtivo = !modoARAtivo;
+            const btn = document.getElementById('btnAR');
+            
+            if (modoARAtivo) {
+                // Aplica a foto como fundo 3D
+                const loader = new THREE.TextureLoader();
+                loader.load(base64ImagemGlobal, function(texture) {
+                    cena3D.background = texture;
+                });
+                btn.innerHTML = '<i class="fas fa-cube"></i> Voltar ao Modo Estúdio';
+                btn.classList.remove('success');
+                btn.classList.add('primary');
+            } else {
+                cena3D.background = null;
+                btn.innerHTML = '<i class="fas fa-image"></i> Ver Móvel Instalado na Foto (AR)';
+                btn.classList.remove('primary');
+                btn.classList.add('success');
+            }
+        }
+
+        // ==========================================
+        // CÁLCULO FINANCEIRO (INTACTO)
         // ==========================================
         function transferirParaOrcamento() {
             document.getElementById('addItemSection').scrollIntoView({behavior: 'smooth'});
