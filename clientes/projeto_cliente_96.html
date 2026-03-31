@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerador de Projetos para Marcenaria - thIAguinho Soluções</title>
-    <link href="[https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Poppins:wght@400;600&display=swap](https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Poppins:wght@400;600&display=swap)" rel="stylesheet">
-    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css)">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
             --primary-dark: #4A3C30;     
@@ -56,6 +56,7 @@
         .input-group input[type="text"],
         .input-group input[type="number"],
         .input-group textarea,
+        .input-group input[type="password"],
         .input-group input[type="file"] {
             width: 100%; padding: 12px; border: 1px solid var(--border-soft);
             border-radius: var(--border-radius-soft); font-size: 1em;
@@ -136,8 +137,8 @@
             padding: 20px; border-radius: 8px; margin-bottom: 30px;
         }
         .warning-message {
-            background-color: #ffe0b2; border-left: 5px solid #ff9800; padding: 15px; margin-bottom: 20px;
-            border-radius: 5px; color: #555; display: flex; align-items: center; gap: 10px;
+            background-color: #e3f2fd; border-left: 5px solid #2196f3; padding: 15px; margin-bottom: 20px;
+            border-radius: 5px; color: #333; display: flex; align-items: center; gap: 10px;
         }
         footer { text-align: center; margin-top: 60px; padding: 25px; color: #777; font-size: 0.9em; }
         
@@ -153,39 +154,42 @@
 </head>
 <body>
     <div class="container">
-        <h1>🛠️ Gerador de Projetos de Marcenaria</h1>
-        <p class="subtitle">Faça o upload do áudio do cliente, deixe a IA transcrever e gere seu orçamento automaticamente.</p>
+        <h1>🛠️ Gerador de Projetos (IA Rápida)</h1>
+        <p class="subtitle">Faça o upload do áudio, deixe a IA transcrever e gere o seu orçamento em segundos.</p>
 
-        <!-- 1. Configuração da IA -->
+        <!-- 1. Configuração da IA (Groq) -->
         <section id="apiConfigSection" class="api-config-section">
-            <h2><i class="fas fa-key"></i> 1. Chave da Inteligência Artificial</h2>
+            <h2><i class="fas fa-key"></i> 1. Chave da Inteligência Artificial (Groq)</h2>
             <div class="warning-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                <div><strong>Atenção:</strong> Cole sua chave da API do Google Gemini abaixo para que o sistema consiga ouvir o áudio e montar o projeto.</div>
+                <i class="fas fa-info-circle" style="color:#2196f3; font-size:1.5em;"></i>
+                <div>
+                    <strong>Dica para o Demo:</strong> Estamos usando a <b>Groq API</b> (100% Grátis e super rápida). <br>
+                    Crie a sua chave gratuita em <a href="https://console.groq.com/" target="_blank" style="color:#2196f3; font-weight:bold;">console.groq.com</a> e cole abaixo.
+                </div>
             </div>
             <div class="input-group full-width">
-                <input type="text" id="geminiApiKeyInput" placeholder="Cole sua chave API aqui (começa com AIza...)">
+                <input type="password" id="apiKeyInput" placeholder="Cole a sua chave API aqui (começa com gsk_...)">
             </div>
             <div class="action-buttons" style="justify-content: flex-start; margin-top: 0;">
-                <button onclick="salvarChave()" class="primary" id="btnSalvarChave">
+                <button onclick="salvarChave(false)" class="primary" id="btnSalvarChave">
                     <i class="fas fa-save"></i> Salvar Chave e Ativar
                 </button>
             </div>
-            <p style="margin-top: 15px; font-weight: 600; font-size: 0.9em;">Status: <span id="currentApiKeyDisplay" style="color:red;">Nenhuma chave registrada</span></p>
+            <p style="margin-top: 15px; font-weight: 600; font-size: 0.9em;">Status: <span id="currentApiKeyDisplay" style="color:red;">Nenhuma chave registada</span></p>
         </section>
 
         <!-- 2. Transcrição de Áudio -->
         <section id="audioInputSection" class="section-panel">
             <h2><i class="fas fa-microphone-alt"></i> 2. Áudio do Cliente</h2>
-            <p class="subtitle">Selecione o arquivo de áudio (MP3, WAV, M4A). A IA vai escutar e escrever o que foi pedido.</p>
+            <p class="subtitle">Selecione o ficheiro de áudio (MP3, WAV, M4A). A IA vai escutar e escrever.</p>
             
             <div class="input-group">
                 <input type="file" id="audioFileInput" accept="audio/*">
             </div>
             
             <div class="input-group full-width">
-                <label>Texto do Pedido (Gerado pela IA):</label>
-                <textarea id="transcribedTextDisplay" rows="6" placeholder="Carregue o arquivo de áudio acima. O texto aparecerá aqui..."></textarea>
+                <label>Texto do Pedido (Transcrito pela IA):</label>
+                <textarea id="transcribedTextDisplay" rows="6" placeholder="Carregue o ficheiro de áudio acima. O texto aparecerá aqui..."></textarea>
             </div>
             
             <div class="action-buttons">
@@ -203,14 +207,14 @@
             </div>
             <div class="action-buttons">
                 <button class="primary" onclick="transferirParaOrcamento()">
-                    <i class="fas fa-arrow-down"></i> Adicionar aos Custos do Orçamento
+                    <i class="fas fa-arrow-down"></i> Confirmar Valores e Editar
                 </button>
             </div>
         </section>
 
         <!-- 4. Painel de Custos -->
         <section id="addItemSection" class="section-panel">
-            <h2><i class="fas fa-cube"></i> Edição de Valores</h2>
+            <h2><i class="fas fa-cube"></i> Edição de Valores do Móvel</h2>
             <div class="grid-layout">
                 <div class="input-group full-width">
                     <label>Nome do Item:</label>
@@ -250,7 +254,7 @@
 
         <!-- 5. Lista de Itens -->
         <section id="itemsList">
-            <h2><i class="fas fa-list-alt"></i> Lista do Projeto</h2>
+            <h2><i class="fas fa-list-alt"></i> Lista do Projeto Final</h2>
             <div id="itemsContainer"></div>
         </section>
 
@@ -258,7 +262,7 @@
         <section id="summary">
             <h2><i class="fas fa-file-invoice-dollar"></i> Total do Orçamento</h2>
             <p><span id="totalProjectCost">R$ 0,00</span></p>
-            <button onclick="mascoteFalar('O valor total do projeto até agora é ' + document.getElementById('totalProjectCost').textContent)" class="warning">
+            <button onclick="mascoteFalar('O valor total de venda do projeto é ' + document.getElementById('totalProjectCost').textContent)" class="warning">
                 <i class="fas fa-robot"></i> Ouvir Valor
             </button>
         </section>
@@ -266,7 +270,7 @@
 
     <!-- Mascote Flutuante -->
     <div class="floating-buttons">
-        <button class="floating-button" onclick="mascoteFalar('Tudo certo! Cole sua chave, envie o áudio e vamos começar a trabalhar!')">
+        <button class="floating-button" onclick="mascoteFalar('Olá! Mudei o motor da IA para um sistema mais rápido e grátis. Pode carregar o áudio!')">
             <i class="fas fa-headset"></i> Mascote
         </button>
     </div>
@@ -274,49 +278,51 @@
     <footer>Powered by thIAguinho Soluções</footer>
 
     <script>
-        let currentGeminiApiKey = null;
+        let currentApiKey = null;
         let listaDeItens = [];
         let indexSendoEditado = -1;
-        // Truque de programação para evitar o corte do arquivo no chat:
-        const backticks = String.fromCharCode(96, 96, 96); 
+
+        // Ao carregar a página
+        window.onload = function() {
+            atualizarTelaItens();
+            const chaveGuardada = localStorage.getItem('groqApiKeyLocal');
+            if (chaveGuardada) {
+                document.getElementById('apiKeyInput').value = chaveGuardada;
+                salvarChave(true); 
+            }
+        };
 
         // 1. SALVAR A CHAVE API
-        function salvarChave() {
-            try {
-                const inputChave = document.getElementById('geminiApiKeyInput');
-                const chave = inputChave.value.trim();
-                
-                if (chave === "") {
-                    alert('Por favor, cole a sua chave da API na caixa de texto antes de clicar em salvar.');
-                    inputChave.focus();
-                    return;
-                }
-
-                currentGeminiApiKey = chave;
-                
-                // Feedback visual de sucesso
-                const statusSpan = document.getElementById('currentApiKeyDisplay');
-                statusSpan.textContent = "Chave Ativada: " + chave.substring(0, 5) + "...";
-                statusSpan.style.color = "#6B8E23"; 
-
-                const botao = document.getElementById('btnSalvarChave');
-                const textoOriginal = botao.innerHTML;
-                botao.innerHTML = '<i class="fas fa-check"></i> Chave Salva com Sucesso!';
-                botao.style.backgroundColor = "#6B8E23";
-                
-                setTimeout(function() {
-                    botao.innerHTML = textoOriginal;
-                    botao.style.backgroundColor = ""; 
-                }, 3000);
-
-                mascoteFalar("Chave ativada! Agora você já pode selecionar o arquivo de áudio.");
-
-            } catch (erro) {
-                alert("Ocorreu um erro ao salvar: " + erro.message);
+        function salvarChave(modoSilencioso = false) {
+            const inputChave = document.getElementById('apiKeyInput');
+            const chave = inputChave.value.trim();
+            
+            if (chave === "") {
+                if(!modoSilencioso) alert('Por favor, cole a sua chave da Groq antes de guardar.');
+                return;
             }
+
+            currentApiKey = chave;
+            localStorage.setItem('groqApiKeyLocal', chave);
+            
+            const statusSpan = document.getElementById('currentApiKeyDisplay');
+            statusSpan.textContent = "Chave Ativada com Sucesso!";
+            statusSpan.style.color = "#6B8E23"; 
+
+            const botao = document.getElementById('btnSalvarChave');
+            const textoOriginal = '<i class="fas fa-save"></i> Salvar Chave e Ativar';
+            botao.innerHTML = '<i class="fas fa-check"></i> Ativada!';
+            botao.style.backgroundColor = "#6B8E23";
+            
+            setTimeout(() => {
+                botao.innerHTML = textoOriginal;
+                botao.style.backgroundColor = ""; 
+            }, 3000);
+
+            if(!modoSilencioso) mascoteFalar("Chave ativada com sucesso! O sistema está pronto.");
         }
 
-        // 2. FUNÇÃO DO MASCOTE (VOZ)
+        // 2. FUNÇÃO DO MASCOTE (VOZ NATIVA)
         function mascoteFalar(texto) {
             try {
                 if ('speechSynthesis' in window) {
@@ -324,168 +330,134 @@
                     const fala = new SpeechSynthesisUtterance(texto);
                     fala.lang = 'pt-BR';
                     window.speechSynthesis.speak(fala);
-                } else {
-                    console.log("Mascote: " + texto);
                 }
-            } catch (e) {
-                console.error("Erro na voz do mascote", e);
-            }
+            } catch (e) { console.error(e); }
         }
 
-        // Função auxiliar para transformar o áudio em dados legíveis pela internet
-        function converterArquivoParaBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        // 3. OUVIR E TRANSCREVER O ÁUDIO REAL
+        // 3. OUVIR E TRANSCREVER O ÁUDIO REAL (GROQ WHISPER API)
         document.getElementById('audioFileInput').addEventListener('change', async function(evento) {
             try {
                 const file = evento.target.files[0];
                 if (!file) return;
 
-                if (!currentGeminiApiKey) {
-                    alert("Atenção! Você precisa colar e salvar a Chave da API (Passo 1) antes de enviar o áudio.");
+                if (!currentApiKey) {
+                    alert("Atenção! Necessita colar e salvar a Chave da API (Passo 1).");
                     document.getElementById('audioFileInput').value = '';
-                    document.getElementById('apiConfigSection').scrollIntoView({behavior: "smooth"});
                     return;
                 }
 
                 const caixaTexto = document.getElementById('transcribedTextDisplay');
-                caixaTexto.value = "⏳ Enviando o arquivo de áudio para a Inteligência Artificial analisar... Isso pode demorar alguns segundos.";
-                mascoteFalar("Enviando o áudio. Por favor, aguarde a transcrição.");
+                caixaTexto.value = "⏳ A Inteligência Artificial está a ouvir o áudio... (Super Rápido!)";
 
-                const base64String = await converterArquivoParaBase64(file);
-                if (!base64String.includes(',')) {
-                    throw new Error("Erro na conversão do arquivo de áudio.");
-                }
-                
-                const base64Data = base64String.split(',')[1];
-                const mimeType = file.type || "audio/mp3";
+                // Preparar ficheiro para a Groq
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("model", "whisper-large-v3");
+                formData.append("language", "pt"); // Força o idioma para português
 
-                const url = "[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=)" + currentGeminiApiKey;
-                
-                const pacoteDeDados = {
-                    contents: [{
-                        parts: [
-                            { text: "Você é um assistente inteligente. Ouça este áudio e transcreva exatamente o que foi dito. Retorne APENAS a transcrição." },
-                            { inlineData: { mimeType: mimeType, data: base64Data } }
-                        ]
-                    }]
-                };
-
-                const resposta = await fetch(url, {
+                // Chamada à API da Groq
+                const resposta = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(pacoteDeDados)
+                    headers: {
+                        "Authorization": `Bearer ${currentApiKey}`
+                    },
+                    body: formData
                 });
 
                 const dadosJson = await resposta.json();
                 
-                if (dadosJson.error) {
-                    throw new Error(dadosJson.error.message);
+                if (!resposta.ok) {
+                    throw new Error(dadosJson.error ? dadosJson.error.message : "Erro desconhecido na API da Groq");
                 }
 
-                if (dadosJson.candidates && dadosJson.candidates[0].content.parts[0].text) {
-                    caixaTexto.value = dadosJson.candidates[0].content.parts[0].text.trim();
-                    mascoteFalar("Terminei de ouvir. O texto já está pronto na tela.");
+                if (dadosJson.text) {
+                    caixaTexto.value = dadosJson.text.trim();
+                    mascoteFalar("Áudio transcrito. Pode rever o texto e gerar o projeto.");
                 } else {
-                    caixaTexto.value = "A IA não conseguiu entender o áudio. Tente digitar manualmente.";
+                    caixaTexto.value = "A IA não conseguiu identificar voz no áudio.";
                 }
 
             } catch (erro) {
                 console.error(erro);
-                document.getElementById('transcribedTextDisplay').value = "❌ Falha ao processar o áudio. Erro: " + erro.message;
-                mascoteFalar("Desculpe, tive um problema técnico ao escutar o áudio.");
+                document.getElementById('transcribedTextDisplay').value = "❌ ERRO NA TRANSCRIÇÃO:\n" + erro.message;
+                mascoteFalar("Desculpe, ocorreu um erro ao tentar ouvir o áudio.");
             }
         });
 
-        // 4. GERAR O PROJETO E CALCULAR VALORES
+        // 4. GERAR O PROJETO E CALCULAR VALORES (GROQ LLAMA 3 API)
         async function gerarProjeto() {
             try {
                 const textoDoCliente = document.getElementById('transcribedTextDisplay').value.trim();
                 
-                if (!textoDoCliente || textoDoCliente.includes('Enviando o arquivo')) {
-                    alert('O texto do pedido está vazio ou ainda está carregando.');
+                if (!textoDoCliente || textoDoCliente.includes('ERRO') || textoDoCliente.includes('Aguarde')) {
+                    alert('Por favor, certifique-se que o texto do pedido é válido.');
                     return;
                 }
-                if (!currentGeminiApiKey) {
-                    alert('Por favor, configure sua chave da API primeiro!');
+                if (!currentApiKey) {
+                    alert('Configure a sua chave da API da Groq!');
                     return;
                 }
 
                 const botaoGerar = document.getElementById('processAudioBtn');
-                botaoGerar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando Projeto...';
+                botaoGerar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A processar (Llama 3)...';
                 botaoGerar.disabled = true;
                 
                 document.getElementById('aiDesignSection').style.display = 'block';
-                document.getElementById('aiDesignDescription').innerText = "Estudando os materiais e calculando os custos ideais. Aguarde...";
-                mascoteFalar("Analisando o texto e criando o projeto técnico.");
+                document.getElementById('aiDesignDescription').innerText = "A criar o design e calcular valores (isto leva menos de 3 segundos)...";
 
-                const textoComando = "Você é um arquiteto sênior especializado em móveis para Lojas de Óticas.\n" +
-                    "Leia o pedido do cliente: \"" + textoDoCliente + "\"\n\n" +
-                    "Crie uma proposta detalhada. No final, adicione OBRIGATORIAMENTE um bloco JSON com os custos realistas.\n\n" +
-                    "Formato da Resposta:\n" +
-                    "## Nome da Peça: [Crie um nome]\n" +
-                    "**Materiais:** [Sua sugestão]\n" +
-                    "**Detalhes:** [Descrição do móvel]\n\n" +
-                    backticks + "json\n" +
-                    "{\n" +
-                    "  \"nome_projeto\": \"Ex: Balcão Ótica\",\n" +
-                    "  \"materiais_resumo\": \"Ex: MDF Branco, Vidro 8mm\",\n" +
-                    "  \"custo_material\": 1200.00,\n" +
-                    "  \"custo_mao_de_obra\": 800.00,\n" +
-                    "  \"custo_ferragens\": 350.00,\n" +
-                    "  \"outros_custos\": 100.00\n" +
-                    "}\n" +
-                    backticks;
+                // Prompt formatado especificamente para gerar um JSON perfeito
+                const promptComando = `Você é um arquiteto e orçamentista de marcenaria.
+Leia o pedido do cliente: "${textoDoCliente}"
 
-                const url = "[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=)" + currentGeminiApiKey;
-                
-                const resposta = await fetch(url, {
+Responda OBRIGATORIAMENTE num formato JSON válido contendo EXATAMENTE as seguintes chaves (sem adicionar textos fora do JSON):
+- "descricao_projeto": "Texto descrevendo o móvel sugerido, suas vantagens para óticas.",
+- "nome_projeto": "Nome curto do móvel",
+- "materiais_resumo": "Materiais principais separados por vírgula",
+- "custo_material": número (ex: 1500),
+- "custo_mao_de_obra": número (ex: 800),
+- "custo_ferragens": número (ex: 300),
+- "outros_custos": número (ex: 100)`;
+
+                const resposta = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: textoComando }] }] })
+                    headers: {
+                        "Authorization": `Bearer ${currentApiKey}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "llama3-70b-8192", // Modelo gratuito ultra-rápido da Meta
+                        messages: [{ role: "user", content: promptComando }],
+                        response_format: { type: "json_object" }, // Força a resposta a ser um JSON
+                        temperature: 0.5
+                    })
                 });
 
                 const dadosJson = await resposta.json();
-                if (dadosJson.error) throw new Error(dadosJson.error.message);
-
-                const textoIA = dadosJson.candidates[0].content.parts[0].text;
                 
-                const regexParaLimparTexto = new RegExp(backticks + "(?:json)?[\\s\\S]*?" + backticks, "i");
-                const regexParaExtrairDados = new RegExp(backticks + "(?:json)?\\n?([\\s\\S]*?)\\n?" + backticks, "i");
-
-                document.getElementById('aiDesignDescription').innerText = textoIA.replace(regexParaLimparTexto, ''); 
-                
-                const parteDoJson = textoIA.match(regexParaExtrairDados);
-                
-                if (parteDoJson && parteDoJson[1]) {
-                    try {
-                        const dadosMovel = JSON.parse(parteDoJson[1]);
-                        document.getElementById('itemName').value = dadosMovel.nome_projeto || "Projeto IA";
-                        document.getElementById('itemMaterial').value = dadosMovel.materiais_resumo || "Verificar Descrição";
-                        document.getElementById('costMaterial').value = dadosMovel.custo_material || 0;
-                        document.getElementById('costLabor').value = dadosMovel.custo_mao_de_obra || 0;
-                        document.getElementById('costHardware').value = dadosMovel.custo_ferragens || 0;
-                        document.getElementById('costOther').value = dadosMovel.outros_custos || 0;
-                        mascoteFalar("O projeto foi gerado com sucesso! Se quiser, já adicione os valores à lista.");
-                    } catch(err) {
-                        console.error("Erro na leitura do formato de custos:", err);
-                        mascoteFalar("Fiz a descrição, mas tive dificuldade de calcular os valores. Pode preencher manualmente?");
-                    }
-                } else {
-                    mascoteFalar("Projeto criado em formato de texto. Preencha os valores nas caixas abaixo.");
+                if (!resposta.ok) {
+                    throw new Error(dadosJson.error ? dadosJson.error.message : "Erro na geração do projeto");
                 }
+
+                // Extrai o conteúdo JSON gerado pela IA
+                const textoIA = dadosJson.choices[0].message.content;
+                const projetoIA = JSON.parse(textoIA);
+
+                // Mostra a descrição na tela
+                document.getElementById('aiDesignDescription').innerText = projetoIA.descricao_projeto || "Projeto gerado, veja os custos abaixo.";
+                
+                // Preenche os inputs para o utilizador poder editar
+                document.getElementById('itemName').value = projetoIA.nome_projeto || "Projeto IA";
+                document.getElementById('itemMaterial').value = projetoIA.materiais_resumo || "";
+                document.getElementById('costMaterial').value = projetoIA.custo_material || 0;
+                document.getElementById('costLabor').value = projetoIA.custo_mao_de_obra || 0;
+                document.getElementById('costHardware').value = projetoIA.custo_ferragens || 0;
+                document.getElementById('costOther').value = projetoIA.outros_custos || 0;
+                
+                mascoteFalar("Sucesso! O projeto foi desenhado. Verifique os valores gerados automaticamente.");
 
             } catch(erro) {
                 console.error(erro);
-                document.getElementById('aiDesignDescription').innerText = "Houve um erro: " + erro.message;
-                mascoteFalar("Infelizmente ocorreu um erro de conexão com a inteligência artificial.");
+                document.getElementById('aiDesignDescription').innerText = "❌ ERRO AO GERAR PROJETO:\n" + erro.message;
             } finally {
                 const botaoGerar = document.getElementById('processAudioBtn');
                 botaoGerar.innerHTML = '<i class="fas fa-magic"></i> Analisar Texto e Gerar Projeto';
@@ -495,7 +467,8 @@
 
         function transferirParaOrcamento() {
             document.getElementById('addItemSection').scrollIntoView({behavior: 'smooth'});
-            mascoteFalar("Ótimo. Verifique os valores calculados na tabela e clique em confirmar item na lista.");
+            document.getElementById('btnSaveItem').style.transform = 'scale(1.05)';
+            setTimeout(() => document.getElementById('btnSaveItem').style.transform = 'scale(1)', 500);
         }
 
         // 5. GESTÃO DE CUSTOS E LISTA DE ITENS
@@ -557,7 +530,6 @@
 
             limparFormulario();
             atualizarTelaItens();
-            mascoteFalar("Item salvo no carrinho!");
         }
 
         function editarItem(index) {
@@ -592,10 +564,6 @@
             indexSendoEditado = -1;
             document.getElementById('btnSaveItem').innerHTML = '<i class="fas fa-plus"></i> Confirmar Item na Lista';
         }
-
-        window.onload = function() {
-            atualizarTelaItens();
-        };
     </script>
 </body>
 </html>
