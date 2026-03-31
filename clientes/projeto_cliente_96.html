@@ -349,13 +349,11 @@
                 const caixaTexto = document.getElementById('transcribedTextDisplay');
                 caixaTexto.value = "⏳ A Inteligência Artificial está a ouvir o áudio... (Super Rápido!)";
 
-                // Preparar ficheiro para a Groq
                 const formData = new FormData();
                 formData.append("file", file);
                 formData.append("model", "whisper-large-v3");
-                formData.append("language", "pt"); // Força o idioma para português
+                formData.append("language", "pt");
 
-                // Chamada à API da Groq
                 const resposta = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
                     method: 'POST',
                     headers: {
@@ -384,7 +382,7 @@
             }
         });
 
-        // 4. GERAR O PROJETO E CALCULAR VALORES (GROQ LLAMA 3 API)
+        // 4. GERAR O PROJETO E CALCULAR VALORES (GROQ LLAMA 3.1 API)
         async function gerarProjeto() {
             try {
                 const textoDoCliente = document.getElementById('transcribedTextDisplay').value.trim();
@@ -399,13 +397,12 @@
                 }
 
                 const botaoGerar = document.getElementById('processAudioBtn');
-                botaoGerar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A processar (Llama 3)...';
+                botaoGerar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A processar...';
                 botaoGerar.disabled = true;
                 
                 document.getElementById('aiDesignSection').style.display = 'block';
                 document.getElementById('aiDesignDescription').innerText = "A criar o design e calcular valores (isto leva menos de 3 segundos)...";
 
-                // Prompt formatado especificamente para gerar um JSON perfeito
                 const promptComando = `Você é um arquiteto e orçamentista de marcenaria.
 Leia o pedido do cliente: "${textoDoCliente}"
 
@@ -425,9 +422,9 @@ Responda OBRIGATORIAMENTE num formato JSON válido contendo EXATAMENTE as seguin
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "llama3-70b-8192", // Modelo gratuito ultra-rápido da Meta
+                        model: "llama-3.1-70b-versatile", // ATUALIZADO AQUI PARA O MODELO MAIS NOVO E SUPORTADO
                         messages: [{ role: "user", content: promptComando }],
-                        response_format: { type: "json_object" }, // Força a resposta a ser um JSON
+                        response_format: { type: "json_object" }, 
                         temperature: 0.5
                     })
                 });
@@ -438,14 +435,11 @@ Responda OBRIGATORIAMENTE num formato JSON válido contendo EXATAMENTE as seguin
                     throw new Error(dadosJson.error ? dadosJson.error.message : "Erro na geração do projeto");
                 }
 
-                // Extrai o conteúdo JSON gerado pela IA
                 const textoIA = dadosJson.choices[0].message.content;
                 const projetoIA = JSON.parse(textoIA);
 
-                // Mostra a descrição na tela
                 document.getElementById('aiDesignDescription').innerText = projetoIA.descricao_projeto || "Projeto gerado, veja os custos abaixo.";
                 
-                // Preenche os inputs para o utilizador poder editar
                 document.getElementById('itemName').value = projetoIA.nome_projeto || "Projeto IA";
                 document.getElementById('itemMaterial').value = projetoIA.materiais_resumo || "";
                 document.getElementById('costMaterial').value = projetoIA.custo_material || 0;
