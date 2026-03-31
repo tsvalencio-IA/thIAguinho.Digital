@@ -270,7 +270,7 @@
 
     <!-- Mascote Flutuante -->
     <div class="floating-buttons">
-        <button class="floating-button" onclick="mascoteFalar('Olá! Mudei o motor da IA para um sistema mais rápido e grátis. Pode carregar o áudio!')">
+        <button class="floating-button" onclick="mascoteFalar('Olá! Mudei o motor da IA para um sistema blindado contra falhas. Pode testar!')">
             <i class="fas fa-headset"></i> Mascote
         </button>
     </div>
@@ -382,7 +382,7 @@
             }
         });
 
-        // 4. GERAR O PROJETO E CALCULAR VALORES (GROQ LLAMA 3.1 API)
+        // 4. GERAR O PROJETO E CALCULAR VALORES (SISTEMA BLINDADO MULTI-MODELOS)
         async function gerarProjeto() {
             try {
                 const textoDoCliente = document.getElementById('transcribedTextDisplay').value.trim();
@@ -397,49 +397,84 @@
                 }
 
                 const botaoGerar = document.getElementById('processAudioBtn');
-                botaoGerar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A processar...';
+                botaoGerar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A procurar IA disponível...';
                 botaoGerar.disabled = true;
                 
                 document.getElementById('aiDesignSection').style.display = 'block';
-                document.getElementById('aiDesignDescription').innerText = "A criar o design e calcular valores (isto leva menos de 3 segundos)...";
+                document.getElementById('aiDesignDescription').innerText = "A testar servidores para criar o design e calcular valores...";
 
                 const promptComando = `Você é um arquiteto e orçamentista de marcenaria.
 Leia o pedido do cliente: "${textoDoCliente}"
 
 Responda OBRIGATORIAMENTE num formato JSON válido contendo EXATAMENTE as seguintes chaves (sem adicionar textos fora do JSON):
-- "descricao_projeto": "Texto descrevendo o móvel sugerido, suas vantagens para óticas.",
-- "nome_projeto": "Nome curto do móvel",
-- "materiais_resumo": "Materiais principais separados por vírgula",
-- "custo_material": número (ex: 1500),
-- "custo_mao_de_obra": número (ex: 800),
-- "custo_ferragens": número (ex: 300),
-- "outros_custos": número (ex: 100)`;
+{
+  "descricao_projeto": "Texto descrevendo o móvel sugerido, suas vantagens para óticas.",
+  "nome_projeto": "Nome curto do móvel",
+  "materiais_resumo": "Materiais principais separados por vírgula",
+  "custo_material": 1500,
+  "custo_mao_de_obra": 800,
+  "custo_ferragens": 300,
+  "outros_custos": 100
+}`;
 
-                const resposta = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: 'POST',
-                    headers: {
-                        "Authorization": `Bearer ${currentApiKey}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        model: "llama-3.1-70b-versatile", // ATUALIZADO AQUI PARA O MODELO MAIS NOVO E SUPORTADO
-                        messages: [{ role: "user", content: promptComando }],
-                        response_format: { type: "json_object" }, 
-                        temperature: 0.5
-                    })
-                });
+                // LISTA DE MODELOS - Se um falhar, tentamos o próximo!
+                const modelosParaTestar = [
+                    "llama-3.3-70b-versatile", // O mais recente hoje
+                    "llama-3.1-8b-instant",    // Modelo de backup super rápido
+                    "mixtral-8x7b-32768",      // Modelo muito estável
+                    "gemma2-9b-it"             // Modelo da Google dentro da Groq
+                ];
 
-                const dadosJson = await resposta.json();
-                
-                if (!resposta.ok) {
-                    throw new Error(dadosJson.error ? dadosJson.error.message : "Erro na geração do projeto");
+                let projetoIA = null;
+                let erroFinal = "";
+
+                // O Loop tenta cada modelo. Se der "decommissioned" (desativado), ele pula pro próximo.
+                for (const modeloAtual of modelosParaTestar) {
+                    try {
+                        console.log("Tentando gerar projeto com o modelo:", modeloAtual);
+                        
+                        const resposta = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                            method: 'POST',
+                            headers: {
+                                "Authorization": `Bearer ${currentApiKey}`,
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                model: modeloAtual, 
+                                messages: [{ role: "user", content: promptComando }],
+                                response_format: { type: "json_object" }, 
+                                temperature: 0.5
+                            })
+                        });
+
+                        const dadosJson = await resposta.json();
+                        
+                        if (!resposta.ok) {
+                            if (dadosJson.error && dadosJson.error.message.includes("decommissioned")) {
+                                console.warn(`Modelo ${modeloAtual} desativado pela Groq. Tentando o próximo...`);
+                                continue; // Pula para o próximo modelo do Array
+                            }
+                            throw new Error(dadosJson.error ? dadosJson.error.message : "Erro na geração do projeto");
+                        }
+
+                        // Se chegou aqui, a IA funcionou e respondeu!
+                        const textoIA = dadosJson.choices[0].message.content;
+                        projetoIA = JSON.parse(textoIA);
+                        break; // Sai do loop porque deu certo
+
+                    } catch (err) {
+                        erroFinal = err.message;
+                        console.error(`Falha ao tentar usar o modelo ${modeloAtual}:`, err);
+                        // Continua o loop para tentar o próximo
+                    }
                 }
 
-                const textoIA = dadosJson.choices[0].message.content;
-                const projetoIA = JSON.parse(textoIA);
+                if (!projetoIA) {
+                    throw new Error("Todos os modelos da Groq tentados falharam. Último erro: " + erroFinal);
+                }
 
+                // Preencher ecrã com os dados recebidos com sucesso
                 document.getElementById('aiDesignDescription').innerText = projetoIA.descricao_projeto || "Projeto gerado, veja os custos abaixo.";
-                
                 document.getElementById('itemName').value = projetoIA.nome_projeto || "Projeto IA";
                 document.getElementById('itemMaterial').value = projetoIA.materiais_resumo || "";
                 document.getElementById('costMaterial').value = projetoIA.custo_material || 0;
