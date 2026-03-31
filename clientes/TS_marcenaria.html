@@ -6,6 +6,7 @@
     <title>Gerador de Projetos e Orçamentos para Marcenaria - thIAguinho Soluções</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <!-- Bibliotecas 3D -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -34,118 +35,640 @@
             --border-radius-soft: 8px;
         }
 
-        body { font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; background-color: var(--light-cream); color: var(--text-color); line-height: 1.6; overflow-x: hidden; }
-        .container { max-width: 960px; margin: 30px auto; padding: 30px; background-color: var(--soft-beige); border-radius: var(--border-radius-soft); box-shadow: var(--shadow-subtle); position: relative; }
-        h1, h2, h3 { font-family: 'Poppins', sans-serif; color: var(--primary-dark); text-align: center; margin-bottom: 30px; }
-        h1 { font-size: 2.8em; margin-bottom: 10px; }
-        h2 { font-size: 2em; border-bottom: 2px solid var(--border-soft); padding-bottom: 15px; margin-top: 40px; color: var(--secondary-wood); }
-        .subtitle { text-align: center; color: #6c757d; margin-bottom: 30px; font-size: 1.1em; }
-        
-        .input-group { margin-bottom: 20px; display: flex; flex-direction: column; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary-dark); font-size: 0.95em; }
-        .input-group input[type="text"], .input-group input[type="number"], .input-group textarea, .input-group input[type="password"], .input-group input[type="file"] { width: 100%; padding: 12px; border: 1px solid var(--border-soft); border-radius: var(--border-radius-soft); font-size: 1em; background-color: var(--light-cream); color: var(--text-color); box-sizing: border-box; }
-        .input-group input:focus, .input-group textarea:focus { border-color: var(--secondary-wood); outline: none; box-shadow: 0 0 0 3px rgba(127, 85, 57, 0.2); }
-        textarea { resize: vertical; }
-
-        .section-panel { padding: 25px; background-color: var(--bg-light-panel); border-radius: var(--border-radius-soft); margin-bottom: 30px; border: 1px solid var(--border-soft); box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); }
-        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
-        .grid-layout .full-width { grid-column: 1 / -1; }
-
-        button { background-color: var(--accent-gold); color: var(--primary-dark); padding: 12px 25px; border: none; border-radius: var(--border-radius-soft); cursor: pointer; font-size: 1em; font-weight: 500; transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); }
-        button:hover { background-color: #C38C4B; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
-        button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); }
-        button:disabled { background-color: #cccccc; cursor: not-allowed; transform: none; box-shadow: none; color: #666; }
-
-        .action-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 25px; flex-wrap: wrap;}
-        .action-buttons button.primary { background-color: var(--secondary-wood); color: white; }
-        .action-buttons button.primary:hover { background-color: #6a4933; }
-        .action-buttons button.success { background-color: var(--earth-green); color: white; }
-        .action-buttons button.success:hover { background-color: #5a7a1c; }
-        .action-buttons button.ai-magic { background-color: var(--ai-blue); color: white; }
-
-        /* Estilos do Visualizador 3D */
-        #container3DWrapper { width: 100%; height: 500px; position: relative; border-radius: var(--border-radius-soft); border: 2px solid var(--border-soft); overflow: hidden; background: radial-gradient(circle, #ffffff 0%, #EFEAE5 100%); touch-action: none; margin-bottom: 20px; transition: height 0.3s ease, transform 0.3s ease; }
-        #visualizador3D { width: 100%; height: 100%; position: absolute; top:0; left:0; z-index: 2; display: block; outline: none; }
-        #info3D { position: absolute; top: 15px; left: 15px; background: rgba(74, 60, 48, 0.85); color: #FFF; padding: 8px 12px; border-radius: 6px; font-size: 0.85em; font-weight: bold; pointer-events: none; backdrop-filter: blur(4px); z-index: 5; }
-        #instrucao3D { position: absolute; bottom: 15px; right: 15px; background: rgba(221, 161, 94, 0.9); color: var(--primary-dark); padding: 6px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; pointer-events: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 5;}
-
-        /* ESTILOS DA EXPERIÊNCIA MOBILE FULLSCREEN AR */
-        .fullscreen-ar { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 99990 !important; border-radius: 0 !important; border: none !important; background: #000 !important; }
-        .fullscreen-ar.hud-open { height: 55vh !important; border-bottom: 2px solid var(--highlight-yellow) !important; }
-        .ar-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none; }
-        
-        .ar-ui-top { position: absolute; top: 20px; left: 20px; right: 20px; z-index: 10; display: none; justify-content: space-between; }
-        .ar-ui-btn { background: var(--warning-red); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-size: 1em; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; }
-        .ar-ui-magic { background: var(--ai-blue); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-size: 1em; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; }
-        
-        /* HUD DE EDIÇÃO PARAMÉTRICA */
-        .edit-hud {
-            position: fixed; bottom: 0; left: 0; width: 100vw; z-index: 99999; display: none;
-            background: rgba(15, 23, 42, 0.98); color: white; padding: 15px 20px 25px 20px; 
-            border-radius: 20px 20px 0 0; box-shadow: 0 -5px 30px rgba(0,0,0,0.8); 
-            border-top: 2px solid var(--highlight-yellow); 
-            flex-direction: column; gap: 10px; height: 45vh; overflow-y: auto; box-sizing: border-box;
-            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* ESTILOS GERAIS */
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: var(--light-cream); 
+            color: var(--text-color); 
+            line-height: 1.6; 
+            overflow-x: hidden; 
         }
-        .edit-hud.show { transform: translateY(0); display: flex; }
-        .edit-hud::-webkit-scrollbar { width: 4px; }
-        .edit-hud::-webkit-scrollbar-thumb { background: var(--highlight-yellow); border-radius: 2px; }
-        .hud-drag-indicator { width: 40px; height: 5px; background: rgba(255,255,255,0.3); border-radius: 5px; margin: 0 auto 10px auto; }
-        .edit-hud h4 { margin: 0 0 5px 0; color: var(--highlight-yellow); font-size: 1.1em; display: flex; justify-content: space-between; align-items: center;}
+
+        .container { 
+            max-width: 960px; 
+            margin: 30px auto; 
+            padding: 30px; 
+            background-color: var(--soft-beige); 
+            border-radius: var(--border-radius-soft); 
+            box-shadow: var(--shadow-subtle); 
+            position: relative; 
+        }
+
+        h1, h2, h3 { 
+            font-family: 'Poppins', sans-serif; 
+            color: var(--primary-dark); 
+            text-align: center; 
+            margin-bottom: 30px; 
+        }
+
+        h1 { 
+            font-size: 2.8em; 
+            margin-bottom: 10px; 
+        }
+
+        h2 { 
+            font-size: 2em; 
+            border-bottom: 2px solid var(--border-soft); 
+            padding-bottom: 15px; 
+            margin-top: 40px; 
+            color: var(--secondary-wood); 
+        }
+
+        .subtitle { 
+            text-align: center; 
+            color: #6c757d; 
+            margin-bottom: 30px; 
+            font-size: 1.1em; 
+        }
         
-        .hud-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .edit-slider { display: flex; flex-direction: column; gap: 2px; }
-        .edit-slider label { display: flex; justify-content: space-between; font-size: 0.8em; color: #cbd5e1; font-weight: bold; margin:0;}
-        .edit-slider input[type="range"] { width: 100%; accent-color: var(--highlight-yellow); margin:0;}
-        .edit-slider select { width: 100%; padding: 6px; background: #334155; color: white; border: 1px solid #475569; border-radius: 6px; outline: none; font-size: 0.85em;}
-        .hud-btn-close { background: transparent; border: none; color: white; font-size: 1.2em; cursor: pointer; padding: 5px;}
-        .hud-action-row { display: flex; gap: 10px; margin-top: 5px; grid-column: 1 / -1;}
-        .hud-action-row button { padding: 10px; font-size: 0.9em; flex: 1;}
+        /* FORMULÁRIOS */
+        .input-group { 
+            margin-bottom: 20px; 
+            display: flex; 
+            flex-direction: column; 
+        }
 
-        /* HUD DE PERSPECTIVA */
-        #perspectiveHUD { border-top: 2px solid var(--ai-blue); }
-        #perspectiveHUD h4 { color: var(--ai-blue); }
-        #perspectiveHUD input[type="range"] { accent-color: var(--ai-blue); }
+        .input-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: var(--primary-dark); 
+            font-size: 0.95em; 
+        }
 
-        /* Tabelas */
-        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-soft); font-size: 0.9em; }
-        th { background-color: var(--secondary-wood); color: white; font-weight: 600; white-space: nowrap; }
-        tr:hover { background-color: var(--soft-beige); }
+        .input-group input[type="text"], 
+        .input-group input[type="number"], 
+        .input-group textarea, 
+        .input-group input[type="password"], 
+        .input-group input[type="file"] { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid var(--border-soft); 
+            border-radius: var(--border-radius-soft); 
+            font-size: 1em; 
+            background-color: var(--light-cream); 
+            color: var(--text-color); 
+            box-sizing: border-box; 
+        }
 
-        #summary { margin-top: 40px; padding: 30px; background-color: var(--bg-summary); border-radius: var(--border-radius-soft); border: 1px solid #dccca0; text-align: center; box-shadow: inset 0 1px 5px rgba(0,0,0,0.03); }
-        #summary p { font-size: 1.6em; font-weight: 700; color: var(--primary-dark); margin: 15px 0; }
+        .input-group input:focus, 
+        .input-group textarea:focus { 
+            border-color: var(--secondary-wood); 
+            outline: none; 
+            box-shadow: 0 0 0 3px rgba(127, 85, 57, 0.2); 
+        }
 
-        .ai-output-section { margin-top: 30px; padding: 25px; background-color: var(--bg-ai-section); border-radius: var(--border-radius-soft); border: 1px solid #B0D7B0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); }
-        .ai-output-section h3 { color: var(--earth-green); text-align: left; font-size: 1.6em; border-bottom: none; padding-bottom: 0;}
-        .description-box { background-color: var(--light-cream); padding: 18px; border-radius: var(--border-radius-soft); border: 1px solid var(--border-soft); white-space: pre-wrap; font-family: 'Roboto', monospace; font-size: 0.95em; color: var(--text-color); margin-top: 15px; min-height: 100px; line-height: 1.5; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); }
-        .api-config-section { background-color: var(--bg-light-panel); border: 1px solid var(--border-soft); border-radius: var(--border-radius-soft); padding: 20px; margin-bottom: 30px; }
+        textarea { 
+            resize: vertical; 
+        }
+
+        .section-panel { 
+            padding: 25px; 
+            background-color: var(--bg-light-panel); 
+            border-radius: var(--border-radius-soft); 
+            margin-bottom: 30px; 
+            border: 1px solid var(--border-soft); 
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); 
+        }
+
+        .grid-layout { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 20px; 
+        }
+
+        .grid-layout .full-width { 
+            grid-column: 1 / -1; 
+        }
+
+        /* BOTÕES */
+        button { 
+            background-color: var(--accent-gold); 
+            color: var(--primary-dark); 
+            padding: 12px 25px; 
+            border: none; 
+            border-radius: var(--border-radius-soft); 
+            cursor: pointer; 
+            font-size: 1em; 
+            font-weight: 500; 
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); 
+        }
+
+        button:hover { 
+            background-color: #C38C4B; 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
+        }
+
+        button:active { 
+            transform: translateY(0); 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); 
+        }
+
+        button:disabled { 
+            background-color: #cccccc; 
+            cursor: not-allowed; 
+            transform: none; 
+            box-shadow: none; 
+            color: #666; 
+        }
+
+        .action-buttons { 
+            display: flex; 
+            justify-content: center; 
+            gap: 15px; 
+            margin-top: 25px; 
+            flex-wrap: wrap;
+        }
+
+        .action-buttons button.primary { 
+            background-color: var(--secondary-wood); 
+            color: white; 
+        }
+
+        .action-buttons button.primary:hover { 
+            background-color: #6a4933; 
+        }
+
+        .action-buttons button.success { 
+            background-color: var(--earth-green); 
+            color: white; 
+        }
+
+        .action-buttons button.success:hover { 
+            background-color: #5a7a1c; 
+        }
+
+        .action-buttons button.ai-magic { 
+            background-color: var(--ai-blue); 
+            color: white; 
+        }
+
+        /* ESTILOS DO VISUALIZADOR 3D */
+        #container3DWrapper { 
+            width: 100%; 
+            height: 500px; 
+            position: relative; 
+            border-radius: var(--border-radius-soft); 
+            border: 2px solid var(--border-soft); 
+            overflow: hidden; 
+            background: radial-gradient(circle, #ffffff 0%, #EFEAE5 100%); 
+            touch-action: none; 
+            margin-bottom: 20px; 
+            transition: height 0.3s ease, transform 0.3s ease; 
+        }
+
+        #visualizador3D { 
+            width: 100%; 
+            height: 100%; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            z-index: 2; 
+            display: block; 
+            outline: none; 
+        }
+
+        #info3D { 
+            position: absolute; 
+            top: 15px; 
+            left: 15px; 
+            background: rgba(74, 60, 48, 0.85); 
+            color: #FFF; 
+            padding: 8px 12px; 
+            border-radius: 6px; 
+            font-size: 0.85em; 
+            font-weight: bold; 
+            pointer-events: none; 
+            backdrop-filter: blur(4px); 
+            z-index: 5; 
+        }
+
+        #instrucao3D { 
+            position: absolute; 
+            bottom: 15px; 
+            right: 15px; 
+            background: rgba(221, 161, 94, 0.9); 
+            color: var(--primary-dark); 
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            font-size: 0.8em; 
+            font-weight: 600; 
+            pointer-events: none; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2); 
+            z-index: 5;
+        }
+
+        /* MODO AR FULLSCREEN E CÂMERA */
+        .fullscreen-ar { 
+            position: fixed !important; 
+            top: 0 !important; 
+            left: 0 !important; 
+            width: 100vw !important; 
+            height: 100vh !important; 
+            z-index: 99990 !important; 
+            border-radius: 0 !important; 
+            border: none !important; 
+            background: #000 !important; 
+        }
+
+        .fullscreen-ar.hud-open { 
+            height: 45vh !important; 
+            border-bottom: 2px solid var(--highlight-yellow) !important; 
+        }
+
+        .ar-bg-image { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            z-index: 1; 
+            display: none; 
+        }
         
-        .error-message { background-color: #ffebee; border-left: 5px solid #f44336; padding: 15px; margin-top: 15px; border-radius: 5px; color: #c62828; font-size: 0.9em; display: none; }
-        .designer-insight { background-color: #e3f2fd; border-left: 5px solid #2196F3; padding: 15px; margin-top: 15px; border-radius: 4px; font-style: italic; color: #0d47a1; font-size: 0.95em; }
-        #imagePreviewContainer img { max-width: 100%; max-height: 250px; border-radius: 8px; border: 2px solid var(--border-soft); margin-top: 10px; display: none; object-fit: cover; }
+        .ar-ui-top { 
+            position: absolute; 
+            top: 20px; 
+            left: 20px; 
+            right: 20px; 
+            z-index: 10; 
+            display: none; 
+            justify-content: space-between; 
+        }
 
-        /* Rodapé e Botões Flutuantes */
-        footer { text-align: center; margin-top: 60px; padding: 25px; color: #777; font-size: 0.9em; border-top: 1px solid var(--border-soft); background-color: var(--bg-light-panel); border-radius: 0 0 var(--border-radius-soft) var(--border-radius-soft); }
-        .floating-buttons { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 1000; }
-        .floating-button { background-color: var(--secondary-wood); color: white; padding: 12px 20px; border-radius: 30px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); font-size: 1em; font-weight: 500; transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; border: none; cursor: pointer; }
-        .floating-button:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25); background-color: #6a4933; }
-        .floating-button.mascote { background-color: #FFC107; color: var(--primary-dark); }
-        .floating-button.mascote:hover { background-color: #e0a800; }
+        .ar-ui-btn { 
+            background: var(--warning-red); 
+            color: white; 
+            border: none; 
+            padding: 12px 20px; 
+            border-radius: 30px; 
+            font-size: 1em; 
+            font-weight: bold; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
+            cursor: pointer; 
+        }
+
+        .ar-ui-magic { 
+            background: var(--ai-blue); 
+            color: white; 
+            border: none; 
+            padding: 12px 20px; 
+            border-radius: 30px; 
+            font-size: 1em; 
+            font-weight: bold; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
+            cursor: pointer; 
+        }
+        
+        /* HUD DE EDIÇÃO PARAMÉTRICA MASTER (COM SCROLL) */
+        .edit-hud {
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            width: 100vw; 
+            z-index: 99999; 
+            display: none;
+            background: rgba(15, 23, 42, 0.98); 
+            color: white; 
+            padding: 15px 20px 25px 20px; 
+            border-radius: 20px 20px 0 0; 
+            box-shadow: 0 -5px 30px rgba(0,0,0,0.8); 
+            border-top: 2px solid var(--highlight-yellow); 
+            flex-direction: column; 
+            gap: 15px; 
+            height: 55vh; /* Ocupa 55% da tela permitindo scroll interno */
+            overflow-y: auto; 
+            box-sizing: border-box;
+            transform: translateY(100%); 
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .edit-hud.show { 
+            transform: translateY(0); 
+            display: flex; 
+        }
+
+        .edit-hud::-webkit-scrollbar { 
+            width: 6px; 
+        }
+
+        .edit-hud::-webkit-scrollbar-thumb { 
+            background: var(--highlight-yellow); 
+            border-radius: 3px; 
+        }
+
+        .hud-drag-indicator { 
+            width: 40px; 
+            height: 5px; 
+            background: rgba(255,255,255,0.3); 
+            border-radius: 5px; 
+            margin: 0 auto 5px auto; 
+        }
+
+        .edit-hud h4 { 
+            margin: 0 0 10px 0; 
+            color: var(--highlight-yellow); 
+            font-size: 1.2em; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+        }
+        
+        .hud-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 15px; 
+        }
+
+        .edit-slider { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 5px; 
+        }
+
+        .edit-slider label { 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 0.85em; 
+            color: #cbd5e1; 
+            font-weight: bold; 
+            margin: 0;
+        }
+
+        .edit-slider input[type="range"] { 
+            width: 100%; 
+            accent-color: var(--highlight-yellow); 
+            margin: 5px 0;
+        }
+
+        .edit-slider select { 
+            width: 100%; 
+            padding: 8px; 
+            background: #334155; 
+            color: white; 
+            border: 1px solid #475569; 
+            border-radius: 6px; 
+            outline: none; 
+            font-size: 0.9em;
+        }
+
+        .hud-btn-close { 
+            background: transparent; 
+            border: none; 
+            color: white; 
+            font-size: 1.2em; 
+            cursor: pointer; 
+            padding: 5px;
+        }
+
+        .hud-action-row { 
+            display: flex; 
+            gap: 10px; 
+            margin-top: 15px; 
+            grid-column: 1 / -1;
+        }
+
+        .hud-action-row button { 
+            padding: 12px; 
+            font-size: 0.95em; 
+            flex: 1;
+            font-weight: bold;
+        }
+
+        .btn-save-edit {
+            background: var(--success-green);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* HUD DE PERSPECTIVA AR */
+        #perspectiveHUD { 
+            border-top: 2px solid var(--ai-blue); 
+        }
+
+        #perspectiveHUD h4 { 
+            color: var(--ai-blue); 
+        }
+
+        #perspectiveHUD input[type="range"] { 
+            accent-color: var(--ai-blue); 
+        }
+
+        /* TABELAS E AVISOS */
+        .table-responsive { 
+            overflow-x: auto; 
+            -webkit-overflow-scrolling: touch; 
+            margin-bottom: 20px; 
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 15px; 
+            background-color: white; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+        }
+
+        th, td { 
+            padding: 12px 15px; 
+            text-align: left; 
+            border-bottom: 1px solid var(--border-soft); 
+            font-size: 0.9em; 
+        }
+
+        th { 
+            background-color: var(--secondary-wood); 
+            color: white; 
+            font-weight: 600; 
+            white-space: nowrap; 
+        }
+
+        tr:hover { 
+            background-color: var(--soft-beige); 
+        }
+
+        #summary { 
+            margin-top: 40px; 
+            padding: 30px; 
+            background-color: var(--bg-summary); 
+            border-radius: var(--border-radius-soft); 
+            border: 1px solid #dccca0; 
+            text-align: center; 
+            box-shadow: inset 0 1px 5px rgba(0,0,0,0.03); 
+        }
+
+        #summary p { 
+            font-size: 1.6em; 
+            font-weight: 700; 
+            color: var(--primary-dark); 
+            margin: 15px 0; 
+        }
+
+        .ai-output-section { 
+            margin-top: 30px; 
+            padding: 25px; 
+            background-color: var(--bg-ai-section); 
+            border-radius: var(--border-radius-soft); 
+            border: 1px solid #B0D7B0; 
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); 
+        }
+
+        .ai-output-section h3 { 
+            color: var(--earth-green); 
+            text-align: left; 
+            font-size: 1.6em; 
+            border-bottom: none; 
+            padding-bottom: 0;
+        }
+
+        .description-box { 
+            background-color: var(--light-cream); 
+            padding: 18px; 
+            border-radius: var(--border-radius-soft); 
+            border: 1px solid var(--border-soft); 
+            white-space: pre-wrap; 
+            font-family: 'Roboto', monospace; 
+            font-size: 0.95em; 
+            color: var(--text-color); 
+            margin-top: 15px; 
+            min-height: 100px; 
+            line-height: 1.5; 
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); 
+        }
+
+        .api-config-section { 
+            background-color: var(--bg-light-panel); 
+            border: 1px solid var(--border-soft); 
+            border-radius: var(--border-radius-soft); 
+            padding: 20px; 
+            margin-bottom: 30px; 
+        }
+        
+        .error-message { 
+            background-color: #ffebee; 
+            border-left: 5px solid #f44336; 
+            padding: 15px; 
+            margin-top: 15px; 
+            border-radius: 5px; 
+            color: #c62828; 
+            font-size: 0.9em; 
+            display: none; 
+        }
+
+        .designer-insight { 
+            background-color: #e3f2fd; 
+            border-left: 5px solid #2196F3; 
+            padding: 15px; 
+            margin-top: 15px; 
+            border-radius: 4px; 
+            font-style: italic; 
+            color: #0d47a1; 
+            font-size: 0.95em; 
+        }
+
+        #imagePreviewContainer img { 
+            max-width: 100%; 
+            max-height: 250px; 
+            border-radius: 8px; 
+            border: 2px solid var(--border-soft); 
+            margin-top: 10px; 
+            display: none; 
+            object-fit: cover; 
+        }
+
+        /* RODAPÉ E BOTÕES FLUTUANTES */
+        footer { 
+            text-align: center; 
+            margin-top: 60px; 
+            padding: 25px; 
+            color: #777; 
+            font-size: 0.9em; 
+            border-top: 1px solid var(--border-soft); 
+            background-color: var(--bg-light-panel); 
+            border-radius: 0 0 var(--border-radius-soft) var(--border-radius-soft); 
+        }
+
+        .floating-buttons { 
+            position: fixed; 
+            bottom: 30px; 
+            right: 30px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            z-index: 1000; 
+        }
+
+        .floating-button { 
+            background-color: var(--secondary-wood); 
+            color: white; 
+            padding: 12px 20px; 
+            border-radius: 30px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
+            font-size: 1em; 
+            font-weight: 500; 
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            border: none; 
+            cursor: pointer; 
+        }
+
+        .floating-button:hover { 
+            transform: scale(1.05) translateY(-2px); 
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25); 
+            background-color: #6a4933; 
+        }
+
+        .floating-button.mascote { 
+            background-color: #FFC107; 
+            color: var(--primary-dark); 
+        }
+
+        .floating-button.mascote:hover { 
+            background-color: #e0a800; 
+        }
 
         @media (max-width: 768px) {
-            .container { margin: 20px 15px; padding: 20px; }
-            h1 { font-size: 2.2em; }
-            h2 { font-size: 1.6em; }
-            .grid-layout { grid-template-columns: 1fr; }
+            .container { 
+                margin: 20px 15px; 
+                padding: 20px; 
+            }
+            h1 { 
+                font-size: 2.2em; 
+            }
+            h2 { 
+                font-size: 1.6em; 
+            }
+            .grid-layout { 
+                grid-template-columns: 1fr; 
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🛠️ Gerador de Projetos e Orçamentos para Marcenaria</h1>
-        <p class="subtitle">Design CAD Profissional: Armários, Cozinhas, Balcões em L e Orçamentos Reais.</p>
+        <p class="subtitle">Design CAD Profissional: Controle Absoluto de Portas, Prateleiras e Formatos.</p>
 
         <!-- 1. Configuração -->
         <section id="apiConfigSection" class="api-config-section">
@@ -164,13 +687,15 @@
         <!-- 2. Pedido e Foto do Ambiente -->
         <section id="audioInputSection" class="section-panel">
             <h2 style="margin-top:0;"><i class="fas fa-microphone-alt"></i> Pedido do Cliente e Leitura do Espaço</h2>
-            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">Use áudio, texto ou foto. A IA vai entender se é um armário de parede ou um "Balcão em L com expositor de doces" e projetar fielmente.</p>
+            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">Use áudio, texto ou foto. A IA vai projetar, e você terá controle total para adicionar portas ou remover prateleiras.</p>
             
             <div class="grid-layout">
                 <div class="input-group">
                     <label><i class="fas fa-camera"></i> Foto da Cozinha/Ambiente (Opcional):</label>
                     <input type="file" id="imageFileInput" accept="image/*" onchange="previewEComprimirImagem(event)">
-                    <div id="imagePreviewContainer"><img id="previewImg" src="" alt="Sua Parede"></div>
+                    <div id="imagePreviewContainer">
+                        <img id="previewImg" src="" alt="Sua Parede">
+                    </div>
                 </div>
                 <div class="input-group">
                     <label><i class="fas fa-microphone-alt"></i> Carregar Áudio do Cliente:</label>
@@ -182,7 +707,9 @@
                 <label>O que vamos projetar? (Texto exato do pedido):</label>
                 <textarea id="transcribedTextDisplay" rows="4" placeholder="Ex: Quero um balcão em L para padaria, de madeira, com cantos curvos e prateleiras vazadas para colocar doces..."></textarea>
             </div>
+            
             <div id="errorDisplay" class="error-message"></div>
+            
             <div class="action-buttons">
                 <button id="processAudioBtn" class="primary" onclick="gerarProjeto()" style="width: 100%; font-size: 1.1em; padding: 15px;">
                     <i class="fas fa-hard-hat"></i> Analisar Foto/Texto e Gerar CAD 3D
@@ -215,6 +742,7 @@
 
                 <div id="container3DWrapper">
                     <img id="arBackgroundImage" class="ar-bg-image" src="" alt="Fundo AR">
+                    
                     <div id="visualizador3D"></div>
                     
                     <div id="info3D">Renderizando motor CAD paramétrico...</div>
@@ -222,83 +750,116 @@
                     
                     <!-- UIs Exclusivas do AR -->
                     <div id="arUITop" class="ar-ui-top">
-                        <button class="ar-ui-magic" onclick="abrirAjustePerspectiva()"><i class="fas fa-crop-alt"></i> Ajuste Fino de Parede</button>
-                        <button id="arCloseBtn" class="ar-ui-btn" onclick="alternarModoAR()"><i class="fas fa-times"></i> Fechar</button>
+                        <button class="ar-ui-magic" onclick="abrirAjustePerspectiva()">
+                            <i class="fas fa-crop-alt"></i> Ajuste Fino de Parede
+                        </button>
+                        <button id="arCloseBtn" class="ar-ui-btn" onclick="alternarModoAR()">
+                            <i class="fas fa-times"></i> Fechar
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- HUD DE EDIÇÃO DE MÓDULO (Bottom Sheet Ouro) -->
+            <!-- HUD DE EDIÇÃO DE MÓDULO (CENTRAL DE COMANDO MASTER) -->
             <div id="editHUD" class="edit-hud">
                 <div class="hud-drag-indicator"></div>
-                <h4><span id="hudTitle">Módulo</span> <button class="hud-btn-close" onclick="fecharEdicao()"><i class="fas fa-times-circle"></i></button></h4>
+                <h4>
+                    <span id="hudTitle">Módulo</span> 
+                    <button class="hud-btn-close" onclick="fecharEdicao()">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </h4>
                 
-                <div class="hud-grid">
+                <!-- Os controles organizados para celular com rolagem -->
+                <div class="hud-grid" style="margin-bottom: 15px;">
                     <div class="edit-slider" style="grid-column: 1 / -1;">
                         <label><span>📦 Tipo de Móvel</span></label>
                         <select id="selTipoMovel" onchange="atualizarModuloParametrico()">
-                            <option value="armario">Armário (Caixa Fechada)</option>
-                            <option value="balcao">Balcão Comercial (Tampo + Expositor)</option>
+                            <option value="armario">Armário de Parede/Cozinha</option>
+                            <option value="balcao">Balcão Comercial (Tampo Especial)</option>
                         </select>
                     </div>
+                    
                     <div class="edit-slider">
-                        <label><span>↔️ Larg. / Raio (mm)</span><span id="lblW"></span></label>
+                        <label><span>↔️ Largura (mm)</span><span id="lblW"></span></label>
                         <input type="range" id="sliderW" min="200" max="3000" step="10" oninput="atualizarModuloParametrico()">
                     </div>
+                    
                     <div class="edit-slider">
-                        <label><span>↕️ Alt. (mm)</span><span id="lblH"></span></label>
-                        <input type="range" id="sliderH" min="200" max="1500" step="10" oninput="atualizarModuloParametrico()">
+                        <label><span>↕️ Altura (mm)</span><span id="lblH"></span></label>
+                        <input type="range" id="sliderH" min="200" max="2500" step="10" oninput="atualizarModuloParametrico()">
                     </div>
+                    
                     <div class="edit-slider">
                         <label><span>↘️ Prof. (mm)</span><span id="lblD"></span></label>
                         <input type="range" id="sliderD" min="200" max="1000" step="10" oninput="atualizarModuloParametrico()">
                     </div>
+                    
                     <div class="edit-slider">
-                        <label><span>📚 Prateleiras Ext.</span><span id="lblPrat"></span></label>
-                        <input type="range" id="sliderPrat" min="0" max="8" step="1" oninput="atualizarModuloParametrico()">
+                        <label><span>📚 Prateleiras</span><span id="lblPrat"></span></label>
+                        <input type="range" id="sliderPrat" min="0" max="10" step="1" oninput="atualizarModuloParametrico()">
                     </div>
-                    <div class="edit-slider">
-                        <label><span>📐 Formato</span></label>
+                    
+                    <div class="edit-slider" style="grid-column: 1 / -1;">
+                        <label><span>📐 Formato da Peça</span></label>
                         <select id="selFormato" onchange="atualizarModuloParametrico()">
-                            <option value="reto">Reto (Padrão)</option>
-                            <option value="curvo">Curvo (Canto em L)</option>
+                            <option value="reto">Reto (Caixa Padrão)</option>
+                            <option value="curvo">Curvo (Canto Arredondado)</option>
                         </select>
                     </div>
-                    <div class="edit-slider">
-                        <label><span>🚪 Abertura</span></label>
+                    
+                    <div class="edit-slider" style="grid-column: 1 / -1; margin-bottom: 10px;">
+                        <label><span>🚪 Portas e Aberturas</span></label>
                         <select id="selPorta" onchange="atualizarModuloParametrico()">
-                            <option value="giro">Portas de Giro</option>
-                            <option value="basculante">Portas Basculantes</option>
-                            <option value="aberto">Aberto (Apenas Expositor)</option>
+                            <option value="aberto">Totalmente Aberto (Sem Portas)</option>
+                            <option value="giro">Com Portas de Giro (Laterais)</option>
+                            <option value="basculante">Com Portas Basculantes (Para Cima)</option>
                         </select>
                     </div>
                     
                     <div class="hud-action-row">
-                        <button class="primary" style="background: var(--success-green);" onclick="duplicarModuloParametrico()"><i class="fas fa-copy"></i> Duplicar</button>
-                        <button class="primary" style="background: var(--danger-red);" onclick="removerModuloParametrico()"><i class="fas fa-trash"></i> Excluir</button>
+                        <button class="primary" style="background: #2196F3;" onclick="duplicarModuloParametrico()">
+                            <i class="fas fa-copy"></i> Duplicar
+                        </button>
+                        <button class="primary" style="background: var(--danger-red);" onclick="removerModuloParametrico()">
+                            <i class="fas fa-trash"></i> Excluir
+                        </button>
                     </div>
                 </div>
+
+                <button class="btn-save-edit" onclick="fecharEdicao()">
+                    <i class="fas fa-save"></i> Salvar Edição no Projeto
+                </button>
             </div>
 
             <!-- HUD DE AJUSTE DE PERSPECTIVA -->
             <div id="perspectiveHUD" class="edit-hud" style="border-top: 2px solid var(--ai-blue);">
                 <div class="hud-drag-indicator"></div>
-                <h4><span style="color:var(--ai-blue);"><i class="fas fa-crop-alt"></i> Calibragem Manual AR</span> <button class="hud-btn-close" onclick="fecharPerspectiva()"><i class="fas fa-times-circle"></i></button></h4>
+                <h4>
+                    <span style="color:var(--ai-blue);"><i class="fas fa-crop-alt"></i> Calibragem Manual AR</span> 
+                    <button class="hud-btn-close" onclick="fecharPerspectiva()">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </h4>
                 
                 <p style="font-size:0.8em; color:#ccc; margin-top:0;">A IA já encontrou as coordenadas da foto. Use aqui para o refinamento fino do projeto real.</p>
 
                 <div class="edit-slider">
                     <label><span>Tamanho na Foto (Escala)</span></label>
-                    <input type="range" id="camScale" min="0.3" max="3.5" step="0.01" value="1.0" oninput="ajustarPerspectivaManual()">
+                    <input type="range" id="camScale" min="0.3" max="3.5" step="0.001" value="1.0" oninput="ajustarPerspectivaManual()">
                 </div>
                 <div class="edit-slider">
                     <label><span>Tombar Parede (Eixo X)</span></label>
-                    <input type="range" id="camRotX" min="-0.8" max="0.8" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
+                    <input type="range" id="camRotX" min="-0.8" max="0.8" step="0.001" value="0" oninput="ajustarPerspectivaManual()">
                 </div>
                 <div class="edit-slider">
                     <label><span>Girar Parede (Eixo Y)</span></label>
-                    <input type="range" id="camRotY" min="-0.8" max="0.8" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
+                    <input type="range" id="camRotY" min="-0.8" max="0.8" step="0.001" value="0" oninput="ajustarPerspectivaManual()">
                 </div>
+                
+                <button class="btn-save-edit" style="background: var(--ai-blue);" onclick="fecharPerspectiva()">
+                    <i class="fas fa-check"></i> Concluir Calibragem
+                </button>
             </div>
 
             <!-- Tabela de Corte Dinâmica -->
@@ -330,13 +891,35 @@
         <section id="addItemSection" class="section-panel">
             <h2><i class="fas fa-money-check-alt"></i> Precificação Final Ouro</h2>
             <div class="grid-layout">
-                <div class="input-group full-width"><label>Nome do Projeto:</label><input type="text" id="itemName" placeholder="Cozinha / Balcão Modular"></div>
-                <div class="input-group"><label>MDF, Granito e Chapas (R$):</label><input type="number" id="costMaterial" value="0" min="0" step="0.01"></div>
-                <div class="input-group"><label>Mão de Obra/Montagem (R$):</label><input type="number" id="costLabor" value="0" min="0" step="0.01"></div>
-                <div class="input-group"><label>Ferragens / Acabamentos (R$):</label><input type="number" id="costHardware" title="Pistões, Corrediças..." value="0" min="0" step="0.01"></div>
-                <div class="input-group"><label>Outros (Frete/LED) (R$):</label><input type="number" id="costOther" value="0" min="0" step="0.01"></div>
-                <div class="input-group"><label>Margem Desejada (%):</label><input type="number" id="profitMargin" value="35" min="0" max="100" step="1"></div>
-                <div class="input-group full-width action-buttons"><button class="primary" onclick="calcularTotal()"><i class="fas fa-calculator"></i> Recalcular Valor</button></div>
+                <div class="input-group full-width">
+                    <label>Nome do Projeto:</label>
+                    <input type="text" id="itemName" placeholder="Cozinha / Balcão Modular">
+                </div>
+                <div class="input-group">
+                    <label>MDF, Granito e Chapas (R$):</label>
+                    <input type="number" id="costMaterial" value="0" min="0" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Mão de Obra/Montagem (R$):</label>
+                    <input type="number" id="costLabor" value="0" min="0" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Ferragens / Acabamentos (R$):</label>
+                    <input type="number" id="costHardware" title="Pistões, Corrediças, Tampos..." value="0" min="0" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Outros (Frete/LED) (R$):</label>
+                    <input type="number" id="costOther" value="0" min="0" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Margem Desejada (%):</label>
+                    <input type="number" id="profitMargin" value="35" min="0" max="100" step="1">
+                </div>
+                <div class="input-group full-width action-buttons">
+                    <button class="primary" onclick="calcularTotal()">
+                        <i class="fas fa-calculator"></i> Recalcular Valor
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -350,40 +933,68 @@
     </div>
 
     <div class="floating-buttons">
-        <button class="floating-button mascote" onclick="mascoteFalar('Agora eu sou um Engenheiro Universal. Se você pedir um balcão comercial de doces curvo, eu farei o tampo superior, a frente sólida e prateleiras expostas arredondadas no 3D! Sem vício em cozinha quadrada!')">
+        <button class="floating-button mascote" onclick="mascoteFalar('Agora você tem controle total! Mude para aberto ou com portas, adicione quantas prateleiras quiser e salve as edições na hora. A tabela de cortes atualiza junto com o 3D!')">
             <i class="fas fa-headset"></i> <span>Arquiteto Universal</span>
         </button>
     </div>
 
     <footer>Powered by thIAguinho Soluções</footer>
 
-    <!-- SCRIPT MÁGICO - ENGENHARIA DE BALCÕES COMERCIAIS, CURVAS E AUTO-AR -->
+    <!-- SCRIPT MÁGICO - EXPANDIDO PARA MÁXIMA LEGIBILIDADE, MANUTENÇÃO E PODER TOTAL -->
     <script>
+        // ---------------------------------------------------------
+        // SETUP INICIAL E VARIÁVEIS GLOBAIS
+        // ---------------------------------------------------------
         let currentApiKey = localStorage.getItem('groqApiKeyLocal') || "";
-        if(currentApiKey) document.getElementById('apiKeyInput').value = currentApiKey;
+        
+        if (currentApiKey) {
+            document.getElementById('apiKeyInput').value = currentApiKey;
+        }
 
-        // ESTADO GLOBAL DO PROJETO
         let projetoGlobal = { 
-            modulos: [], design: null, instalacao: "chao", 
-            posicionamento_auto_ar: { escala: 1.0, pos_x: 0, pos_y: 0, rot_x: 0, rot_y: 0, rot_z: 0 } 
+            modulos: [], 
+            design: null, 
+            instalacao: "chao", 
+            posicionamento_auto_ar: { 
+                escala: 1.0, 
+                pos_x: 0, 
+                pos_y: 0, 
+                rot_x: 0, 
+                rot_y: 0, 
+                rot_z: 0 
+            } 
         };
+        
         let moduloSendoEditado = null; 
         let boxHelper = null; 
 
-        // VARIÁVEIS THREE.JS
-        let cena3D, camera3D, renderizador3D, controles3D;
+        // Variáveis do Motor 3D
+        let cena3D;
+        let camera3D;
+        let renderizador3D;
+        let controles3D;
         let motor3DIniciado = false;
-        let raycaster = new THREE.Raycaster(), mouse = new THREE.Vector2();
+        
+        let raycaster = new THREE.Raycaster();
+        let mouse = new THREE.Vector2();
         let objetosInterativos = [];
+        
         let grupoCozinha = null; 
         let rootNode = null; 
         
         let base64ImagemGlobal = null;
         let modoARAtivo = false;
 
-        let pressTimer; let startTouchX, startTouchY;
-        let isEditingMode = false; let isPerspectiveMode = false;
+        // Variáveis de Interação Touch
+        let pressTimer; 
+        let startTouchX;
+        let startTouchY;
+        let isEditingMode = false; 
+        let isPerspectiveMode = false;
 
+        // ---------------------------------------------------------
+        // FUNÇÕES UTILITÁRIAS E DE UI
+        // ---------------------------------------------------------
         function salvarChave() {
             currentApiKey = document.getElementById('apiKeyInput').value.trim();
             localStorage.setItem('groqApiKeyLocal', currentApiKey);
@@ -393,28 +1004,53 @@
         function mascoteFalar(texto) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel(); 
-                let f = new SpeechSynthesisUtterance(texto); f.lang = 'pt-BR'; window.speechSynthesis.speak(f);
+                let f = new SpeechSynthesisUtterance(texto); 
+                f.lang = 'pt-BR'; 
+                window.speechSynthesis.speak(f);
             }
         }
 
+        // ---------------------------------------------------------
+        // TRATAMENTO DE IMAGEM E ÁUDIO
+        // ---------------------------------------------------------
         function previewEComprimirImagem(event) {
             const file = event.target.files[0];
             if (!file) return;
+            
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1000; const MAX_HEIGHT = 1000;
-                    let width = img.width, height = img.height;
-                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
-                    else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
-                    canvas.width = width; canvas.height = height;
-                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+                    const MAX_WIDTH = 1000; 
+                    const MAX_HEIGHT = 1000;
+                    
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > height) { 
+                        if (width > MAX_WIDTH) { 
+                            height *= MAX_WIDTH / width; 
+                            width = MAX_WIDTH; 
+                        } 
+                    } else { 
+                        if (height > MAX_HEIGHT) { 
+                            width *= MAX_HEIGHT / height; 
+                            height = MAX_HEIGHT; 
+                        } 
+                    }
+                    
+                    canvas.width = width; 
+                    canvas.height = height;
+                    
+                    const ctx = canvas.getContext('2d'); 
+                    ctx.drawImage(img, 0, 0, width, height);
                     
                     base64ImagemGlobal = canvas.toDataURL('image/jpeg', 0.7);
+                    
                     const preview = document.getElementById('previewImg');
-                    preview.src = base64ImagemGlobal; preview.style.display = 'block';
+                    preview.src = base64ImagemGlobal; 
+                    preview.style.display = 'block';
                 }
                 img.src = e.target.result;
             }
@@ -423,167 +1059,301 @@
 
         document.getElementById('audioFileInput').addEventListener('change', async function(e) {
             const file = e.target.files[0];
+            
             if (!file || !currentApiKey) return;
+            
             document.getElementById('transcribedTextDisplay').value = "⏳ Transcrevendo...";
-            const formData = new FormData(); formData.append("file", file); formData.append("model", "whisper-large-v3");
+            
+            const formData = new FormData(); 
+            formData.append("file", file); 
+            formData.append("model", "whisper-large-v3");
+            
             try {
-                const res = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", { method: 'POST', headers: { "Authorization": `Bearer ${currentApiKey}` }, body: formData });
-                const json = await res.json(); document.getElementById('transcribedTextDisplay').value = json.text;
-            } catch (err) { alert("Erro ao ler áudio."); }
+                const res = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", { 
+                    method: 'POST', 
+                    headers: { "Authorization": `Bearer ${currentApiKey}` }, 
+                    body: formData 
+                });
+                
+                const json = await res.json(); 
+                document.getElementById('transcribedTextDisplay').value = json.text;
+                
+            } catch (err) { 
+                alert("Erro ao ler áudio."); 
+            }
         });
 
         function extrairJSONSeguro(texto) {
-            try { return JSON.parse(texto); } 
-            catch(e) {
+            try { 
+                return JSON.parse(texto); 
+            } catch(e) {
                 const match = texto.match(/\{[\s\S]*\}/);
-                if (match) return JSON.parse(match[0]);
-                throw new Error("Formato JSON inválido da IA.");
+                
+                if (match) {
+                    return JSON.parse(match[0]);
+                }
+                
+                throw new Error("Formato JSON inválido da Inteligência Artificial.");
             }
         }
 
-        // ==========================================
-        // PROMPT ARQUITETO COMERCIAL (Diferencia Balcão e Armário)
-        // ==========================================
+        // ---------------------------------------------------------
+        // O CÉREBRO PRINCIPAL DA IA (GERAÇÃO DE PROJETO)
+        // ---------------------------------------------------------
         async function gerarProjeto() {
             const txt = document.getElementById('transcribedTextDisplay').value.trim();
             const errorDiv = document.getElementById('errorDisplay');
             errorDiv.style.display = 'none';
 
-            if (!txt && !base64ImagemGlobal) return alert("Anexe a foto ou descreva o projeto.");
-            if (!currentApiKey) return alert("Cadastre a Chave da IA.");
+            if (!txt && !base64ImagemGlobal) {
+                alert("Anexe a foto do ambiente ou descreva o projeto.");
+                return;
+            }
+            
+            if (!currentApiKey) {
+                alert("Cadastre a Chave da IA nas configurações.");
+                return;
+            }
 
             const btn = document.getElementById('processAudioBtn');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> O Arquiteto Universal está projetando...';
             btn.disabled = true;
 
-            const promptComando = `Você é um Arquiteto CAD Sênior. Você sabe projetar QUALQUER TIPO de móvel (não apenas cozinhas).
-AJA COM VERDADE ABSOLUTA:
-1. IDENTIFIQUE A CATEGORIA (tipo_movel):
-   - Se o cliente pedir ou a foto mostrar um "Balcão", "Ilha", "Recepção", "Expositor de Doces", defina "tipo_movel": "balcao".
-   - Se for guarda-roupa, estante, cozinha superior, defina "tipo_movel": "armario".
-2. CURVAS E FORMATOS (formato): Se pedirem um "Canto curvo" ou "Balcão em L com canto arredondado", defina "formato": "curvo" na peça que faz a curva. Senão, "reto".
-3. PRATELEIRAS EXPOSITORAS (tipo_abertura): Se for um expositor de doces de padaria, a frente não tem porta, tem prateleiras expostas. Defina "tipo_abertura": "aberto" e "expositor_frontal": true.
-4. CORES HEXADECIMAIS: Siga EXATAMENTE a cor pedida (ex: Azul = #1c3144). Se pedir tampo de granito, gere a cor do granito (ex: Preto = #111).
-5. FOTOGRAMETRIA (MATCH PHOTO): Se enviou foto, avalie a escala, posX, posY e rotações para que o 3D tampe perfeitamente o ambiente.
+            const promptComando = `Você é um Arquiteto CAD Sênior. Você projeta QUALQUER TIPO de móvel.
+            AJA COM VERDADE ABSOLUTA:
+            1. IDENTIFIQUE A CATEGORIA (tipo_movel):
+               - Se o cliente pedir ou a foto mostrar um "Balcão", "Ilha", "Recepção", "Expositor de Doces", defina "tipo_movel": "balcao".
+               - Se for guarda-roupa, estante, armário de parede, cozinha, defina "tipo_movel": "armario".
+            2. CURVAS E FORMATOS (formato): Se pedirem "Canto curvo" ou "Balcão em L com canto arredondado", defina "formato": "curvo". Senão, "reto".
+            3. PORTAS E ABERTURAS (tipo_abertura): 
+               - Se for prateleiras abertas (expositor), defina "tipo_abertura": "aberto" e "portas": 0.
+               - Se for armário fechado padrão, defina "tipo_abertura": "giro" e "portas": 2.
+               - Se for armário aéreo que abre para cima, defina "tipo_abertura": "basculante" e "portas": 1.
+            4. CORES HEXADECIMAIS: Siga EXATAMENTE a cor pedida (ex: Azul = #1c3144). 
+            5. FOTOGRAMETRIA (MATCH PHOTO): Avalie a escala, posX, posY e rotações para que o 3D tampe perfeitamente o ambiente da foto.
 
-JSON ESTRITO DE RESPOSTA (Siga este modelo):
-{
-  "nome_projeto": "Balcão Comercial Padaria",
-  "engenharia": "Identifiquei o pedido de um balcão comercial curvo para doces. Adicionei tampo reforçado e prateleiras frontais expostas.",
-  "design": { "cor_caixa": "#DDA15E", "cor_tampo": "#222222", "material_nome": "MDF Carvalho e Tampo Granito São Gabriel" },
-  "posicionamento_auto_ar": { "escala": 1.0, "pos_x": 0.0, "pos_y": -0.5, "rot_x": 0.0, "rot_y": 0.0, "rot_z": 0.0 },
-  "instalacao": "chao", 
-  "modulos": [
-    { "nome": "Balcão Reto", "tipo_movel": "balcao", "expositor_frontal": true, "largura": 1200, "altura": 1100, "profundidade": 500, "tipo_abertura": "aberto", "prateleiras": 3, "formato": "reto", "pos_x": 0, "pos_z": 0, "rot_y": 0 },
-    { "nome": "Canto Curvo L", "tipo_movel": "balcao", "expositor_frontal": true, "largura": 600, "altura": 1100, "profundidade": 600, "tipo_abertura": "aberto", "prateleiras": 3, "formato": "curvo", "pos_x": 900, "pos_z": 300, "rot_y": -90 }
-  ],
-  "custos": {"material": 1800, "mao_de_obra": 800, "ferragens": 100, "outros": 300}
-}`;
+            JSON ESTRITO DE RESPOSTA:
+            {
+              "nome_projeto": "Balcão Comercial Padaria",
+              "engenharia": "Identifiquei o balcão. Apliquei formato curvo no canto e mantive as prateleiras abertas para exposição.",
+              "design": { "cor_caixa": "#DDA15E", "cor_tampo": "#222222", "material_nome": "MDF Carvalho" },
+              "posicionamento_auto_ar": { "escala": 1.0, "pos_x": 0.0, "pos_y": -0.5, "rot_x": 0.0, "rot_y": 0.0, "rot_z": 0.0 },
+              "instalacao": "chao", 
+              "modulos": [
+                { "nome": "Balcão Reto", "tipo_movel": "balcao", "largura": 1200, "altura": 1100, "profundidade": 500, "tipo_abertura": "aberto", "portas": 0, "prateleiras": 3, "formato": "reto", "pos_x": 0, "pos_z": 0, "rot_y": 0 },
+                { "nome": "Canto Curvo L", "tipo_movel": "balcao", "largura": 600, "altura": 1100, "profundidade": 600, "tipo_abertura": "aberto", "portas": 0, "prateleiras": 3, "formato": "curvo", "pos_x": 900, "pos_z": 300, "rot_y": -90 }
+              ],
+              "custos": {"material": 1800, "mao_de_obra": 800, "ferragens": 100, "outros": 300}
+            }`;
 
-            let mensagens = base64ImagemGlobal ? 
-                [{ role: "user", content: [{ type: "text", text: `Pedido:\n${txt}\n\n${promptComando}` }, { type: "image_url", image_url: { url: base64ImagemGlobal } }] }] : 
-                [{ role: "user", content: `Pedido:\n${txt}\n\n${promptComando}` }];
+            let mensagens;
+            if (base64ImagemGlobal) {
+                mensagens = [
+                    { 
+                        role: "user", 
+                        content: [
+                            { type: "text", text: `Pedido:\n${txt}\n\n${promptComando}` }, 
+                            { type: "image_url", image_url: { url: base64ImagemGlobal } }
+                        ] 
+                    }
+                ];
+            } else {
+                mensagens = [
+                    { 
+                        role: "user", 
+                        content: `Pedido:\n${txt}\n\n${promptComando}` 
+                    }
+                ];
+            }
 
             try {
                 const url = "https://api.groq.com/openai/v1/chat/completions";
                 let modelo = base64ImagemGlobal ? "llama-3.2-11b-vision-preview" : "llama-3.3-70b-versatile";
                 
                 let res = await fetch(url, {
-                    method: 'POST', headers: { "Authorization": `Bearer ${currentApiKey}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({ model: modelo, messages: mensagens, temperature: 0.1 })
+                    method: 'POST', 
+                    headers: { 
+                        "Authorization": `Bearer ${currentApiKey}`, 
+                        "Content-Type": "application/json" 
+                    },
+                    body: JSON.stringify({ 
+                        model: modelo, 
+                        messages: mensagens, 
+                        temperature: 0.1 
+                    })
                 });
 
                 let dados = await res.json();
+                
                 if (!res.ok) {
-                    if(base64ImagemGlobal) {
-                        mensagens = [{ role: "user", content: `Pedido:\n${txt}\n\n${promptComando}` }];
-                        res = await fetch(url, { method: 'POST', headers: { "Authorization": `Bearer ${currentApiKey}`, "Content-Type": "application/json" }, body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: mensagens, temperature: 0.1, response_format: { type: "json_object" } }) });
+                    if (base64ImagemGlobal) {
+                        mensagens = [
+                            { 
+                                role: "user", 
+                                content: `Pedido:\n${txt}\n\n${promptComando}` 
+                            }
+                        ];
+                        
+                        res = await fetch(url, { 
+                            method: 'POST', 
+                            headers: { 
+                                "Authorization": `Bearer ${currentApiKey}`, 
+                                "Content-Type": "application/json" 
+                            }, 
+                            body: JSON.stringify({ 
+                                model: "llama-3.3-70b-versatile", 
+                                messages: mensagens, 
+                                temperature: 0.1, 
+                                response_format: { type: "json_object" } 
+                            }) 
+                        });
+                        
                         dados = await res.json();
-                        if(!res.ok) throw new Error(dados.error?.message || "Erro API.");
-                    } else { throw new Error(dados.error?.message || "Erro API."); }
+                        
+                        if (!res.ok) {
+                            throw new Error(dados.error?.message || "Erro fatal na API da IA.");
+                        }
+                    } else { 
+                        throw new Error(dados.error?.message || "Erro na API da IA."); 
+                    }
                 }
 
                 const ia = extrairJSONSeguro(dados.choices[0].message.content);
+                
                 projetoGlobal.modulos = ia.modulos || [];
-                projetoGlobal.design = ia.design || { cor_caixa:"#FDFCF9", cor_tampo:"#333333", material_nome:"MDF Padrão" }; 
+                
+                projetoGlobal.design = ia.design || { 
+                    cor_caixa: "#FDFCF9", 
+                    cor_tampo: "#333333", 
+                    material_nome: "MDF Padrão" 
+                }; 
+                
                 projetoGlobal.instalacao = ia.instalacao || "chao";
-                projetoGlobal.posicionamento_auto_ar = ia.posicionamento_auto_ar || { escala: 1.0, pos_x: 0, pos_y: 0, rot_x: 0, rot_y: 0, rot_z: 0 };
+                
+                projetoGlobal.posicionamento_auto_ar = ia.posicionamento_auto_ar || { 
+                    escala: 1.0, 
+                    pos_x: 0, 
+                    pos_y: 0, 
+                    rot_x: 0, 
+                    rot_y: 0, 
+                    rot_z: 0 
+                };
 
                 document.getElementById('aiDesignSection').style.display = 'block';
                 document.getElementById('designerInsight').style.display = 'block';
                 document.getElementById('textoDesigner').innerText = ia.engenharia + " (Material: " + projetoGlobal.design.material_nome + ")";
-
                 document.getElementById('itemName').value = ia.nome_projeto || "Projeto CAD Customizado";
-                if(ia.custos) {
-                    document.getElementById('costMaterial').value = ia.custos.material||0;
-                    document.getElementById('costLabor').value = ia.custos.mao_de_obra||0;
-                    document.getElementById('costHardware').value = ia.custos.ferragens||0;
-                    document.getElementById('costOther').value = ia.custos.outros||0;
+                
+                if (ia.custos) {
+                    document.getElementById('costMaterial').value = ia.custos.material || 0;
+                    document.getElementById('costLabor').value = ia.custos.mao_de_obra || 0;
+                    document.getElementById('costHardware').value = ia.custos.ferragens || 0;
+                    document.getElementById('costOther').value = ia.custos.outros || 0;
                     calcularTotal();
                 }
 
-                if (!motor3DIniciado) { init3D(); motor3DIniciado = true; }
+                if (!motor3DIniciado) { 
+                    init3D(); 
+                    motor3DIniciado = true; 
+                }
+                
                 setTimeout(() => {
-                    fecharEdicao(); fecharPerspectiva();
+                    fecharEdicao(); 
+                    fecharPerspectiva();
                     reconstruirCenaParametrica(); 
                     
-                    document.getElementById('btnAR').style.display = base64ImagemGlobal ? 'inline-flex' : 'none';
-                    if(modoARAtivo) alternarModoAR(); 
+                    if (base64ImagemGlobal) {
+                        document.getElementById('btnAR').style.display = 'inline-flex';
+                    } else {
+                        document.getElementById('btnAR').style.display = 'none';
+                    }
+                    
+                    if (modoARAtivo) {
+                        alternarModoAR(); 
+                    }
                 }, 150);
 
             } catch(e) { 
-                errorDiv.innerHTML = `<strong>Erro:</strong> ${e.message}`; errorDiv.style.display = 'block'; 
+                errorDiv.innerHTML = `<strong>Erro:</strong> ${e.message}`; 
+                errorDiv.style.display = 'block'; 
             } finally { 
-                btn.innerHTML = '<i class="fas fa-ruler-combined"></i> Analisar Foto/Texto e Gerar CAD 3D'; btn.disabled = false; 
+                btn.innerHTML = '<i class="fas fa-ruler-combined"></i> Analisar Foto/Texto e Gerar CAD 3D'; 
+                btn.disabled = false; 
             }
         }
 
-        // ==========================================
-        // CÁLCULO DE PLANO DE CORTE DINÂMICO
-        // ==========================================
+        // ---------------------------------------------------------
+        // MATEMÁTICA DO PLANO DE CORTE
+        // ---------------------------------------------------------
         function calcularPlanoDeCorteRealTime() {
             const tbody = document.getElementById('tabelaPlanoCorteDin');
             tbody.innerHTML = '';
-            let custoMatExato = 0; let custoFerExato = 0;
+            
+            let custoMatExato = 0; 
+            let custoFerExato = 0;
+            
             const mat = projetoGlobal.design.material_nome;
             const E = 18; 
 
             projetoGlobal.modulos.forEach((m, idx) => {
-                const W = Math.round(m.largura), H = Math.round(m.altura), D = Math.round(m.profundidade);
+                const W = Math.round(m.largura);
+                const H = Math.round(m.altura);
+                const D = Math.round(m.profundidade);
+                
                 const prat = m.prateleiras || 0;
                 const isBalcao = m.tipo_movel === 'balcao';
 
                 if (m.formato === 'curvo') {
-                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Frente Curva (Raio)</td><td>1</td><td>R: ${W}</td><td>Alt: ${H}</td><td>${mat}</td></tr>`;
-                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Tampo Curvo</td><td>1</td><td>R: ${W}</td><td>-</td><td>Tampo</td></tr>`;
-                    if(prat > 0) tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras Curvas</td><td>${prat}</td><td>R: ${W}</td><td>-</td><td>${mat}</td></tr>`;
-                    custoMatExato += (((W * W * (Math.PI/4)) * (prat+2)) / 1000000) * 120; // Mais caro por ser curvo
-                } else {
-                    // Reto
-                    if(isBalcao) {
-                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Frente Balcão</td><td>1</td><td>${W}</td><td>${H}</td><td style="color:var(--ai-blue);">${mat}</td></tr>`;
-                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Tampo Atendimento</td><td>1</td><td>${W}</td><td>${D + 50}</td><td>Granito/Madeira</td></tr>`;
+                    
+                    if (m.tipo_abertura === 'aberto') {
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Base/Tampo Curvos</td><td>2</td><td>Raio ${W}</td><td>-</td><td>${mat}</td></tr>`;
+                        if (prat > 0) {
+                            tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras Curvas</td><td>${prat}</td><td>Raio ${W}</td><td>-</td><td>${mat}</td></tr>`;
+                        }
                     } else {
-                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Base/Tampo</td><td>2</td><td>${W}</td><td>${D}</td><td>MDF Base</td></tr>`;
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Base/Tampo Curvos</td><td>2</td><td>Raio ${W}</td><td>-</td><td>${mat}</td></tr>`;
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Porta Frontal Curva</td><td>1</td><td>Raio ${W}</td><td>Alt: ${H}</td><td style="color:var(--ai-blue);">${mat}</td></tr>`;
+                        if (prat > 0) {
+                            tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras Internas Curvas</td><td>${prat}</td><td>Raio ${W}</td><td>-</td><td>${mat}</td></tr>`;
+                        }
+                    }
+                    
+                    custoMatExato += (((W * W * (Math.PI/4)) * (prat + 2)) / 1000000) * 120; 
+                
+                } else {
+                    
+                    if (isBalcao) {
+                        if (m.tipo_abertura !== 'aberto') {
+                            tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Fundo Balcão Fechado</td><td>1</td><td>${W}</td><td>${H}</td><td style="color:var(--ai-blue);">${mat}</td></tr>`;
+                        }
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Tampo de Atendimento</td><td>1</td><td>${W}</td><td>${D + 50}</td><td>Granito/Pedra</td></tr>`;
+                    } else {
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Base e Tampo do Armário</td><td>2</td><td>${W}</td><td>${D}</td><td>MDF Base</td></tr>`;
                     }
                     
                     tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Laterais Estruturais</td><td>2</td><td>${H}</td><td>${D}</td><td>MDF Base</td></tr>`;
                     
+                    let HPorta = m.tem_nicho_aberto ? H - (m.altura_nicho || 0) : H;
+                    
                     if (m.tipo_abertura !== 'aberto' && m.portas > 0) {
                         let wPorta = Math.round(W / m.portas);
                         let nomePorta = m.tipo_abertura === 'basculante' ? 'Porta Basculante' : 'Porta de Giro';
+                        
                         tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> ${nomePorta}</td><td>${m.portas}</td><td>${wPorta}</td><td>${H}</td><td style="color:var(--ai-blue); font-weight:bold;">${mat}</td></tr>`;
-                        if(m.tipo_abertura === 'basculante') custoFerExato += m.portas * 2 * 25; 
-                        else custoFerExato += m.portas * 2 * 5; 
+                        
+                        if (m.tipo_abertura === 'basculante') {
+                            custoFerExato += m.portas * 2 * 25; 
+                        } else {
+                            custoFerExato += m.portas * 2 * 5; 
+                        }
                     }
                     
-                    if(prat > 0) {
-                        let profP = isBalcao ? 250 : (D - E - 10); // Prateleira de balcão é mais rasa
-                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras/Expositores</td><td>${prat}</td><td>${W - E*2}</td><td>${profP}</td><td>${mat}</td></tr>`;
+                    if (prat > 0) {
+                        let profP = isBalcao ? 250 : (D - E - 10); 
+                        tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras</td><td>${prat}</td><td>${W - E*2}</td><td>${profP}</td><td>${mat}</td></tr>`;
                         custoMatExato += (((W - E*2) * profP * prat) / 1000000) * 80;
                     }
                     
-                    // Cálculo de área geral bruta
                     custoMatExato += (((W*D*2) + (H*D*2) + (W*H)) / 1000000) * 80;
                 }
             });
@@ -593,19 +1363,29 @@ JSON ESTRITO DE RESPOSTA (Siga este modelo):
             calcularTotal();
         }
 
-        // ==========================================
-        // MOTOR 3D: CÂMERA ANTI-CLIPPING ABSOLUTA
-        // ==========================================
+        // ---------------------------------------------------------
+        // INICIALIZAÇÃO DO THREE.JS (CÂMERA ANTI-CLIPPING)
+        // ---------------------------------------------------------
         function init3D() {
             const container = document.getElementById('visualizador3D');
             const wrapper = document.getElementById('container3DWrapper');
-            cena3D = new THREE.Scene(); cena3D.background = null;
+            
+            cena3D = new THREE.Scene(); 
+            cena3D.background = null; 
 
-            cena3D.add(new THREE.AmbientLight(0xffffff, 0.8));
-            const luz = new THREE.DirectionalLight(0xffffff, 0.8); luz.position.set(5, 10, 8); cena3D.add(luz);
-            const luz2 = new THREE.DirectionalLight(0xDDA15E, 0.4); luz2.position.set(-5, 0, -5); cena3D.add(luz2);
+            const luzAmbiente = new THREE.AmbientLight(0xffffff, 0.8);
+            cena3D.add(luzAmbiente);
+            
+            const luz1 = new THREE.DirectionalLight(0xffffff, 0.8); 
+            luz1.position.set(5, 10, 8); 
+            cena3D.add(luz1);
+            
+            const luz2 = new THREE.DirectionalLight(0xDDA15E, 0.4); 
+            luz2.position.set(-5, 0, -5); 
+            cena3D.add(luz2);
 
-            camera3D = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 0.1, 10000);
+            // ANTI-CLIPPING ABSOLUTO: near 0.001 e far 50000 garante que a câmera nunca corta o móvel
+            camera3D = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 0.001, 50000);
             
             renderizador3D = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderizador3D.setClearColor( 0x000000, 0 ); 
@@ -613,9 +1393,10 @@ JSON ESTRITO DE RESPOSTA (Siga este modelo):
             renderizador3D.setSize(wrapper.clientWidth, wrapper.clientHeight);
             container.appendChild(renderizador3D.domElement);
 
-            controles3D = new THREE.OrbitControls(camera3D, renderizador3D.domElement);
-            controles3D.enableDamping = true; controles3D.dampingFactor = 0.05;
-            controles3D.maxDistance = 5000; 
+            controles3D = new OrbitControls(camera3D, renderizador3D.domElement);
+            controles3D.enableDamping = true; 
+            controles3D.dampingFactor = 0.05;
+            controles3D.maxDistance = 10000; 
 
             rootNode = new THREE.Group();
             cena3D.add(rootNode);
@@ -626,113 +1407,174 @@ JSON ESTRITO DE RESPOSTA (Siga este modelo):
 
             function animar() {
                 requestAnimationFrame(animar);
+                
                 if (grupoCozinha) {
                     grupoCozinha.children.forEach(mod => {
                         mod.children.forEach(f => {
                             if (!f.userData || !f.userData.animavel) return;
+                            
                             const d = f.userData;
-                            if (d.tipo === 'giro') f.rotation.y += ((d.aberto ? d.rotAbre : 0) - f.rotation.y) * 0.1;
-                            if (d.tipo === 'basculante') f.rotation.x += ((d.aberto ? d.rotAbre : 0) - f.rotation.x) * 0.1;
+                            
+                            if (d.tipo === 'giro') {
+                                f.rotation.y += ((d.aberto ? d.rotAbre : 0) - f.rotation.y) * 0.1;
+                            }
+                            if (d.tipo === 'basculante') {
+                                f.rotation.x += ((d.aberto ? d.rotAbre : 0) - f.rotation.x) * 0.1;
+                            }
                         });
                     });
                 }
-                if (boxHelper) boxHelper.update();
-                controles3D.update(); renderizador3D.render(cena3D, camera3D);
+                
+                if (boxHelper) {
+                    boxHelper.update();
+                }
+                
+                controles3D.update(); 
+                renderizador3D.render(cena3D, camera3D);
             }
-            animar(); window.addEventListener('resize', ajustarTamanho3D);
+            
+            animar(); 
+            window.addEventListener('resize', ajustarTamanho3D);
         }
 
         function ajustarTamanho3D() {
             const w = document.getElementById('container3DWrapper');
-            if(!camera3D || w.clientWidth === 0) return;
-            camera3D.aspect = w.clientWidth / w.clientHeight; camera3D.updateProjectionMatrix();
+            
+            if (!camera3D || w.clientWidth === 0) return;
+            
+            camera3D.aspect = w.clientWidth / w.clientHeight; 
+            camera3D.updateProjectionMatrix();
             renderizador3D.setSize(w.clientWidth, w.clientHeight);
         }
 
-        // ==========================================
-        // DETECÇÃO DE TOQUE E LONG PRESS
-        // ==========================================
+        // ---------------------------------------------------------
+        // MÁQUINA DE TOQUE (CLIQUE SIMPLES E PRESSIONAMENTO LONGO)
+        // ---------------------------------------------------------
         function getIntersectedModulo(event) {
             const rect = renderizador3D.domElement.getBoundingClientRect();
             mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
             mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            
             raycaster.setFromCamera(mouse, camera3D);
             const intersects = raycaster.intersectObjects(objetosInterativos, false);
+            
             if (intersects.length > 0) {
                 let obj = intersects[0].object;
-                while(obj.parent && obj.parent !== grupoCozinha) {
-                    if(obj.userData && obj.userData.isModulo) return obj;
+                
+                while (obj.parent && obj.parent !== grupoCozinha) {
+                    if (obj.userData && obj.userData.isModulo) {
+                        return obj;
+                    }
                     obj = obj.parent;
                 }
-                if(obj.userData && obj.userData.isModulo) return obj;
+                
+                if (obj.userData && obj.userData.isModulo) {
+                    return obj;
+                }
             }
             return null;
         }
 
         function onPointerDown(event) {
-            startTouchX = event.clientX; startTouchY = event.clientY;
+            startTouchX = event.clientX; 
+            startTouchY = event.clientY;
+            
             const moduloTocado = getIntersectedModulo(event);
+            
             if (moduloTocado) {
-                pressTimer = setTimeout(() => { ativarEdicaoModulo(moduloTocado.userData.modIndex); }, 500);
+                pressTimer = setTimeout(() => { 
+                    ativarEdicaoModulo(moduloTocado.userData.modIndex); 
+                }, 500);
             }
         }
+        
         function onPointerMove(event) {
-            if (Math.abs(event.clientX - startTouchX) > 10 || Math.abs(event.clientY - startTouchY) > 10) clearTimeout(pressTimer);
+            if (Math.abs(event.clientX - startTouchX) > 10 || Math.abs(event.clientY - startTouchY) > 10) {
+                clearTimeout(pressTimer);
+            }
         }
+        
         function onPointerUp(event) {
             clearTimeout(pressTimer);
+            
             if (Math.abs(event.clientX - startTouchX) < 10 && Math.abs(event.clientY - startTouchY) < 10) {
-                if(!isEditingMode && !isPerspectiveMode) {
+                if (!isEditingMode && !isPerspectiveMode) {
                     const rect = renderizador3D.domElement.getBoundingClientRect();
                     mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
                     mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+                    
                     raycaster.setFromCamera(mouse, camera3D);
                     const intersects = raycaster.intersectObjects(objetosInterativos, false);
+                    
                     if (intersects.length > 0) {
                         const grp = intersects[0].object.userData.grupoPai;
-                        if (grp) grp.userData.aberto = !grp.userData.aberto;
+                        if (grp) {
+                            grp.userData.aberto = !grp.userData.aberto;
+                        }
                     }
                 }
             }
         }
 
-        // ==========================================
-        // FLUXO DE EDIÇÃO BOTTOM SHEET 
-        // ==========================================
+        // ---------------------------------------------------------
+        // FLUXO DE EDIÇÃO NA TELA (CENTRAL DE COMANDO HUD)
+        // ---------------------------------------------------------
         function ativarEdicaoModulo(index) {
             fecharPerspectiva(); 
-            isEditingMode = true; moduloSendoEditado = index; controles3D.enabled = false; 
+            isEditingMode = true; 
+            moduloSendoEditado = index; 
+            controles3D.enabled = false; 
+            
             const modObj = projetoGlobal.modulos[index];
             
             document.getElementById('hudTitle').innerText = modObj.nome || `Módulo ${index+1}`;
             document.getElementById('selTipoMovel').value = modObj.tipo_movel || 'armario';
-            document.getElementById('sliderW').value = modObj.largura; document.getElementById('lblW').innerText = Math.round(modObj.largura);
-            document.getElementById('sliderH').value = modObj.altura; document.getElementById('lblH').innerText = Math.round(modObj.altura);
-            document.getElementById('sliderD').value = modObj.profundidade; document.getElementById('lblD').innerText = Math.round(modObj.profundidade);
+            document.getElementById('sliderW').value = modObj.largura; 
+            document.getElementById('lblW').innerText = Math.round(modObj.largura);
+            document.getElementById('sliderH').value = modObj.altura; 
+            document.getElementById('lblH').innerText = Math.round(modObj.altura);
+            document.getElementById('sliderD').value = modObj.profundidade; 
+            document.getElementById('lblD').innerText = Math.round(modObj.profundidade);
             document.getElementById('selPorta').value = modObj.tipo_abertura || 'giro';
             document.getElementById('selFormato').value = modObj.formato || 'reto';
-            document.getElementById('sliderPrat').value = modObj.prateleiras || 0; document.getElementById('lblPrat').innerText = modObj.prateleiras || 0;
+            document.getElementById('sliderPrat').value = modObj.prateleiras || 0; 
+            document.getElementById('lblPrat').innerText = modObj.prateleiras || 0;
             
             const hud = document.getElementById('editHUD');
-            hud.style.display = 'flex'; setTimeout(() => hud.classList.add('show'), 10);
+            hud.style.display = 'flex'; 
+            
+            setTimeout(() => {
+                hud.classList.add('show')
+            }, 10);
+            
             destacarModuloVisualmente(index);
 
-            if(modoARAtivo) {
+            if (modoARAtivo) {
                 document.getElementById('container3DWrapper').classList.add('hud-open');
                 setTimeout(ajustarTamanho3D, 300); 
             }
         }
 
         function fecharEdicao() {
-            if(!isEditingMode) return;
-            isEditingMode = false; moduloSendoEditado = null; controles3D.enabled = true; 
+            if (!isEditingMode) return;
+            
+            isEditingMode = false; 
+            moduloSendoEditado = null; 
+            controles3D.enabled = true; 
             
             const hud = document.getElementById('editHUD');
             hud.classList.remove('show');
-            setTimeout(() => hud.style.display = 'none', 300);
-            if (boxHelper) { cena3D.remove(boxHelper); boxHelper = null; }
+            
+            setTimeout(() => {
+                hud.style.display = 'none'
+            }, 300);
+            
+            if (boxHelper) { 
+                cena3D.remove(boxHelper); 
+                boxHelper = null; 
+            }
 
-            if(modoARAtivo) {
+            if (modoARAtivo) {
                 document.getElementById('container3DWrapper').classList.remove('hud-open');
                 setTimeout(ajustarTamanho3D, 300);
             }
@@ -740,6 +1582,7 @@ JSON ESTRITO DE RESPOSTA (Siga este modelo):
 
         function atualizarModuloParametrico() {
             if (moduloSendoEditado === null) return;
+            
             const w = parseFloat(document.getElementById('sliderW').value);
             const h = parseFloat(document.getElementById('sliderH').value);
             const d = parseFloat(document.getElementById('sliderD').value);
@@ -748,18 +1591,29 @@ JSON ESTRITO DE RESPOSTA (Siga este modelo):
             const tipo_movel = document.getElementById('selTipoMovel').value;
             const prat = parseInt(document.getElementById('sliderPrat').value);
             
-            document.getElementById('lblW').innerText = w; document.getElementById('lblH').innerText = h;
-            document.getElementById('lblD').innerText = d; document.getElementById('lblPrat').innerText = prat;
+            document.getElementById('lblW').innerText = w; 
+            document.getElementById('lblH').innerText = h;
+            document.getElementById('lblD').innerText = d; 
+            document.getElementById('lblPrat').innerText = prat;
 
             projetoGlobal.modulos[moduloSendoEditado].largura = w;
             projetoGlobal.modulos[moduloSendoEditado].altura = h;
             projetoGlobal.modulos[moduloSendoEditado].profundidade = d;
+            
+            // O SEGREDO DO CONTROLE TOTAL: Aqui a propriedade de porta é alterada na raiz do módulo
             projetoGlobal.modulos[moduloSendoEditado].tipo_abertura = porta;
+            
+            if (porta === 'aberto') {
+                projetoGlobal.modulos[moduloSendoEditado].portas = 0;
+            } else if (porta === 'basculante') {
+                projetoGlobal.modulos[moduloSendoEditado].portas = 1;
+            } else {
+                projetoGlobal.modulos[moduloSendoEditado].portas = 2; // Giro padrão
+            }
+
             projetoGlobal.modulos[moduloSendoEditado].formato = formato;
             projetoGlobal.modulos[moduloSendoEditado].tipo_movel = tipo_movel;
             projetoGlobal.modulos[moduloSendoEditado].prateleiras = prat;
-            // Se for comercial aberto, ativa expositor
-            projetoGlobal.modulos[moduloSendoEditado].expositor_frontal = (porta === "aberto" && tipo_movel === "balcao");
 
             reconstruirCenaParametrica();
             destacarModuloVisualmente(moduloSendoEditado);
@@ -767,114 +1621,194 @@ JSON ESTRITO DE RESPOSTA (Siga este modelo):
 
         function duplicarModuloParametrico() {
             if (moduloSendoEditado === null) return;
+            
             const novoMod = JSON.parse(JSON.stringify(projetoGlobal.modulos[moduloSendoEditado]));
             novoMod.nome = novoMod.nome + " (Cópia)";
-            // Se tinha pos fixa, limpa para não renderizar um dentro do outro
-            novoMod.pos_x = undefined; novoMod.pos_z = undefined;
+            
+            novoMod.pos_x = undefined; 
+            novoMod.pos_z = undefined;
             
             projetoGlobal.modulos.splice(moduloSendoEditado + 1, 0, novoMod);
-            fecharEdicao(); reconstruirCenaParametrica();
+            
+            fecharEdicao(); 
+            reconstruirCenaParametrica();
         }
 
         function removerModuloParametrico() {
             if (moduloSendoEditado === null) return;
+            
             projetoGlobal.modulos.splice(moduloSendoEditado, 1);
-            fecharEdicao(); reconstruirCenaParametrica();
+            
+            fecharEdicao(); 
+            reconstruirCenaParametrica();
         }
 
         function destacarModuloVisualmente(index) {
-            if (boxHelper) { cena3D.remove(boxHelper); boxHelper = null; }
+            if (boxHelper) { 
+                cena3D.remove(boxHelper); 
+                boxHelper = null; 
+            }
+            
             const targetMod = grupoCozinha.children.find(c => c.userData.modIndex === index);
-            if(targetMod) { boxHelper = new THREE.BoxHelper(targetMod, 0xffeb3b); cena3D.add(boxHelper); }
+            
+            if (targetMod) { 
+                boxHelper = new THREE.BoxHelper(targetMod, 0xffeb3b); 
+                cena3D.add(boxHelper); 
+            }
         }
 
         function abrirAjustePerspectiva() {
-            fecharEdicao(); isPerspectiveMode = true; controles3D.enabled = false;
+            fecharEdicao(); 
+            
+            isPerspectiveMode = true; 
+            controles3D.enabled = false;
+            
             const hud = document.getElementById('perspectiveHUD');
-            hud.style.display = 'flex'; setTimeout(() => hud.classList.add('show'), 10);
-            if(modoARAtivo) { document.getElementById('container3DWrapper').classList.add('hud-open'); setTimeout(ajustarTamanho3D, 300); }
+            hud.style.display = 'flex'; 
+            
+            setTimeout(() => {
+                hud.classList.add('show')
+            }, 10);
+            
+            if (modoARAtivo) { 
+                document.getElementById('container3DWrapper').classList.add('hud-open'); 
+                setTimeout(ajustarTamanho3D, 300); 
+            }
         }
 
         function fecharPerspectiva() {
-            if(!isPerspectiveMode) return;
-            isPerspectiveMode = false; controles3D.enabled = true;
+            if (!isPerspectiveMode) return;
+            
+            isPerspectiveMode = false; 
+            controles3D.enabled = true;
+            
             const hud = document.getElementById('perspectiveHUD');
-            hud.classList.remove('show'); setTimeout(() => hud.style.display = 'none', 300);
-            if(modoARAtivo) { document.getElementById('container3DWrapper').classList.remove('hud-open'); setTimeout(ajustarTamanho3D, 300); }
+            hud.classList.remove('show'); 
+            
+            setTimeout(() => {
+                hud.style.display = 'none'
+            }, 300);
+            
+            if (modoARAtivo) { 
+                document.getElementById('container3DWrapper').classList.remove('hud-open'); 
+                setTimeout(ajustarTamanho3D, 300); 
+            }
         }
 
         function ajustarPerspectivaManual() {
-            if(!rootNode) return;
+            if (!rootNode) return;
+            
             const s = parseFloat(document.getElementById('camScale').value);
-            const pX = parseFloat(document.getElementById('camPosX').value);
-            const pY = parseFloat(document.getElementById('camPosY').value);
             const rX = parseFloat(document.getElementById('camRotX').value);
             const rY = parseFloat(document.getElementById('camRotY').value);
             
             rootNode.scale.set(s, s, s);
             rootNode.rotation.set(rX, rY, 0);
-            
-            camera3D.position.set(pX, pY, camera3D.position.z);
-            controles3D.target.set(pX, pY, controles3D.target.z);
         }
 
-        // ==========================================
-        // O CORAÇÃO DO RENDER (BALCÕES COMERCIAIS & CURVAS)
-        // ==========================================
+        // ---------------------------------------------------------
+        // CONSTRUTOR GEOMÉTRICO ABSOLUTO (COM PORTAS CURVAS E ABERTURAS)
+        // ---------------------------------------------------------
         function reconstruirCenaParametrica() {
-            if (grupoCozinha) rootNode.remove(grupoCozinha);
-            objetosInterativos = []; grupoCozinha = new THREE.Group(); rootNode.add(grupoCozinha);
+            if (grupoCozinha) {
+                rootNode.remove(grupoCozinha);
+            }
+            
+            objetosInterativos = []; 
+            grupoCozinha = new THREE.Group(); 
+            rootNode.add(grupoCozinha);
 
             const design = projetoGlobal.design;
-            const matCaixa = new THREE.MeshStandardMaterial({ color: new THREE.Color(design?.cor_caixa||"#FFF"), roughness: 0.9 });
-            const matPorta = new THREE.MeshStandardMaterial({ color: new THREE.Color(design?.cor_portas||"#CCC"), roughness: 0.6 });
-            const matTampo = new THREE.MeshStandardMaterial({ color: new THREE.Color(design?.cor_tampo||"#222"), roughness: 0.2, metalness:0.3 }); // Granito/Pedra
-            const matPux = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.4 });
-            const E = 0.018; const F = 0.003; 
+            
+            const matCaixa = new THREE.MeshStandardMaterial({ 
+                color: new THREE.Color(design?.cor_caixa || "#FFFFFF"), 
+                roughness: 0.9 
+            });
+            
+            const matPorta = new THREE.MeshStandardMaterial({ 
+                color: new THREE.Color(design?.cor_caixa || "#CCCCCC"), 
+                roughness: 0.6 
+            });
+            
+            const matTampo = new THREE.MeshStandardMaterial({ 
+                color: new THREE.Color(design?.cor_tampo || "#222222"), 
+                roughness: 0.2, 
+                metalness: 0.3 
+            }); 
+            
+            const matPux = new THREE.MeshStandardMaterial({ 
+                color: 0x333333, 
+                roughness: 0.4 
+            });
+            
+            const E = 0.018; // 18mm
+            const F = 0.003; // 3mm folga
 
-            // Se algum módulo tiver pos_x, usamos layout livre da IA
             let usaLayoutLivre = projetoGlobal.modulos.some(m => m.pos_x !== undefined && m.pos_x !== 0);
             
-            let largTotal_mm = 0, alturaMaxima_mm = 0;
-            projetoGlobal.modulos.forEach(m => { largTotal_mm += m.largura; if(m.altura > alturaMaxima_mm) alturaMaxima_mm = m.altura; });
+            let largTotal_mm = 0;
+            let alturaMaxima_mm = 0;
+            
+            projetoGlobal.modulos.forEach(m => { 
+                largTotal_mm += m.largura; 
+                
+                if (m.altura > alturaMaxima_mm) {
+                    alturaMaxima_mm = m.altura; 
+                }
+            });
 
-            const T_W = largTotal_mm / 1000, T_H = alturaMaxima_mm / 1000;
+            const T_W = largTotal_mm / 1000;
+            const T_H = alturaMaxima_mm / 1000;
             const baseElevacao = (projetoGlobal.instalacao === "aereo") ? 1.5 : 0;
+            
             grupoCozinha.position.y = baseElevacao;
 
             let currentX = -T_W / 2;
 
             function criarPlaca(w, h, d, mat, x, y, z, modGrp, isInt=false) {
-                const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-                m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), new THREE.LineBasicMaterial({color:0x000, opacity:0.1, transparent:true})));
-                m.position.set(x, y, z); modGrp.add(m);
-                if(isInt) objetosInterativos.push(m);
+                const geo = new THREE.BoxGeometry(w, h, d);
+                const m = new THREE.Mesh(geo, mat);
+                
+                const edges = new THREE.EdgesGeometry(geo);
+                const lines = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({color: 0x000000, opacity: 0.1, transparent: true}));
+                m.add(lines);
+                
+                m.position.set(x, y, z); 
+                modGrp.add(m);
+                
+                if (isInt) {
+                    objetosInterativos.push(m);
+                }
                 return m;
             }
             
             function criarCurva(raio, h, mat, y, modGrp, isInt=false, open=false) {
-                // Cria uma fatia de cilindro de 90 graus
                 const geo = new THREE.CylinderGeometry(raio, raio, h, 32, 1, open, 0, Math.PI/2);
                 const m = new THREE.Mesh(geo, mat);
-                // Posiciona para o eixo de rotação ficar na aresta correta
+                
                 m.position.set(-raio/2, y, -raio/2); 
                 modGrp.add(m);
-                if(isInt) objetosInterativos.push(m);
+                
+                if (isInt) {
+                    objetosInterativos.push(m);
+                }
                 return m;
             }
 
             projetoGlobal.modulos.forEach((mod, idx) => {
-                const mW = mod.largura/1000, mH = mod.altura/1000, mD = mod.profundidade/1000;
+                const mW = mod.largura / 1000;
+                const mH = mod.altura / 1000;
+                const mD = mod.profundidade / 1000;
+                
                 const isBalcao = mod.tipo_movel === 'balcao';
                 
                 const mGrp = new THREE.Group();
                 mGrp.userData = { isModulo: true, modIndex: idx }; 
                 
-                let mX = usaLayoutLivre && mod.pos_x !== undefined ? mod.pos_x/1000 : currentX + mW/2;
-                let mZ = usaLayoutLivre && mod.pos_z !== undefined ? mod.pos_z/1000 : 0;
+                let mX = usaLayoutLivre && mod.pos_x !== undefined ? mod.pos_x / 1000 : currentX + mW/2;
+                let mZ = usaLayoutLivre && mod.pos_z !== undefined ? mod.pos_z / 1000 : 0;
                 let mRotY = mod.rot_y !== undefined ? (mod.rot_y * Math.PI / 180) : 0;
                 
-                // Armários são alinhados pelo topo. Balcões alinham pela base!
                 const baseModY = (projetoGlobal.instalacao === "aereo") ? (T_H - mH) : 0; 
                 
                 mGrp.position.set(mX, baseModY, mZ); 
@@ -883,79 +1817,133 @@ JSON ESTRITO DE RESPOSTA (Siga este modelo):
                 const qPrat = mod.prateleiras || 0;
                 const espacoPrat = mH / (qPrat + 1);
 
+                // LOGICA DE CONSTRUÇÃO ABSOLUTA
                 if (mod.formato === "curvo") {
-                    // BALCÃO CURVO (O "L" da Padaria)
+                    // MÓDULO CURVO
                     const raio = mW; 
                     
-                    // Frente Curva Solida
-                    criarCurva(raio, mH, matCaixa, mH/2, mGrp, true, true); 
-                    // Tampo Curvo Granito (levemente maior)
-                    criarCurva(raio + 0.05, E, matTampo, mH, mGrp, true, false); 
+                    criarCurva(raio, E, matCaixa, E/2, mGrp, true, false); // Base curva
+                    criarCurva(raio + 0.05, E, matTampo, mH, mGrp, true, false); // Tampo curvo
                     
-                    if(mod.tipo_abertura === "aberto" || mod.expositor_frontal) {
-                        // Prateleiras de doces saindo da curva
-                        for(let i=1; i<=qPrat; i++) {
-                            // Cria prateleiras como fatias de cilindro menores
-                            criarCurva(raio + 0.15, E, matCaixa, espacoPrat*i, mGrp, false, false);
+                    if (mod.tipo_abertura === "aberto") {
+                        // PRATELEIRAS EXPOSTAS CURVAS (NÃO TEM PORTA)
+                        for (let i = 1; i <= qPrat; i++) {
+                            criarCurva(raio, E, matCaixa, espacoPrat * i, mGrp, false, false);
+                        }
+                        // Desenha fundo curvo interno
+                        criarCurva(raio - 0.2, mH, matCaixa, mH/2, mGrp, false, true); 
+                    } else {
+                        // MÓDULO CURVO FECHADO (COM PORTA CURVA)
+                        // A porta é uma chapa curva fina na frente
+                        const portaCurvaGrp = new THREE.Group();
+                        
+                        // Pivot no centro, para poder abrir girando
+                        portaCurvaGrp.position.set(0, mH/2, 0); 
+                        
+                        const meshPorta = criarCurva(raio, mH - F*2, matPorta, 0, portaCurvaGrp, true, true);
+                        meshPorta.userData.grupoPai = portaCurvaGrp;
+                        
+                        portaCurvaGrp.userData = { animavel: true, tipo: 'giro', aberto: false, rotAbre: Math.PI/2 };
+                        mGrp.add(portaCurvaGrp);
+                        
+                        // Prateleiras internas do curvo fechado
+                        for (let i = 1; i <= qPrat; i++) {
+                            criarCurva(raio - E, E, matCaixa, espacoPrat * i - mH/2, portaCurvaGrp, false, false);
                         }
                     }
                 } 
                 else {
-                    // BALCÃO OU ARMÁRIO RETO
+                    // MÓDULO RETO
                     if (isBalcao) {
-                        // BALCÃO COMERCIAL (Oco por dentro para o vendedor, fechado na frente, tampo em cima)
-                        criarPlaca(mW, mH, E, matCaixa, 0, mH/2, mD/2 - E/2, mGrp, true); // Frente do Balcão
-                        criarPlaca(mW+0.05, E, mD+0.1, matTampo, 0, mH, 0, mGrp, true); // Tampo de Atendimento (Balanço)
+                        // BALCÃO RETO
+                        if (mod.tipo_abertura !== "aberto") {
+                            criarPlaca(mW, mH, E, matCaixa, 0, mH/2, mD/2 - E/2, mGrp, true); // Frente Fechada
+                        }
                         
-                        if(mod.tipo_abertura === "aberto" || mod.expositor_frontal) {
-                            // Expositor Frontal (Prateleiras de Doces projetadas pra fora)
-                            for(let i=1; i<=qPrat; i++) {
-                                criarPlaca(mW, E, 0.20, matCaixa, 0, espacoPrat*i, mD/2 + 0.10, mGrp, false);
+                        criarPlaca(mW + 0.05, E, mD + 0.1, matTampo, 0, mH, 0, mGrp, true); // Tampo Atendimento
+                        
+                        if (mod.tipo_abertura === "aberto") {
+                            // Prateleiras Expostas Frontais
+                            for (let i = 1; i <= qPrat; i++) {
+                                criarPlaca(mW, E, 0.20, matCaixa, 0, espacoPrat * i, mD/2 + 0.10, mGrp, false);
                             }
                         } else {
-                            // Prateleiras internas pro vendedor
-                            for(let i=1; i<=qPrat; i++) criarPlaca(mW-E*2, E, mD-E, matCaixa, 0, espacoPrat*i, -E/2, mGrp, false);
+                            // Prateleiras Internas
+                            for (let i = 1; i <= qPrat; i++) {
+                                criarPlaca(mW - E*2, E, mD - E, matCaixa, 0, espacoPrat * i, -E/2, mGrp, false);
+                            }
                         }
                         
                     } else {
-                        // ARMÁRIO PADRÃO CAIXA FECHADA
-                        criarPlaca(mW, E, mD, matCaixa, 0, E/2, mD/2, mGrp, true); 
-                        criarPlaca(E, mH, mD, matCaixa, -mW/2+E/2, mH/2, mD/2, mGrp, true); 
-                        criarPlaca(E, mH, mD, matCaixa, mW/2-E/2, mH/2, mD/2, mGrp, true); 
-                        criarPlaca(mW, E, mD, matCaixa, 0, mH-E/2, mD/2, mGrp, true); 
+                        // ARMÁRIO RETO (COM OU SEM PORTAS)
+                        criarPlaca(mW, E, mD, matCaixa, 0, E/2, mD/2, mGrp, true); // Base
+                        criarPlaca(E, mH, mD, matCaixa, -mW/2 + E/2, mH/2, mD/2, mGrp, true); // Esq
+                        criarPlaca(E, mH, mD, matCaixa, mW/2 - E/2, mH/2, mD/2, mGrp, true); // Dir
+                        criarPlaca(mW, E, mD, matCaixa, 0, mH - E/2, mD/2, mGrp, true); // Tampo
                         
-                        let altPortas = mH - E*2, startYPortas = E; 
-                        criarPlaca(mW-E*2, altPortas, 0.006, matCaixa, 0, mH/2, 0.01, mGrp); // Fundo
+                        let altFundo = mH - E*2;
+                        let baseFundo = mH/2;
+                        let altPortas = mH - E*2;
+                        let startYPortas = E;
+                        let startYPrat = E; 
+
+                        if (mod.tem_nicho_aberto) {
+                            const hNicho = (mod.altura_nicho || 400) / 1000;
+                            criarPlaca(mW - E*2, E, mD - E, matCaixa, 0, E + hNicho + E/2, mD/2, mGrp); 
+                            
+                            altPortas = mH - E*2 - hNicho - E; 
+                            startYPortas = E + hNicho + E; 
+                            altFundo = altPortas; 
+                            baseFundo = startYPortas + altFundo/2; 
+                            startYPrat = E + hNicho + E;
+                        }
                         
-                        if (qPrat > 0) {
+                        criarPlaca(mW - E*2, altFundo, 0.006, matCaixa, 0, baseFundo, 0.01, mGrp); 
+
+                        // PRATELEIRAS
+                        if (qPrat > 0 && altPortas > 0) {
                             const espPratInterna = altPortas / (qPrat + 1);
-                            for(let i=1; i<=qPrat; i++) criarPlaca(mW - E*2, E, mD - E - 0.01, matCaixa, 0, startYPortas + (espPratInterna * i), mD/2 - 0.005, mGrp);
+                            for (let i = 1; i <= qPrat; i++) {
+                                criarPlaca(mW - E*2, E, mD - E - 0.01, matCaixa, 0, startYPrat + (espPratInterna * i), mD/2 - 0.005, mGrp);
+                            }
                         }
 
-                        if (mod.tipo_abertura !== "aberto" && altPortas > 0) {
+                        // PORTAS SE NÃO FOR ABERTO
+                        if (mod.tipo_abertura !== "aberto" && altPortas > 0.1) {
                             const nPortas = mod.portas || 1;
+                            
                             if (mod.tipo_abertura === "basculante") {
                                 const hInd = altPortas / nPortas;
-                                for(let i=0; i<nPortas; i++) {
+                                
+                                for (let i = 0; i < nPortas; i++) {
                                     const bGrp = new THREE.Group(); 
-                                    bGrp.position.set(0, startYPortas + (i*hInd) + hInd, mD+E/2); 
-                                    const pMesh = criarPlaca(mW-E*2-F*2, hInd-F, E, matPorta, 0, -hInd/2, 0, bGrp, true);
+                                    bGrp.position.set(0, startYPortas + (i*hInd) + hInd, mD + E/2); 
+                                    
+                                    const pMesh = criarPlaca(mW - E*2 - F*2, hInd - F, E, matPorta, 0, -hInd/2, 0, bGrp, true);
                                     pMesh.userData.grupoPai = bGrp;
-                                    criarPlaca(mW-E*4, 0.02, 0.02, matPux, 0, -hInd+0.03, E/2+0.01, bGrp); 
+                                    
+                                    criarPlaca(mW - E*4, 0.02, 0.02, matPux, 0, -hInd + 0.03, E/2 + 0.01, bGrp); 
                                     bGrp.userData = { animavel: true, tipo: 'basculante', aberto: false, rotAbre: -Math.PI/2.2 };
+                                    
                                     mGrp.add(bGrp);
                                 }
                             } else {
-                                const wInd = (mW - E*2 - F*(nPortas+1)) / nPortas;
+                                const wInd = (mW - E*2 - F*(nPortas + 1)) / nPortas;
                                 const startXP = -mW/2 + E + F + wInd/2;
-                                for(let i=0; i<nPortas; i++) {
-                                    const bGrp = new THREE.Group(); const esq = i < nPortas/2;
-                                    bGrp.position.set(startXP + i*(wInd+F) + (esq?-wInd/2:wInd/2), startYPortas + altPortas/2, mD+E/2);
+                                
+                                for (let i = 0; i < nPortas; i++) {
+                                    const bGrp = new THREE.Group(); 
+                                    const esq = i < nPortas/2;
+                                    
+                                    bGrp.position.set(startXP + i*(wInd + F) + (esq ? -wInd/2 : wInd/2), startYPortas + altPortas/2, mD + E/2);
+                                    
                                     const deslocX = esq ? wInd/2 : -wInd/2;
-                                    const pMesh = criarPlaca(wInd, altPortas-F, E, matPorta, deslocX, 0, 0, bGrp, true);
+                                    const pMesh = criarPlaca(wInd, altPortas - F, E, matPorta, deslocX, 0, 0, bGrp, true);
                                     pMesh.userData.grupoPai = bGrp;
-                                    criarPlaca(0.02, 0.15, 0.02, matPux, esq? deslocX+wInd/2-0.03 : deslocX-wInd/2+0.03, 0, E/2+0.01, bGrp); 
+                                    
+                                    criarPlaca(0.02, 0.15, 0.02, matPux, esq ? deslocX + wInd/2 - 0.03 : deslocX - wInd/2 + 0.03, 0, E/2 + 0.01, bGrp); 
                                     bGrp.userData = { animavel: true, tipo: 'giro', aberto: false, rotAbre: esq ? -Math.PI/1.8 : Math.PI/1.8 };
+                                    
                                     mGrp.add(bGrp);
                                 }
                             }
@@ -964,22 +1952,29 @@ JSON ESTRITO DE RESPOSTA (Siga este modelo):
                 }
                 
                 grupoCozinha.add(mGrp); 
-                if(!usaLayoutLivre) currentX += mW; 
+                
+                if (!usaLayoutLivre) {
+                    currentX += mW; 
+                }
             });
 
             calcularPlanoDeCorteRealTime();
 
-            if(!isEditingMode && !modoARAtivo && camera3D && !isPerspectiveMode) {
+            if (!isEditingMode && !modoARAtivo && camera3D && !isPerspectiveMode) {
                 camera3D.position.set(0, T_H/2, Math.max(T_W, T_H)*1.5);
-                controles3D.target.set(0, T_H/2, 0); controles3D.update();
+                controles3D.target.set(0, T_H/2, 0); 
+                controles3D.update();
             }
         }
 
-        // ==========================================
-        // AUTO-ENCAIXE IA (MATCH PHOTO COVER)
-        // ==========================================
+        // ---------------------------------------------------------
+        // REALIDADE AUMENTADA NATIVA (AUTO-ENCAIXE)
+        // ---------------------------------------------------------
         function alternarModoAR() {
-            if (!base64ImagemGlobal) { alert("Envie uma foto do local primeiro!"); return; }
+            if (!base64ImagemGlobal) { 
+                alert("Envie uma foto do local primeiro!"); 
+                return; 
+            }
             
             const wrapper = document.getElementById('container3DWrapper');
             const bgImg = document.getElementById('arBackgroundImage');
@@ -989,51 +1984,76 @@ JSON ESTRITO DE RESPOSTA (Siga este modelo):
             
             if (modoARAtivo) {
                 wrapper.classList.add('fullscreen-ar');
-                bgImg.src = base64ImagemGlobal; bgImg.style.display = 'block';
+                bgImg.src = base64ImagemGlobal; 
+                bgImg.style.display = 'block';
                 uiTop.style.display = 'flex';
                 
                 document.getElementById('info3D').style.display = 'none';
                 document.getElementById('instrucao3D').style.display = 'none';
                 
                 const posIA = projetoGlobal.posicionamento_auto_ar;
-                if(posIA) {
+                
+                if (posIA) {
                     rootNode.scale.set(posIA.escala, posIA.escala, posIA.escala);
                     rootNode.rotation.set(posIA.rot_x, posIA.rot_y, posIA.rot_z);
+                    
                     camera3D.position.set(posIA.pos_x, posIA.pos_y, 4); 
                     controles3D.target.set(posIA.pos_x, posIA.pos_y, 0); 
                     
                     document.getElementById('camScale').value = posIA.escala;
-                    document.getElementById('camPosX').value = posIA.pos_x;
-                    document.getElementById('camPosY').value = posIA.pos_y;
                     document.getElementById('camRotX').value = posIA.rot_x;
                     document.getElementById('camRotY').value = posIA.rot_y;
                 } else {
-                    camera3D.position.set(0, 0, 5); controles3D.target.set(0, 0, 0); 
+                    camera3D.position.set(0, 0, 5); 
+                    controles3D.target.set(0, 0, 0); 
                 }
+                
                 controles3D.update();
 
             } else {
-                fecharEdicao(); fecharPerspectiva(); 
+                fecharEdicao(); 
+                fecharPerspectiva(); 
+                
                 wrapper.classList.remove('fullscreen-ar');
                 wrapper.classList.remove('hud-open'); 
-                bgImg.style.display = 'none'; uiTop.style.display = 'none';
+                
+                bgImg.style.display = 'none'; 
+                uiTop.style.display = 'none';
                 
                 document.getElementById('info3D').style.display = 'block';
                 document.getElementById('instrucao3D').style.display = 'block';
                 
-                rootNode.rotation.set(0,0,0); rootNode.scale.set(1,1,1);
+                rootNode.rotation.set(0, 0, 0); 
+                rootNode.scale.set(1, 1, 1);
                 
-                if(grupoCozinha) { 
-                    camera3D.position.set(0, 1, 3); controles3D.target.set(0, 1, 0); controles3D.update(); 
+                if (grupoCozinha) { 
+                    let T_H = 1; 
+                    camera3D.position.set(0, -T_H/2, 3); 
+                    controles3D.target.set(0, -T_H/2, 0); 
+                    controles3D.update(); 
                 }
             }
+            
             setTimeout(ajustarTamanho3D, 50);
         }
 
+        // ---------------------------------------------------------
+        // CUSTOS E ORÇAMENTO
+        // ---------------------------------------------------------
         function calcularTotal() {
-            const m = parseFloat(document.getElementById('costMaterial').value)||0, mo = parseFloat(document.getElementById('costLabor').value)||0, h = parseFloat(document.getElementById('costHardware').value)||0, o = parseFloat(document.getElementById('costOther').value)||0, p = parseFloat(document.getElementById('profitMargin').value)||0;
-            const custo = m+mo+h+o;
-            document.getElementById('totalProjectCost').innerText = new Intl.NumberFormat('pt-BR', {style:'currency', currency:'BRL'}).format(custo / (1-(p/100)));
+            const m = parseFloat(document.getElementById('costMaterial').value) || 0;
+            const mo = parseFloat(document.getElementById('costLabor').value) || 0;
+            const h = parseFloat(document.getElementById('costHardware').value) || 0;
+            const o = parseFloat(document.getElementById('costOther').value) || 0;
+            const p = parseFloat(document.getElementById('profitMargin').value) || 0;
+            
+            const custo = m + mo + h + o;
+            const final = custo / (1 - (p / 100));
+            
+            document.getElementById('totalProjectCost').innerText = new Intl.NumberFormat('pt-BR', {
+                style: 'currency', 
+                currency: 'BRL'
+            }).format(final);
         }
     </script>
 </body>
