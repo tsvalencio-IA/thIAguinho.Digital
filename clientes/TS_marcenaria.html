@@ -28,6 +28,7 @@
             --highlight-yellow: #ffeb3b;
             --danger-red: #f44336;
             --success-green: #4CAF50;
+            --ai-blue: #2196F3;
 
             --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
             --border-radius-soft: 8px;
@@ -60,6 +61,7 @@
         .action-buttons button.primary:hover { background-color: #6a4933; }
         .action-buttons button.success { background-color: var(--earth-green); color: white; }
         .action-buttons button.success:hover { background-color: #5a7a1c; }
+        .action-buttons button.ai-magic { background-color: var(--ai-blue); color: white; }
 
         /* Estilos do Visualizador 3D */
         #container3DWrapper { width: 100%; height: 500px; position: relative; border-radius: var(--border-radius-soft); border: 2px solid var(--border-soft); overflow: hidden; background: radial-gradient(circle, #ffffff 0%, #EFEAE5 100%); touch-action: none; margin-bottom: 20px; transition: 0.3s ease; }
@@ -70,25 +72,37 @@
         /* ESTILOS DA EXPERIÊNCIA MOBILE FULLSCREEN AR */
         .fullscreen-ar { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 99999 !important; border-radius: 0 !important; border: none !important; background: #000 !important; }
         .ar-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; z-index: 1; display: none; }
-        .ar-ui-close { position: absolute; top: 20px; right: 20px; z-index: 10; display: none; background: var(--warning-red); color: white; border: none; padding: 12px 25px; border-radius: 30px; font-size: 1.1em; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; }
+        .ar-ui-top { position: absolute; top: 20px; left: 20px; right: 20px; z-index: 10; display: none; justify-content: space-between; }
+        .ar-ui-btn { background: var(--warning-red); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-size: 1em; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; }
+        .ar-ui-magic { background: var(--ai-blue); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-size: 1em; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; }
         
-        /* O HUD DE EDIÇÃO PARAMÉTRICA OURO */
+        /* O HUD DE EDIÇÃO PARAMÉTRICA (COMPACTO DE BASE) - RESOLVE O PROBLEMA DE TAMPA A TELA */
         .edit-hud {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 20; display: none;
-            background: rgba(15, 23, 42, 0.95); color: white; padding: 20px; border-radius: 12px; 
-            width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); border: 2px solid var(--highlight-yellow);
-            backdrop-filter: blur(10px); flex-direction: column; gap: 15px;
-            max-height: 80vh; overflow-y: auto; /* Para telas pequenas */
+            position: absolute; bottom: 0; left: 0; width: 100%; z-index: 20; display: none;
+            background: rgba(15, 23, 42, 0.85); color: white; padding: 15px 20px 25px 20px; 
+            border-radius: 20px 20px 0 0; box-shadow: 0 -5px 30px rgba(0,0,0,0.5); 
+            border-top: 2px solid var(--highlight-yellow); backdrop-filter: blur(10px); 
+            flex-direction: column; gap: 10px; max-height: 45vh; overflow-y: auto; box-sizing: border-box;
         }
-        .edit-hud::-webkit-scrollbar { width: 6px; }
-        .edit-hud::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
-        .edit-hud h4 { margin: 0; color: var(--highlight-yellow); font-size: 1.1em; display: flex; justify-content: space-between; align-items: center;}
-        .edit-slider { display: flex; flex-direction: column; gap: 5px; }
-        .edit-slider label { display: flex; justify-content: space-between; font-size: 0.85em; color: #cbd5e1; font-weight: bold;}
-        .edit-slider input[type="range"] { width: 100%; accent-color: var(--highlight-yellow); }
-        .edit-slider select { width: 100%; padding: 8px; background: #334155; color: white; border: 1px solid #475569; border-radius: 6px; outline: none; font-family: inherit;}
-        .hud-btn-close { background: transparent; border: none; color: white; font-size: 1.2em; cursor: pointer;}
-        .hud-action-row { display: flex; gap: 10px; margin-top: 5px; }
+        .edit-hud::-webkit-scrollbar { width: 4px; }
+        .edit-hud::-webkit-scrollbar-thumb { background: var(--highlight-yellow); border-radius: 2px; }
+        .hud-drag-indicator { width: 40px; height: 5px; background: rgba(255,255,255,0.3); border-radius: 5px; margin: 0 auto 10px auto; }
+        .edit-hud h4 { margin: 0 0 5px 0; color: var(--highlight-yellow); font-size: 1.1em; display: flex; justify-content: space-between; align-items: center;}
+        
+        /* Grid para deixar os controles menores e lado a lado */
+        .hud-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .edit-slider { display: flex; flex-direction: column; gap: 2px; }
+        .edit-slider label { display: flex; justify-content: space-between; font-size: 0.8em; color: #cbd5e1; font-weight: bold; margin:0;}
+        .edit-slider input[type="range"] { width: 100%; accent-color: var(--highlight-yellow); margin:0;}
+        .edit-slider select { width: 100%; padding: 6px; background: #334155; color: white; border: 1px solid #475569; border-radius: 6px; outline: none; font-size: 0.85em;}
+        .hud-btn-close { background: transparent; border: none; color: white; font-size: 1.2em; cursor: pointer; padding: 5px;}
+        .hud-action-row { display: flex; gap: 10px; margin-top: 5px; grid-column: 1 / -1;}
+        .hud-action-row button { padding: 10px; font-size: 0.9em; flex: 1;}
+
+        /* HUD DE PERSPECTIVA (NOVO) */
+        #perspectiveHUD { border-top: 2px solid var(--ai-blue); }
+        #perspectiveHUD h4 { color: var(--ai-blue); }
+        #perspectiveHUD input[type="range"] { accent-color: var(--ai-blue); }
 
         /* Tabelas */
         .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 20px; }
@@ -128,7 +142,7 @@
 <body>
     <div class="container">
         <h1>🛠️ Gerador de Projetos e Orçamentos para Marcenaria</h1>
-        <p class="subtitle">Design visual modular paramétrico. Ajuste portas, prateleiras e medidas com os dedos!</p>
+        <p class="subtitle">Design CAD Paramétrico e Ajuste de Perspectiva (Anti-Parede Torta).</p>
 
         <!-- 1. Configuração -->
         <section id="apiConfigSection" class="api-config-section">
@@ -147,7 +161,7 @@
         <!-- 2. Pedido e Foto do Ambiente -->
         <section id="audioInputSection" class="section-panel">
             <h2 style="margin-top:0;"><i class="fas fa-camera-retro"></i> Leitura de Ambiente (Módulos Reais)</h2>
-            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">A IA varre a foto criando a estrutura. Depois, <b>você tem o poder absoluto de editar, duplicar ou excluir peças no 3D!</b></p>
+            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">A IA varre a foto criando a estrutura. Depois, no AR, <b>use a IA para corrigir a perspectiva da foto!</b></p>
             
             <div class="grid-layout">
                 <div class="input-group">
@@ -184,15 +198,15 @@
             <!-- Visor 3D Modular e Tela Cheia AR -->
             <div style="margin-top: 30px;">
                 <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;">
-                    <i class="fas fa-cube"></i> 3D Editável e Realidade Aumentada
+                    <i class="fas fa-cube"></i> 3D Editável e Correção de Parede (AR)
                 </h3>
                 
                 <div class="action-buttons" style="justify-content: flex-start; margin-bottom: 15px; margin-top: 0;">
                     <button id="btnAR" class="success" onclick="alternarModoAR()" style="display: none;">
-                        <i class="fas fa-expand-arrows-alt"></i> Ver Instalado na Foto (AR Fullscreen)
+                        <i class="fas fa-expand-arrows-alt"></i> Encaixar na Foto do Cliente (AR)
                     </button>
                     <p style="font-size: 0.85em; color: var(--earth-green); margin-top: auto; margin-bottom: auto; padding-left: 10px;">
-                        <i class="fas fa-hand-pointer"></i> <b>1 Toque:</b> Abre portas | <b>Pressione e Segure:</b> Edita o Módulo Completo
+                        <i class="fas fa-hand-pointer"></i> Segure o dedo sobre um módulo para editar.
                     </p>
                 </div>
 
@@ -203,50 +217,79 @@
                     <div id="info3D">Renderizando motor paramétrico...</div>
                     <div id="instrucao3D"><i class="fas fa-magic"></i> Segure num módulo para editá-lo!</div>
                     
-                    <button id="arCloseBtn" class="ar-ui-close" onclick="alternarModoAR()"><i class="fas fa-times"></i> FECHAR AR</button>
+                    <!-- UIs Exclusivas do AR -->
+                    <div id="arUITop" class="ar-ui-top">
+                        <button class="ar-ui-magic" onclick="abrirAjustePerspectiva()"><i class="fas fa-crop-alt"></i> Ajustar Parede (Perspectiva)</button>
+                        <button id="arCloseBtn" class="ar-ui-btn" onclick="alternarModoAR()"><i class="fas fa-times"></i> Fechar</button>
+                    </div>
                     
-                    <!-- HUD DE EDIÇÃO DE MÓDULO (NÍVEL OURO) -->
+                    <!-- HUD DE EDIÇÃO DE MÓDULO (Bottom Sheet Ouro) -->
                     <div id="editHUD" class="edit-hud">
+                        <div class="hud-drag-indicator"></div>
                         <h4><span id="hudTitle">Módulo</span> <button class="hud-btn-close" onclick="fecharEdicao()"><i class="fas fa-times-circle"></i></button></h4>
                         
-                        <div class="edit-slider">
-                            <label><span>↔️ Largura (mm)</span><span id="lblW"></span></label>
-                            <input type="range" id="sliderW" min="200" max="1500" step="10" oninput="atualizarModuloParametrico()">
-                        </div>
-                        <div class="edit-slider">
-                            <label><span>↕️ Altura (mm)</span><span id="lblH"></span></label>
-                            <input type="range" id="sliderH" min="200" max="1500" step="10" oninput="atualizarModuloParametrico()">
-                        </div>
-                        <div class="edit-slider">
-                            <label><span>↘️ Profundidade (mm)</span><span id="lblD"></span></label>
-                            <input type="range" id="sliderD" min="200" max="800" step="10" oninput="atualizarModuloParametrico()">
-                        </div>
-                        
-                        <!-- NOVAS FUNÇÕES OURO -->
-                        <div class="edit-slider">
-                            <label><span>🚪 Tipo de Abertura</span></label>
-                            <select id="selPorta" onchange="atualizarModuloParametrico()">
-                                <option value="giro">Giro (Lateral)</option>
-                                <option value="basculante">Basculante (Para Cima)</option>
-                            </select>
-                        </div>
-                        <div class="edit-slider">
-                            <label><span>📚 Prateleiras Internas</span><span id="lblPrat"></span></label>
-                            <input type="range" id="sliderPrat" min="0" max="5" step="1" oninput="atualizarModuloParametrico()">
-                        </div>
-
-                        <div class="hud-action-row">
-                            <button class="primary" style="flex:1; background: var(--success-green);" onclick="duplicarModuloParametrico()"><i class="fas fa-plus"></i> Duplicar</button>
-                            <button class="primary" style="flex:1; background: var(--danger-red);" onclick="removerModuloParametrico()"><i class="fas fa-trash"></i> Excluir</button>
+                        <div class="hud-grid">
+                            <div class="edit-slider">
+                                <label><span>↔️ Larg. (mm)</span><span id="lblW"></span></label>
+                                <input type="range" id="sliderW" min="200" max="1500" step="10" oninput="atualizarModuloParametrico()">
+                            </div>
+                            <div class="edit-slider">
+                                <label><span>↕️ Alt. (mm)</span><span id="lblH"></span></label>
+                                <input type="range" id="sliderH" min="200" max="1500" step="10" oninput="atualizarModuloParametrico()">
+                            </div>
+                            <div class="edit-slider">
+                                <label><span>↘️ Prof. (mm)</span><span id="lblD"></span></label>
+                                <input type="range" id="sliderD" min="200" max="800" step="10" oninput="atualizarModuloParametrico()">
+                            </div>
+                            <div class="edit-slider">
+                                <label><span>📚 Prateleiras</span><span id="lblPrat"></span></label>
+                                <input type="range" id="sliderPrat" min="0" max="5" step="1" oninput="atualizarModuloParametrico()">
+                            </div>
+                            <div class="edit-slider" style="grid-column: 1 / -1;">
+                                <label><span>🚪 Tipo de Abertura</span></label>
+                                <select id="selPorta" onchange="atualizarModuloParametrico()">
+                                    <option value="giro">Giro (Para o lado)</option>
+                                    <option value="basculante">Basculante (Para cima)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="hud-action-row">
+                                <button class="primary" style="background: var(--success-green);" onclick="duplicarModuloParametrico()"><i class="fas fa-copy"></i> Duplicar</button>
+                                <button class="primary" style="background: var(--danger-red);" onclick="removerModuloParametrico()"><i class="fas fa-trash"></i> Excluir</button>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- HUD DE AJUSTE DE PERSPECTIVA (Botton Sheet IA) -->
+                    <div id="perspectiveHUD" class="edit-hud">
+                        <div class="hud-drag-indicator"></div>
+                        <h4><span><i class="fas fa-crop-alt"></i> Perspectiva / Rotação da Parede</span> <button class="hud-btn-close" onclick="fecharPerspectiva()"><i class="fas fa-times-circle"></i></button></h4>
+                        
+                        <div class="hud-action-row" style="margin-bottom: 10px;">
+                            <button class="primary" style="background: var(--ai-blue); width: 100%;" onclick="autoEncaixarIA()"><i class="fas fa-magic"></i> Tentar Auto-Encaixe IA</button>
+                        </div>
+
+                        <div class="edit-slider">
+                            <label><span>Tombar / Levantar (Eixo X)</span></label>
+                            <input type="range" id="camRotX" min="-1" max="1" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
+                        </div>
+                        <div class="edit-slider">
+                            <label><span>Girar Parede Esq/Dir (Eixo Y)</span></label>
+                            <input type="range" id="camRotY" min="-1" max="1" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
+                        </div>
+                        <div class="edit-slider">
+                            <label><span>Inclinação Lateral (Eixo Z)</span></label>
+                            <input type="range" id="camRotZ" min="-0.5" max="0.5" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
             <!-- Tabela de Corte Dinâmica -->
             <div style="margin-top: 30px;">
                 <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;"><i class="fas fa-calculator"></i> Plano de Corte Dinâmico Absoluto</h3>
-                <p style="font-size: 0.85em; color: var(--earth-green); margin-bottom: 10px;">* As peças (e prateleiras) atualizam automaticamente ao editar o 3D.</p>
+                <p style="font-size: 0.85em; color: var(--earth-green); margin-bottom: 10px;">* As peças e prateleiras atualizam automaticamente ao editar o 3D.</p>
                 <div class="table-responsive">
                     <table>
                         <thead>
@@ -294,19 +337,19 @@
     </div>
 
     <div class="floating-buttons">
-        <button class="floating-button mascote" onclick="mascoteFalar('Toque e segure no módulo. Agora você pode adicionar prateleiras internas, duplicar armários ou trocar de basculante para giro na hora!')">
+        <button class="floating-button mascote" onclick="mascoteFalar('A tela de edição agora sobe de baixo sem tampar sua visão do móvel! E no modo AR, use o botão Ajustar Parede para deitar ou girar o 3D e encaixar nas fotos com ângulo torto!')">
             <i class="fas fa-headset"></i> <span>Mascote Promob Ouro</span>
         </button>
     </div>
 
     <footer>Powered by thIAguinho Soluções</footer>
 
-    <!-- SCRIPT MÁGICO - ENGENHARIA ABSOLUTA COM LONG-PRESS & EDIÇÃO OURO -->
+    <!-- SCRIPT MÁGICO - ENGENHARIA ABSOLUTA COM CAMERA SMART SHIFT & AUTO-FIT -->
     <script>
         let currentApiKey = localStorage.getItem('groqApiKeyLocal') || "";
         if(currentApiKey) document.getElementById('apiKeyInput').value = currentApiKey;
 
-        // ESTADO GLOBAL DO PROJETO
+        // ESTADO GLOBAL
         let projetoGlobal = { modulos: [], design: null, instalacao: "aereo" };
         let moduloSendoEditado = null; 
         let boxHelper = null; 
@@ -317,6 +360,7 @@
         let raycaster = new THREE.Raycaster(), mouse = new THREE.Vector2();
         let objetosInterativos = [];
         let grupoCozinha = null; 
+        let rootNode = null; // O nó central para girar a perspectiva inteira
         
         let base64ImagemGlobal = null;
         let modoARAtivo = false;
@@ -384,7 +428,7 @@
         }
 
         // ==========================================
-        // PROMPT "ABSOLUTE TRUTH" E INJEÇÃO NO ESTADO GLOBAL
+        // PROMPT "ABSOLUTE TRUTH" 
         // ==========================================
         async function gerarProjeto() {
             const txt = document.getElementById('transcribedTextDisplay').value.trim();
@@ -400,8 +444,8 @@
 
             const promptComando = `Você é um Projetista Sênior (Promob). 
 AJA COM VERDADE ABSOLUTA: Analise a imagem DA EXTREMA ESQUERDA ATÉ A EXTREMA DIREITA.
-NÃO IGNORE O ARMÁRIO DA PONTA DIREITA.
-Crie 1 'modulo' no JSON para CADA coluna vertical. Inclua "prateleiras": 1 (ou mais) por padrão se achar necessário.
+NÃO IGNORE NENHUM ARMÁRIO.
+Crie 1 'modulo' no JSON para CADA coluna vertical. Inclua "prateleiras": 1 (ou mais) por padrão.
 JSON ESTRITO:
 {
   "nome_projeto": "Armários Modulares Ouro",
@@ -410,8 +454,7 @@ JSON ESTRITO:
   "instalacao": "aereo",
   "modulos": [
     { "nome": "Mod Esq", "largura": 800, "altura": 400, "profundidade": 350, "tipo_abertura": "basculante", "tem_nicho_aberto": false, "altura_nicho": 0, "portas": 2, "prateleiras": 1 },
-    { "nome": "Torre Central", "largura": 650, "altura": 800, "profundidade": 400, "tipo_abertura": "basculante", "tem_nicho_aberto": true, "altura_nicho": 450, "portas": 1, "prateleiras": 0 },
-    { "nome": "Mod Dir", "largura": 700, "altura": 500, "profundidade": 350, "tipo_abertura": "giro", "tem_nicho_aberto": false, "altura_nicho": 0, "portas": 2, "prateleiras": 2 }
+    { "nome": "Torre Central", "largura": 650, "altura": 800, "profundidade": 400, "tipo_abertura": "basculante", "tem_nicho_aberto": true, "altura_nicho": 450, "portas": 1, "prateleiras": 0 }
   ],
   "custos": {"material": 1200, "mao_de_obra": 600, "ferragens": 300, "outros": 100}
 }`;
@@ -439,7 +482,6 @@ JSON ESTRITO:
                     } else { throw new Error(dados.error?.message || "Erro API."); }
                 }
 
-                // SALVA NO ESTADO GLOBAL
                 const ia = extrairJSONSeguro(dados.choices[0].message.content);
                 projetoGlobal.modulos = ia.modulos || [];
                 projetoGlobal.design = ia.design || { cor_caixa:"#FFF", cor_portas:"#CCC", material_nome:"MDF Padrão" };
@@ -460,7 +502,7 @@ JSON ESTRITO:
 
                 if (!motor3DIniciado) { init3D(); motor3DIniciado = true; }
                 setTimeout(() => {
-                    fecharEdicao(); 
+                    fecharEdicao(); fecharPerspectiva();
                     reconstruirCenaParametrica(); 
                     document.getElementById('btnAR').style.display = base64ImagemGlobal ? 'inline-flex' : 'none';
                     if(modoARAtivo) alternarModoAR(); 
@@ -474,21 +516,17 @@ JSON ESTRITO:
         }
 
         // ==========================================
-        // CÁLCULO DE PLANO DE CORTE DINÂMICO E CUSTOS
+        // CÁLCULO DE PLANO DE CORTE DINÂMICO
         // ==========================================
         function calcularPlanoDeCorteRealTime() {
             const tbody = document.getElementById('tabelaPlanoCorteDin');
             tbody.innerHTML = '';
-            let custoMatExato = 0;
-            let custoFerExato = 0;
-
+            let custoMatExato = 0; let custoFerExato = 0;
             const mat = projetoGlobal.design.material_nome;
             const E = 18; 
 
             projetoGlobal.modulos.forEach((m, idx) => {
-                const W = Math.round(m.largura);
-                const H = Math.round(m.altura);
-                const D = Math.round(m.profundidade);
+                const W = Math.round(m.largura), H = Math.round(m.altura), D = Math.round(m.profundidade);
                 const prat = m.prateleiras || 0;
 
                 tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Base/Tampo</td><td>2</td><td>${W}</td><td>${D}</td><td>MDF Br</td></tr>`;
@@ -504,18 +542,14 @@ JSON ESTRITO:
                 }
                 
                 if(prat > 0) {
-                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras Internas</td><td>${prat}</td><td>${W - E*2}</td><td>${D - E - 10}</td><td>MDF Br</td></tr>`;
-                    let areaPrat = ((W - E*2) * (D - E) * prat) / 1000000;
-                    custoMatExato += areaPrat * 80;
+                    tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Prateleiras Int.</td><td>${prat}</td><td>${W - E*2}</td><td>${D - E - 10}</td><td>MDF Br</td></tr>`;
+                    custoMatExato += (((W - E*2) * (D - E) * prat) / 1000000) * 80;
                 }
 
                 tbody.innerHTML += `<tr><td><b>[M${idx+1}]</b> Fundo Traseiro</td><td>1</td><td>${W - E*2}</td><td>${HPorta - E*2}</td><td>MDF 6mm</td></tr>`;
-
-                let area_m2 = ((W*D*2) + (H*D*2) + (W*HPorta)) / 1000000;
-                custoMatExato += area_m2 * 80;
+                custoMatExato += (((W*D*2) + (H*D*2) + (W*HPorta)) / 1000000) * 80;
             });
 
-            // Atualiza os inputs silenciosamente para o calcularTotal() puxar
             document.getElementById('costMaterial').value = Math.round(custoMatExato);
             document.getElementById('costHardware').value = Math.round(custoFerExato);
             calcularTotal();
@@ -542,6 +576,10 @@ JSON ESTRITO:
 
             controles3D = new THREE.OrbitControls(camera3D, renderizador3D.domElement);
             controles3D.enableDamping = true; controles3D.dampingFactor = 0.05;
+
+            // ROOT NODE para rotacionar a perspectiva de TUDO junto
+            rootNode = new THREE.Group();
+            cena3D.add(rootNode);
 
             renderizador3D.domElement.addEventListener('pointerdown', onPointerDown, false);
             renderizador3D.domElement.addEventListener('pointerup', onPointerUp, false);
@@ -599,11 +637,9 @@ JSON ESTRITO:
                 pressTimer = setTimeout(() => { ativarEdicaoModulo(moduloTocado.userData.modIndex); }, 500);
             }
         }
-
         function onPointerMove(event) {
             if (Math.abs(event.clientX - startTouchX) > 10 || Math.abs(event.clientY - startTouchY) > 10) clearTimeout(pressTimer);
         }
-
         function onPointerUp(event) {
             clearTimeout(pressTimer);
             if (Math.abs(event.clientX - startTouchX) < 10 && Math.abs(event.clientY - startTouchY) < 10) {
@@ -622,9 +658,10 @@ JSON ESTRITO:
         }
 
         // ==========================================
-        // FLUXO DE EDIÇÃO PARAMÉTRICA (OURO)
+        // FLUXO DE EDIÇÃO PARAMÉTRICA (BOTTOM SHEET MAGICO)
         // ==========================================
         function ativarEdicaoModulo(index) {
+            fecharPerspectiva(); // Se aberto
             isEditingMode = true; moduloSendoEditado = index; controles3D.enabled = false; 
             const modObj = projetoGlobal.modulos[index];
             
@@ -637,12 +674,28 @@ JSON ESTRITO:
             
             document.getElementById('editHUD').style.display = 'flex';
             destacarModuloVisualmente(index);
+
+            // MÁGICA DE UX: PAN PARA CIMA. Move o target da câmera pra descer a visão, subindo o móvel!
+            const t = controles3D.target;
+            const pos = camera3D.position;
+            // Desloca 0.5 em Y. O móvel foge do Bottom Sheet e vai pro centro superior.
+            controles3D.target.set(t.x, t.y - 0.8, t.z);
+            camera3D.position.set(pos.x, pos.y - 0.8, pos.z);
+            controles3D.update();
         }
 
         function fecharEdicao() {
+            if(!isEditingMode) return;
             isEditingMode = false; moduloSendoEditado = null; controles3D.enabled = true; 
             document.getElementById('editHUD').style.display = 'none';
             if (boxHelper) { cena3D.remove(boxHelper); boxHelper = null; }
+
+            // MÁGICA DE UX: PAN PARA BAIXO. Devolve o móvel pro centro
+            const t = controles3D.target;
+            const pos = camera3D.position;
+            controles3D.target.set(t.x, t.y + 0.8, t.z);
+            camera3D.position.set(pos.x, pos.y + 0.8, pos.z);
+            controles3D.update();
         }
 
         function atualizarModuloParametrico() {
@@ -687,11 +740,11 @@ JSON ESTRITO:
         }
 
         // ==========================================
-        // O CORAÇÃO DO RENDER (Cria Prateleiras dinâmicas)
+        // O CORAÇÃO DO RENDER 
         // ==========================================
         function reconstruirCenaParametrica() {
-            if (grupoCozinha) cena3D.remove(grupoCozinha);
-            objetosInterativos = []; grupoCozinha = new THREE.Group(); cena3D.add(grupoCozinha);
+            if (grupoCozinha) rootNode.remove(grupoCozinha);
+            objetosInterativos = []; grupoCozinha = new THREE.Group(); rootNode.add(grupoCozinha);
 
             const design = projetoGlobal.design;
             const matCaixa = new THREE.MeshStandardMaterial({ color: new THREE.Color(design?.cor_caixa||"#FFF"), roughness: 0.8 });
@@ -730,7 +783,7 @@ JSON ESTRITO:
                 criarPlaca(mW, E, mD, matCaixa, 0, mH-E/2, mD/2, mGrp, true); 
                 
                 let altFundo = mH - E*2, baseFundo = mH/2, altPortas = mH - E*2, startYPortas = E;
-                let startYPrat = E; // Base para calcular prateleiras internas
+                let startYPrat = E; 
 
                 if (mod.tem_nicho_aberto) {
                     const hNicho = (mod.altura_nicho || 400)/1000;
@@ -742,7 +795,6 @@ JSON ESTRITO:
                 
                 criarPlaca(mW-E*2, altFundo, 0.006, matCaixa, 0, baseFundo, 0.01, mGrp); 
 
-                // PRATELEIRAS
                 const qPrat = mod.prateleiras || 0;
                 if (qPrat > 0 && altPortas > 0) {
                     const espacoPrat = altPortas / (qPrat + 1);
@@ -751,7 +803,6 @@ JSON ESTRITO:
                     }
                 }
 
-                // PORTAS
                 if (altPortas > 0.1) {
                     const nPortas = mod.portas || 1;
                     if (mod.tipo_abertura === "basculante") {
@@ -786,28 +837,29 @@ JSON ESTRITO:
 
             calcularPlanoDeCorteRealTime();
 
-            if(!isEditingMode && camera3D) {
+            // Só centraliza se não for edição/AR, senão o user perde o lugar que puxou
+            if(!isEditingMode && !modoARAtivo && camera3D) {
                 camera3D.position.set(0, -T_H/2, Math.max(T_W, T_H)*1.5);
                 controles3D.target.set(0, -T_H/2, 0); controles3D.update();
             }
         }
 
         // ==========================================
-        // AR FULLSCREEN NATIVO
+        // AR E PERSPECTIVA (NOVO AUTO-ENCAIXE IA)
         // ==========================================
         function alternarModoAR() {
             if (!base64ImagemGlobal) { alert("Envie uma foto do local primeiro!"); return; }
             
             const wrapper = document.getElementById('container3DWrapper');
             const bgImg = document.getElementById('arBackgroundImage');
-            const btnClose = document.getElementById('arCloseBtn');
+            const uiTop = document.getElementById('arUITop');
             
             modoARAtivo = !modoARAtivo;
             
             if (modoARAtivo) {
                 wrapper.classList.add('fullscreen-ar');
                 bgImg.src = base64ImagemGlobal; bgImg.style.display = 'block';
-                btnClose.style.display = 'block';
+                uiTop.style.display = 'flex';
                 
                 document.getElementById('info3D').style.display = 'none';
                 document.getElementById('instrucao3D').style.display = 'none';
@@ -816,16 +868,68 @@ JSON ESTRITO:
                 camera3D.position.set(0, 0, 5); controles3D.update();
 
             } else {
-                fecharEdicao(); 
+                fecharEdicao(); fecharPerspectiva();
                 wrapper.classList.remove('fullscreen-ar');
-                bgImg.style.display = 'none'; btnClose.style.display = 'none';
+                bgImg.style.display = 'none'; uiTop.style.display = 'none';
                 
                 document.getElementById('info3D').style.display = 'block';
                 document.getElementById('instrucao3D').style.display = 'block';
                 
+                // Reseta a parede se o cara bagunçou muito a perspectiva
+                rootNode.rotation.set(0,0,0);
+                document.getElementById('camRotX').value = 0;
+                document.getElementById('camRotY').value = 0;
+                document.getElementById('camRotZ').value = 0;
+
                 if(grupoCozinha) { controles3D.target.set(0, 0, 0); camera3D.position.set(0, 0, 4); controles3D.update(); }
             }
             setTimeout(ajustarTamanho3D, 50);
+        }
+
+        function abrirAjustePerspectiva() {
+            fecharEdicao();
+            document.getElementById('perspectiveHUD').style.display = 'flex';
+            
+            // Pan Câmera para baixo (sobe o móvel) pra não tapar
+            const t = controles3D.target; const pos = camera3D.position;
+            controles3D.target.set(t.x, t.y - 0.8, t.z); camera3D.position.set(pos.x, pos.y - 0.8, pos.z); controles3D.update();
+        }
+
+        function fecharPerspectiva() {
+            if(document.getElementById('perspectiveHUD').style.display === 'none') return;
+            document.getElementById('perspectiveHUD').style.display = 'none';
+            // Devolve Câmera
+            const t = controles3D.target; const pos = camera3D.position;
+            controles3D.target.set(t.x, t.y + 0.8, t.z); camera3D.position.set(pos.x, pos.y + 0.8, pos.z); controles3D.update();
+        }
+
+        function ajustarPerspectivaManual() {
+            if(!rootNode) return;
+            const rX = parseFloat(document.getElementById('camRotX').value);
+            const rY = parseFloat(document.getElementById('camRotY').value);
+            const rZ = parseFloat(document.getElementById('camRotZ').value);
+            
+            // Gira o nó mestre que segura toda a cozinha
+            rootNode.rotation.set(rX, rY, rZ);
+        }
+
+        function autoEncaixarIA() {
+            if(!rootNode) return;
+            // Simulação de ponto de fuga. Geralmente armários aéreos são tirados de baixo pra cima
+            // Então tombamos levemente o eixo X pra trás e recuamos a escala.
+            
+            // Animação leve
+            let startRotX = rootNode.rotation.x;
+            let endRotX = -0.15; // Tombo pra trás
+            
+            let frame = 0;
+            function animateFit() {
+                frame++;
+                rootNode.rotation.x += (endRotX - rootNode.rotation.x) * 0.1;
+                document.getElementById('camRotX').value = rootNode.rotation.x;
+                if(frame < 30) requestAnimationFrame(animateFit);
+            }
+            animateFit();
         }
 
         function calcularTotal() {
