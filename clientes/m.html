@@ -329,7 +329,7 @@
             cursor: pointer; 
         }
         
-        /* HUD DE EDIÇÃO PARAMÉTRICA MASTER (COM SCROLL E NOVAS FUNÇÕES) */
+        /* HUD DE EDIÇÃO PARAMÉTRICA MASTER 10/10 (COM ROTAÇÃO E EIXOS LIVRES) */
         .edit-hud {
             position: fixed; 
             bottom: 0; 
@@ -672,7 +672,7 @@
 <body>
     <div class="container">
         <h1>🛠️ Gerador de Projetos e Orçamentos para Marcenaria</h1>
-        <p class="subtitle">Design CAD Master: Inteligência Espacial e Auto-Encaixe Preciso.</p>
+        <p class="subtitle">Design CAD Profissional: Montagem Livre de Blocos e Gavetas Reais 10/10.</p>
 
         <!-- 1. Configuração -->
         <section id="apiConfigSection" class="api-config-section">
@@ -691,11 +691,11 @@
         <!-- 2. Pedido e Foto do Ambiente -->
         <section id="audioInputSection" class="section-panel">
             <h2 style="margin-top:0;"><i class="fas fa-microphone-alt"></i> Pedido do Cliente e Leitura do Espaço</h2>
-            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">Use áudio, texto ou foto. A IA vai projetar a estrutura completa (Respeitando Cores Solidas e Curvas), e você terá controle total.</p>
+            <p class="subtitle" style="text-align: center; color: #777; margin-bottom: 20px;">Use áudio, texto ou foto. A IA vai projetar os módulos, e você poderá girar e alinhar cada bloco como um Lego!</p>
             
             <div class="grid-layout">
                 <div class="input-group">
-                    <label><i class="fas fa-camera"></i> Foto da Cozinha/Parede:</label>
+                    <label><i class="fas fa-camera"></i> Foto da Parede (Cozinha/Balcão):</label>
                     <input type="file" id="imageFileInput" accept="image/*" onchange="previewEComprimirImagem(event)">
                     <div id="imagePreviewContainer">
                         <img id="previewImg" src="" alt="Sua Parede">
@@ -708,8 +708,8 @@
             </div>
 
             <div class="input-group full-width">
-                <label>O que vamos projetar? (Especifique cores! Ex: Marrom Escuro, Azul, etc):</label>
-                <textarea id="transcribedTextDisplay" rows="4" placeholder="Ex: Quero um balcão em L para padaria, cor preta, com cantos curvos e prateleiras para expor doces... ou Quero uma cozinha marrom escura no lugar da foto."></textarea>
+                <label>O que vamos projetar? (Especifique cores! Ex: Marrom Escuro):</label>
+                <textarea id="transcribedTextDisplay" rows="4" placeholder="Ex: Quero um balcão em L curvo com gavetas. Ou armários marrons escuros para substituir os da foto..."></textarea>
             </div>
             
             <div id="errorDisplay" class="error-message"></div>
@@ -726,13 +726,13 @@
             <h3 style="margin-top: 0;"><i class="fas fa-drafting-compass"></i> Engenharia e Design Aplicado</h3>
             
             <div id="designerInsight" class="designer-insight" style="display: none;">
-                <i class="fas fa-eye"></i> <b>Interpretação do Arquiteto IA (20 anos de XP):</b> <span id="textoDesigner"></span>
+                <i class="fas fa-eye"></i> <b>Interpretação do Arquiteto IA:</b> <span id="textoDesigner"></span>
             </div>
 
             <!-- Visor 3D Modular e Tela Cheia AR -->
             <div style="margin-top: 30px;">
                 <h3 style="color: var(--primary-dark); font-size: 1.4em; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px;">
-                    <i class="fas fa-cube"></i> 3D Editável Paramétrico Absoluto
+                    <i class="fas fa-cube"></i> 3D Editável Paramétrico (Módulos Livres)
                 </h3>
                 
                 <div class="action-buttons" style="justify-content: flex-start; margin-bottom: 15px; margin-top: 0;">
@@ -740,7 +740,7 @@
                         <i class="fas fa-expand-arrows-alt"></i> Ver Instalado na Foto (Auto-Encaixe)
                     </button>
                     <p style="font-size: 0.85em; color: var(--earth-green); margin-top: auto; margin-bottom: auto; padding-left: 10px;">
-                        <i class="fas fa-hand-pointer"></i> Segure o dedo sobre o balcão/armário para editar.
+                        <i class="fas fa-hand-pointer"></i> Segure o dedo sobre um módulo para editá-lo ou girá-lo!
                     </p>
                 </div>
 
@@ -764,7 +764,7 @@
                 </div>
             </div>
 
-            <!-- HUD DE EDIÇÃO DE MÓDULO (CENTRAL DE COMANDO MASTER) -->
+            <!-- HUD DE EDIÇÃO DE MÓDULO (CENTRAL DE COMANDO MASTER COM POSIÇÃO LIVRE) -->
             <div id="editHUD" class="edit-hud">
                 <div class="hud-drag-indicator"></div>
                 <h4>
@@ -775,10 +775,32 @@
                 </h4>
                 
                 <div class="hud-grid" style="margin-bottom: 15px;">
-                    <div class="edit-slider" style="grid-column: 1 / -1;">
-                        <label><span>📦 Tipo de Móvel (Estrutura)</span></label>
+                    
+                    <!-- NOVOS CONTROLES DE POSIÇÃO ABSOLUTA E ROTAÇÃO (10/10) -->
+                    <div class="edit-slider" style="grid-column: 1 / -1; border-bottom: 1px solid #475569; padding-bottom: 10px; margin-bottom: 5px;">
+                        <label style="color:var(--highlight-yellow);"><i class="fas fa-arrows-alt"></i> Posição Espacial e Rotação do Bloco</label>
+                    </div>
+
+                    <div class="edit-slider">
+                        <label><span>📍 Mover X (Esq/Dir)</span><span id="lblPosX"></span></label>
+                        <input type="range" id="sliderPosX" min="-3000" max="3000" step="10" value="0" oninput="atualizarModuloParametrico()">
+                    </div>
+                    
+                    <div class="edit-slider">
+                        <label><span>📍 Mover Z (Frente/Trás)</span><span id="lblPosZ"></span></label>
+                        <input type="range" id="sliderPosZ" min="-3000" max="3000" step="10" value="0" oninput="atualizarModuloParametrico()">
+                    </div>
+                    
+                    <div class="edit-slider" style="grid-column: 1 / -1; margin-bottom: 10px;">
+                        <label><span>🔄 Girar Módulo (Ângulo)</span><span id="lblRotY"></span></label>
+                        <input type="range" id="sliderRotY" min="-180" max="180" step="5" value="0" oninput="atualizarModuloParametrico()">
+                    </div>
+
+                    <!-- CONTROLES ESTRUTURAIS -->
+                    <div class="edit-slider" style="grid-column: 1 / -1; border-top: 1px solid #475569; padding-top: 10px;">
+                        <label><span>📦 Tipo de Móvel</span></label>
                         <select id="selTipoMovel" onchange="atualizarModuloParametrico()">
-                            <option value="armario">Armário de Parede/Cozinha/Guarda-Roupa</option>
+                            <option value="armario">Armário de Parede/Chão</option>
                             <option value="balcao">Balcão Comercial (Tampo P/ Atendimento)</option>
                         </select>
                     </div>
@@ -792,7 +814,7 @@
                     </div>
 
                     <div class="edit-slider" style="grid-column: 1 / -1; border-top: 1px solid #475569; padding-top: 10px; margin-top: 5px;">
-                        <label><span>🚪 Portas e Aberturas (Visibilidade)</span></label>
+                        <label><span>🚪 Portas (Aberturas Frontais)</span></label>
                         <select id="selPorta" onchange="atualizarModuloParametrico()">
                             <option value="giro">Fechado - Portas de Giro (Laterais)</option>
                             <option value="basculante">Fechado - Portas Basculantes (Para Cima)</option>
@@ -820,8 +842,8 @@
                         <input type="range" id="sliderGav" min="0" max="8" step="1" oninput="atualizarModuloParametrico()">
                     </div>
 
-                    <div class="edit-slider">
-                        <label><span>📚 Prateleiras (Visíveis no 3D)</span><span id="lblPrat"></span></label>
+                    <div class="edit-slider" style="grid-column: 1 / -1;">
+                        <label><span>📚 Prateleiras (Visíveis)</span><span id="lblPrat"></span></label>
                         <input type="range" id="sliderPrat" min="0" max="10" step="1" oninput="atualizarModuloParametrico()">
                     </div>
                     
@@ -850,7 +872,7 @@
                     </button>
                 </h4>
                 
-                <p style="font-size:0.8em; color:#ccc; margin-top:0;">A IA já encontrou as coordenadas da foto. Use aqui para o refinamento fino do projeto real.</p>
+                <p style="font-size:0.8em; color:#ccc; margin-top:0;">A IA já encontrou as coordenadas da foto. Use aqui para o refinamento fino da cena inteira.</p>
 
                 <div class="edit-slider">
                     <label><span>Tamanho na Foto (Escala)</span></label>
@@ -913,7 +935,7 @@
                 </div>
                 <div class="input-group">
                     <label>Ferragens / Acabamentos (R$):</label>
-                    <input type="number" id="costHardware" title="Pistões, Corrediças, Tampos..." value="0" min="0" step="0.01">
+                    <input type="number" id="costHardware" title="Pistões, Corrediças..." value="0" min="0" step="0.01">
                 </div>
                 <div class="input-group">
                     <label>Outros (Frete/LED) (R$):</label>
@@ -941,14 +963,14 @@
     </div>
 
     <div class="floating-buttons">
-        <button class="floating-button mascote" onclick="mascoteFalar('O motor Auto-Snap foi ativado. A IA não adivinha mais posições, ela envia os módulos e o nosso 3D os cola perfeitamente na ordem. Experimente o balcão da padaria agora!')">
+        <button class="floating-button mascote" onclick="mascoteFalar('Mestre, agora você tem liberdade absoluta. Segure no módulo e arraste as barras de Posição X e Z para alinhar como um Lego e formar o L perfeito! Gavetas são caixas reais 3D e as curvas têm laterais!')">
             <i class="fas fa-headset"></i> <span>Arquiteto Master (20+ Anos)</span>
         </button>
     </div>
 
     <footer>Powered by thIAguinho Soluções</footer>
 
-    <!-- SCRIPT MÁGICO - EXPANDIDO PARA MÁXIMA LEGIBILIDADE E ESTABILIDADE AUTO-SNAP -->
+    <!-- SCRIPT MÁGICO - EXPANDIDO PARA MÁXIMA LEGIBILIDADE E PODER TOTAL -->
     <script>
         // ---------------------------------------------------------
         // SETUP INICIAL E VARIÁVEIS GLOBAIS
@@ -1106,7 +1128,7 @@
         }
 
         // ---------------------------------------------------------
-        // O CÉREBRO DA IA (ESTABILIZADO COM PROMPT ANTI-ALUCINAÇÃO)
+        // O CÉREBRO DA IA (BLINDADO, MULTI-MÓDULOS E CORES REAIS)
         // ---------------------------------------------------------
         async function gerarProjeto() {
             const txt = document.getElementById('transcribedTextDisplay').value.trim();
@@ -1127,26 +1149,27 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> O Arquiteto Universal está projetando...';
             btn.disabled = true;
 
-            // O PROMPT BLINDADO: Remove a liberdade espacial e foca em Módulos Lógicos.
-            const promptComando = `Você é um Arquiteto CAD Sênior. 
+            // PROMPT BLINDADO: Impede a IA de gerar madeira se a cor for sólida e força múltiplos módulos.
+            const promptComando = `Você é um Projetista CAD Sênior. 
             REGRAS ABSOLUTAS (AJA COMO UMA MÁQUINA DE CÁLCULO EXATA):
-            1. NÃO CRIE APENAS UM MÓDULO. Se a foto mostra uma cozinha/parede inteira com geladeira, micro-ondas, e armários de ponta a ponta, você DEVE dividir o projeto em múltiplos módulos no JSON.
-            2. CORES: Respeite a cor EXATA exigida (ex: Azul, Cinza, Marrom, Preto) e gere o código Hexadecimal sólido (ex: #1A252F). NUNCA utilize texturas de madeira ou amarelo se o cliente pedir cor escura sólida.
-            3. ABERTURAS ("tipo_abertura"): Se for prateleira exposta (expositor puro), "aberto". Fechado lateral é "giro". Fechado para cima é "basculante".
-            4. FORMATO E L-SHAPE ("formato"): Se o cliente pedir Balcão em L ou canto curvo, você DEVE OBRIGATORIAMENTE gerar no MÍNIMO 3 módulos: Um Módulo "reto" normal, Um Módulo "curvo" e outro Módulo "reto". Apenas UM módulo pode ter "formato": "curvo" no projeto.
-            5. POSICIONAMENTO: O motor 3D fará o encaixe automático (Auto-Snap). Portanto, VOCÊ ESTÁ PROIBIDO DE ENVIAR AS CHAVES "pos_x" E "pos_z" PARA OS MÓDULOS. Envie apenas as dimensões!
+            1. NÃO CRIE APENAS UM MÓDULO. Se a foto mostra uma cozinha/parede inteira, divida o projeto em múltiplos módulos sequenciais no array "modulos".
+            2. CORES (ATENÇÃO MÁXIMA): Respeite a cor EXATA exigida (ex: Azul, Cinza, Marrom, Preto) e gere o código Hexadecimal correspondente (ex: #1A252F, #4A3018). NUNCA devolva texturas de madeira ou amarelo se o cliente pedir cor sólida escura.
+            3. ABERTURAS ("tipo_abertura"): Expositor/Prateleiras = "aberto" (portas: 0). Fechado lateral = "giro". Fechado para cima = "basculante".
+            4. FORMATO ("formato"): Se o cliente pedir Balcão em L ou canto curvo, adicione "formato": "curvo" na peça que faz a esquina. As demais são "reto".
+            5. POSICIONAMENTO: Deixe "pos_x", "pos_z" e "rot_y" AUSENTES na resposta JSON para a maioria das peças. O motor 3D cuidará do alinhamento automático lado a lado.
+            6. MATCH PHOTO: Defina a escala e coordenadas de câmera para que o 3D tampe a foto original.
 
-            JSON ESTRITO DE RESPOSTA (Isto é um modelo de exemplo. CRIE QUANTOS MÓDULOS FOREM NECESSÁRIOS LENDO A FOTO DA ESQUERDA PARA A DIREITA):
+            JSON ESTRITO DE RESPOSTA (Isto é um modelo. CRIE QUANTOS MÓDULOS FOREM NECESSÁRIOS LENDO A FOTO):
             {
               "nome_projeto": "Projeto Marceneiro Master",
-              "engenharia": "Analisei o ambiente de ponta a ponta. Apliquei a cor exata solicitada e dividi os blocos sem omitir cantos.",
-              "design": { "cor_caixa": "#1A252F", "cor_tampo": "#222222", "material_nome": "MDF Azul Noturno (Cor Sólida)" },
+              "engenharia": "Analisei o ambiente. Apliquei a cor exata solicitada e dividi os blocos.",
+              "design": { "cor_caixa": "#2C3E50", "cor_tampo": "#222222", "material_nome": "MDF Azul/Cinza (Cor Sólida)" },
               "posicionamento_auto_ar": { "escala": 1.0, "pos_x": 0.0, "pos_y": 0.0, "rot_x": 0.0, "rot_y": 0.0, "rot_z": 0.0 },
               "instalacao": "chao", 
               "modulos": [
-                { "nome": "Módulo Esquerdo (Frente)", "tipo_movel": "balcao", "largura": 1200, "altura": 1100, "profundidade": 500, "tipo_abertura": "aberto", "portas": 0, "gavetas": 0, "prateleiras": 3, "formato": "reto" },
-                { "nome": "Canto / Quina", "tipo_movel": "balcao", "largura": 500, "altura": 1100, "profundidade": 500, "tipo_abertura": "aberto", "portas": 0, "gavetas": 0, "prateleiras": 3, "formato": "curvo" },
-                { "nome": "Módulo Direito (Lateral)", "tipo_movel": "balcao", "largura": 800, "altura": 1100, "profundidade": 500, "tipo_abertura": "aberto", "portas": 0, "gavetas": 0, "prateleiras": 3, "formato": "reto" }
+                { "nome": "Módulo Esquerdo", "tipo_movel": "armario", "largura": 800, "altura": 700, "profundidade": 400, "tipo_abertura": "giro", "portas": 2, "gavetas": 0, "prateleiras": 1, "formato": "reto" },
+                { "nome": "Módulo Central", "tipo_movel": "armario", "largura": 600, "altura": 700, "profundidade": 400, "tipo_abertura": "aberto", "tem_nicho_aberto": true, "altura_nicho": 450, "portas": 0, "gavetas": 0, "prateleiras": 1, "formato": "reto" },
+                { "nome": "Módulo Direito", "tipo_movel": "armario", "largura": 800, "altura": 700, "profundidade": 400, "tipo_abertura": "giro", "portas": 2, "gavetas": 0, "prateleiras": 1, "formato": "reto" }
               ],
               "custos": {"material": 1800, "mao_de_obra": 800, "ferragens": 100, "outros": 300}
             }`;
@@ -1157,7 +1180,7 @@
                     { 
                         role: "user", 
                         content: [
-                            { type: "text", text: `Pedido do Cliente:\n${txt}\n\n${promptComando}` }, 
+                            { type: "text", text: `Pedido:\n${txt}\n\n${promptComando}` }, 
                             { type: "image_url", image_url: { url: base64ImagemGlobal } }
                         ] 
                     }
@@ -1166,7 +1189,7 @@
                 mensagens = [
                     { 
                         role: "user", 
-                        content: `Pedido do Cliente:\n${txt}\n\n${promptComando}` 
+                        content: `Pedido:\n${txt}\n\n${promptComando}` 
                     }
                 ];
             }
@@ -1195,7 +1218,7 @@
                         mensagens = [
                             { 
                                 role: "user", 
-                                content: `Pedido do Cliente:\n${txt}\n\n${promptComando}` 
+                                content: `Pedido:\n${txt}\n\n${promptComando}` 
                             }
                         ];
                         
@@ -1249,7 +1272,7 @@
                 document.getElementById('aiDesignSection').style.display = 'block';
                 document.getElementById('designerInsight').style.display = 'block';
                 document.getElementById('textoDesigner').innerText = ia.engenharia + " (Cor Processada: " + projetoGlobal.design.material_nome + ")";
-                document.getElementById('itemName').value = ia.nome_projeto || "Projeto CAD Funcional";
+                document.getElementById('itemName').value = ia.nome_projeto || "Projeto CAD Customizado";
                 
                 if (ia.custos) {
                     document.getElementById('costMaterial').value = ia.custos.material || 0;
@@ -1376,7 +1399,7 @@
         }
 
         // ---------------------------------------------------------
-        // INICIALIZAÇÃO DO THREE.JS (CÂMERA ANTI-CLIPPING)
+        // INICIALIZAÇÃO DO THREE.JS (CÂMERA ANTI-CLIPPING ABSOLUTA)
         // ---------------------------------------------------------
         function init3D() {
             const container = document.getElementById('visualizador3D');
@@ -1396,6 +1419,7 @@
             luz2.position.set(-5, 0, -5); 
             cena3D.add(luz2);
 
+            // ANTI-CLIPPING: Near ultra pequeno e Far ultra grande
             camera3D = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 0.001, 50000);
             
             renderizador3D = new THREE.WebGLRenderer({ antialias: true, alpha: true, logarithmicDepthBuffer: true }); 
@@ -1531,7 +1555,7 @@
         }
 
         // ---------------------------------------------------------
-        // FLUXO DE EDIÇÃO NA TELA (CENTRAL DE COMANDO HUD)
+        // FLUXO DE EDIÇÃO NA TELA (CENTRAL DE COMANDO HUD COM CONTROLE ESPACIAL LIVRE)
         // ---------------------------------------------------------
         function ativarEdicaoModulo(index) {
             fecharPerspectiva(); 
@@ -1542,6 +1566,15 @@
             const modObj = projetoGlobal.modulos[index];
             
             document.getElementById('hudTitle').innerText = modObj.nome || `Módulo ${index+1}`;
+            
+            // Popula os Sliders com valores salvos (se o usuário duplicou ou moveu, lê daqui)
+            document.getElementById('sliderPosX').value = modObj.pos_x || 0;
+            document.getElementById('lblPosX').innerText = Math.round(modObj.pos_x || 0);
+            document.getElementById('sliderPosZ').value = modObj.pos_z || 0;
+            document.getElementById('lblPosZ').innerText = Math.round(modObj.pos_z || 0);
+            document.getElementById('sliderRotY').value = modObj.rot_y || 0;
+            document.getElementById('lblRotY').innerText = Math.round(modObj.rot_y || 0);
+
             document.getElementById('selTipoMovel').value = modObj.tipo_movel || 'armario';
             document.getElementById('sliderW').value = modObj.largura; 
             document.getElementById('lblW').innerText = Math.round(modObj.largura);
@@ -1608,16 +1641,29 @@
             const prat = parseInt(document.getElementById('sliderPrat').value);
             const gavs = parseInt(document.getElementById('sliderGav').value);
             
+            // Coordenadas Livres
+            const px = parseFloat(document.getElementById('sliderPosX').value);
+            const pz = parseFloat(document.getElementById('sliderPosZ').value);
+            const ry = parseFloat(document.getElementById('sliderRotY').value);
+            
             document.getElementById('lblW').innerText = w; 
             document.getElementById('lblH').innerText = h;
             document.getElementById('lblD').innerText = d; 
             document.getElementById('lblPrat').innerText = prat;
             document.getElementById('lblGav').innerText = gavs;
+            document.getElementById('lblPosX').innerText = px;
+            document.getElementById('lblPosZ').innerText = pz;
+            document.getElementById('lblRotY').innerText = ry;
 
             projetoGlobal.modulos[moduloSendoEditado].largura = w;
             projetoGlobal.modulos[moduloSendoEditado].altura = h;
             projetoGlobal.modulos[moduloSendoEditado].profundidade = d;
             
+            // Posicionamento Manual Substitui o Auto-Snap para este módulo
+            projetoGlobal.modulos[moduloSendoEditado].pos_x = px;
+            projetoGlobal.modulos[moduloSendoEditado].pos_z = pz;
+            projetoGlobal.modulos[moduloSendoEditado].rot_y = ry;
+
             projetoGlobal.modulos[moduloSendoEditado].tipo_abertura = porta;
             
             if (porta === 'aberto') {
@@ -1642,6 +1688,9 @@
             
             const novoMod = JSON.parse(JSON.stringify(projetoGlobal.modulos[moduloSendoEditado]));
             novoMod.nome = novoMod.nome + " (Cópia)";
+            
+            // Dá um pequeno pulo pro lado pra não nascer grudado no original
+            novoMod.pos_x = (novoMod.pos_x || 0) + 500; 
             
             projetoGlobal.modulos.splice(moduloSendoEditado + 1, 0, novoMod);
             
@@ -1722,8 +1771,7 @@
         }
 
         // ---------------------------------------------------------
-        // CONSTRUTOR GEOMÉTRICO "AUTO-SNAP" (ALINHAMENTO EM FILA PERFEITO)
-        // O Fim do "Caos Espacial"
+        // CONSTRUTOR GEOMÉTRICO (CAIXAS REAIS DE GAVETAS E LATERAIS)
         // ---------------------------------------------------------
         function reconstruirCenaParametrica() {
             if (grupoCozinha) {
@@ -1742,7 +1790,7 @@
             });
             
             const matPorta = new THREE.MeshStandardMaterial({ 
-                color: new THREE.Color(design?.cor_caixa || "#CCCCCC"), 
+                color: new THREE.Color(design?.cor_caixa || "#CCCCCC"), // Usando cor real solicitada
                 roughness: 0.6 
             });
             
@@ -1777,14 +1825,7 @@
             
             grupoCozinha.position.y = baseElevacao;
 
-            // LÓGICA DE AUTO-SNAP (Encaixe Magnético Direcional)
-            let curX = 0;
-            let curZ = 0;
-            let curAngle = 0; // 0 = Eixo X. 1 = Eixo Z (Quina virou pra trás)
-
-            // Para centralizar o grupo todo no final, guardamos a bounding box improvisada
-            let finalWidth = 0;
-            let finalDepth = 0;
+            let currentX = -T_W / 2; // Auto-Snap default
 
             function criarPlaca(w, h, d, mat, x, y, z, modGrp, isInt=false) {
                 const geo = new THREE.BoxGeometry(w, h, d);
@@ -1807,7 +1848,6 @@
                 const geo = new THREE.CylinderGeometry(raio, raio, h, 32, 1, open, 0, Math.PI/2);
                 const m = new THREE.Mesh(geo, mat);
                 
-                // Ajusta o pivot do cilindro para ficar alinhado na quina
                 m.position.set(-raio/2, y, -raio/2); 
                 modGrp.add(m);
                 
@@ -1827,42 +1867,15 @@
                 const mGrp = new THREE.Group();
                 mGrp.userData = { isModulo: true, modIndex: idx }; 
                 
+                // LÓGICA DE POSIÇÃO: Se o usuário editou pos_x no HUD, usa a dele. Senão, Auto-Snap.
+                let mX = mod.pos_x !== undefined && mod.pos_x !== 0 ? mod.pos_x / 1000 : currentX + mW/2;
+                let mZ = mod.pos_z !== undefined ? mod.pos_z / 1000 : 0;
+                let mRotY = mod.rot_y !== undefined ? (mod.rot_y * Math.PI / 180) : 0;
+                
                 const baseModY = (projetoGlobal.instalacao === "aereo") ? (T_H - mH) : 0; 
                 
-                // MÁGICA DO POSICIONAMENTO E ROTAÇÃO AUTOMÁTICA
-                if (mod.formato === 'curvo') {
-                    // A curva é o eixo pivot central.
-                    let cX = curX + (curAngle === 0 ? mW/2 : 0);
-                    let cZ = curZ + (curAngle === 1 ? mW/2 : 0);
-                    
-                    mGrp.position.set(cX, baseModY, cZ);
-                    mGrp.rotation.y = curAngle === 0 ? 0 : Math.PI/2;
-                    
-                    if (curAngle === 0) {
-                        curX += mW;
-                        curAngle = 1; // Vira o corredor pra trás (Eixo Z)
-                        finalDepth += mW;
-                    } else {
-                        curZ += mW;
-                        curAngle = 0; // Vira de volta pro Eixo X
-                        finalWidth += mW;
-                    }
-                } else {
-                    // Módulo Reto
-                    let cX = curX + (curAngle === 0 ? mW/2 : 0);
-                    let cZ = curZ + (curAngle === 1 ? mW/2 : 0);
-
-                    mGrp.position.set(cX, baseModY, cZ);
-                    mGrp.rotation.y = curAngle === 0 ? 0 : Math.PI/2;
-
-                    if (curAngle === 0) {
-                        curX += mW;
-                        finalWidth += mW;
-                    } else {
-                        curZ += mW;
-                        finalDepth += mW;
-                    }
-                }
+                mGrp.position.set(mX, baseModY, mZ); 
+                mGrp.rotation.y = mRotY;
 
                 const qPrat = mod.prateleiras || 0;
                 const qGav = mod.gavetas || 0;
@@ -1873,7 +1886,6 @@
                     const raio = mW; 
                     
                     if (mod.tipo_abertura === "aberto") {
-                        
                         criarCurva(raio, E, matCaixa, E/2, mGrp, true, false); // Base
                         criarCurva(raio + 0.05, E, matTampo, mH, mGrp, true, false); // Tampo
                         
@@ -1884,10 +1896,14 @@
                         criarCurva(raio - 0.2, mH, matCaixa, mH/2, mGrp, false, true); // Fundo Curvo
                     
                     } else {
-                        // Curvo Fechado com Porta!
+                        // CURVO FECHADO (E AGORA COM FECHAMENTO LATERAL NO CANTO DO L)
                         criarCurva(raio, E, matCaixa, E/2, mGrp, true, false); // Base
                         criarCurva(raio + 0.05, E, matTampo, mH, mGrp, true, false); // Tampo
                         
+                        // LATERAIS QUE FECHAM A CURVA QUANDO ELA ESTÁ SOLTA
+                        criarPlaca(E, mH, mW, matCaixa, -mW/2 + E/2, mH/2, 0, mGrp, false);
+                        criarPlaca(mW, mH, E, matCaixa, 0, mH/2, -mW/2 + E/2, mGrp, false);
+
                         const portaCurvaGrp = new THREE.Group();
                         
                         if (mod.tipo_abertura === 'basculante') {
@@ -1911,36 +1927,51 @@
                 } 
                 else {
                     
+                    // -------------- MÓDULOS RETOS --------------
                     if (isBalcao) {
                         
+                        // O Balcão SEMPRE tem as laterais estruturais nas pontas
+                        criarPlaca(E, mH, mD, matCaixa, -mW/2 + E/2, mH/2, 0, mGrp, false); // Esq
+                        criarPlaca(E, mH, mD, matCaixa, mW/2 - E/2, mH/2, 0, mGrp, false); // Dir
+
                         if (mod.tipo_abertura !== "aberto") {
-                            // Painel Frontal Liso do Balcão
+                            // Frente Fechada
                             criarPlaca(mW, mH, E, matCaixa, 0, mH/2, mD/2 - E/2, mGrp, true); 
                         }
                         
-                        criarPlaca(mW + 0.05, E, mD + 0.1, matTampo, 0, mH, 0, mGrp, true); 
+                        criarPlaca(mW + 0.05, E, mD + 0.1, matTampo, 0, mH, 0, mGrp, true); // Tampo
                         
                         if (mod.tipo_abertura === "aberto") {
-                            // Prateleiras Expostas (Lado do Cliente)
                             for (let i = 1; i <= qPrat; i++) {
                                 criarPlaca(mW, E, 0.25, matCaixa, 0, espacoPrat * i, mD/2 + 0.10, mGrp, false);
                             }
                         } else {
-                            // Prateleiras Internas (Lado do Funcionário)
                             for (let i = 1; i <= qPrat; i++) {
                                 criarPlaca(mW - E*2, E, mD - E, matCaixa, 0, espacoPrat * i, -E/2, mGrp, false);
                             }
                         }
                         
+                        // GAVETAS DO BALCÃO (COM CAIXA REAL COMPLETA)
                         if (qGav > 0) {
                             const hGav = (mH * 0.4) / qGav;
                             for (let i = 0; i < qGav; i++) {
                                 const gavGrp = new THREE.Group();
                                 gavGrp.position.set(0, E + (i * hGav) + hGav/2, 0);
                                 
-                                const frente = criarPlaca(mW - E*2 - F*2, hGav - F, E, matPorta, 0, 0, -mD/2 + E/2, gavGrp, true);
+                                const wFrente = mW - E*2 - F*2;
+                                const hFrente = hGav - F;
+                                const profGavetaInt = mD * 0.8;
+
+                                // Frente
+                                const frente = criarPlaca(wFrente, hFrente, E, matPorta, 0, 0, -mD/2 + E/2, gavGrp, true);
                                 frente.userData.grupoPai = gavGrp;
-                                criarPlaca(mW - E*4, 0.02, 0.02, matPux, 0, 0, -mD/2 - 0.01, gavGrp, false);
+                                criarPlaca(wFrente - 0.1, 0.02, 0.02, matPux, 0, 0, -mD/2 - 0.01, gavGrp, false);
+                                
+                                // Caixa da gaveta (Laterais, Fundo, Traseira)
+                                criarPlaca(E, hFrente - 0.05, profGavetaInt, matCaixa, -wFrente/2 + E/2, 0, -mD/2 + profGavetaInt/2, gavGrp, false); // Esq
+                                criarPlaca(E, hFrente - 0.05, profGavetaInt, matCaixa, wFrente/2 - E/2, 0, -mD/2 + profGavetaInt/2, gavGrp, false); // Dir
+                                criarPlaca(wFrente - E*2, E, profGavetaInt, matCaixa, 0, -hFrente/2 + E/2, -mD/2 + profGavetaInt/2, gavGrp, false); // Base
+                                criarPlaca(wFrente - E*2, hFrente - 0.05, E, matCaixa, 0, 0, -mD/2 + profGavetaInt, gavGrp, false); // Costa
                                 
                                 gavGrp.userData = { animavel: true, tipo: 'gaveta', aberto: false, posAbre: -mD * 0.6 };
                                 mGrp.add(gavGrp);
@@ -1948,11 +1979,11 @@
                         }
                         
                     } else {
-                        // ARMÁRIO RETO (Comum)
-                        criarPlaca(mW, E, mD, matCaixa, 0, E/2, mD/2, mGrp, true); 
-                        criarPlaca(E, mH, mD, matCaixa, -mW/2 + E/2, mH/2, mD/2, mGrp, true); 
-                        criarPlaca(E, mH, mD, matCaixa, mW/2 - E/2, mH/2, mD/2, mGrp, true); 
-                        criarPlaca(mW, E, mD, matCaixa, 0, mH - E/2, mD/2, mGrp, true); 
+                        // -------------- ARMÁRIO PADRÃO --------------
+                        criarPlaca(mW, E, mD, matCaixa, 0, E/2, mD/2, mGrp, true); // Base
+                        criarPlaca(E, mH, mD, matCaixa, -mW/2 + E/2, mH/2, mD/2, mGrp, true); // Esq
+                        criarPlaca(E, mH, mD, matCaixa, mW/2 - E/2, mH/2, mD/2, mGrp, true); // Dir
+                        criarPlaca(mW, E, mD, matCaixa, 0, mH - E/2, mD/2, mGrp, true); // Tampo
                         
                         let altFundo = mH - E*2;
                         let baseFundo = mH/2;
@@ -1973,7 +2004,7 @@
                         
                         criarPlaca(mW - E*2, altFundo, 0.006, matCaixa, 0, baseFundo, 0.01, mGrp); 
 
-                        // PRATELEIRAS INTERNAS
+                        // PRATELEIRAS
                         if (qPrat > 0 && altPortas > 0) {
                             const espPratInterna = altPortas / (qPrat + 1);
                             for (let i = 1; i <= qPrat; i++) {
@@ -1981,17 +2012,27 @@
                             }
                         }
 
-                        // GAVETAS FRONTAIS
+                        // GAVETAS DO ARMÁRIO (CAIXAS REAIS)
                         if (qGav > 0 && altPortas > 0) {
                             const hGav = (altPortas * 0.4) / qGav; 
                             for (let i = 0; i < qGav; i++) {
                                 const gavGrp = new THREE.Group();
                                 gavGrp.position.set(0, startYPortas + (i * hGav) + hGav/2, 0);
                                 
-                                const frente = criarPlaca(mW - E*2 - F*2, hGav - F, E, matPorta, 0, 0, mD/2 - E/2, gavGrp, true);
+                                const wFrente = mW - E*2 - F*2;
+                                const hFrente = hGav - F;
+                                const profGavetaInt = mD * 0.8;
+
+                                const frente = criarPlaca(wFrente, hFrente, E, matPorta, 0, 0, mD/2 - E/2, gavGrp, true);
                                 frente.userData.grupoPai = gavGrp;
-                                criarPlaca(mW - E*4, 0.02, 0.02, matPux, 0, 0, mD/2 + 0.01, gavGrp, false);
+                                criarPlaca(wFrente - 0.1, 0.02, 0.02, matPux, 0, 0, mD/2 + 0.01, gavGrp, false);
                                 
+                                // Caixa da gaveta
+                                criarPlaca(E, hFrente - 0.05, profGavetaInt, matCaixa, -wFrente/2 + E/2, 0, mD/2 - profGavetaInt/2, gavGrp, false); // Esq
+                                criarPlaca(E, hFrente - 0.05, profGavetaInt, matCaixa, wFrente/2 - E/2, 0, mD/2 - profGavetaInt/2, gavGrp, false); // Dir
+                                criarPlaca(wFrente - E*2, E, profGavetaInt, matCaixa, 0, -hFrente/2 + E/2, mD/2 - profGavetaInt/2, gavGrp, false); // Base
+                                criarPlaca(wFrente - E*2, hFrente - 0.05, E, matCaixa, 0, 0, mD/2 - profGavetaInt, gavGrp, false); // Costa
+
                                 gavGrp.userData = { animavel: true, tipo: 'gaveta', aberto: false, posAbre: mD * 0.6 };
                                 mGrp.add(gavGrp);
                             }
@@ -2000,7 +2041,7 @@
                             startYPortas = startYPortas + (hGav * qGav);
                         }
 
-                        // PORTAS FRONTAIS
+                        // PORTAS
                         if (mod.tipo_abertura !== "aberto" && altPortas > 0.1) {
                             const nPortas = mod.portas || 1;
                             
@@ -2044,11 +2085,12 @@
                 }
                 
                 grupoCozinha.add(mGrp); 
+                
+                // O PONTEIRO ANDA LADO A LADO AUTOMATICAMENTE
+                if (mod.pos_x === undefined || mod.pos_x === 0) {
+                    currentX += mW; 
+                }
             });
-
-            // Centraliza o bloco na câmera
-            grupoCozinha.position.x = -finalWidth / 2;
-            grupoCozinha.position.z = -finalDepth / 2;
 
             calcularPlanoDeCorteRealTime();
 
