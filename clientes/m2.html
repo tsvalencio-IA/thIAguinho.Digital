@@ -163,8 +163,13 @@
 
                 <div class="input-group full-width">
                     <label><i class="fas fa-key"></i> API Key Groq (para IA)</label>
-                    <input type="password" id="apiKeyInput" placeholder="Sua chave Groq aqui">
-                    <small style="color: #666; margin-top: 5px;">Obtenha em <a href="https://console.groq.com" target="_blank">console.groq.com</a></small>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="password" id="apiKeyInput" placeholder="Sua chave Groq aqui" style="flex: 1;">
+                        <button class="primary" onclick="salvarChaveAPI()" style="flex: 0 0 auto;"><i class="fas fa-save"></i> Salvar</button>
+                        <button onclick="toggleMostrarChave()" style="flex: 0 0 auto; background: var(--accent-gold);"><i class="fas fa-eye" id="iconOlho"></i></button>
+                    </div>
+                    <small style="color: #666; margin-top: 5px;">Obtenha em <a href="https://console.groq.com" target="_blank">console.groq.com</a> | Sua chave é salva localmente no navegador</small>
+                    <div id="statusChave" style="margin-top: 8px; font-size: 0.9em; display: none;"></div>
                 </div>
 
                 <button class="primary full-width ai-magic" onclick="analisarComIA()">
@@ -327,11 +332,54 @@
         let raycaster = new THREE.Raycaster(), mouse = new THREE.Vector2();
 
         // ============================================
+        // GERENCIAMENTO DE CHAVE API
+        // ============================================
+
+        function salvarChaveAPI() {
+            const chave = document.getElementById('apiKeyInput').value.trim();
+            const statusDiv = document.getElementById('statusChave');
+
+            if (!chave) {
+                statusDiv.style.color = 'var(--danger-red)';
+                statusDiv.innerHTML = '<i class="fas fa-times-circle"></i> Chave não pode estar vazia';
+                statusDiv.style.display = 'block';
+                return;
+            }
+
+            if (chave.length < 20) {
+                statusDiv.style.color = 'var(--danger-red)';
+                statusDiv.innerHTML = '<i class="fas fa-times-circle"></i> Chave parece inválida (muito curta)';
+                statusDiv.style.display = 'block';
+                return;
+            }
+
+            localStorage.setItem('groqApiKey', chave);
+            statusDiv.style.color = 'var(--success-green)';
+            statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> ✓ Chave salva com sucesso!';
+            statusDiv.style.display = 'block';
+            setTimeout(() => { statusDiv.style.display = 'none'; }, 3000);
+        }
+
+        function toggleMostrarChave() {
+            const input = document.getElementById('apiKeyInput');
+            const icon = document.getElementById('iconOlho');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // ============================================
         // IA - ANÁLISE COM GROQ
         // ============================================
 
         async function analisarComIA() {
-            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            let apiKey = document.getElementById('apiKeyInput').value.trim();
             const descricao = document.getElementById('descricaoPedido').value.trim();
             const errorDiv = document.getElementById('errorDiv');
             const successDiv = document.getElementById('successDiv');
@@ -339,8 +387,16 @@
             errorDiv.style.display = 'none';
             successDiv.style.display = 'none';
 
+            // Se não tem chave no input, tenta recuperar do localStorage
             if (!apiKey) {
-                errorDiv.innerHTML = '<strong>Erro:</strong> Adicione sua API Key Groq';
+                apiKey = localStorage.getItem('groqApiKey') || '';
+                if (apiKey) {
+                    document.getElementById('apiKeyInput').value = apiKey;
+                }
+            }
+
+            if (!apiKey) {
+                errorDiv.innerHTML = '<strong>Erro:</strong> Adicione sua API Key Groq e clique em Salvar';
                 errorDiv.style.display = 'block';
                 return;
             }
