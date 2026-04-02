@@ -161,8 +161,8 @@
 
     <!-- CONTROLE DE CÂMERA / MOVER -->
     <div class="top-tools" id="toolModeContainer">
-        <button class="tool-btn active" id="btnOrbit" onclick="App.ar.setModoCamera('orbit')"><i class="fas fa-sync-alt"></i> Orbitar</button>
-        <button class="tool-btn" id="btnMove" onclick="App.ar.setModoCamera('move')"><i class="fas fa-arrows-alt"></i> Mover</button>
+        <button class="tool-btn active" id="btnOrbit" onclick="App.ar.setModoCamera('orbit')"><i class="fas fa-sync-alt"></i> Orbitar / Abrir</button>
+        <button class="tool-btn" id="btnMove" onclick="App.ar.setModoCamera('move')"><i class="fas fa-arrows-alt"></i> Mover Móvel</button>
     </div>
 
     <!-- BOTÃO DE SAÍDA DO PRINT -->
@@ -209,7 +209,7 @@
             <p id="transcriptionText" style="font-size:0.85rem; color:var(--earth-green); text-align:center; margin:10px 0; font-weight:700;"></p>
 
             <div class="input-group">
-                <textarea id="textoAdicional" placeholder="Peça TUDO: balcão com prateleiras fora e gavetas internas, painel de TV, sofá, cadeira..."></textarea>
+                <textarea id="textoAdicional" placeholder="Peça TUDO: armário com gavetas do lado esquerdo, porta basculante, etc. A IA processará a geometria exata."></textarea>
             </div>
 
             <div class="input-group">
@@ -350,6 +350,7 @@
                     <option value="gavetas_internas">Gavetas Embutidas (Atrás da Porta)</option>
                     <option value="apenas_portas">Apenas Portas (100% Volume)</option>
                     <option value="apenas_gavetas">Apenas Gavetas (100% Volume)</option>
+                    <option value="ilha_dupla">Ilha Dupla (Portas nos 2 Lados)</option>
                 </select>
                 <select id="eDobradica" onchange="App.ui.updateModuleFromEditor()">
                     <option value="esq">Dobradiça Esq. (P/ 1 Porta)</option>
@@ -398,7 +399,7 @@
         </div>
 
         <div class="input-group">
-            <label>Componentes Paramétricos (Quantidades)</label>
+            <label>Qtd. de Componentes Físicos</label>
             <div class="grid-4-col">
                 <input type="number" id="ePo" title="Portas Físicas" placeholder="Port" oninput="App.ui.updateModuleFromEditor()">
                 <input type="number" id="eG" title="Gavetas com Corrediça" placeholder="Gav" oninput="App.ui.updateModuleFromEditor()">
@@ -483,6 +484,10 @@
                 if(mod.formato.includes('L_') && mod.retornoL < 400) fixes.push({k:'retornoL',v:1000,msg:'Braço do L ajustado (>400mm)'});
                 if((mod.formato === 'redondo' || mod.formato === 'triangular') && mod.largura !== mod.profundidade) fixes.push({k:'profundidade', v:mod.largura, msg:'Formas puras exigem L=P (Raio equalizado).'});
                 
+                // Força ajustes de layout interno baseados nas quantidades se o usuário definir manualmente algo que colida com o layout ativo
+                if(mod.gavetas > 0 && mod.portas > 0 && (mod.layoutInterno === 'apenas_portas' || mod.layoutInterno === 'apenas_gavetas')) {
+                    fixes.push({k:'layoutInterno', v:'top_drawers', msg:'Layout ajustado para misto (Gavetas no topo).'});
+                }
                 if(mod.gavetas > 0 && mod.portas === 0) fixes.push({k:'layoutInterno', v:'apenas_gavetas', msg:'Layout ajustado para Apenas Gavetas.'});
                 if(mod.portas > 0 && mod.gavetas === 0) fixes.push({k:'layoutInterno', v:'apenas_portas', msg:'Layout ajustado para Apenas Portas.'});
 
@@ -586,9 +591,14 @@
             },
             getPtr: (e) => {
                 const rect = ThreeEngine.renderer.domElement.getBoundingClientRect();
-                const x = e.touches ? e.touches[0].clientX : e.clientX, y = e.touches ? e.touches[0].clientY : e.clientY;
-                ThreeEngine.pointer.x = ((x - rect.left)/rect.width)*2 - 1; ThreeEngine.pointer.y = -((y - rect.top)/rect.height)*2 + 1;
-                return {x, y};
+                let cX = e.clientX; let cY = e.clientY;
+                // Resgate imbatível para telas Touch:
+                if(cX === undefined && e.changedTouches && e.changedTouches.length > 0) {
+                    cX = e.changedTouches[0].clientX; cY = e.changedTouches[0].clientY;
+                }
+                ThreeEngine.pointer.x = ((cX - rect.left)/rect.width)*2 - 1;
+                ThreeEngine.pointer.y = -((cY - rect.top)/rect.height)*2 + 1;
+                return {x: cX, y: cY}; // Retorna Pixels de ecrã para precisão milimétrica!
             },
             onPtrDown: (e) => {
                 const pos = ThreeEngine.getPtr(e);
@@ -615,7 +625,7 @@
                         }
                         
                         const ind = document.getElementById('longPressIndicator');
-                        ind.style.display = 'block'; ind.style.left = (e.touches ? e.touches[0].clientX : e.clientX - 30) + 'px'; ind.style.top = (e.touches ? e.touches[0].clientY : e.clientY - 30) + 'px';
+                        ind.style.display = 'block'; ind.style.left = (pos.x - 30) + 'px'; ind.style.top = (pos.y - 30) + 'px';
                         ThreeEngine.pressTimer = setTimeout(() => {
                             ThreeEngine.isLongPress = true; ind.style.display = 'none'; App.ui.openLiveEditor(obj.userData.id);
                         }, 600);
@@ -627,7 +637,7 @@
             onPtrMove: (e) => {
                 if(!ThreeEngine.isDown) return;
                 const pos = ThreeEngine.getPtr(e);
-                if(Math.hypot(pos.x - ThreeEngine.pDown.x, pos.y - ThreeEngine.pDown.y) > 0.05) {
+                if(Math.hypot(pos.x - ThreeEngine.pDown.x, pos.y - ThreeEngine.pDown.y) > 8) {
                     clearTimeout(ThreeEngine.pressTimer); document.getElementById('longPressIndicator').style.display = 'none';
                 }
                 
@@ -652,18 +662,26 @@
                 if(ThreeEngine.dragObj) { ThreeEngine.dragObj = null; return; }
                 if(ThreeEngine.isLongPress) return;
                 
-                // Abre e Fecha Portas/Gavetas de forma robusta e infalível
+                // Lógica Absoluta de Busca de Interatividade Física
                 if(AppState.tool === 'orbit') {
                     const pos = ThreeEngine.getPtr(e);
-                    if(Math.hypot(pos.x - ThreeEngine.pDown.x, pos.y - ThreeEngine.pDown.y) < 0.05) {
+                    // Checa se foi apenas um clique/toque (movimentação < 5 pixels)
+                    if(Math.hypot(pos.x - ThreeEngine.pDown.x, pos.y - ThreeEngine.pDown.y) < 5) {
                         ThreeEngine.raycaster.setFromCamera(ThreeEngine.pointer, ThreeEngine.camera);
                         const hits = ThreeEngine.raycaster.intersectObjects(ThreeEngine.rootNode.children, true);
+                        
                         if(hits.length > 0) {
-                            let curr = hits[0].object; let anim = null;
-                            while(curr) { 
-                                if(curr.userData && curr.userData.isAnimatable) { anim = curr; break; } 
-                                curr = curr.parent; 
+                            let anim = null;
+                            // Pesquisa profunda em todos os objetos que o raio atingiu (Mesmo através do vidro)
+                            for (let i = 0; i < hits.length; i++) {
+                                let curr = hits[i].object;
+                                while(curr) { 
+                                    if(curr.userData && curr.userData.isAnimatable) { anim = curr; break; } 
+                                    curr = curr.parent; 
+                                }
+                                if(anim) break;
                             }
+                            
                             if(anim) {
                                 anim.userData.isOpen = !anim.userData.isOpen;
                                 AppState.animacoesAtivas = AppState.animacoesAtivas.filter(a => a.obj !== anim);
@@ -679,13 +697,15 @@
                     const a = AppState.animacoesAtivas[i]; const obj = a.obj; const speed = 0.12;
                     if(a.type === 'door_hinge') {
                         const mult = obj.userData.zDir || 1;
-                        const finalHinge = obj.userData.hinge === 'left' ? 1 : -1;
+                        // Ajuste vetorial definitivo
+                        const finalHinge = obj.userData.hinge === 'left' ? -1 : 1; 
                         const maxAngle = (Math.PI/1.6) * finalHinge * mult;
                         const tgt = a.target ? maxAngle : 0;
                         obj.rotation.y += (tgt - obj.rotation.y)*speed;
                         if(Math.abs(obj.rotation.y-tgt)<0.01) { obj.rotation.y=tgt; AppState.animacoesAtivas.splice(i,1); }
                     } else if(a.type === 'door_flap') { 
-                        const tgt = a.target ? -Math.PI/2.2 : 0;
+                        const mult = obj.userData.zDir || 1;
+                        const tgt = a.target ? (-Math.PI/2.2 * mult) : 0;
                         obj.rotation.x += (tgt - obj.rotation.x)*speed;
                         if(Math.abs(obj.rotation.x-tgt)<0.01) { obj.rotation.x=tgt; AppState.animacoesAtivas.splice(i,1); }
                     } else if(a.type === 'door_slide') { 
@@ -703,6 +723,7 @@
             },
             
             rebuildScene: () => {
+                AppState.animacoesAtivas = []; // Blindagem contra mesh fantasmas
                 while(ThreeEngine.rootNode.children.length > 0) ThreeEngine.rootNode.remove(ThreeEngine.rootNode.children[0]);
                 let autoX = 0;
                 
@@ -719,7 +740,7 @@
                     const matVidro = new THREE.MeshStandardMaterial(MatDefs['vidro']);
                     const selMat = new THREE.MeshStandardMaterial({...baseDef, emissive: 0x333333 });
                     
-                    const edgeMat = new THREE.LineBasicMaterial({ color: 0x222, transparent: true, opacity: 0.15 });
+                    const edgeMat = new THREE.LineBasicMaterial({ color: 0x222, transparent: true, opacity: 0.25 });
                     const activeMat = (AppState.selectedModule === mod.id) ? selMat : matCorpo;
                     const activeMatFront = (AppState.selectedModule === mod.id) ? selMat : matFrente;
 
@@ -766,7 +787,7 @@
                                 grp.position.set(px + (isLeft ? -wF/2 : wF/2), py, pz);
                                 pM.position.x = isLeft ? wF/2 : -wF/2;
                                 const pux = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.15, 0.02), new THREE.MeshStandardMaterial({color:0x888, metalness:1}));
-                                pux.position.set(isLeft ? wF-0.04 : -wF+0.04, 0, 0.015 * zDir); pM.add(pux);
+                                pux.position.set(isLeft ? wF/2-0.04 : -wF/2+0.04, 0, 0.015 * zDir); pM.add(pux);
                                 grp.add(pM);
                             }
                         }
@@ -780,6 +801,22 @@
                         
                         let isInternalDrawers = (layout === 'gavetas_internas');
 
+                        // Modo Ilha (Portas nos 2 Lados)
+                        if(layout === 'ilha_dupla') {
+                            const pW = boxW/portas;
+                            for(let i=0; i<portas; i++) {
+                                let isLeft = (i%2===0); if(portas===1) isLeft = (dobrLado === 'esq');
+                                let tX = (i%2===0) ? pW*0.95 : -pW*0.95;
+                                drawInteractiveFronte(parentGroup, false, pW, boxH, boxD, startX + pW/2 + i*pW, startY + boxH/2, boxZ, activeMatFront, abertura, isLeft, zDir, tX);
+                                // Parte de trás da ilha (inverte zDir)
+                                const backZDir = zDir * -1;
+                                const backZ = boxZ + (boxD * backZDir);
+                                drawInteractiveFronte(parentGroup, false, pW, boxH, boxD, startX + pW/2 + i*pW, startY + boxH/2, backZ, activeMatFront, abertura, !isLeft, backZDir, -tX);
+                            }
+                            return; // Preenchemos a frente e trás, finaliza aqui
+                        }
+
+                        // Cálculos Espaciais das Subdivisões
                         if(gavetas > 0 && portas > 0 && !isInternalDrawers) {
                             if(layout === 'top_drawers') { hG = boxH*0.25; hP = boxH*0.75; syP = startY; syG = startY + hP; }
                             else if(layout === 'bottom_drawers') { hG = boxH*0.25; hP = boxH*0.75; syG = startY; syP = startY + hG; }
@@ -787,6 +824,7 @@
                             else if(layout === 'right_drawers') { wP = boxW*0.65; wG = boxW*0.35; sxP = startX; sxG = startX + wP; }
                         }
 
+                        // Renderização Física: Gavetas
                         if(gavetas > 0 && layout !== 'apenas_portas') {
                             const gH = hG/gavetas;
                             for(let i=0; i<gavetas; i++) {
@@ -795,6 +833,7 @@
                             }
                         }
 
+                        // Renderização Física: Portas
                         if(portas > 0 && layout !== 'apenas_gavetas') {
                             const pW = wP/portas;
                             for(let i=0; i<portas; i++) {
@@ -898,7 +937,7 @@
                         const chassiD = d - prEx; 
                         
                         const zDir = isBalcao ? -1 : 1; 
-                        const fZ = isBalcao ? (-chassiD/2 + esp/2) : (chassiD/2 - esp/2); 
+                        const fZ = isBalcao ? (-chassiD/2 - esp/2) : (chassiD/2 + esp/2); 
                         const bZ = isBalcao ? (chassiD/2 - esp/2) : (-chassiD/2 + esp/2); 
 
                         criarBloco(w, esp, d, 0, esp/2, isBalcao ? prEx/2 : -prEx/2); 
@@ -1034,7 +1073,7 @@
                     AppState.tool = modo;
                     document.getElementById('btnOrbit').classList.toggle('active', modo === 'orbit');
                     document.getElementById('btnMove').classList.toggle('active', modo === 'move');
-                    App.ui.toast(`Ferramenta ${modo==='move'?'Mover':'Orbitar'} Ativada.`, 'success');
+                    App.ui.toast(`Ferramenta ${modo==='move'?'Mover':'Orbitar/Abrir Portas'} Ativada.`, 'success');
                 },
                 setModoInteracao: (modo) => {
                     AppState.modoInteracao = modo;
@@ -1127,7 +1166,7 @@
                     try {
                         const prompt = `Você é um Arquiteto e Marceneiro Master.
                         Gere a estrutura 3D.
-                        LAYOUT INTERNO VÁLIDO: "top_drawers", "bottom_drawers", "left_drawers", "right_drawers", "gavetas_internas", "apenas_portas", "apenas_gavetas".
+                        LAYOUT INTERNO VÁLIDO: "top_drawers", "bottom_drawers", "left_drawers", "right_drawers", "gavetas_internas", "apenas_portas", "apenas_gavetas", "ilha_dupla".
                         DOBRADIÇA: "esq" ou "dir" (Se for só 1 porta).
                         VOZ/TEXTO DO CLIENTE: "${AppState.transcricaoAtual} ${txt}"
                         RETORNE APENAS JSON, ex: {"modulos": [{"tipo": "armario", "nome": "Armário Preciso", "largura": 800, "altura": 900, "profundidade": 500, "formato": "reto", "retornoL": 0, "material": "amadeirado", "ripadoFrontal": false, "tampoVidro": false, "prateleirasExternas": 0, "portas": 1, "gavetas": 3, "prateleiras": 1, "abertura": "giro", "layoutInterno": "left_drawers", "dobradicaLado": "esq", "posX": 0, "posY": 0, "posZ": 0, "rotY": 0}]}`;
