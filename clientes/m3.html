@@ -37,7 +37,7 @@
         .icon-btn { background: none; border: none; color: var(--accent-gold); font-size: 1.5rem; cursor: pointer; transition: transform 0.2s; }
         .icon-btn:hover { transform: rotate(45deg); }
 
-        #canvas-container { flex: 1; position: relative; width: 100%; height: 100%; background: radial-gradient(circle, #ffffff 0%, #e0e0e0 100%); }
+        #canvas-container { flex: 1; position: relative; width: 100%; height: 100%; background: radial-gradient(circle, #ffffff 0%, #e0e0e0 100%); transition: background 0.3s; }
         canvas { display: block; width: 100% !important; height: 100% !important; outline: none; }
 
         .floating-controls { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; z-index: 50; background: rgba(255, 255, 255, 0.95); padding: 10px 20px; border-radius: 30px; box-shadow: var(--shadow-subtle); }
@@ -48,19 +48,28 @@
         .fab-btn.success i { color: var(--earth-green); }
         .fab-btn:hover { transform: translateY(-3px); }
 
+        /* HUDs (Bottom Sheets) */
         .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 85vh; background-color: var(--soft-beige); border-radius: 20px 20px 0 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.3); z-index: 200; transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; }
         .bottom-sheet.active { bottom: 0; }
         .sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid var(--border-soft); background-color: var(--light-cream); border-radius: 20px 20px 0 0; }
         .sheet-header h3 { color: var(--primary-dark); margin: 0; font-size: 1.1rem; }
-        .close-btn { background: #e0e0e0; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; color: var(--text-color); }
+        .close-btn { background: #e0e0e0; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; color: var(--text-color); display: flex; justify-content: center; align-items: center; }
         .sheet-body { padding: 20px; overflow-y: auto; flex: 1; }
 
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--secondary-wood); }
-        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 12px; border: 1px solid var(--border-soft); border-radius: var(--border-radius); font-family: inherit; font-size: 1rem; background: #fff; }
+        /* EDITOR FLUTUANTE AO VIVO (NOVO) */
+        .floating-editor { position: fixed; bottom: -100%; right: 0; width: 100%; max-height: 55vh; background: rgba(253, 252, 249, 0.95); backdrop-filter: blur(10px); border-radius: 20px 20px 0 0; box-shadow: 0 -10px 25px rgba(0,0,0,0.2); z-index: 250; transition: bottom 0.4s; overflow-y: auto; padding: 20px; border-top: 3px solid var(--accent-gold); }
+        .floating-editor.active { bottom: 0; }
+        @media(min-width: 768px) {
+            .floating-editor { top: 80px; bottom: auto; right: 20px; width: 350px; max-height: 80vh; border-radius: 12px; border: 1px solid var(--border-soft); }
+            .floating-editor.active { top: 80px; }
+        }
+
+        .input-group { margin-bottom: 12px; }
+        .input-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: var(--secondary-wood); }
+        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border-soft); border-radius: 6px; font-family: inherit; font-size: 0.9rem; background: #fff; }
         .input-group textarea { resize: vertical; min-height: 80px; }
 
-        .btn-block { display: block; width: 100%; padding: 15px; text-align: center; background-color: #e0e0e0; color: var(--primary-dark); border: none; border-radius: var(--border-radius); font-weight: 600; font-size: 1rem; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
+        .btn-block { display: block; width: 100%; padding: 12px; text-align: center; background-color: #e0e0e0; color: var(--primary-dark); border: none; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
         .btn-block.action-btn { background-color: var(--accent-gold); color: #fff; }
         .btn-block.success { background-color: var(--earth-green); color: #fff; }
         .btn-block.recording { background-color: var(--warning-red); color: #fff; animation: pulse 1.5s infinite; }
@@ -69,14 +78,16 @@
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
 
         .file-input { display: none; }
-        .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .grid-3-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .grid-3-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 
-        .module-card { background: #fff; border-left: 5px solid var(--accent-gold); padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .module-card { background: #fff; border-left: 5px solid var(--accent-gold); padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.3s; }
+        .module-card.highlighted { border-left: 5px solid var(--warning-red); background-color: #fff9f9; transform: scale(1.02); }
         .module-card h4 { margin-bottom: 5px; color: var(--primary-dark); text-transform: uppercase; font-size: 0.95rem; }
         .module-card p { font-size: 0.85rem; color: #666; margin-bottom: 5px; }
 
-        .edit-form { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-top: 10px; border: 1px solid var(--border-soft); }
+        .cad-controls { background: #eef2f5; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed var(--ai-blue); }
+        .cad-controls h5 { color: var(--ai-blue); margin-bottom: 10px; font-size: 0.85rem; text-transform: uppercase; }
 
         .price-summary { margin-top: 20px; padding: 20px; background-color: #fff; border: 2px dashed var(--accent-gold); border-radius: var(--border-radius); text-align: center; }
         .price-summary p { font-size: 2.2rem; font-weight: 700; color: var(--earth-green); margin-top: 10px; }
@@ -94,16 +105,24 @@
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
         @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+        
+        #longPressIndicator { position: fixed; width: 40px; height: 40px; border: 4px solid var(--accent-gold); border-radius: 50%; border-top-color: transparent; animation: spin 0.6s linear infinite; display: none; z-index: 150; pointer-events: none; }
     </style>
 </head>
 <body>
 
     <header class="app-header">
-        <h1><i class="fas fa-hammer"></i> AutoCAD Marcenaria Universal</h1>
+        <h1><i class="fas fa-hammer"></i> AutoCAD Marcenaria PRO</h1>
         <button class="icon-btn" onclick="toggleModal('modalSettings')"><i class="fas fa-cog"></i></button>
     </header>
 
     <div id="canvas-container"></div>
+    <div id="longPressIndicator"></div>
+
+    <!-- PAINEL FLUTUANTE DE EDIÇÃO AO VIVO -->
+    <div id="floatingEditor" class="floating-editor">
+        <!-- Injetado dinamicamente no JS -->
+    </div>
 
     <div class="floating-controls">
         <button class="fab-btn primary" onclick="abrirHUD('hudIA')"><i class="fas fa-robot"></i><span>Assistente</span></button>
@@ -124,11 +143,11 @@
     <!-- ================= HUDS ================= -->
     <div id="hudIA" class="bottom-sheet">
         <div class="sheet-header">
-            <h3><i class="fas fa-brain"></i> Criador Multimodal IA</h3>
+            <h3><i class="fas fa-brain"></i> Visão & Fotogrametria IA</h3>
             <button class="close-btn" onclick="fecharHUDs()"><i class="fas fa-times"></i></button>
         </div>
         <div class="sheet-body">
-            <p style="font-size: 0.85rem; margin-bottom: 15px; color: var(--secondary-wood);">Peça qualquer coisa: sofá, painel de TV, rack, guarda-roupa, mesa, estante...</p>
+            <p style="font-size: 0.85rem; margin-bottom: 15px; color: var(--secondary-wood);">Forneça instruções. A IA usará a foto de fundo para calcular posições exatas e dimensões reais.</p>
             
             <button class="btn-block" id="btnRecord" onmousedown="startRecording()" onmouseup="stopRecording()" ontouchstart="startRecording()" ontouchend="stopRecording()">
                 <i class="fas fa-microphone"></i> 1. Segure para falar (Groq)
@@ -136,13 +155,13 @@
             <p id="transcriptionText" style="font-size:0.85rem; color:var(--earth-green); font-style:italic; margin-bottom:10px; text-align:center;"></p>
 
             <div class="input-group">
-                <textarea id="textoAdicional" placeholder="2. Ou digite aqui (Ex: Quero um painel de tv ripado com rack, e um sofá cinza na frente)..."></textarea>
+                <textarea id="textoAdicional" placeholder="2. Ou digite aqui (Ex: Construa um guarda-roupa alinhado na parede direita)..."></textarea>
             </div>
 
             <input type="file" id="fotoCliente" accept="image/*" class="file-input">
-            <label for="fotoCliente" class="btn-block"><i class="fas fa-camera"></i> 3. Referência (Foto do Local)</label>
+            <label for="fotoCliente" class="btn-block"><i class="fas fa-camera"></i> 3. Carregar Foto da Parede/Local</label>
             
-            <button class="btn-block action-btn" onclick="analisarComIA()"><i class="fas fa-hammer"></i> Fabricar Projeto Universal</button>
+            <button class="btn-block action-btn" onclick="analisarComIA()"><i class="fas fa-hammer"></i> Extrair Dados e Fabricar</button>
             <div id="iaErrorBox" class="error-box"></div>
         </div>
     </div>
@@ -153,6 +172,7 @@
             <button class="close-btn" onclick="fecharHUDs()"><i class="fas fa-times"></i></button>
         </div>
         <div class="sheet-body">
+            <p style="font-size: 0.8rem; color: #666; margin-bottom:15px;"><i class="fas fa-info-circle"></i> Segure o dedo em um móvel no 3D para editar ao vivo.</p>
             <div id="listaModulosContainer"></div>
             <button class="btn-block success" onclick="adicionarModuloManual()"><i class="fas fa-plus"></i> Adicionar Nova Peça</button>
         </div>
@@ -160,22 +180,26 @@
 
     <div id="perspectiveHUD" class="bottom-sheet">
         <div class="sheet-header">
-            <h3><i class="fas fa-arrows-alt"></i> Câmera & AR</h3>
+            <h3><i class="fas fa-arrows-alt"></i> Realidade Aumentada (AR)</h3>
             <button class="close-btn" onclick="fecharHUDs()"><i class="fas fa-times"></i></button>
         </div>
         <div class="sheet-body">
+            <p style="font-size: 0.85rem; margin-bottom:15px; color: var(--secondary-wood);">Para uma simulação perfeita, carregue uma foto no Assistente e ative o AR. Os móveis ficarão sobrepostos na imagem.</p>
+            
+            <button class="btn-block" id="btnToggleAR" style="background:var(--ai-blue); color:#fff; padding: 20px;" onclick="toggleARMode()">
+                <i class="fas fa-eye"></i> <span id="arBtnText">Ativar Fundo Real (AR Mode)</span>
+            </button>
+
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-soft);">
+            
             <div class="input-group">
-                <label>Tombar Câmera (Encaixe Parede)</label>
+                <label>Tombar Câmera (Encaixe)</label>
                 <input type="range" id="camRotX" min="-1" max="1" step="0.05" value="0" oninput="ajustarPerspectivaManual()">
             </div>
             <div class="grid-2-col">
                 <button class="btn-block action-btn" onclick="autoEncaixarIA()"><i class="fas fa-magic"></i> Auto Encaixe</button>
                 <button class="btn-block" onclick="resetCamera()"><i class="fas fa-video"></i> Resetar</button>
             </div>
-            <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-soft);">
-            <button class="btn-block" id="btnToggleAR" style="background:var(--ai-blue); color:#fff;" onclick="toggleARMode()">
-                <i class="fas fa-hand-pointer"></i> <span id="arBtnText">Ativar Modo AR (Mover Móveis)</span>
-            </button>
         </div>
     </div>
 
@@ -198,7 +222,6 @@
         </div>
     </div>
 
-    <!-- Modal Configurações -->
     <div id="modalSettings" class="modal-overlay">
         <div class="modal-content">
             <h2 style="margin-bottom:15px; color:var(--primary-dark);"><i class="fas fa-key"></i> Chaves de API</h2>
@@ -221,20 +244,25 @@
     <script>
         const AppState = {
             modulos: [], modoAR: false, arrastando: null, animacoesAtivas: [], transcricaoAtual: "",
+            imagemFundoBase64: null, imagemFundoURL: null,
             chavesAPI: { gemini: localStorage.getItem('ak_gemini_cad') || '', groq: localStorage.getItem('ak_groq_cad') || '' }
         };
 
         let scene, camera, renderer, controls, raycaster, pointer, groundPlane, rootNode;
-        const CLICK_TOLERANCE = 5; let pointerDownPos = { x: 0, y: 0 }, isPointerDown = false;
+        const CLICK_TOLERANCE = 5; 
+        let pointerDownPos = { x: 0, y: 0 };
+        let isPointerDown = false;
+        
+        let pressTimer;
+        let longPressTriggered = false;
         let mediaRecorder, audioChunks = [];
 
         window.addEventListener('DOMContentLoaded', () => {
             initThreeJS(); carregarChaves();
-            // Demo inicial demonstrando a diversidade paramétrica
-            AppState.modulos.push({ id: 1, tipo: "painel_tv", nome: "Painel de Sala", largura: 2000, altura: 2500, profundidade: 50, portas: 0, gavetas: 0, prateleiras: 1, abertura: "nenhuma", cor: "#8B5A2B" });
-            AppState.modulos.push({ id: 2, tipo: "rack", nome: "Rack Inferior", largura: 2000, altura: 450, profundidade: 400, portas: 0, gavetas: 3, prateleiras: 0, abertura: "nenhuma", cor: "#F5F5DC" });
-            AppState.modulos.push({ id: 3, tipo: "sofa", nome: "Sofá Retrátil", largura: 2200, altura: 900, profundidade: 1000, portas: 0, gavetas: 0, prateleiras: 0, abertura: "nenhuma", cor: "#708090" });
+            // Base inicial
+            AppState.modulos.push({ id: 1, tipo: "armario", nome: "Gabinete Base", largura: 1200, altura: 850, profundidade: 550, portas: 2, gavetas: 3, prateleiras: 1, abertura: "giro", cor: "#FDFCF9", posX: 0, posZ: 0, rotY: 0 });
             reconstruirCena(); atualizarHUDLista(); calcularTotal();
+            setupImageUploader();
         });
 
         function showToast(msg) {
@@ -243,10 +271,12 @@
         }
 
         function abrirHUD(hudId) {
-            document.querySelectorAll('.bottom-sheet').forEach(s => s.classList.remove('active'));
+            fecharHUDs(); fecharEditor();
             document.getElementById(hudId).classList.add('active');
         }
-        function fecharHUDs() { document.querySelectorAll('.bottom-sheet').forEach(s => s.classList.remove('active')); }
+        function fecharHUDs() { 
+            document.querySelectorAll('.bottom-sheet').forEach(s => s.classList.remove('active')); 
+        }
         function toggleModal(id) { const m = document.getElementById(id); m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; }
         
         function carregarChaves() { document.getElementById('keyGemini').value = AppState.chavesAPI.gemini; document.getElementById('keyGroq').value = AppState.chavesAPI.groq; }
@@ -259,6 +289,45 @@
         function showLoading(msg) { document.getElementById('statusText').innerText = msg; document.getElementById('statusOverlay').style.display = 'flex'; }
         function hideLoading() { document.getElementById('statusOverlay').style.display = 'none'; }
 
+        // ================= IMAGEM DE FUNDO & AR =================
+        function setupImageUploader() {
+            document.getElementById('fotoCliente').addEventListener('change', async function(e) {
+                if(e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    AppState.imagemFundoURL = URL.createObjectURL(file);
+                    
+                    // Converter para base64 para uso na IA
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => {
+                        AppState.imagemFundoBase64 = reader.result.split(',')[1];
+                        showToast("Foto salva! Ative o AR Mode para visualizar o ambiente.");
+                    };
+                }
+            });
+        }
+
+        function toggleARMode() {
+            AppState.modoAR = !AppState.modoAR;
+            const container = document.getElementById('canvas-container');
+            const btnText = document.getElementById('arBtnText');
+
+            if (AppState.modoAR) {
+                container.style.background = 'none';
+                if(AppState.imagemFundoURL) {
+                    container.style.backgroundImage = `url(${AppState.imagemFundoURL})`;
+                    container.style.backgroundSize = 'cover';
+                    container.style.backgroundPosition = 'center';
+                }
+                btnText.innerText = "Modo AR Ativo (Arraste os Móveis)";
+                showToast("AR Ativo: Você pode arrastar os móveis e editá-los sobre a foto!");
+            } else {
+                container.style.background = 'radial-gradient(circle, #ffffff 0%, #e0e0e0 100%)';
+                container.style.backgroundImage = 'none';
+                btnText.innerText = "Ativar Fundo Real (AR Mode)";
+            }
+        }
+
         // ================= ÁUDIO GROQ =================
         async function startRecording() {
             if (!AppState.chavesAPI.groq) return showToast("Adicione a chave Groq!");
@@ -268,7 +337,7 @@
                 mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
                 mediaRecorder.onstop = processarAudioGroq;
                 audioChunks = []; mediaRecorder.start();
-                document.getElementById('btnRecord').innerText = "Gravando..."; document.getElementById('btnRecord').classList.add('recording');
+                document.getElementById('btnRecord').innerText = "Gravando... (Solte)"; document.getElementById('btnRecord').classList.add('recording');
             } catch (err) { showToast("Erro no microfone"); }
         }
         function stopRecording() {
@@ -287,7 +356,7 @@
             } catch(e) { showToast("Falha na transcrição."); } finally { hideLoading(); }
         }
 
-        // ================= MOTOR 3D =================
+        // ================= MOTOR 3D & LONG PRESS =================
         function initThreeJS() {
             const container = document.getElementById('canvas-container');
             scene = new THREE.Scene();
@@ -300,27 +369,92 @@
             groundPlane = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshBasicMaterial({ visible: false })); groundPlane.rotation.x = -Math.PI / 2; scene.add(groundPlane);
             rootNode = new THREE.Group(); scene.add(rootNode);
             raycaster = new THREE.Raycaster(); pointer = new THREE.Vector2();
-            renderer.domElement.addEventListener('pointerdown', onPointerDown); renderer.domElement.addEventListener('pointermove', onPointerMove); renderer.domElement.addEventListener('pointerup', onPointerUp); window.addEventListener('resize', () => { camera.aspect = container.clientWidth / container.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(container.clientWidth, container.clientHeight); });
+            
+            renderer.domElement.addEventListener('pointerdown', onPointerDown); 
+            renderer.domElement.addEventListener('pointermove', onPointerMove); 
+            renderer.domElement.addEventListener('pointerup', onPointerUp); 
+            
+            window.addEventListener('resize', () => { camera.aspect = container.clientWidth / container.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(container.clientWidth, container.clientHeight); });
             animate();
         }
 
         function onPointerDown(e) {
-            isPointerDown = true; pointerDownPos = { x: e.clientX, y: e.clientY }; updatePointer(e); raycaster.setFromCamera(pointer, camera);
+            if(e.touches) {
+                pointerDownPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            } else {
+                pointerDownPos = { x: e.clientX, y: e.clientY };
+            }
+            isPointerDown = true; 
+            updatePointer(pointerDownPos.x, pointerDownPos.y); 
+            raycaster.setFromCamera(pointer, camera);
+            longPressTriggered = false;
+            
+            // AR Drag Mode
             if (AppState.modoAR) {
                 controls.enabled = false; const hits = raycaster.intersectObjects(rootNode.children, true);
                 if (hits.length > 0) { let obj = hits[0].object; while (obj && !obj.userData.isRootModule && obj.parent) obj = obj.parent; if (obj && obj.userData.isRootModule) AppState.arrastando = obj; }
+            } 
+            
+            // Lógica do Clique Longo (Funciona no AR e Normal)
+            const hits = raycaster.intersectObjects(rootNode.children, true);
+            if(hits.length > 0 && !AppState.arrastando) { // Se não está arrastando
+                let obj = hits[0].object;
+                while (obj && !obj.userData.isRootModule && obj.parent) obj = obj.parent;
+                if (obj && obj.userData.isRootModule) {
+                    const objectClickedId = obj.userData.rawData.id;
+                    const ind = document.getElementById('longPressIndicator');
+                    ind.style.display = 'block'; ind.style.left = (pointerDownPos.x - 20) + 'px'; ind.style.top = (pointerDownPos.y - 20) + 'px';
+                    
+                    pressTimer = setTimeout(() => {
+                        longPressTriggered = true;
+                        ind.style.display = 'none';
+                        navigator.vibrate && navigator.vibrate(50);
+                        abrirEditorAoVivo(objectClickedId);
+                    }, 500); 
+                }
             }
         }
 
         function onPointerMove(e) {
             if (!isPointerDown) return;
-            if (AppState.modoAR && AppState.arrastando) { updatePointer(e); raycaster.setFromCamera(pointer, camera); const hits = raycaster.intersectObject(groundPlane); if (hits.length > 0) { AppState.arrastando.position.x = hits[0].point.x; AppState.arrastando.position.z = hits[0].point.z; } }
+            const px = e.touches ? e.touches[0].clientX : e.clientX;
+            const py = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            const dist = Math.sqrt(Math.pow(px - pointerDownPos.x, 2) + Math.pow(py - pointerDownPos.y, 2));
+            if(dist > CLICK_TOLERANCE) {
+                clearTimeout(pressTimer); 
+                document.getElementById('longPressIndicator').style.display = 'none';
+            }
+            if (AppState.modoAR && AppState.arrastando) { 
+                updatePointer(px, py); raycaster.setFromCamera(pointer, camera); 
+                const hits = raycaster.intersectObject(groundPlane); 
+                if (hits.length > 0) { 
+                    AppState.arrastando.position.x = hits[0].point.x; AppState.arrastando.position.z = hits[0].point.z; 
+                    // Se estiver com o editor aberto, atualiza os campos de input de posição
+                    const idx = AppState.modulos.findIndex(m => m.id === AppState.arrastando.userData.rawData.id);
+                    if(idx !== -1 && document.getElementById(`ePx`)) {
+                        document.getElementById(`ePx`).value = (hits[0].point.x * 1000).toFixed(0);
+                        document.getElementById(`ePz`).value = (hits[0].point.z * 1000).toFixed(0);
+                        AppState.modulos[idx].posX = hits[0].point.x * 1000;
+                        AppState.modulos[idx].posZ = hits[0].point.z * 1000;
+                    }
+                } 
+            }
         }
 
         function onPointerUp(e) {
-            isPointerDown = false; controls.enabled = true; if (AppState.arrastando) { AppState.arrastando = null; return; }
-            if (Math.abs(e.clientX - pointerDownPos.x) < CLICK_TOLERANCE && Math.abs(e.clientY - pointerDownPos.y) < CLICK_TOLERANCE && !AppState.modoAR) {
-                updatePointer(e); raycaster.setFromCamera(pointer, camera); const hits = raycaster.intersectObjects(rootNode.children, true);
+            isPointerDown = false; controls.enabled = true; clearTimeout(pressTimer);
+            document.getElementById('longPressIndicator').style.display = 'none';
+            
+            if (AppState.arrastando) { AppState.arrastando = null; return; }
+            if (longPressTriggered) return;
+
+            const px = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+            const py = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+            const dx = Math.abs(px - pointerDownPos.x); const dy = Math.abs(py - pointerDownPos.y);
+            
+            if (dx < CLICK_TOLERANCE && dy < CLICK_TOLERANCE) { // Física e abertura mesmo no AR
+                updatePointer(px, py); raycaster.setFromCamera(pointer, camera); const hits = raycaster.intersectObjects(rootNode.children, true);
                 if (hits.length > 0) {
                     let curr = hits[0].object; let animatable = null;
                     while(curr && curr.parent) { if(curr.userData.isAnimatable) { animatable = curr; break; } curr = curr.parent; }
@@ -333,31 +467,41 @@
             }
         }
 
-        function updatePointer(e) { const r = renderer.domElement.getBoundingClientRect(); pointer.x = ((e.clientX - r.left) / r.width) * 2 - 1; pointer.y = -((e.clientY - r.top) / r.height) * 2 + 1; }
+        function updatePointer(x, y) { const r = renderer.domElement.getBoundingClientRect(); pointer.x = ((x - r.left) / r.width) * 2 - 1; pointer.y = -((y - r.top) / r.height) * 2 + 1; }
 
         function animate() {
             requestAnimationFrame(animate); const speed = 0.15;
             for (let i = AppState.animacoesAtivas.length - 1; i >= 0; i--) {
                 const anim = AppState.animacoesAtivas[i]; const obj = anim.obj;
+                
+                // FÍSICA ESTRITA: Portas abrem geometricamente CORRETAS
                 if (anim.type === 'door_hinge') {
-                    const angle = obj.userData.hinge === 'left' ? Math.PI/2 : -Math.PI/2; const targetRot = anim.target ? angle : 0;
-                    obj.rotation.y += (targetRot - obj.rotation.y) * speed; if (Math.abs(obj.rotation.y - targetRot) < 0.01) { obj.rotation.y = targetRot; AppState.animacoesAtivas.splice(i, 1); }
-                } else if (anim.type === 'door_slide' || anim.type === 'window_slide') {
+                    // Dobradiça esquerda: Rotação negativa em Y = Para Fora
+                    // Dobradiça direita: Rotação positiva em Y = Para Fora
+                    const angle = obj.userData.hinge === 'left' ? -Math.PI/2 : Math.PI/2; 
+                    const targetRot = anim.target ? angle : 0;
+                    obj.rotation.y += (targetRot - obj.rotation.y) * speed; 
+                    if (Math.abs(obj.rotation.y - targetRot) < 0.01) { obj.rotation.y = targetRot; AppState.animacoesAtivas.splice(i, 1); }
+                } 
+                else if (anim.type === 'door_slide' || anim.type === 'window_slide') {
                     const travel = obj.userData.travelX; const targetX = anim.target ? travel : 0;
-                    obj.position.x += (targetX - obj.position.x) * speed; if (Math.abs(obj.position.x - targetX) < 0.001) { obj.position.x = targetX; AppState.animacoesAtivas.splice(i, 1); }
-                } else if (anim.type === 'drawer') {
+                    obj.position.x += (targetX - obj.position.x) * speed; 
+                    if (Math.abs(obj.position.x - targetX) < 0.001) { obj.position.x = targetX; AppState.animacoesAtivas.splice(i, 1); }
+                } 
+                else if (anim.type === 'drawer') {
+                    // Gavetas empurram no eixo Z positivo para abrir para a frente
                     const depth = obj.userData.depth; const targetZ = anim.target ? depth * 0.8 : 0; 
-                    obj.position.z += (targetZ - obj.position.z) * speed; if (Math.abs(obj.position.z - targetZ) < 0.001) { obj.position.z = targetZ; AppState.animacoesAtivas.splice(i, 1); }
+                    obj.position.z += (targetZ - obj.position.z) * speed; 
+                    if (Math.abs(obj.position.z - targetZ) < 0.001) { obj.position.z = targetZ; AppState.animacoesAtivas.splice(i, 1); }
                 }
             }
             controls.update(); renderer.render(scene, camera);
         }
 
-        // ================= FÁBRICA UNIVERSAL DE MÓVEIS =================
+        // ================= CONSTRUÇÃO PARAMÉTRICA DE MÓVEIS =================
         function reconstruirCena() {
             while(rootNode.children.length > 0) rootNode.remove(rootNode.children[0]);
-            let offsetX = 0; 
-
+            let posAutoX = 0; 
             AppState.modulos.forEach(mod => {
                 const w = mod.largura / 1000, h = mod.altura / 1000, d = mod.profundidade / 1000;
                 const thickness = 0.015; const color = mod.cor || "#FFFFFF";
@@ -373,31 +517,26 @@
                 };
 
                 const type = mod.tipo.toLowerCase();
-                const openingType = mod.abertura || "giro"; // giro ou correr
+                const openingType = mod.abertura || "giro"; 
 
-                // SOFÁ
                 if (type === 'sofa') {
                     const tSeat = 0.2; const tBack = 0.2; const tArm = 0.15;
                     const matFabric = new THREE.MeshStandardMaterial({ color: color, roughness: 0.9, bumpScale: 0.02 });
-                    modGroup.add(createPart(new THREE.BoxGeometry(w, 0.1, d), 0, 0.05, 0, matFabric)); // Base
-                    modGroup.add(createPart(new THREE.BoxGeometry(w - tArm*2, tSeat, d), 0, 0.1 + tSeat/2, 0, matFabric)); // Assento
-                    modGroup.add(createPart(new THREE.BoxGeometry(w, h - 0.1, tBack), 0, 0.1 + (h-0.1)/2, -d/2 + tBack/2, matFabric)); // Encosto
-                    modGroup.add(createPart(new THREE.BoxGeometry(tArm, h*0.6, d), -w/2 + tArm/2, 0.1 + (h*0.6)/2, 0, matFabric)); // Braço Esq
-                    modGroup.add(createPart(new THREE.BoxGeometry(tArm, h*0.6, d), w/2 - tArm/2, 0.1 + (h*0.6)/2, 0, matFabric)); // Braço Dir
+                    modGroup.add(createPart(new THREE.BoxGeometry(w, 0.1, d), 0, 0.05, 0, matFabric)); 
+                    modGroup.add(createPart(new THREE.BoxGeometry(w - tArm*2, tSeat, d), 0, 0.1 + tSeat/2, 0, matFabric)); 
+                    modGroup.add(createPart(new THREE.BoxGeometry(w, h - 0.1, tBack), 0, 0.1 + (h-0.1)/2, -d/2 + tBack/2, matFabric)); 
+                    modGroup.add(createPart(new THREE.BoxGeometry(tArm, h*0.6, d), -w/2 + tArm/2, 0.1 + (h*0.6)/2, 0, matFabric)); 
+                    modGroup.add(createPart(new THREE.BoxGeometry(tArm, h*0.6, d), w/2 - tArm/2, 0.1 + (h*0.6)/2, 0, matFabric)); 
                 }
-                // CADEIRA / BANCO
                 else if (type === 'cadeira' || type === 'banco') {
                     const tSeat = 0.05; const legW = 0.04;
-                    modGroup.add(createPart(new THREE.BoxGeometry(w, tSeat, d), 0, h/2, 0)); // Assento
-                    modGroup.add(createPart(new THREE.BoxGeometry(legW, h/2, legW), -w/2+legW, h/4, -d/2+legW)); // Pernas
+                    modGroup.add(createPart(new THREE.BoxGeometry(w, tSeat, d), 0, h/2, 0)); 
+                    modGroup.add(createPart(new THREE.BoxGeometry(legW, h/2, legW), -w/2+legW, h/4, -d/2+legW)); 
                     modGroup.add(createPart(new THREE.BoxGeometry(legW, h/2, legW), w/2-legW, h/4, -d/2+legW));
                     modGroup.add(createPart(new THREE.BoxGeometry(legW, h/2, legW), -w/2+legW, h/4, d/2-legW));
                     modGroup.add(createPart(new THREE.BoxGeometry(legW, h/2, legW), w/2-legW, h/4, d/2-legW));
-                    if (type === 'cadeira') {
-                        modGroup.add(createPart(new THREE.BoxGeometry(w, h/2, 0.02), 0, h * 0.75, -d/2 + 0.01)); // Encosto
-                    }
+                    if (type === 'cadeira') modGroup.add(createPart(new THREE.BoxGeometry(w, h/2, 0.02), 0, h * 0.75, -d/2 + 0.01)); 
                 }
-                // MESA / ESCRIVANINHA
                 else if (type === 'mesa' || type === 'escrivaninha') {
                     modGroup.add(createPart(new THREE.BoxGeometry(w, thickness*2, d), 0, h - thickness, 0));
                     const legW = 0.05;
@@ -414,37 +553,31 @@
                         modGroup.add(gavGroup);
                     }
                 }
-                // PAINEL DE TV
                 else if (type === 'painel_tv') {
-                    modGroup.add(createPart(new THREE.BoxGeometry(w, h, thickness), 0, h/2, -d/2 + thickness/2)); // Painel Traseiro
-                    // Fake TV preta no meio
+                    modGroup.add(createPart(new THREE.BoxGeometry(w, h, thickness), 0, h/2, -d/2 + thickness/2)); 
                     const matTV = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1, metalness: 0.8 });
                     modGroup.add(createPart(new THREE.BoxGeometry(w*0.7, h*0.5, 0.04), 0, h/2, -d/2 + thickness + 0.02, matTV));
-                    if (mod.prateleiras > 0) {
-                        modGroup.add(createPart(new THREE.BoxGeometry(w*0.8, thickness, d*0.8), 0, h*0.2, -d/2 + thickness + (d*0.8)/2));
-                    }
+                    if (mod.prateleiras > 0) modGroup.add(createPart(new THREE.BoxGeometry(w*0.8, thickness, d*0.8), 0, h*0.2, -d/2 + thickness + (d*0.8)/2));
                 }
-                // PORTA / JANELA DA CASA
                 else if (type === 'porta' || type === 'janela') {
                     const isWin = type === 'janela';
                     const frameD = 0.1; const matFrame = new THREE.MeshStandardMaterial({color: 0xdddddd});
                     const matGlass = new THREE.MeshStandardMaterial({color: 0x88CCFF, transparent: true, opacity: 0.5});
                     
-                    // Batente Externo
                     modGroup.add(createPart(new THREE.BoxGeometry(thickness, h, frameD), -w/2+thickness/2, h/2, 0, matFrame));
                     modGroup.add(createPart(new THREE.BoxGeometry(thickness, h, frameD), w/2-thickness/2, h/2, 0, matFrame));
                     modGroup.add(createPart(new THREE.BoxGeometry(w, thickness, frameD), 0, h-thickness/2, 0, matFrame));
                     if(isWin) modGroup.add(createPart(new THREE.BoxGeometry(w, thickness, frameD), 0, thickness/2, 0, matFrame));
 
-                    if (mod.portas > 0) { // Quantidade de folhas
+                    if (mod.portas > 0) { 
                         const leafW = w / mod.portas;
                         for(let i=0; i<mod.portas; i++) {
                             const pGroup = new THREE.Group();
-                            if(openingType === 'correr' || isWin) { // Janelas costumam correr
+                            if(openingType === 'correr' || isWin) { 
                                 pGroup.userData = { isAnimatable: true, type: 'window_slide', isOpen: false, travelX: (i%2===0)? leafW*0.9 : -leafW*0.9 };
                                 pGroup.position.set(-w/2 + leafW/2 + (i*leafW), h/2, (i%2===0)? 0.02 : -0.02);
                                 pGroup.add(createPart(new THREE.BoxGeometry(leafW, h-thickness*2, 0.03), 0, 0, 0, isWin? matGlass : matBase));
-                            } else { // Porta de giro normal
+                            } else { 
                                 const isLeft = (i%2===0);
                                 pGroup.userData = { isAnimatable: true, type: 'door_hinge', isOpen: false, hinge: isLeft?'left':'right' };
                                 const hx = -w/2 + thickness + (i*leafW) + (isLeft?0:leafW);
@@ -455,19 +588,17 @@
                         }
                     }
                 }
-                // ARMÁRIOS, GUARDA-ROUPAS, RACKS, ESTANTES, NICHOS (Estrutura Caixaria Padrão)
                 else { 
-                    modGroup.add(createPart(new THREE.BoxGeometry(w, thickness, d), 0, thickness/2, 0)); // Base
-                    modGroup.add(createPart(new THREE.BoxGeometry(w, thickness, d), 0, h - thickness/2, 0)); // Tampo
-                    modGroup.add(createPart(new THREE.BoxGeometry(thickness, h, d), -w/2 + thickness/2, h/2, 0)); // Lat Esq
-                    modGroup.add(createPart(new THREE.BoxGeometry(thickness, h, d), w/2 - thickness/2, h/2, 0)); // Lat Dir
-                    modGroup.add(createPart(new THREE.BoxGeometry(w, h, thickness), 0, h/2, -d/2 + thickness/2)); // Fundo
+                    // CAIXARIAS NORMAIS
+                    modGroup.add(createPart(new THREE.BoxGeometry(w, thickness, d), 0, thickness/2, 0)); 
+                    modGroup.add(createPart(new THREE.BoxGeometry(w, thickness, d), 0, h - thickness/2, 0)); 
+                    modGroup.add(createPart(new THREE.BoxGeometry(thickness, h, d), -w/2 + thickness/2, h/2, 0)); 
+                    modGroup.add(createPart(new THREE.BoxGeometry(thickness, h, d), w/2 - thickness/2, h/2, 0)); 
+                    modGroup.add(createPart(new THREE.BoxGeometry(w, h, thickness), 0, h/2, -d/2 + thickness/2)); 
 
                     if (mod.prateleiras > 0) {
                         const espaco = (h - thickness * 2) / (mod.prateleiras + 1);
-                        for (let p = 1; p <= mod.prateleiras; p++) {
-                            modGroup.add(createPart(new THREE.BoxGeometry(w - thickness*2, thickness, d - 0.02), 0, thickness + (espaco * p), -0.01));
-                        }
+                        for (let p = 1; p <= mod.prateleiras; p++) modGroup.add(createPart(new THREE.BoxGeometry(w - thickness*2, thickness, d - 0.02), 0, thickness + (espaco * p), -0.01));
                     }
 
                     if (mod.gavetas > 0) {
@@ -484,12 +615,10 @@
                         for (let i = 0; i < mod.portas; i++) {
                             const pGroup = new THREE.Group();
                             if(openingType === 'correr' || type === 'guarda_roupa') {
-                                // Porta de Correr
                                 pGroup.userData = { isAnimatable: true, type: 'door_slide', isOpen: false, travelX: (i%2===0)? portaW*0.95 : -portaW*0.95 };
                                 pGroup.position.set(-w/2 + thickness + portaW/2 + (i*portaW), h/2, d/2 + ((i%2===0)? 0.01 : 0.03));
                                 pGroup.add(createPart(new THREE.BoxGeometry(portaW + 0.02, portaH, thickness), 0, 0, 0));
                             } else {
-                                // Porta de Giro Normal
                                 const isLeft = (i % 2 === 0);
                                 pGroup.userData = { isAnimatable: true, type: 'door_hinge', isOpen: false, hinge: isLeft ? 'left' : 'right' };
                                 const hingeX = -w/2 + thickness + (i * portaW) + (isLeft ? 0 : portaW);
@@ -504,62 +633,56 @@
                     }
                 }
 
-                modGroup.position.set(offsetX + (w/2), 0, 0);
-                offsetX += w + 0.15; 
+                // APLICAÇÃO CAD (Matriz Posicional e Rotação)
+                const finalX = mod.posX !== undefined ? mod.posX / 1000 : (posAutoX + w/2);
+                const finalZ = mod.posZ !== undefined ? mod.posZ / 1000 : 0;
+                modGroup.position.set(finalX, 0, finalZ);
+                
+                if(mod.rotY !== undefined) modGroup.rotation.y = THREE.MathUtils.degToRad(mod.rotY);
+                
+                posAutoX = finalX + w/2 + 0.15; 
                 rootNode.add(modGroup);
             });
-
-            if (offsetX > 0) { controls.target.set(offsetX/2, 1, 0); camera.position.set(offsetX/2, 2, 6); controls.update(); }
         }
 
-        // ================= IA MULTIMODAL (CÉREBRO ABSOLUTO) =================
+        // ================= IA MULTIMODAL (FOTOGRAMETRIA REAL) =================
         async function analisarComIA() {
-            const inputImg = document.getElementById('fotoCliente');
             const txtUser = document.getElementById('textoAdicional').value.trim();
             const apikey = AppState.chavesAPI.gemini;
             
             if (!apikey) { showToast("Erro: Chave API Gemini ausente!"); toggleModal('modalSettings'); return; }
-            if ((!inputImg.files || inputImg.files.length === 0) && !AppState.transcricaoAtual && !txtUser) {
-                document.getElementById('iaErrorBox').innerText = "Forneça áudio, texto ou foto para projetar."; return;
+            if (!AppState.imagemFundoBase64 && !AppState.transcricaoAtual && !txtUser) {
+                document.getElementById('iaErrorBox').innerText = "Forneça áudio, texto ou foto da parede."; return;
             }
 
-            showLoading("A IA Gemini está criando a engenharia completa..."); document.getElementById('iaErrorBox').innerText = "";
+            showLoading("A IA Gemini está extraindo a escala da imagem e processando a física..."); document.getElementById('iaErrorBox').innerText = "";
 
             try {
                 const parts = [];
                 const promptGeral = `
-                    Você é um Arquiteto e Marceneiro Sênior Operando um CAD. 
-                    Seu objetivo é transformar as instruções (áudio, texto) e a foto (se houver) em uma lista ESTRITA de objetos 3D paramétricos.
+                    Você é um Motor de Fotogrametria 3D de Precisão.
+                    Sua missão é extrair VERDADEIRAMENTE a escala e os elementos da imagem de fundo e cruzar com as ordens do usuário.
                     
                     Áudio: "${AppState.transcricaoAtual}"
                     Texto: "${txtUser}"
                     
-                    REGRAS DE TIPAGEM (Use EXATAMENTE um destes no campo "tipo"):
-                    - "armario", "guarda_roupa", "rack", "criado_mudo", "aparador" (Caixarias)
-                    - "painel_tv" (Painel plano)
-                    - "mesa", "escrivaninha", "cadeira", "banco", "sofa" (Móveis soltos)
-                    - "estante", "nicho", "prateleira" (Estruturas abertas)
-                    - "porta", "janela" (Esquadrias do ambiente)
-
-                    REGRAS DE ABERTURA ("abertura"):
-                    Se for porta, defina "giro" ou "correr". Guarda-roupas geralmente usam "correr".
+                    MANDAMENTOS ABSOLUTOS:
+                    1. SEJA FIEL À IMAGEM. Se a parede da imagem pedir um painel, desenhe o painel EXATAMENTE adaptado à dimensão aparente e não invente módulos soltos.
+                    2. TIPOS EXATOS: "armario", "guarda_roupa", "rack", "criado_mudo", "aparador", "painel_tv", "mesa", "escrivaninha", "cadeira", "banco", "sofa", "estante", "nicho", "porta", "janela".
+                    3. ESTIME AS POSIÇÕES REAIS (CAD): Dê "posX" e "posZ" em milímetros, simulando a escala da foto enviada para sobreposição no AR.
+                    4. Abertura das portas: "giro" ou "correr".
                     
-                    Retorne EXATAMENTE este JSON:
+                    FORMATO ESTRITO (APENAS ESTE JSON):
                     {
                         "modulos": [
-                            { "tipo": "guarda_roupa", "nome": "Guarda Roupa Casal", "largura": 2500, "altura": 2600, "profundidade": 600, "portas": 3, "gavetas": 0, "prateleiras": 4, "abertura": "correr", "cor": "#4A3C30" },
-                            { "tipo": "sofa", "nome": "Sofá 3 Lugares", "largura": 2000, "altura": 900, "profundidade": 900, "portas": 0, "gavetas": 0, "prateleiras": 0, "abertura": "nenhuma", "cor": "#cccccc" }
+                            { "tipo": "guarda_roupa", "nome": "Guarda Roupa Extraído", "largura": 2000, "altura": 2600, "profundidade": 600, "portas": 3, "gavetas": 0, "prateleiras": 4, "abertura": "correr", "cor": "#FFFFFF", "posX": -1500, "posZ": 0, "rotY": 0 }
                         ]
                     }
                 `;
                 parts.push({ text: promptGeral });
 
-                if (inputImg.files && inputImg.files.length > 0) {
-                    const base64Str = await new Promise((res, rej) => {
-                        const r = new FileReader(); r.readAsDataURL(inputImg.files[0]);
-                        r.onload = () => res(r.result.split(',')[1]); r.onerror = rej;
-                    });
-                    parts.push({ inlineData: { mimeType: inputImg.files[0].type, data: base64Str } });
+                if (AppState.imagemFundoBase64) {
+                    parts.push({ inlineData: { mimeType: "image/jpeg", data: AppState.imagemFundoBase64 } });
                 }
 
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apikey}`, {
@@ -572,98 +695,130 @@
 
                 if (iaJSON.modulos && Array.isArray(iaJSON.modulos)) {
                     AppState.modulos = iaJSON.modulos.map((m, idx) => ({ ...m, id: Date.now() + idx }));
-                    reconstruirCena(); atualizarHUDLista(); calcularTotal(); fecharHUDs(); showToast(`Sucesso! Projeto gerado.`);
+                    reconstruirCena(); atualizarHUDLista(); calcularTotal(); fecharHUDs(); 
+                    showToast(`Fotogrametria concluída: ${AppState.modulos.length} entidades criadas.`);
                 } else throw new Error("A IA gerou formato inválido.");
             } catch (err) { document.getElementById('iaErrorBox').innerText = "Falha da IA: " + err.message; } finally { hideLoading(); }
         }
 
-        // ================= EDITOR AVANÇADO =================
+        // ================= EDITOR AO VIVO (FLUTUANTE NO AR) =================
         function atualizarHUDLista() {
             const container = document.getElementById('listaModulosContainer'); container.innerHTML = '';
-            
             AppState.modulos.forEach((mod, index) => {
                 container.innerHTML += `
                     <div class="module-card">
                         <h4>${mod.nome} (${mod.tipo})</h4>
-                        <p>L: ${mod.largura} | A: ${mod.altura} | P: ${mod.profundidade} mm</p>
-                        <p>Prt: ${mod.portas} (${mod.abertura||'giro'}) | Gav: ${mod.gavetas} | Pral: ${mod.prateleiras || 0}</p>
-                        <div style="display:flex; gap:10px; margin-top:10px;">
-                            <button class="btn-block action-btn" style="padding:8px; margin-bottom:0;" onclick="abrirEdicao(${index})"><i class="fas fa-edit"></i> Editar Físico</button>
-                            <button class="btn-block danger" style="padding:8px; margin-bottom:0;" onclick="removerModulo(${index})"><i class="fas fa-trash"></i></button>
-                        </div>
-
-                        <div id="editForm-${index}" class="edit-form" style="display:none;">
-                            <div class="grid-2-col">
-                                <div class="input-group">
-                                    <label>Classe Móvel</label>
-                                    <select id="eTipo-${index}">
-                                        <option value="armario" ${mod.tipo==='armario'?'selected':''}>Armário/Gabinete</option>
-                                        <option value="guarda_roupa" ${mod.tipo==='guarda_roupa'?'selected':''}>Guarda-Roupa</option>
-                                        <option value="painel_tv" ${mod.tipo==='painel_tv'?'selected':''}>Painel de TV</option>
-                                        <option value="rack" ${mod.tipo==='rack'?'selected':''}>Rack</option>
-                                        <option value="mesa" ${mod.tipo==='mesa'?'selected':''}>Mesa</option>
-                                        <option value="escrivaninha" ${mod.tipo==='escrivaninha'?'selected':''}>Escrivaninha</option>
-                                        <option value="cadeira" ${mod.tipo==='cadeira'?'selected':''}>Cadeira</option>
-                                        <option value="sofa" ${mod.tipo==='sofa'?'selected':''}>Sofá/Poltrona</option>
-                                        <option value="estante" ${mod.tipo==='estante'?'selected':''}>Estante</option>
-                                        <option value="nicho" ${mod.tipo==='nicho'?'selected':''}>Nicho</option>
-                                        <option value="porta" ${mod.tipo==='porta'?'selected':''}>Porta (Casa)</option>
-                                        <option value="janela" ${mod.tipo==='janela'?'selected':''}>Janela (Casa)</option>
-                                    </select>
-                                </div>
-                                <div class="input-group">
-                                    <label>Abertura</label>
-                                    <select id="eAbertura-${index}">
-                                        <option value="giro" ${mod.abertura==='giro'?'selected':''}>Giro (Dobradiça)</option>
-                                        <option value="correr" ${mod.abertura==='correr'?'selected':''}>Correr (Trilho)</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="grid-3-col">
-                                <div class="input-group"><label>Larg(mm)</label><input type="number" id="eL-${index}" value="${mod.largura}"></div>
-                                <div class="input-group"><label>Alt(mm)</label><input type="number" id="eA-${index}" value="${mod.altura}"></div>
-                                <div class="input-group"><label>Prof(mm)</label><input type="number" id="eP-${index}" value="${mod.profundidade}"></div>
-                            </div>
-                            <div class="grid-3-col">
-                                <div class="input-group"><label>Portas</label><input type="number" id="ePt-${index}" value="${mod.portas}"></div>
-                                <div class="input-group"><label>Gavetas</label><input type="number" id="eGv-${index}" value="${mod.gavetas}"></div>
-                                <div class="input-group"><label>Prats</label><input type="number" id="ePr-${index}" value="${mod.prateleiras || 0}"></div>
-                            </div>
-                            <div class="input-group"><label>Cor/Textura (Hex)</label><input type="color" id="eCor-${index}" value="${mod.cor}" style="height:40px; padding:2px;"></div>
-                            <button class="btn-block success" onclick="salvarEdicao(${index})">Aplicar Mudanças Físicas</button>
-                        </div>
+                        <p>Dim: L ${mod.largura} x A ${mod.altura} x P ${mod.profundidade} mm</p>
+                        <button class="btn-block action-btn" style="padding:8px; margin-top:10px;" onclick="abrirEditorAoVivo(${mod.id})"><i class="fas fa-sliders-h"></i> Editar ao Vivo</button>
                     </div>
                 `;
             });
         }
 
-        function abrirEdicao(idx) { const f = document.getElementById(`editForm-${idx}`); f.style.display = f.style.display === 'none' ? 'block' : 'none'; }
-        function salvarEdicao(idx) {
-            AppState.modulos[idx].tipo = document.getElementById(`eTipo-${idx}`).value;
-            AppState.modulos[idx].abertura = document.getElementById(`eAbertura-${idx}`).value;
-            AppState.modulos[idx].largura = parseFloat(document.getElementById(`eL-${idx}`).value)||0;
-            AppState.modulos[idx].altura = parseFloat(document.getElementById(`eA-${idx}`).value)||0;
-            AppState.modulos[idx].profundidade = parseFloat(document.getElementById(`eP-${idx}`).value)||0;
-            AppState.modulos[idx].portas = parseInt(document.getElementById(`ePt-${idx}`).value)||0;
-            AppState.modulos[idx].gavetas = parseInt(document.getElementById(`eGv-${idx}`).value)||0;
-            AppState.modulos[idx].prateleiras = parseInt(document.getElementById(`ePr-${idx}`).value)||0;
-            AppState.modulos[idx].cor = document.getElementById(`eCor-${idx}`).value;
-            reconstruirCena(); atualizarHUDLista(); calcularTotal(); showToast("Física do módulo reconstruída!");
+        function abrirEditorAoVivo(idDoModulo) {
+            fecharHUDs();
+            const idx = AppState.modulos.findIndex(m => m.id === idDoModulo);
+            if(idx === -1) return;
+            const mod = AppState.modulos[idx];
+            
+            const html = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h4 style="color:var(--primary-dark); font-size: 1rem;"><i class="fas fa-edit"></i> Editando ${mod.nome}</h4>
+                    <button class="close-btn" onclick="fecharEditor()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="cad-controls">
+                    <h5>Posição & AR (Live)</h5>
+                    <div class="grid-3-col">
+                        <div class="input-group"><label>Pos X (Lado)</label><input type="number" id="ePx" value="${mod.posX || 0}" oninput="aplicarEdicaoAoVivo(${idx})"></div>
+                        <div class="input-group"><label>Pos Z (Frente)</label><input type="number" id="ePz" value="${mod.posZ || 0}" oninput="aplicarEdicaoAoVivo(${idx})"></div>
+                        <div class="input-group"><label>Giro Y (°)</label><input type="number" id="eRy" value="${mod.rotY || 0}" oninput="aplicarEdicaoAoVivo(${idx})"></div>
+                    </div>
+                </div>
+                <div class="grid-2-col">
+                    <div class="input-group">
+                        <label>Classe Móvel</label>
+                        <select id="eTipo" onchange="aplicarEdicaoAoVivo(${idx})">
+                            <option value="armario" ${mod.tipo==='armario'?'selected':''}>Armário/Gabinete</option>
+                            <option value="guarda_roupa" ${mod.tipo==='guarda_roupa'?'selected':''}>Guarda-Roupa</option>
+                            <option value="painel_tv" ${mod.tipo==='painel_tv'?'selected':''}>Painel de TV</option>
+                            <option value="rack" ${mod.tipo==='rack'?'selected':''}>Rack</option>
+                            <option value="mesa" ${mod.tipo==='mesa'?'selected':''}>Mesa</option>
+                            <option value="escrivaninha" ${mod.tipo==='escrivaninha'?'selected':''}>Escrivaninha</option>
+                            <option value="cadeira" ${mod.tipo==='cadeira'?'selected':''}>Cadeira</option>
+                            <option value="sofa" ${mod.tipo==='sofa'?'selected':''}>Sofá/Poltrona</option>
+                            <option value="estante" ${mod.tipo==='estante'?'selected':''}>Estante</option>
+                            <option value="nicho" ${mod.tipo==='nicho'?'selected':''}>Nicho</option>
+                            <option value="porta" ${mod.tipo==='porta'?'selected':''}>Porta (Parede)</option>
+                            <option value="janela" ${mod.tipo==='janela'?'selected':''}>Janela (Parede)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Abertura</label>
+                        <select id="eAbertura" onchange="aplicarEdicaoAoVivo(${idx})">
+                            <option value="giro" ${mod.abertura==='giro'?'selected':''}>Giro (Dobradiça)</option>
+                            <option value="correr" ${mod.abertura==='correr'?'selected':''}>Correr (Trilho)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid-3-col">
+                    <div class="input-group"><label>Larg(mm)</label><input type="number" id="eL" value="${mod.largura}" oninput="aplicarEdicaoAoVivo(${idx})"></div>
+                    <div class="input-group"><label>Alt(mm)</label><input type="number" id="eA" value="${mod.altura}" oninput="aplicarEdicaoAoVivo(${idx})"></div>
+                    <div class="input-group"><label>Prof(mm)</label><input type="number" id="eP" value="${mod.profundidade}" oninput="aplicarEdicaoAoVivo(${idx})"></div>
+                </div>
+                <div class="grid-3-col">
+                    <div class="input-group"><label>Portas</label><input type="number" id="ePt" value="${mod.portas}" oninput="aplicarEdicaoAoVivo(${idx})"></div>
+                    <div class="input-group"><label>Gavetas</label><input type="number" id="eGv" value="${mod.gavetas}" oninput="aplicarEdicaoAoVivo(${idx})"></div>
+                    <div class="input-group"><label>Prats</label><input type="number" id="ePr" value="${mod.prateleiras || 0}" oninput="aplicarEdicaoAoVivo(${idx})"></div>
+                </div>
+                <div class="grid-2-col">
+                    <div class="input-group"><label>Cor (Hex)</label><input type="color" id="eCor" value="${mod.cor}" style="height:40px; padding:2px;" oninput="aplicarEdicaoAoVivo(${idx})"></div>
+                    <button class="btn-block danger" style="padding:10px; margin-top:20px;" onclick="removerModulo(${idx})"><i class="fas fa-trash"></i> Apagar Peça</button>
+                </div>
+            `;
+            
+            document.getElementById('floatingEditor').innerHTML = html;
+            document.getElementById('floatingEditor').classList.add('active');
         }
 
-        function removerModulo(idx) { AppState.modulos.splice(idx, 1); reconstruirCena(); atualizarHUDLista(); calcularTotal(); }
-        function adicionarModuloManual() { AppState.modulos.push({ id: Date.now(), tipo: "armario", abertura: "giro", nome: "Novo Móvel", largura: 800, altura: 800, profundidade: 500, portas: 2, gavetas: 0, prateleiras: 1, cor: "#DDA15E" }); reconstruirCena(); atualizarHUDLista(); calcularTotal(); }
+        function fecharEditor() {
+            document.getElementById('floatingEditor').classList.remove('active');
+        }
+
+        function aplicarEdicaoAoVivo(idx) {
+            AppState.modulos[idx].tipo = document.getElementById(`eTipo`).value;
+            AppState.modulos[idx].abertura = document.getElementById(`eAbertura`).value;
+            AppState.modulos[idx].largura = parseFloat(document.getElementById(`eL`).value)||0;
+            AppState.modulos[idx].altura = parseFloat(document.getElementById(`eA`).value)||0;
+            AppState.modulos[idx].profundidade = parseFloat(document.getElementById(`eP`).value)||0;
+            AppState.modulos[idx].portas = parseInt(document.getElementById(`ePt`).value)||0;
+            AppState.modulos[idx].gavetas = parseInt(document.getElementById(`eGv`).value)||0;
+            AppState.modulos[idx].prateleiras = parseInt(document.getElementById(`ePr`).value)||0;
+            AppState.modulos[idx].cor = document.getElementById(`eCor`).value;
+            AppState.modulos[idx].posX = parseFloat(document.getElementById(`ePx`).value)||0;
+            AppState.modulos[idx].posZ = parseFloat(document.getElementById(`ePz`).value)||0;
+            AppState.modulos[idx].rotY = parseFloat(document.getElementById(`eRy`).value)||0;
+
+            reconstruirCena(); 
+            calcularTotal();
+        }
+
+        function removerModulo(idx) { 
+            AppState.modulos.splice(idx, 1); 
+            reconstruirCena(); 
+            atualizarHUDLista(); 
+            calcularTotal(); 
+            fecharEditor();
+        }
+
+        function adicionarModuloManual() { 
+            AppState.modulos.push({ id: Date.now(), tipo: "armario", abertura: "giro", nome: "Novo Móvel Físico", largura: 800, altura: 800, profundidade: 500, portas: 2, gavetas: 0, prateleiras: 1, cor: "#DDA15E", posX: 0, posZ: 0, rotY: 0 }); 
+            reconstruirCena(); atualizarHUDLista(); calcularTotal(); 
+        }
 
         function calcularTotal() {
             const m = parseFloat(document.getElementById('costMaterial').value)||0, mo = parseFloat(document.getElementById('costLabor').value)||0, h = parseFloat(document.getElementById('costHardware').value)||0, p = parseFloat(document.getElementById('profitMargin').value)||0;
             document.getElementById('totalProjectCost').innerText = new Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format((m+mo+h) / (1-(p/100)));
         }
-
-        // ================= AR =================
-        function ajustarPerspectivaManual() { if(rootNode) rootNode.rotation.set(parseFloat(document.getElementById('camRotX').value), 0, 0); }
-        function autoEncaixarIA() { if(!rootNode) return; let f = 0; function aFit() { f++; rootNode.rotation.x += (-0.15 - rootNode.rotation.x)*0.1; document.getElementById('camRotX').value = rootNode.rotation.x; if(f<30) requestAnimationFrame(aFit); } aFit(); }
-        function resetCamera() { if(rootNode) { rootNode.rotation.set(0,0,0); document.getElementById('camRotX').value = 0; controls.target.set(0, 1, 0); camera.position.set(0, 2, 6); controls.update(); } }
-        function toggleARMode() { AppState.modoAR = !AppState.modoAR; document.getElementById('arBtnText').innerText = AppState.modoAR ? "Modo AR Ativo (Arraste os Móveis)" : "Ativar Modo AR (Arrastar)"; if(AppState.modoAR) showToast("Modo AR: Arraste os móveis com o dedo."); }
     </script>
 </body>
 </html>
