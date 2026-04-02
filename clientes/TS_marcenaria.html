@@ -74,7 +74,7 @@
         .floating-editor.active { bottom: 0; }
         
         @media(min-width: 1024px) {
-            .floating-editor { top: 85px; bottom: 25px; right: 25px; width: 450px; max-height: calc(100vh - 110px); border-radius: 16px; border: 1px solid var(--border-soft); transform: translateX(120%); opacity: 0; }
+            .floating-editor { top: 85px; bottom: 25px; right: 25px; width: 480px; max-height: calc(100vh - 110px); border-radius: 16px; border: 1px solid var(--border-soft); transform: translateX(120%); opacity: 0; }
             .floating-editor.active { transform: translateX(0); opacity: 1; bottom: auto; }
             .bottom-sheet { width: 420px; left: 25px; bottom: 100px; border-radius: 16px; max-height: 75vh; opacity: 0; pointer-events: none; transform: translateY(30px); }
             .bottom-sheet.active { opacity: 1; pointer-events: all; transform: translateY(0); }
@@ -198,7 +198,7 @@
             <p id="transcriptionText" style="font-size:0.85rem; color:var(--earth-green); text-align:center; margin:10px 0; font-weight:700;"></p>
 
             <div class="input-group">
-                <textarea id="textoAdicional" placeholder="Peça TUDO: cadeira de metal, puff redondo, mesa dobrável, sofá, nichos triangulares... A IA processará a geometria."></textarea>
+                <textarea id="textoAdicional" placeholder="Peça TUDO: armário com gavetas do lado esquerdo, porta basculante, etc. A IA processará a geometria exata."></textarea>
             </div>
 
             <div class="input-group">
@@ -329,6 +329,22 @@
         </div>
 
         <div class="input-group">
+            <label>Layout Interno Específico (Corte da Chapa)</label>
+            <div class="grid-2-col">
+                <select id="eLayoutInt" onchange="App.ui.updateModuleFromEditor()">
+                    <option value="top_drawers">Gavetas no Topo / Portas Base</option>
+                    <option value="bottom_drawers">Gavetas na Base / Portas Topo</option>
+                    <option value="left_drawers">Gavetas à Esquerda / Portas Direita</option>
+                    <option value="right_drawers">Gavetas à Direita / Portas Esquerda</option>
+                </select>
+                <select id="eDobradica" onchange="App.ui.updateModuleFromEditor()">
+                    <option value="esq">Dobradiça Esq. (P/ 1 Porta)</option>
+                    <option value="dir">Dobradiça Dir. (P/ 1 Porta)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
             <label>Materiais Reais & Aberturas</label>
             <div class="grid-2-col">
                 <select id="eMat" onchange="App.ui.updateModuleFromEditor()">
@@ -439,6 +455,18 @@
         };
 
         const OracleEngine = {
+            rules: {
+                armario: { label: 'Armário/Aéreo' },
+                balcao: { label: 'Balcão' },
+                guarda_roupa: { label: 'Guarda-Roupa' },
+                mesa: { label: 'Mesa' },
+                painel_tv: { label: 'Painel de TV' },
+                rack: { label: 'Rack Baixo' },
+                cadeira: { label: 'Cadeira/Banqueta' },
+                sofa: { label: 'Sofá/Poltrona' },
+                puff: { label: 'Puff Central' },
+                nicho: { label: 'Nicho Decorativo' }
+            },
             validateAndFix: (mod) => {
                 if(!AppState.modoOraculo) return;
                 let fixes = [];
@@ -701,7 +729,6 @@
 
                     // ---- GEOMETRIAS UNIVERSAIS ----
                     if (mod.formato === 'redondo') {
-                        // Cilíndrico (Mesa redonda, puff redondo, nicho circular)
                         if(mod.tipo === 'puff' || mod.tipo === 'cadeira' || mod.tipo === 'sofa') {
                             criarGeo(new THREE.CylinderGeometry(w/2, w/2, h, 32), 0, h/2, 0, activeMatFront);
                         } else {
@@ -710,35 +737,31 @@
                         }
                     } 
                     else if (mod.formato === 'triangular') {
-                        // Prismas
                         criarGeo(new THREE.CylinderGeometry(w/2, w/2, h, 3), 0, h/2, 0, activeMatFront);
                     }
                     else if (mod.tipo === 'sofa' || mod.tipo === 'puff' || mod.tipo === 'cadeira') {
-                        // ESTOFADOS E ASSENTOS
                         if (mod.tipo === 'sofa') {
-                            criarBloco(w, h*0.4, d, 0, h*0.2, 0, activeMatFront); // Assento Base
-                            criarBloco(esp*4, h*0.8, d, -w/2+esp*2, h*0.4, 0, activeMatFront); // Braço Esq
-                            criarBloco(esp*4, h*0.8, d, w/2-esp*2, h*0.4, 0, activeMatFront); // Braço Dir
-                            criarBloco(w, h*0.6, esp*4, 0, h*0.7, -d/2+esp*2, activeMatFront); // Encosto
+                            criarBloco(w, h*0.4, d, 0, h*0.2, 0, activeMatFront); 
+                            criarBloco(esp*4, h*0.8, d, -w/2+esp*2, h*0.4, 0, activeMatFront); 
+                            criarBloco(esp*4, h*0.8, d, w/2-esp*2, h*0.4, 0, activeMatFront); 
+                            criarBloco(w, h*0.6, esp*4, 0, h*0.7, -d/2+esp*2, activeMatFront); 
                         } else if (mod.tipo === 'cadeira') {
-                            criarBloco(w, esp*3, d, 0, h*0.5, 0, activeMatFront); // Assento
-                            criarBloco(0.04, h*0.5, 0.04, -w/2+0.02, h*0.25, -d/2+0.02); // Pés
+                            criarBloco(w, esp*3, d, 0, h*0.5, 0, activeMatFront); 
+                            criarBloco(0.04, h*0.5, 0.04, -w/2+0.02, h*0.25, -d/2+0.02); 
                             criarBloco(0.04, h*0.5, 0.04, w/2-0.02, h*0.25, -d/2+0.02);
                             criarBloco(0.04, h*0.5, 0.04, -w/2+0.02, h*0.25, d/2-0.02);
                             criarBloco(0.04, h*0.5, 0.04, w/2-0.02, h*0.25, d/2-0.02);
-                            criarBloco(w, h*0.5, 0.04, 0, h*0.75, -d/2+0.02, activeMatFront); // Encosto
+                            criarBloco(w, h*0.5, 0.04, 0, h*0.75, -d/2+0.02, activeMatFront); 
                         } else {
-                            criarBloco(w, h, d, 0, h/2, 0, activeMatFront); // Puff quadrado
+                            criarBloco(w, h, d, 0, h/2, 0, activeMatFront); 
                         }
                     }
                     else if (mod.tipo === 'mesa') {
-                        // MESAS (Escritório, Dobrável, Reunião)
                         if(mod.tampoVidro) criarBloco(w, 0.015, d, 0, h-0.0075, 0, matVidro);
                         else criarBloco(w, esp*2, d, 0, h-esp, 0, activeMatFront); 
                         
                         if(mod.formato === 'dobravel') {
-                            // Pernas X Articuladas
-                            criarBloco(0.03, h, 0.03, -w/2+0.1, h/2, 0); criarBloco(0.03, h, 0.03, w/2-0.1, h/2, 0); // Simplificação
+                            criarBloco(0.03, h, 0.03, -w/2+0.1, h/2, 0); criarBloco(0.03, h, 0.03, w/2-0.1, h/2, 0); 
                         } else if(mod.formato === 'L_esq' || mod.formato === 'L_dir') {
                             const isEsq = mod.formato === 'L_esq';
                             const wL = d, lenL = rL - d, pxL = isEsq ? -w/2+wL/2 : w/2-wL/2, pzL = -d/2 - lenL/2;
@@ -753,7 +776,6 @@
                         }
                     }
                     else if (mod.tipo === 'painel_tv') {
-                        // PAINEL DE TV 
                         criarBloco(w, h, esp, 0, h/2, -d/2+esp/2, activeMatFront); 
                         drawRipado(w, h, 0, h/2, -d/2+esp);
                         if(mod.gavetas || mod.portas) { 
@@ -768,7 +790,6 @@
                         }
                     } 
                     else if (mod.formato === 'canto_obliquo' || mod.formato === 'canto_curvo') {
-                        // CANTOS COMPLEXOS
                         const shape = new THREE.Shape();
                         shape.moveTo(0,0); shape.lineTo(w,0); 
                         if(mod.formato === 'canto_curvo') { shape.lineTo(w, w*0.4); shape.quadraticCurveTo(w, w, w*0.4, w); shape.lineTo(0,w); }
@@ -785,7 +806,7 @@
                         if(mod.portas > 0) criarBloco(w*0.7, h-esp*2, esp, 0, h/2, d/2-esp, activeMatFront); 
                     } 
                     else {
-                        // CAIXARIA MARCEARIA PADRÃO (Armários, Balcões, Nichos Retos)
+                        // CAIXARIA PADRÃO (Com Layout Interno Controlado pelo Usuário)
                         const prEx = mod.prateleirasExternas > 0 ? 0.20 : 0; 
                         const inD = d - prEx; const fZ = inD/2 - esp/2; 
                         
@@ -824,40 +845,63 @@
                             cab.rotation.z = Math.PI/2; cab.position.set(0, h-0.15, -d/2 + inD/2); g.add(cab);
                         }
 
-                        // FÍSICA E ANIMAÇÕES (GAVETAS E PORTAS)
-                        let yP = esp, hP = h-esp*2, yG = esp, hG = h-esp*2;
-                        if(mod.gavetas > 0 && mod.portas > 0) { hG = (h-esp*2)*0.25; hP = (h-esp*2)*0.75; yG = esp + hP; }
+                        // LÓGICA DE CORTES E LAYOUT INTERNO (GAVETAS E PORTAS)
+                        let startYP = esp, hP = h-esp*2, startYG = esp, hG = h-esp*2;
+                        let startXP = -w/2 + esp, wP = w-esp*2, startXG = -w/2 + esp, wG = w-esp*2;
                         const doorZ = prEx > 0 ? (-d/2 + esp) : (d/2 - esp); 
 
+                        // Divisão do Chassi baseada no Layout do Usuário
+                        if(mod.gavetas > 0 && mod.portas > 0) {
+                            if(mod.layoutInterno === 'top_drawers') {
+                                hG = (h-esp*2)*0.25; hP = (h-esp*2)*0.75;
+                                startYG = esp + hP; startYP = esp;
+                            } else if(mod.layoutInterno === 'bottom_drawers') {
+                                hG = (h-esp*2)*0.25; hP = (h-esp*2)*0.75;
+                                startYG = esp; startYP = esp + hG;
+                            } else if(mod.layoutInterno === 'left_drawers') {
+                                wG = (w-esp*2)*0.35; wP = (w-esp*2)*0.65;
+                                startXG = -w/2 + esp; startXP = -w/2 + esp + wG;
+                            } else if(mod.layoutInterno === 'right_drawers') {
+                                wP = (w-esp*2)*0.65; wG = (w-esp*2)*0.35;
+                                startXP = -w/2 + esp; startXG = -w/2 + esp + wP;
+                            }
+                        }
+
+                        // Construtor Gavetas
                         if(mod.gavetas > 0) {
-                            const gH = hG/mod.gavetas; const gW = w-esp*2;
+                            const gH = hG/mod.gavetas; 
                             for(let i=0; i<mod.gavetas; i++) {
                                 const dr = new THREE.Group(); dr.userData = { isAnimatable:true, type:'drawer', isOpen:false, depth:inD };
-                                dr.position.set(0, yG + gH*i + gH/2, doorZ);
-                                const fM = new THREE.Mesh(new THREE.BoxGeometry(gW-0.01, gH-0.005, esp), activeMatFront); fM.castShadow = true;
+                                dr.position.set(startXG + wG/2, startYG + gH*i + gH/2, doorZ);
+                                const fM = new THREE.Mesh(new THREE.BoxGeometry(wG-0.01, gH-0.005, esp), activeMatFront); fM.castShadow = true;
                                 dr.add(fM); g.add(dr);
                             }
                         }
 
+                        // Construtor Portas (Com regras precisas de Dobradiça)
                         if(mod.portas > 0) {
-                            const pW = (w-esp*2)/mod.portas;
+                            const pW = wP/mod.portas;
                             for(let i=0; i<mod.portas; i++) {
                                 const piv = new THREE.Group(); 
                                 const pM = new THREE.Mesh(new THREE.BoxGeometry(pW-0.005, hP-0.005, esp), activeMatFront); pM.castShadow = true;
                                 
                                 if(mod.abertura === 'correr') {
                                     piv.userData = { isAnimatable:true, type:'door_slide', isOpen:false, travelX:(i%2===0?pW*0.95:-pW*0.95) };
-                                    piv.position.set(-w/2+esp+pW/2+i*pW, yP+hP/2, doorZ + (i%2===0?0.01:0.03));
+                                    piv.position.set(startXP + pW/2 + i*pW, startYP + hP/2, doorZ + (i%2===0?0.01:0.03));
                                     piv.add(pM);
                                 } else if(mod.abertura === 'basculante') {
                                     piv.userData = { isAnimatable:true, type:'door_flap', isOpen:false };
-                                    piv.position.set(-w/2+esp+pW/2+i*pW, yP+hP, doorZ); 
+                                    piv.position.set(startXP + pW/2 + i*pW, startYP + hP, doorZ); 
                                     pM.position.y = -hP/2; piv.add(pM);
                                 } else { 
-                                    const isLeft = i%2===0;
+                                    // Direção exata da dobradiça
+                                    let isLeft = (i%2===0);
+                                    if(mod.portas === 1) isLeft = (mod.dobradicaLado === 'esq');
+
                                     piv.userData = { isAnimatable:true, type:'door_hinge', isOpen:false, hinge:isLeft?'left':'right' };
-                                    piv.position.set(-w/2+esp + i*pW + (isLeft?0:pW), yP+hP/2, doorZ);
+                                    piv.position.set(startXP + i*pW + (isLeft?0:pW), startYP + hP/2, doorZ);
                                     pM.position.x = isLeft ? pW/2 : -pW/2; 
+                                    
                                     const pux = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.15, 0.02), new THREE.MeshStandardMaterial({color:0x888, metalness:1}));
                                     pux.position.set(isLeft?pW-0.04:-pW+0.04, 0, 0.015); pM.add(pux);
                                     piv.add(pM);
@@ -892,7 +936,7 @@
                     const mod = { 
                         id, tipo, nome: OracleEngine.rules[tipo]?.label || "Móvel Inteligente", 
                         largura: 800, altura: 800, profundidade: 450, formato: 'reto', retornoL: 1000, material: 'branco', ripadoFrontal: false, tampoVidro: false, prateleirasExternas: 0,
-                        portas: 2, gavetas: 0, prateleiras: 1, abertura: 'giro', posX: 0, posY: 0, posZ: 0, rotY: 0, ...overrides 
+                        portas: 2, gavetas: 0, prateleiras: 1, abertura: 'giro', layoutInterno: 'top_drawers', dobradicaLado: 'esq', posX: 0, posY: 0, posZ: 0, rotY: 0, ...overrides 
                     };
                     OracleEngine.validateAndFix(mod); AppState.modules.push(mod); App.modules.select(id); App.modules.refreshAll();
                 },
@@ -936,8 +980,8 @@
                 openLiveEditor: (id) => {
                     const m = AppState.modules.find(x => x.id === id); if(!m) return;
                     document.getElementById('eId').value = m.id;
-                    const keys = ['eT','eFormato','eMat','eA','eL','eAl','eP','eRetL','ePo','eG','ePr','ePratExt','ePx','ePy','ePz','eRy'];
-                    const props = ['tipo','formato','material','abertura','largura','altura','profundidade','retornoL','portas','gavetas','prateleiras','prateleirasExternas','posX','posY','posZ','rotY'];
+                    const keys = ['eT','eFormato','eMat','eA','eLayoutInt','eDobradica','eL','eAl','eP','eRetL','ePo','eG','ePr','ePratExt','ePx','ePy','ePz','eRy'];
+                    const props = ['tipo','formato','material','abertura','layoutInterno','dobradicaLado','largura','altura','profundidade','retornoL','portas','gavetas','prateleiras','prateleirasExternas','posX','posY','posZ','rotY'];
                     keys.forEach((k, idx) => { const el = document.getElementById(k); if(el) el.value = m[props[idx]] !== undefined ? m[props[idx]] : ''; });
                     document.getElementById('eRipado').checked = m.ripadoFrontal; document.getElementById('eVidro').checked = m.tampoVidro;
                     App.ui.fecharHUDs(); document.getElementById('floatingEditor').classList.add('active');
@@ -946,9 +990,9 @@
                 
                 updateModuleFromEditor: () => {
                     const id = document.getElementById('eId').value; const m = AppState.modules.find(x => x.id === id); if(!m) return;
-                    const keys = ['eT','eFormato','eMat','eA','eL','eAl','eP','eRetL','ePo','eG','ePr','ePratExt','ePx','ePy','ePz','eRy'];
-                    const props = ['tipo','formato','material','abertura','largura','altura','profundidade','retornoL','portas','gavetas','prateleiras','prateleirasExternas','posX','posY','posZ','rotY'];
-                    keys.forEach((k, idx) => { const el = document.getElementById(k); if(el) m[props[idx]] = (k==='eT'||k==='eFormato'||k==='eMat'||k==='eA') ? el.value : parseFloat(el.value)||0; });
+                    const keys = ['eT','eFormato','eMat','eA','eLayoutInt','eDobradica','eL','eAl','eP','eRetL','ePo','eG','ePr','ePratExt','ePx','ePy','ePz','eRy'];
+                    const props = ['tipo','formato','material','abertura','layoutInterno','dobradicaLado','largura','altura','profundidade','retornoL','portas','gavetas','prateleiras','prateleirasExternas','posX','posY','posZ','rotY'];
+                    keys.forEach((k, idx) => { const el = document.getElementById(k); if(el) m[props[idx]] = (k==='eT'||k==='eFormato'||k==='eMat'||k==='eA'||k==='eLayoutInt'||k==='eDobradica') ? el.value : parseFloat(el.value)||0; });
                     m.ripadoFrontal = document.getElementById('eRipado').checked; m.tampoVidro = document.getElementById('eVidro').checked;
                     OracleEngine.validateAndFix(m); App.modules.refreshAll(); App.ui.syncLiveEditor();
                 }
@@ -1043,13 +1087,11 @@
                     App.ui.showLoader("Oráculo Arquitetônico Processando...");
                     try {
                         const prompt = `Você é um Arquiteto e Marceneiro Master.
-                        Analise a intenção do usuário (voz/texto e foto se houver) e gere a estrutura física real.
-                        TIPOS: "armario", "balcao", "guarda_roupa", "mesa", "painel_tv", "rack", "cadeira", "sofa", "puff", "nicho".
-                        FORMATOS: "reto", "L_esq", "L_dir", "canto_obliquo", "canto_curvo", "redondo", "triangular", "dobravel".
-                        ABERTURAS: "giro", "correr", "basculante".
-                        MATERIAIS: "amadeirado", "branco", "preto", "misto", "vidro", "metal_preto", "metal_dourado", "tecido".
+                        Gere a estrutura 3D.
+                        LAYOUT INTERNO VÁLIDO: "top_drawers" (Gaveta cima, porta base), "bottom_drawers", "left_drawers" (Gaveta esquerda, porta direita), "right_drawers".
+                        DOBRADIÇA: "esq" ou "dir" (Se for só 1 porta).
                         VOZ/TEXTO DO CLIENTE: "${AppState.transcricaoAtual} ${txt}"
-                        RETORNE APENAS O JSON, ex: {"modulos": [{"tipo": "cadeira", "nome": "Cadeira Industrial", "largura": 500, "altura": 900, "profundidade": 500, "formato": "reto", "retornoL": 0, "material": "metal_preto", "ripadoFrontal": false, "tampoVidro": false, "prateleirasExternas": 0, "portas": 0, "gavetas": 0, "prateleiras": 0, "abertura": "giro", "posX": 0, "posY": 0, "posZ": 0, "rotY": 0}]}`;
+                        RETORNE APENAS JSON, ex: {"modulos": [{"tipo": "armario", "nome": "Armário Preciso", "largura": 800, "altura": 900, "profundidade": 500, "formato": "reto", "retornoL": 0, "material": "amadeirado", "ripadoFrontal": false, "tampoVidro": false, "prateleirasExternas": 0, "portas": 1, "gavetas": 3, "prateleiras": 1, "abertura": "giro", "layoutInterno": "left_drawers", "dobradicaLado": "esq", "posX": 0, "posY": 0, "posZ": 0, "rotY": 0}]}`;
                         
                         const parts = [{ text: prompt }];
                         if (AppState.imagemFundoBase64) parts.push({ inlineData: { mimeType: "image/jpeg", data: AppState.imagemFundoBase64 } });
