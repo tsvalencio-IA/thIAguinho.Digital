@@ -163,7 +163,7 @@
 
             <div class="input-group full-width">
                 <label>Pedido Consolidado:</label>
-                <textarea id="transcribedTextDisplay" rows="3" placeholder="Ex: Um balcão em L com 3 gavetas. Pode enviar foto para a IA analisar..."></textarea>
+                <textarea id="transcribedTextDisplay" rows="3" placeholder="Ex: Um balcão em L com 3 gavetas. Substitua o armário da foto por um azul..."></textarea>
             </div>
             
             <!-- Log Multi-Agente -->
@@ -217,6 +217,14 @@
                                 <option value="l_canto">Canto em L</option>
                                 <option value="curvo">Terminal Curvo Redondo</option>
                             </select>
+                        </div>
+                        <div class="edit-slider">
+                            <label><span>🎨 Cor da Caixa</span></label>
+                            <input type="color" id="modCorCaixa" onchange="atualizarModuloParametrico()" style="height: 30px; padding: 0; border: none; cursor: pointer; background: transparent;">
+                        </div>
+                        <div class="edit-slider">
+                            <label><span>🎨 Cor das Portas</span></label>
+                            <input type="color" id="modCorPorta" onchange="atualizarModuloParametrico()" style="height: 30px; padding: 0; border: none; cursor: pointer; background: transparent;">
                         </div>
                         <div class="edit-slider">
                             <label><span>↔️ Larg. (mm)</span><span id="lblW"></span></label>
@@ -310,14 +318,14 @@
                 <small>(Mat: <span id="matSpan">R$ 0</span> | Ferragens: <span id="ferSpan">R$ 0</span> | MO: <span id="moSpan">R$ 0</span>)</small>
             </div>
             <br>
-            <button onclick="mascoteFalar('O Conselho Multi-Agente finalizou o projeto. Modifique o 3D ou os preços do MDF para que eu recalcule automaticamente o preço de venda.')" class="warning" style="background-color: var(--accent-gold); color: #fff; padding: 10px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+            <button onclick="mascoteFalar('O Conselho Multi-Agente finalizou o projeto. Modifique as cores, o 3D ou os preços para que eu recalcule o orçamento.')" class="warning" style="background-color: var(--accent-gold); color: #fff; padding: 10px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
                 <i class="fas fa-robot"></i> Perguntar ao Mascote
             </button>
         </section>
     </div>
 
     <div class="floating-buttons">
-        <button class="floating-button mascote" onclick="mascoteFalar('A Mistura de Especialistas está ativada. Groq cuida dos ouvidos, Gemini dos olhos, e OpenAI do Cérebro. Além disso, as gavetas e portas agora respondem ao seu clique no 3D!')">
+        <button class="floating-button mascote" onclick="mascoteFalar('A Mistura de Especialistas está ativada e compreende cores personalizadas! Além disso, o sistema de interação com as portas foi completamente restaurado e melhorado!')">
             <i class="fas fa-headset"></i> <span>Mascote Promob Ouro</span>
         </button>
     </div>
@@ -333,7 +341,6 @@
         let cena3D, camera3D, renderizador3D, controles3D;
         let motor3DIniciado = false;
         let raycaster = new THREE.Raycaster(), mouse = new THREE.Vector2();
-        let objetosInterativos = [];
         let rootNode = null, grupoCozinha = null, boxHelper = null;
 
         let pressTimer, startTouchX, startTouchY, isEditingMode = false;
@@ -344,8 +351,8 @@
             document.getElementById('keyOpenAI').value = localStorage.getItem('k_oai_mc') || "";
             
             init3D(); motor3DIniciado = true;
-            // Projeto Demonstração
-            pGlobal.modulos.push({nome: "Exemplo Multi-IA", largura:900, altura:850, profundidade:550, formato:"reto", prateleiras:1, gavetas:3, portas:1, tipo_abertura:"giro"});
+            // Projeto Demonstração Seguro
+            pGlobal.modulos.push({nome: "Exemplo Multi-IA", largura:900, altura:850, profundidade:550, formato:"reto", prateleiras:1, gavetas:3, portas:1, tipo_abertura:"giro", cor_caixa:"#ECF0F1", cor_portas:"#DDA15E"});
             reconstruirCenaParametrica();
         };
 
@@ -437,6 +444,19 @@
             tf.value=""; mostrarErro("Nenhuma IA configurada conseguiu ouvir o áudio.");
         });
 
+        // PARSER BLINDADO
+        function extrairJSONSeguro(texto) {
+            try {
+                let limpo = texto.replace(/```json/gi, '').replace(/```/g, '').trim();
+                const start = limpo.indexOf('{');
+                const end = limpo.lastIndexOf('}');
+                if (start !== -1 && end !== -1) { limpo = limpo.substring(start, end + 1); }
+                return JSON.parse(limpo);
+            } catch(e) {
+                throw new Error("A IA falhou em estruturar a engenharia do projeto de forma válida. Tente novamente.");
+            }
+        }
+
         // ENGENHARIA MULTI-AGENTE
         async function gerarProjetoMultiAgente() {
             const txt = document.getElementById('transcribedTextDisplay').value.trim();
@@ -459,7 +479,7 @@
                 if (kgemini) {
                     try {
                         logIA("Gemini inspecionando a foto e extraindo dimensões base...", "gemini");
-                        const pl = {contents:[{parts:[{text:"Aja como marceneiro. Descreva os móveis, formato, gavetas, portas e medidas estimadas baseadas na foto em um parágrafo."}, {inlineData:{mimeType:mimeImg, data:base64Img.split(',')[1]}}]}]};
+                        const pl = {contents:[{parts:[{text:"Aja como marceneiro. Descreva os móveis, formato, cores, gavetas, portas e medidas estimadas baseadas na foto em um parágrafo."}, {inlineData:{mimeType:mimeImg, data:base64Img.split(',')[1]}}]}]};
                         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${kgemini}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(pl) });
                         if(res.ok) { const d = await res.json(); analiseVisual = d.candidates[0].content.parts[0].text; logIA("Laudo visual do Gemini pronto.", "gemini"); }
                     } catch(e) { logIA("Gemini falhou na visão.", "gemini"); }
@@ -468,7 +488,7 @@
                 if (!analiseVisual && kopenai) {
                     try {
                         logIA("OpenAI inspecionando a foto (Fallback Vision)...", "openai");
-                        const res = await fetch("https://api.openai.com/v1/chat/completions", { method: 'POST', headers: { "Authorization": `Bearer ${kopenai}`, "Content-Type": "application/json" }, body: JSON.stringify({ model: "gpt-4o-mini", messages: [{role: "user", content: [{type: "text", text: "Descreva o móvel da foto para um marceneiro."}, {type: "image_url", image_url: {url: base64Img}}]}] }) });
+                        const res = await fetch("https://api.openai.com/v1/chat/completions", { method: 'POST', headers: { "Authorization": `Bearer ${kopenai}`, "Content-Type": "application/json" }, body: JSON.stringify({ model: "gpt-4o-mini", messages: [{role: "user", content: [{type: "text", text: "Descreva o móvel da foto para um marceneiro. Repare nas cores e no design."}, {type: "image_url", image_url: {url: base64Img}}]}] }) });
                         if(res.ok) { const d = await res.json(); analiseVisual = d.choices[0].message.content; logIA("Laudo visual da OpenAI pronto.", "openai"); }
                     } catch(e) { logIA("OpenAI falhou na visão.", "openai"); }
                 }
@@ -479,21 +499,24 @@
 Pedido do Cliente: "${txt}"
 Laudo Visual do Engenheiro de Imagem: "${analiseVisual || "Sem foto."}"
 
-Quebre o pedido em MÓDULOS PARAMÉTRICOS para serem renderizados no 3D.
-Propriedades obrigatórias: "nome", "formato" ("reto", "l_canto" ou "curvo"), "largura"(mm), "altura", "profundidade", "gavetas", "portas", "prateleiras", "tipo_abertura" ("giro", "basculante", "nenhuma").
+Sua tarefa: 
+1. Respeite ABSOLUTAMENTE o pedido do cliente. Se o cliente pediu cor AZUL, defina as cores em HEX (ex: #1E90FF). Se o cliente pediu "substituir", projete APENAS os novos módulos solicitados que substituirão os da foto.
+2. Quebre o projeto em MÓDULOS PARAMÉTRICOS adjacentes.
+Propriedades de cada módulo: "nome", "formato" ("reto", "l_canto" ou "curvo"), "largura"(numero em mm), "altura"(numero), "profundidade"(numero), "gavetas"(numero), "portas"(numero), "prateleiras"(numero), "tipo_abertura" ("giro", "basculante", "nenhuma"), "cor_caixa" (hex), "cor_portas" (hex).
 "instalacao" geral: "piso" ou "aereo".
-GERE EXCLUSIVAMENTE UM JSON:
-{ "nome_projeto": "Nome", "engenharia": "Explicação breve", "instalacao": "piso", "modulos": [{ "nome":"Mod1", "formato":"reto", "largura":600, "altura":850, "profundidade":500, "gavetas":4, "portas":0, "prateleiras":0, "tipo_abertura":"nenhuma" }] }`;
+
+GERE EXCLUSIVAMENTE UM JSON VÁLIDO:
+{ "nome_projeto": "Projeto Master", "engenharia": "Motivo das escolhas...", "instalacao": "piso", "modulos": [{ "nome":"Mod1", "formato":"reto", "largura":600, "altura":850, "profundidade":500, "gavetas":0, "portas":2, "prateleiras":1, "tipo_abertura":"giro", "cor_caixa": "#ECF0F1", "cor_portas": "#1E90FF" }] }`;
 
             let jsonFinal = null;
 
             // Tenta OpenAI 
             if (kopenai && !jsonFinal) {
                 try {
-                    logIA("OpenAI processando matemática e gerando JSON paramétrico...", "openai");
+                    logIA("OpenAI processando matemática, cores e gerando JSON paramétrico...", "openai");
                     const res = await fetch("https://api.openai.com/v1/chat/completions", { method: 'POST', headers: { "Authorization": `Bearer ${kopenai}`, "Content-Type": "application/json" }, body: JSON.stringify({ model: "gpt-4o-mini", messages: [{role: "user", content: promptMestre}], temperature: 0.1, response_format: {type:"json_object"} }) });
-                    if(res.ok) { const d = await res.json(); jsonFinal = JSON.parse(d.choices[0].message.content); logIA("OpenAI gerou a planta com sucesso.", "openai"); }
-                } catch(e) { logIA("OpenAI falhou na lógica.", "openai"); }
+                    if(res.ok) { const d = await res.json(); jsonFinal = extrairJSONSeguro(d.choices[0].message.content); logIA("OpenAI gerou a planta com sucesso.", "openai"); }
+                } catch(e) { logIA("OpenAI falhou na lógica: " + e.message, "openai"); }
             }
 
             // Tenta Groq Llama 70B
@@ -501,8 +524,8 @@ GERE EXCLUSIVAMENTE UM JSON:
                 try {
                     logIA("Groq Llama assumindo matemática e gerando JSON...", "groq");
                     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", { method: 'POST', headers: { "Authorization": `Bearer ${kgroq}`, "Content-Type": "application/json" }, body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role: "user", content: promptMestre}], temperature: 0.1, response_format: {type:"json_object"} }) });
-                    if(res.ok) { const d = await res.json(); jsonFinal = JSON.parse(d.choices[0].message.content); logIA("Groq gerou a planta com sucesso.", "groq"); }
-                } catch(e) { logIA("Groq falhou na lógica.", "groq"); }
+                    if(res.ok) { const d = await res.json(); jsonFinal = extrairJSONSeguro(d.choices[0].message.content); logIA("Groq gerou a planta com sucesso.", "groq"); }
+                } catch(e) { logIA("Groq falhou na lógica: " + e.message, "groq"); }
             }
 
             // Tenta Gemini
@@ -510,13 +533,13 @@ GERE EXCLUSIVAMENTE UM JSON:
                 try {
                     logIA("Gemini assumindo matemática e gerando JSON...", "gemini");
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${kgemini}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({contents: [{parts: [{text: promptMestre}]}], generationConfig: {temperature: 0.1, responseMimeType: "application/json"}}) });
-                    if(res.ok) { const d = await res.json(); jsonFinal = JSON.parse(d.candidates[0].content.parts[0].text); logIA("Gemini gerou a planta com sucesso.", "gemini"); }
-                } catch(e) { logIA("Gemini falhou na lógica.", "gemini"); }
+                    if(res.ok) { const d = await res.json(); jsonFinal = extrairJSONSeguro(d.candidates[0].content.parts[0].text); logIA("Gemini gerou a planta com sucesso.", "gemini"); }
+                } catch(e) { logIA("Gemini falhou na lógica: " + e.message, "gemini"); }
             }
 
             btn.innerHTML = '<i class="fas fa-magic"></i> Projetar Móvel no AutoCAD'; btn.disabled = false;
 
-            if(!jsonFinal) return mostrarErro("O Conselho Multi-Agente falhou em gerar o projeto. Tem créditos/chaves válidas?");
+            if(!jsonFinal) return mostrarErro("O Conselho Multi-Agente falhou em decodificar o JSON. Assegure-se de que a IA está respondendo corretamente.");
 
             pGlobal.modulos = jsonFinal.modulos || [];
             pGlobal.instalacao = jsonFinal.instalacao || "piso";
@@ -641,7 +664,7 @@ GERE EXCLUSIVAMENTE UM JSON:
                 clearTimeout(pressTimer);
                 if (Math.abs(e.clientX - startTouchX) < 5 && Math.abs(e.clientY - startTouchY) < 5 && !isEditingMode) {
                     const hit = getHit(e);
-                    if(hit && hit.obj.userData.animavel) {
+                    if(hit && hit.obj && hit.obj.userData && hit.obj.userData.animavel) {
                         hit.obj.userData.aberto = !hit.obj.userData.aberto;
                     }
                 }
@@ -650,11 +673,13 @@ GERE EXCLUSIVAMENTE UM JSON:
             function loop() {
                 requestAnimationFrame(loop);
                 if(grupoCozinha) {
-                    objetosInterativos.forEach(obj => {
-                        const d = obj.userData; if(!d.animavel) return;
-                        if(d.tipo === 'giro') obj.rotation.y += ((d.aberto ? d.rot : 0) - obj.rotation.y) * 0.1;
-                        if(d.tipo === 'basculante') obj.rotation.x += ((d.aberto ? d.rot : 0) - obj.rotation.x) * 0.1;
-                        if(d.tipo === 'gaveta') obj.position.z += ((d.aberto ? d.zOpen : d.zOrig) - obj.position.z) * 0.15;
+                    grupoCozinha.children.forEach(mod => {
+                        mod.children.forEach(obj => {
+                            const d = obj.userData; if(!d || !d.animavel) return;
+                            if(d.tipo === 'giro') obj.rotation.y += ((d.aberto ? d.rotAbre : 0) - obj.rotation.y) * 0.1;
+                            if(d.tipo === 'basculante') obj.rotation.x += ((d.aberto ? d.rotAbre : 0) - obj.rotation.x) * 0.1;
+                            if(d.tipo === 'gaveta') obj.position.z += ((d.aberto ? d.zOpen : d.zOrig) - obj.position.z) * 0.15;
+                        });
                     });
                 }
                 if (boxHelper) boxHelper.update();
@@ -663,39 +688,71 @@ GERE EXCLUSIVAMENTE UM JSON:
             loop(); window.addEventListener('resize', () => { camera3D.aspect = w.clientWidth/w.clientHeight; camera3D.updateProjectionMatrix(); renderizador3D.setSize(w.clientWidth, w.clientHeight); });
         }
 
+        // ALGORITMO DE RAYCASTER BLINDADO PARA IGNORAR LINHAS (EDGES) E FOCAR NA MALHA DE MADEIRA
         function getHit(e) {
             const rect = renderizador3D.domElement.getBoundingClientRect();
-            mouse.x = ((e.clientX - rect.left)/rect.width)*2-1; mouse.y = -((e.clientY - rect.top)/rect.height)*2+1;
+            mouse.x = ((e.clientX - rect.left)/rect.width)*2-1; 
+            mouse.y = -((e.clientY - rect.top)/rect.height)*2+1;
             raycaster.setFromCamera(mouse, camera3D);
-            const ints = raycaster.intersectObjects(objetosInterativos, true); // Intersecta todas meshes
+            
+            if(!grupoCozinha) return null;
+            
+            const ints = raycaster.intersectObjects(grupoCozinha.children, true); 
             if (ints.length > 0) {
-                let o = ints[0].object;
-                while(o.parent && o.parent !== rootNode) {
-                    if(o.userData && o.userData.isMod) return { obj: (ints[0].object.parent.userData.animavel ? ints[0].object.parent : o), idx: o.userData.idx };
-                    o = o.parent;
+                let curr = ints[0].object;
+                let animavel = null;
+                let isMod = null;
+                let idx = null;
+                
+                while(curr && curr !== cena3D) {
+                    if (curr.userData) {
+                        if (curr.userData.animavel) animavel = curr;
+                        if (curr.userData.grupoPai && curr.userData.grupoPai.userData && curr.userData.grupoPai.userData.animavel) animavel = curr.userData.grupoPai;
+                        if (curr.userData.isMod) { isMod = curr; idx = curr.userData.idx; }
+                    }
+                    curr = curr.parent;
                 }
-            } return null;
+                if (isMod) return { obj: (animavel ? animavel : isMod), idx: idx };
+            } 
+            return null;
+        }
+
+        // CONVERSOR UNIVERSAL DE CORES (Impede telas brancas caso a IA gere strings exóticas)
+        function getColor(str, def) {
+            if (!str || typeof str !== 'string') return new THREE.Color(def);
+            const s = str.trim().toLowerCase();
+            const colorMap = { "azul": "#1E90FF", "vermelho": "#E74C3C", "verde": "#2ECC71", "amarelo": "#F1C40F", "preto": "#111111", "branco": "#FFFFFF", "cinza": "#95A5A6", "marrom": "#8B4513", "madeira": "#D35400", "laranja": "#E67E22", "roxo": "#9B59B6" };
+            if (colorMap[s]) return new THREE.Color(colorMap[s]);
+            try { return new THREE.Color(s); } catch(e) { return new THREE.Color(def); }
         }
 
         function reconstruirCenaParametrica() {
             if (grupoCozinha) rootNode.remove(grupoCozinha);
-            objetosInterativos = []; grupoCozinha = new THREE.Group(); rootNode.add(grupoCozinha);
+            grupoCozinha = new THREE.Group(); rootNode.add(grupoCozinha);
 
-            const mC = new THREE.MeshStandardMaterial({ color: 0xECF0F1, roughness: 0.9 });
-            const mP = new THREE.MeshStandardMaterial({ color: 0xDDA15E, roughness: 0.6 }); // Portas e Gavetas Ouro
             const E = 0.018; const F = 0.003; 
 
+            // NORMALIZAÇÃO DE TIPOS (Garante que a matemática nunca exploda concatenando strings)
             let lT = 0, hM = 0;
-            pGlobal.modulos.forEach(m => { lT += m.largura; if(m.altura > hM) hM = m.altura; });
+            pGlobal.modulos.forEach(m => { 
+                m.largura = Number(m.largura) || 800;
+                m.altura = Number(m.altura) || 800;
+                m.profundidade = Number(m.profundidade) || 500;
+                m.gavetas = Number(m.gavetas) || 0;
+                m.portas = Number(m.portas) || 0;
+                m.prateleiras = Number(m.prateleiras) || 0;
+                lT += m.largura; 
+                if(m.altura > hM) hM = m.altura; 
+            });
+
             const T_W = lT / 1000, T_H = hM / 1000;
             grupoCozinha.position.y = (pGlobal.instalacao === "piso") ? 0 : 1.2;
             let cX = -T_W / 2;
 
-            function placa(w, h, d, mat, x, y, z, grp, isInt=false) {
+            function placa(w, h, d, mat, x, y, z, grp) {
                 const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
                 m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), new THREE.LineBasicMaterial({color:0x000, opacity:0.15, transparent:true})));
                 m.position.set(x, y, z); grp.add(m);
-                if(isInt) objetosInterativos.push(m);
                 return m;
             }
 
@@ -704,19 +761,23 @@ GERE EXCLUSIVAMENTE UM JSON:
                 const mG = new THREE.Group(); mG.userData = { isMod: true, idx: idx }; 
                 const form = mod.formato || 'reto';
                 mG.position.set(cX + W/2, 0, 0); 
+                
+                // Mapeamento dinâmico de cores
+                const mC = new THREE.MeshStandardMaterial({ color: getColor(mod.cor_caixa, "#ECF0F1"), roughness: 0.9 });
+                const mP = new THREE.MeshStandardMaterial({ color: getColor(mod.cor_portas, "#DDA15E"), roughness: 0.6 });
 
                 if (form === 'reto') {
-                    placa(W, E, D, mC, 0, E/2, D/2, mG, true); // Base
-                    placa(W, E, D, mC, 0, H-E/2, D/2, mG, true); // Tampo
-                    placa(E, H, D, mC, -W/2+E/2, H/2, D/2, mG, true); // Lat E
-                    placa(E, H, D, mC, W/2-E/2, H/2, D/2, mG, true); // Lat D
+                    placa(W, E, D, mC, 0, E/2, D/2, mG); // Base
+                    placa(W, E, D, mC, 0, H-E/2, D/2, mG); // Tampo
+                    placa(E, H, D, mC, -W/2+E/2, H/2, D/2, mG); // Lat E
+                    placa(E, H, D, mC, W/2-E/2, H/2, D/2, mG); // Lat D
                     placa(W-E*2, H-E*2, 0.006, mC, 0, H/2, 0.01, mG); // Fundo
                     
                     const hInt = H - E*2;
                     let hPor = hInt, gY = E;
-                    const gavs = mod.gavetas || 0;
-                    const prats = mod.prateleiras || 0;
-                    const pts = mod.portas || 0;
+                    const gavs = mod.gavetas;
+                    const prats = mod.prateleiras;
+                    const pts = mod.portas;
 
                     // Gavetas (Com corrediça/física)
                     if(gavs > 0) {
@@ -725,10 +786,10 @@ GERE EXCLUSIVAMENTE UM JSON:
                         const hU = hGavArea / gavs;
                         for(let i=0; i<gavs; i++) {
                             const gG = new THREE.Group(); gG.position.set(0, gY + (i*hU) + hU/2, D/2);
-                            const pF = placa(W-E*2-F*2, hU-F, E, mP, 0, 0, D/2+E/2, gG, true); // Frente
+                            const pF = placa(W-E*2-F*2, hU-F, E, mP, 0, 0, D/2+E/2, gG); // Frente
                             placa(W-E*4, hU-E*2, D-E, mC, 0, 0, E/2, gG); // Caixa interna
                             gG.userData = { animavel: true, tipo: 'gaveta', aberto: false, zOrig: D/2, zOpen: D/2 + D*0.8 };
-                            pF.userData.grupoPai = gG; mG.add(gG); objetosInterativos.push(pF);
+                            pF.userData.grupoPai = gG; mG.add(gG); 
                         }
                     }
 
@@ -744,9 +805,9 @@ GERE EXCLUSIVAMENTE UM JSON:
                             const hI = hPor / pts;
                             for(let i=0; i<pts; i++) {
                                 const bG = new THREE.Group(); bG.position.set(0, E + (i*hI) + hI, D+E/2); 
-                                const pM = placa(W-E*2-F*2, hI-F, E, mP, 0, -hI/2, 0, bG, true);
+                                const pM = placa(W-E*2-F*2, hI-F, E, mP, 0, -hI/2, 0, bG);
                                 bG.userData = { animavel: true, tipo: 'basculante', aberto: false, rotAbre: -Math.PI/2.2 };
-                                pM.userData.grupoPai = bG; mG.add(bG); objetosInterativos.push(pM);
+                                pM.userData.grupoPai = bG; mG.add(bG); 
                             }
                         } else {
                             const wI = (W - E*2 - F*(pts+1)) / pts; const sX = -W/2 + E + F + wI/2;
@@ -754,30 +815,30 @@ GERE EXCLUSIVAMENTE UM JSON:
                                 const bG = new THREE.Group(); const esq = i < pts/2;
                                 bG.position.set(sX + i*(wI+F) + (esq?-wI/2:wI/2), E + hPor/2, D+E/2);
                                 const dx = esq ? wI/2 : -wI/2;
-                                const pM = placa(wI, hPor-F, E, mP, dx, 0, 0, bG, true);
+                                const pM = placa(wI, hPor-F, E, mP, dx, 0, 0, bG);
                                 bG.userData = { animavel: true, tipo: 'giro', aberto: false, rotAbre: esq ? -Math.PI/1.8 : Math.PI/1.8 };
-                                pM.userData.grupoPai = bG; mG.add(bG); objetosInterativos.push(pM);
+                                pM.userData.grupoPai = bG; mG.add(bG); 
                             }
                         }
                     }
                 }
                 else if (form === 'l_canto') {
-                    placa(W, E, D, mC, 0, E/2, D/2, mG, true); 
-                    placa(W, E, D, mC, 0, H-E/2, D/2, mG, true);
-                    placa(E, H, D, mC, -W/2+E/2, H/2, D/2, mG, true); 
+                    placa(W, E, D, mC, 0, E/2, D/2, mG); 
+                    placa(W, E, D, mC, 0, H-E/2, D/2, mG);
+                    placa(E, H, D, mC, -W/2+E/2, H/2, D/2, mG); 
                     placa(W-E*2, H, 0.006, mC, 0, H/2, 0.01, mG);
-                    placa(D, E, W-D, mC, W/2-D/2, E/2, D + (W-D)/2, mG, true);
-                    placa(D, E, W-D, mC, W/2-D/2, H-E/2, D + (W-D)/2, mG, true);
-                    placa(D, H, E, mC, W/2-D/2, H/2, W-E/2, mG, true);
-                    placa(E, H, W-D, mC, W/2-D+E/2, H/2, D + (W-D)/2, mG, true);
+                    placa(D, E, W-D, mC, W/2-D/2, E/2, D + (W-D)/2, mG);
+                    placa(D, E, W-D, mC, W/2-D/2, H-E/2, D + (W-D)/2, mG);
+                    placa(D, H, E, mC, W/2-D/2, H/2, W-E/2, mG);
+                    placa(E, H, W-D, mC, W/2-D+E/2, H/2, D + (W-D)/2, mG);
                 }
                 else if (form === 'curvo') {
-                    placa(W, E, D, mC, 0, E/2, D/2, mG, true);
-                    placa(W, E, D, mC, 0, H-E/2, D/2, mG, true);
-                    placa(E, H, D, mC, -W/2+E/2, H/2, D/2, mG, true);
+                    placa(W, E, D, mC, 0, E/2, D/2, mG);
+                    placa(W, E, D, mC, 0, H-E/2, D/2, mG);
+                    placa(E, H, D, mC, -W/2+E/2, H/2, D/2, mG);
                     const cil = new THREE.Mesh(new THREE.CylinderGeometry(W-E, W-E, H-E*2, 16, 1, true, 0, Math.PI/2), mP);
                     cil.material.side = THREE.DoubleSide; cil.position.set(-W/2+E, H/2, E);
-                    mG.add(cil); objetosInterativos.push(cil);
+                    mG.add(cil); 
                 }
                 grupoCozinha.add(mG); cX += W; 
             });
@@ -801,6 +862,11 @@ GERE EXCLUSIVAMENTE UM JSON:
             
             document.getElementById('hudTitle').innerText = m.nome || `Módulo ${index+1}`;
             document.getElementById('selFormato').value = m.formato || 'reto';
+            
+            // Tratamento Seguro de Cores Hexadecimais para o input type="color"
+            document.getElementById('modCorCaixa').value = "#" + getColor(m.cor_caixa, "#ECF0F1").getHexString();
+            document.getElementById('modCorPorta').value = "#" + getColor(m.cor_portas, "#DDA15E").getHexString();
+            
             document.getElementById('sliderW').value = m.largura; document.getElementById('lblW').innerText = Math.round(m.largura);
             document.getElementById('sliderH').value = m.altura; document.getElementById('lblH').innerText = Math.round(m.altura);
             document.getElementById('sliderD').value = m.profundidade; document.getElementById('lblD').innerText = Math.round(m.profundidade);
@@ -832,6 +898,8 @@ GERE EXCLUSIVAMENTE UM JSON:
             if (moduloSendoEditado === null) return;
             const m = pGlobal.modulos[moduloSendoEditado];
             m.formato = document.getElementById('selFormato').value;
+            m.cor_caixa = document.getElementById('modCorCaixa').value;
+            m.cor_portas = document.getElementById('modCorPorta').value;
             m.largura = parseFloat(document.getElementById('sliderW').value); document.getElementById('lblW').innerText = m.largura;
             m.altura = parseFloat(document.getElementById('sliderH').value); document.getElementById('lblH').innerText = m.altura;
             m.profundidade = parseFloat(document.getElementById('sliderD').value); document.getElementById('lblD').innerText = m.profundidade;
