@@ -521,8 +521,16 @@
 
                 if(mod.prateleiras) area += mod.prateleiras * (w*d);
                 if(mod.prateleirasExternas) area += mod.prateleirasExternas * (w * 0.20); 
+                
+                // Hardware Cálculo Profundo
                 if(mod.gavetas) { area += mod.gavetas * (w*0.3 + d*0.3*2 + w*d); hwCusto += mod.gavetas * 25.0; } 
-                if(mod.portas) { area += (w*h); hwCusto += mod.portas * 15.0; } 
+                if(mod.portas) { 
+                    area += (w*h); 
+                    if (mod.abertura === 'correr') hwCusto += mod.portas * 45.0; // Kit Trilho
+                    else if (mod.abertura === 'basculante') hwCusto += mod.portas * 35.0; // Pistão
+                    else hwCusto += mod.portas * 15.0; // Par Dobradiça
+                } 
+
                 if(mod.ripadoFrontal) { area += (w*h) * 1.5; laborMult += 0.3; }
                 
                 let custM2 = AppState.costs.mdf;
@@ -592,13 +600,20 @@
             getPtr: (e) => {
                 const rect = ThreeEngine.renderer.domElement.getBoundingClientRect();
                 let cX = e.clientX; let cY = e.clientY;
-                // Resgate imbatível para telas Touch:
-                if(cX === undefined && e.changedTouches && e.changedTouches.length > 0) {
-                    cX = e.changedTouches[0].clientX; cY = e.changedTouches[0].clientY;
-                }
+                if(cX === undefined && e.changedTouches && e.changedTouches.length > 0) { cX = e.changedTouches[0].clientX; cY = e.changedTouches[0].clientY; }
                 ThreeEngine.pointer.x = ((cX - rect.left)/rect.width)*2 - 1;
                 ThreeEngine.pointer.y = -((cY - rect.top)/rect.height)*2 + 1;
-                return {x: cX, y: cY}; // Retorna Pixels de ecrã para precisão milimétrica!
+                return {x: cX, y: cY};
+            },
+            highlightSelection: (id) => {
+                ThreeEngine.rootNode.children.forEach(modGroup => {
+                    const isSelected = (modGroup.userData.id === id);
+                    modGroup.traverse(child => {
+                        if (child.isMesh && child.material && !child.material.transparent) {
+                            if (child.material.emissive) { child.material.emissive.setHex(isSelected ? 0x333333 : 0x000000); }
+                        }
+                    });
+                });
             },
             onPtrDown: (e) => {
                 const pos = ThreeEngine.getPtr(e);
@@ -662,23 +677,18 @@
                 if(ThreeEngine.dragObj) { ThreeEngine.dragObj = null; return; }
                 if(ThreeEngine.isLongPress) return;
                 
-                // Lógica Absoluta de Busca de Interatividade Física
+                // Abre a porta independentemente (não reconstrói cena, mantém o estado perfeito de todas)
                 if(AppState.tool === 'orbit') {
                     const pos = ThreeEngine.getPtr(e);
-                    // Checa se foi apenas um clique/toque (movimentação < 5 pixels)
                     if(Math.hypot(pos.x - ThreeEngine.pDown.x, pos.y - ThreeEngine.pDown.y) < 5) {
                         ThreeEngine.raycaster.setFromCamera(ThreeEngine.pointer, ThreeEngine.camera);
                         const hits = ThreeEngine.raycaster.intersectObjects(ThreeEngine.rootNode.children, true);
                         
                         if(hits.length > 0) {
                             let anim = null;
-                            // Pesquisa profunda em todos os objetos que o raio atingiu (Mesmo através do vidro)
                             for (let i = 0; i < hits.length; i++) {
                                 let curr = hits[i].object;
-                                while(curr) { 
-                                    if(curr.userData && curr.userData.isAnimatable) { anim = curr; break; } 
-                                    curr = curr.parent; 
-                                }
+                                while(curr) { if(curr.userData && curr.userData.isAnimatable) { anim = curr; break; } curr = curr.parent; }
                                 if(anim) break;
                             }
                             
@@ -694,10 +704,9 @@
             animate: () => {
                 requestAnimationFrame(ThreeEngine.animate);
                 for(let i = AppState.animacoesAtivas.length -1; i>=0; i--) {
-                    const a = AppState.animacoesAtivas[i]; const obj = a.obj; const speed = 0.12;
+                    const a = AppState.animacoesAtivas[i]; const obj = a.obj; const speed = 0.15;
                     if(a.type === 'door_hinge') {
                         const mult = obj.userData.zDir || 1;
-                        // Ajuste vetorial definitivo
                         const finalHinge = obj.userData.hinge === 'left' ? -1 : 1; 
                         const maxAngle = (Math.PI/1.6) * finalHinge * mult;
                         const tgt = a.target ? maxAngle : 0;
@@ -709,12 +718,12 @@
                         obj.rotation.x += (tgt - obj.rotation.x)*speed;
                         if(Math.abs(obj.rotation.x-tgt)<0.01) { obj.rotation.x=tgt; AppState.animacoesAtivas.splice(i,1); }
                     } else if(a.type === 'door_slide') { 
-                        const tgt = a.target ? obj.userData.travelX : 0;
+                        const tgt = a.target ? (obj.userData.baseX + obj.userData.travelX) : obj.userData.baseX;
                         obj.position.x += (tgt - obj.position.x)*speed;
                         if(Math.abs(obj.position.x-tgt)<0.001) { obj.position.x=tgt; AppState.animacoesAtivas.splice(i,1); }
                     } else if(a.type === 'drawer') { 
                         const zD = obj.userData.zDir || 1;
-                        const tgt = a.target ? (obj.userData.depth*0.8 * zD) : 0;
+                        const tgt = a.target ? (obj.userData.baseZ + obj.userData.depth*0.8 * zD) : obj.userData.baseZ;
                         obj.position.z += (tgt - obj.position.z)*speed;
                         if(Math.abs(obj.position.z-tgt)<0.001) { obj.position.z=tgt; AppState.animacoesAtivas.splice(i,1); }
                     }
@@ -723,7 +732,7 @@
             },
             
             rebuildScene: () => {
-                AppState.animacoesAtivas = []; // Blindagem contra mesh fantasmas
+                AppState.animacoesAtivas = []; 
                 while(ThreeEngine.rootNode.children.length > 0) ThreeEngine.rootNode.remove(ThreeEngine.rootNode.children[0]);
                 let autoX = 0;
                 
@@ -738,13 +747,10 @@
                     const matCorpo = new THREE.MeshStandardMaterial(baseDef);
                     const matFrente = mod.material === 'misto' ? new THREE.MeshStandardMaterial({...baseDef, color: baseDef.frontColor}) : matCorpo;
                     const matVidro = new THREE.MeshStandardMaterial(MatDefs['vidro']);
-                    const selMat = new THREE.MeshStandardMaterial({...baseDef, emissive: 0x333333 });
                     
                     const edgeMat = new THREE.LineBasicMaterial({ color: 0x222, transparent: true, opacity: 0.25 });
-                    const activeMat = (AppState.selectedModule === mod.id) ? selMat : matCorpo;
-                    const activeMatFront = (AppState.selectedModule === mod.id) ? selMat : matFrente;
 
-                    const criarGeo = (geo, px, py, pz, cMat=activeMat) => {
+                    const criarGeo = (geo, px, py, pz, cMat=matCorpo) => {
                         const m = new THREE.Mesh(geo, cMat);
                         m.position.set(px, py, pz); m.castShadow = m.receiveShadow = true;
                         m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), edgeMat));
@@ -759,15 +765,14 @@
                             const rGeo = new THREE.BoxGeometry(isRotated?esp:0.02, bh, isRotated?0.02:esp);
                             const rPz = isRotated ? (pz - bw/2 + r*0.035 + 0.017) : pz;
                             const rPx = isRotated ? px : (px - bw/2 + r*0.035 + 0.017);
-                            criarGeo(rGeo, rPx, py, rPz, activeMatFront);
+                            criarGeo(rGeo, rPx, py, rPz, matFrente);
                         }
                     };
 
-                    // CONSTRUTORES DE CAIXARIA PARAMÉTRICA COM PORTAS/GAVETAS
                     const drawInteractiveFronte = (gParent, isDrawer, wF, hF, dF, px, py, pz, cMat, abertura, isLeft, zDir, travelX) => {
                         const grp = new THREE.Group();
                         if (isDrawer) {
-                            grp.userData = { isAnimatable:true, type:'drawer', isOpen:false, depth: dF, zDir: zDir };
+                            grp.userData = { isAnimatable:true, type:'drawer', isOpen:false, depth: dF, zDir: zDir, baseZ: pz };
                             grp.position.set(px, py, pz);
                             const fM = new THREE.Mesh(new THREE.BoxGeometry(wF-0.01, hF-0.005, esp), cMat); fM.castShadow = true;
                             fM.add(new THREE.LineSegments(new THREE.EdgesGeometry(fM.geometry), edgeMat));
@@ -777,7 +782,7 @@
                             pM.add(new THREE.LineSegments(new THREE.EdgesGeometry(pM.geometry), edgeMat));
 
                             if(abertura === 'correr') {
-                                grp.userData = { isAnimatable:true, type:'door_slide', isOpen:false, travelX: travelX };
+                                grp.userData = { isAnimatable:true, type:'door_slide', isOpen:false, travelX: travelX, baseX: px };
                                 grp.position.set(px, py, pz); grp.add(pM);
                             } else if(abertura === 'basculante') {
                                 grp.userData = { isAnimatable:true, type:'door_flap', isOpen:false, zDir: zDir };
@@ -801,22 +806,19 @@
                         
                         let isInternalDrawers = (layout === 'gavetas_internas');
 
-                        // Modo Ilha (Portas nos 2 Lados)
                         if(layout === 'ilha_dupla') {
                             const pW = boxW/portas;
                             for(let i=0; i<portas; i++) {
                                 let isLeft = (i%2===0); if(portas===1) isLeft = (dobrLado === 'esq');
                                 let tX = (i%2===0) ? pW*0.95 : -pW*0.95;
-                                drawInteractiveFronte(parentGroup, false, pW, boxH, boxD, startX + pW/2 + i*pW, startY + boxH/2, boxZ, activeMatFront, abertura, isLeft, zDir, tX);
-                                // Parte de trás da ilha (inverte zDir)
+                                drawInteractiveFronte(parentGroup, false, pW, boxH, boxD, startX + pW/2 + i*pW, startY + boxH/2, boxZ, matFrente, abertura, isLeft, zDir, tX);
                                 const backZDir = zDir * -1;
                                 const backZ = boxZ + (boxD * backZDir);
-                                drawInteractiveFronte(parentGroup, false, pW, boxH, boxD, startX + pW/2 + i*pW, startY + boxH/2, backZ, activeMatFront, abertura, !isLeft, backZDir, -tX);
+                                drawInteractiveFronte(parentGroup, false, pW, boxH, boxD, startX + pW/2 + i*pW, startY + boxH/2, backZ, matFrente, abertura, !isLeft, backZDir, -tX);
                             }
-                            return; // Preenchemos a frente e trás, finaliza aqui
+                            return; 
                         }
 
-                        // Cálculos Espaciais das Subdivisões
                         if(gavetas > 0 && portas > 0 && !isInternalDrawers) {
                             if(layout === 'top_drawers') { hG = boxH*0.25; hP = boxH*0.75; syP = startY; syG = startY + hP; }
                             else if(layout === 'bottom_drawers') { hG = boxH*0.25; hP = boxH*0.75; syG = startY; syP = startY + hG; }
@@ -824,67 +826,64 @@
                             else if(layout === 'right_drawers') { wP = boxW*0.65; wG = boxW*0.35; sxP = startX; sxG = startX + wP; }
                         }
 
-                        // Renderização Física: Gavetas
                         if(gavetas > 0 && layout !== 'apenas_portas') {
                             const gH = hG/gavetas;
                             for(let i=0; i<gavetas; i++) {
                                 const gZFinal = isInternalDrawers ? boxZ - (0.02 * zDir) : boxZ;
-                                drawInteractiveFronte(parentGroup, true, wG, gH, boxD, sxG + wG/2, syG + gH*i + gH/2, gZFinal, activeMatFront, '', false, zDir, 0);
+                                drawInteractiveFronte(parentGroup, true, wG, gH, boxD, sxG + wG/2, syG + gH*i + gH/2, gZFinal, matFrente, '', false, zDir, 0);
                             }
                         }
 
-                        // Renderização Física: Portas
                         if(portas > 0 && layout !== 'apenas_gavetas') {
                             const pW = wP/portas;
                             for(let i=0; i<portas; i++) {
                                 let isLeft = (i%2===0);
                                 if(portas === 1) isLeft = (dobrLado === 'esq');
                                 let tX = (i%2===0) ? pW*0.95 : -pW*0.95;
-                                let doorZReal = boxZ + (abertura==='correr' ? ((i%2===0?0.01:0.03)*zDir) : 0);
-                                drawInteractiveFronte(parentGroup, false, pW, hP, boxD, sxP + pW/2 + i*pW, syP + hP/2, doorZReal, activeMatFront, abertura, isLeft, zDir, tX);
+                                let doorZReal = boxZ + (abertura==='correr' ? ((i%2===0?0.01:0.035)*zDir) : 0); // Espaçamento de 3.5cm para trilho perfeito
+                                drawInteractiveFronte(parentGroup, false, pW, hP, boxD, sxP + pW/2 + i*pW, syP + hP/2, doorZReal, matFrente, abertura, isLeft, zDir, tX);
                             }
                         }
                     };
 
-                    // ---- GEOMETRIAS UNIVERSAIS (AGORA COM INTERATIVIDADE TOTAL) ----
                     if (mod.formato === 'redondo') {
                         if(mod.tipo === 'puff' || mod.tipo === 'cadeira' || mod.tipo === 'sofa') {
-                            criarGeo(new THREE.CylinderGeometry(w/2, w/2, h, 32), 0, h/2, 0, activeMatFront);
+                            criarGeo(new THREE.CylinderGeometry(w/2, w/2, h, 32), 0, h/2, 0, matFrente);
                         } else {
-                            criarGeo(new THREE.CylinderGeometry(w/2, w/2, esp, 32), 0, h-esp/2, 0, mod.tampoVidro?matVidro:activeMatFront);
+                            criarGeo(new THREE.CylinderGeometry(w/2, w/2, esp, 32), 0, h-esp/2, 0, mod.tampoVidro?matVidro:matFrente);
                             criarGeo(new THREE.CylinderGeometry(w/8, w/8, h-esp, 16), 0, h/2-esp/2, 0); 
                         }
                     } 
                     else if (mod.formato === 'triangular') {
-                        criarGeo(new THREE.CylinderGeometry(w/2, w/2, h, 3), 0, h/2, 0, activeMatFront);
+                        criarGeo(new THREE.CylinderGeometry(w/2, w/2, h, 3), 0, h/2, 0, matFrente);
                     }
                     else if (mod.tipo === 'sofa' || mod.tipo === 'puff' || mod.tipo === 'cadeira') {
                         if (mod.tipo === 'sofa') {
-                            criarBloco(w, h*0.4, d, 0, h*0.2, 0, activeMatFront); 
-                            criarBloco(esp*4, h*0.8, d, -w/2+esp*2, h*0.4, 0, activeMatFront); 
-                            criarBloco(esp*4, h*0.8, d, w/2-esp*2, h*0.4, 0, activeMatFront); 
-                            criarBloco(w, h*0.6, esp*4, 0, h*0.7, -d/2+esp*2, activeMatFront); 
+                            criarBloco(w, h*0.4, d, 0, h*0.2, 0, matFrente); 
+                            criarBloco(esp*4, h*0.8, d, -w/2+esp*2, h*0.4, 0, matFrente); 
+                            criarBloco(esp*4, h*0.8, d, w/2-esp*2, h*0.4, 0, matFrente); 
+                            criarBloco(w, h*0.6, esp*4, 0, h*0.7, -d/2+esp*2, matFrente); 
                         } else if (mod.tipo === 'cadeira') {
-                            criarBloco(w, esp*3, d, 0, h*0.5, 0, activeMatFront); 
+                            criarBloco(w, esp*3, d, 0, h*0.5, 0, matFrente); 
                             criarBloco(0.04, h*0.5, 0.04, -w/2+0.02, h*0.25, -d/2+0.02); 
                             criarBloco(0.04, h*0.5, 0.04, w/2-0.02, h*0.25, -d/2+0.02);
                             criarBloco(0.04, h*0.5, 0.04, -w/2+0.02, h*0.25, d/2-0.02);
                             criarBloco(0.04, h*0.5, 0.04, w/2-0.02, h*0.25, d/2-0.02);
-                            criarBloco(w, h*0.5, 0.04, 0, h*0.75, -d/2+0.02, activeMatFront); 
+                            criarBloco(w, h*0.5, 0.04, 0, h*0.75, -d/2+0.02, matFrente); 
                         } else {
-                            criarBloco(w, h, d, 0, h/2, 0, activeMatFront); 
+                            criarBloco(w, h, d, 0, h/2, 0, matFrente); 
                         }
                     }
                     else if (mod.tipo === 'mesa') {
                         if(mod.tampoVidro) criarBloco(w, 0.015, d, 0, h-0.0075, 0, matVidro);
-                        else criarBloco(w, esp*2, d, 0, h-esp, 0, activeMatFront); 
+                        else criarBloco(w, esp*2, d, 0, h-esp, 0, matFrente); 
                         
                         if(mod.formato === 'dobravel') {
                             criarBloco(0.03, h, 0.03, -w/2+0.1, h/2, 0); criarBloco(0.03, h, 0.03, w/2-0.1, h/2, 0); 
                         } else if(mod.formato === 'L_esq' || mod.formato === 'L_dir') {
                             const isEsq = mod.formato === 'L_esq';
                             const wL = d, lenL = rL - d, pxL = isEsq ? -w/2+wL/2 : w/2-wL/2, pzL = -d/2 - lenL/2;
-                            criarBloco(wL, esp*2, lenL, pxL, h-esp, pzL, mod.tampoVidro?matVidro:activeMatFront);
+                            criarBloco(wL, esp*2, lenL, pxL, h-esp, pzL, mod.tampoVidro?matVidro:matFrente);
                             criarBloco(esp, h-esp*2, d-0.1, -w/2+esp/2, h/2-esp, 0); 
                             criarBloco(esp, h-esp*2, d-0.1, w/2-esp/2, h/2-esp, 0);  
                             criarBloco(wL-0.1, h-esp*2, esp, pxL, h/2-esp, pzL - lenL/2 + esp/2);
@@ -895,13 +894,12 @@
                         }
                     }
                     else if (mod.tipo === 'painel_tv') {
-                        criarBloco(w, h, esp, 0, h/2, -d/2+esp/2, activeMatFront); 
+                        criarBloco(w, h, esp, 0, h/2, -d/2+esp/2, matFrente); 
                         drawRipado(w, h, 0, h/2, -d/2+esp);
                         if(mod.gavetas || mod.portas) { 
                             const rH = h*0.25, rY = rH/2 + 0.1;
                             criarBloco(w, esp, d, 0, rY-rH/2, 0); criarBloco(w, esp, d, 0, rY+rH/2, 0); 
                             criarBloco(esp, rH, d, -w/2+esp/2, rY, 0); criarBloco(esp, rH, d, w/2-esp/2, rY, 0); 
-                            // Renderiza interatividade total no Rack embutido
                             fillStorageArea(w-esp*2, rH-esp*2, d, 0, rY, d/2-esp/2, mod.portas, mod.gavetas, mod.layoutInterno, mod.abertura, mod.dobradicaLado, 1, g);
                         }
                     } 
@@ -913,25 +911,21 @@
                         const extrude = { depth: esp, bevelEnabled: false };
                         
                         const tGeo = new THREE.ExtrudeGeometry(shape, extrude); tGeo.rotateX(Math.PI/2); tGeo.translate(-w/2, h-esp/2, d/2);
-                        criarGeo(tGeo, 0,0,0, activeMat);
+                        criarGeo(tGeo, 0,0,0, matCorpo);
                         const bGeo = new THREE.ExtrudeGeometry(shape, extrude); bGeo.rotateX(Math.PI/2); bGeo.translate(-w/2, esp/2, d/2);
-                        criarGeo(bGeo, 0,0,0, activeMat);
+                        criarGeo(bGeo, 0,0,0, matCorpo);
                         
                         criarBloco(esp, h-esp*2, w, -w/2+esp/2, h/2, 0); 
                         criarBloco(w, h-esp*2, esp, 0, h/2, -w/2+esp/2); 
                         
                         if(mod.portas > 0) {
-                            // Canto oblíquo tem portas com rotação 45 graus
                             const diagW = Math.sqrt(Math.pow(w,2) + Math.pow(w,2)) * 0.45; 
-                            const cG = new THREE.Group();
-                            cG.position.set(0, 0, w/2 - w*0.25); 
-                            cG.rotation.y = -Math.PI/4;
+                            const cG = new THREE.Group(); cG.position.set(0, 0, w/2 - w*0.25); cG.rotation.y = -Math.PI/4;
                             fillStorageArea(diagW, h-esp*2, esp, 0, h/2, 0, mod.portas, mod.gavetas, mod.layoutInterno, mod.abertura, mod.dobradicaLado, 1, cG);
                             g.add(cG);
                         }
                     } 
                     else {
-                        // CAIXARIA PADRÃO E BALCÕES
                         const isBalcao = (mod.tipo === 'balcao');
                         const prEx = mod.prateleirasExternas > 0 ? 0.20 : 0; 
                         const chassiD = d - prEx; 
@@ -950,7 +944,7 @@
                         criarBloco(w-esp*2, h-esp*2, 0.006, 0, h/2, bZ - (0.003*zDir));
                         
                         if(prEx > 0 || mod.ripadoFrontal) {
-                            criarBloco(w-esp*2, h-esp*2, esp, 0, h/2, bZ, activeMatFront);
+                            criarBloco(w-esp*2, h-esp*2, esp, 0, h/2, bZ, matFrente);
                             drawRipado(w-esp*2, h-esp*2, 0, h/2, bZ + (esp*zDir));
                             if(prEx > 0) {
                                 const epEx = (h-esp*2)/(mod.prateleirasExternas+1);
@@ -962,7 +956,7 @@
                             const isE = mod.formato === 'L_esq'; const wL = d, lenL = rL - d;
                             const pxL = isE ? -w/2+wL/2 : w/2-wL/2; const pzL = isBalcao ? d/2 + lenL/2 : -d/2 - lenL/2;
                             criarBloco(wL, esp, lenL, pxL, esp/2, pzL);
-                            criarBloco(wL, esp, lenL, pxL, h-esp/2, pzL, mod.tampoVidro?matVidro:activeMat);
+                            criarBloco(wL, esp, lenL, pxL, h-esp/2, pzL, mod.tampoVidro?matVidro:matCorpo);
                             criarBloco(esp, h-esp*2, lenL, pxL - (isE?wL/2-esp/2:-wL/2+esp/2), h/2, pzL); 
                             criarBloco(wL, h-esp*2, esp, pxL, h/2, pzL - (lenL/2*zDir) + (esp/2*zDir)); 
                         }
@@ -977,11 +971,12 @@
                             cab.rotation.z = Math.PI/2; cab.position.set(0, h-0.15, isBalcao ? -prEx/2 : prEx/2); g.add(cab);
                         }
 
-                        // Renderiza interatividade total baseada nas customizações do cliente
                         fillStorageArea(w-esp*2, h-esp*2, chassiD, 0, h/2, fZ, mod.portas, mod.gavetas, mod.layoutInterno, mod.abertura, mod.dobradicaLado, zDir, g);
                     }
 
-                    // APLICAÇÃO DE MATRIZ DE TRANSFORMAÇÃO GLOBAL
+                    // APLICA SELEÇÃO VISUAL
+                    ThreeEngine.highlightSelection(AppState.selectedModule);
+
                     const fx = mod.posX/1000 || (autoX + w/2);
                     g.position.set(fx, mod.posY/1000 || 0, mod.posZ/1000 || 0);
                     g.rotation.y = THREE.MathUtils.degToRad(mod.rotY || 0);
@@ -996,7 +991,7 @@
             init: () => {
                 App.config.load();
                 ThreeEngine.init();
-                App.modules.add('balcao', { nome: "Balcão em L", largura: 1500, altura: 1050, profundidade: 600, formato: 'L_esq', retornoL: 1200, portas: 2, gavetas: 2, layoutInterno: 'gavetas_internas', prateleirasExternas: 2, material: 'amadeirado', ripadoFrontal: true });
+                App.modules.add('balcao', { nome: "Balcão em L", largura: 1500, altura: 1050, profundidade: 600, formato: 'L_esq', retornoL: 1200, portas: 4, gavetas: 4, layoutInterno: 'gavetas_internas', prateleirasExternas: 2, material: 'amadeirado', ripadoFrontal: true });
                 App.ui.toast('Motor 1000/1000 Inicializado.', 'success');
             },
 
@@ -1012,7 +1007,9 @@
                 },
                 addGeneric: () => { App.ui.fecharHUDs(); App.modules.add('armario', {nome: "Peça Genérica"}); },
                 select: (id) => {
-                    AppState.selectedModule = id; ThreeEngine.rebuildScene(); App.ui.renderList();
+                    AppState.selectedModule = id; 
+                    ThreeEngine.highlightSelection(id); // NÃO RECONSTRÓI MAIS A CENA AO SELECIONAR! (Conserta o bug da porta)
+                    App.ui.renderList();
                     if(id && document.getElementById('floatingEditor').classList.contains('active')) App.ui.openLiveEditor(id);
                 },
                 removeCurrent: () => {
