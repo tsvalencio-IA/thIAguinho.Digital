@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gerador de Projetos e Orçamentos para Marcenaria - thIAguinho Soluções</title>
+    <title>Marcenaria IA 1000/1000 - thIAguinho Soluções</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <style>
-        /* ================== ROOT E VARIÁVEIS OFICIAIS ================== */
+        /* ================== ROOT E DESIGN SYSTEM ================== */
         :root {
             --primary-dark: #4A3C30;     
             --secondary-wood: #7F5539;   
@@ -35,61 +35,57 @@
 
         /* ================== HEADER & BRANDING ================== */
         .app-header { background-color: var(--primary-dark); color: var(--light-cream); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-        .app-header h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.5px; }
+        .app-header h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.5px; margin: 0; }
         .app-header h1 span.brand { color: var(--accent-gold); }
         .icon-btn { background: none; border: none; color: var(--accent-gold); font-size: 1.4rem; cursor: pointer; transition: transform 0.2s; }
         .icon-btn:hover { transform: rotate(45deg); }
 
-        .footer-signature { position: absolute; bottom: 5px; right: 15px; font-size: 0.65rem; color: #555; font-weight: 700; pointer-events: none; z-index: 40; text-transform: uppercase; letter-spacing: 1px; }
+        .footer-signature { position: absolute; bottom: 85px; right: 15px; font-size: 0.65rem; color: #555; font-weight: 700; pointer-events: none; z-index: 40; text-transform: uppercase; letter-spacing: 1px; }
 
         /* ================== MOTOR 3D ================== */
         #canvas-container { flex: 1; position: relative; width: 100%; height: 100%; background: radial-gradient(circle, #ffffff 0%, #e0e0e0 100%); transition: background 0.3s; }
         canvas { display: block; width: 100% !important; height: 100% !important; outline: none; }
 
-        /* ================== CONTROLES FLUTUANTES ================== */
+        /* ================== CONTROLES FLUTUANTES (FABs) ================== */
         .floating-controls { position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 50; background: rgba(255, 255, 255, 0.95); padding: 8px 15px; border-radius: 30px; box-shadow: var(--shadow-subtle); backdrop-filter: blur(5px); }
-        .fab-btn { background: transparent; border: none; color: var(--primary-dark); display: flex; flex-direction: column; align-items: center; cursor: pointer; font-family: 'Poppins', sans-serif; transition: 0.3s; min-width: 60px; }
+        .fab-btn { background: transparent; border: none; color: var(--primary-dark); display: flex; flex-direction: column; align-items: center; cursor: pointer; font-family: 'Poppins', sans-serif; transition: 0.3s; min-width: 65px; }
         .fab-btn i { font-size: 1.3rem; margin-bottom: 4px; color: var(--secondary-wood); pointer-events: none; }
         .fab-btn span { font-size: 0.65rem; font-weight: 600; pointer-events: none; }
         .fab-btn.primary i { color: var(--ai-blue); }
         .fab-btn.success i { color: var(--earth-green); }
+        .fab-btn:active { transform: scale(0.9); }
 
-        /* ================== HUDS & BOTTOM SHEETS ================== */
+        /* ================== HUDS (BOTTOM SHEETS CRM) ================== */
         .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 85vh; background-color: var(--soft-beige); border-radius: 20px 20px 0 0; box-shadow: 0 -5px 25px rgba(0,0,0,0.4); z-index: 200; transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; }
         .bottom-sheet.active { bottom: 0; }
         .sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border-soft); background-color: var(--light-cream); border-radius: 20px 20px 0 0; }
-        .sheet-header h3 { color: var(--primary-dark); margin: 0; font-size: 1rem; font-weight: 700; }
+        .sheet-header h3 { color: var(--primary-dark); margin: 0; font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
         .close-btn { background: #e0e0e0; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold; color: var(--text-color); display: flex; justify-content: center; align-items: center; transition: 0.2s; }
         .close-btn:hover { background: var(--warning-red); color: #fff; }
         .sheet-body { padding: 20px; overflow-y: auto; flex: 1; }
 
-        /* ================== EDITOR AO VIVO (LIVE CAD) ================== */
-        .floating-editor { 
-            position: fixed; bottom: -100%; right: 0; width: 100%; max-height: 65vh; 
-            background: rgba(253, 252, 249, 0.98); box-shadow: 0 -10px 30px rgba(0,0,0,0.3); 
-            z-index: 300; transition: all 0.4s; overflow-y: auto; padding: 20px; 
-            border-top: 5px solid var(--ai-blue); overscroll-behavior: contain;
-        }
+        /* ================== EDITOR AO VIVO (LONG PRESS) ================== */
+        .floating-editor { position: fixed; bottom: -100%; right: 0; width: 100%; max-height: 75vh; background: rgba(253, 252, 249, 0.98); box-shadow: 0 -10px 30px rgba(0,0,0,0.3); z-index: 300; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow-y: auto; padding: 20px; border-top: 5px solid var(--ai-blue); border-radius: 20px 20px 0 0; }
         .floating-editor.active { bottom: 0; }
         
         @media(min-width: 1024px) {
-            .floating-editor { 
-                top: 75px; bottom: 20px; right: 20px; width: 420px; max-height: calc(100vh - 95px); 
-                border-radius: 12px; border: 1px solid var(--border-soft); border-top: 5px solid var(--ai-blue);
-                transform: translateX(120%); opacity: 0;
-            }
-            .floating-editor.active { transform: translateX(0); opacity: 1; }
+            .floating-editor { top: 75px; bottom: 20px; right: 20px; width: 420px; max-height: calc(100vh - 95px); border-radius: 12px; border: 1px solid var(--border-soft); transform: translateX(120%); opacity: 0; }
+            .floating-editor.active { transform: translateX(0); opacity: 1; bottom: auto; }
+            .bottom-sheet { width: 400px; left: 20px; bottom: 100px; border-radius: 12px; max-height: 70vh; opacity: 0; pointer-events: none; transform: translateY(20px); }
+            .bottom-sheet.active { opacity: 1; pointer-events: all; transform: translateY(0); }
         }
 
-        /* ================== COMPONENTES DE FORMULÁRIO ================== */
+        /* ================== FORMS & INPUTS ================== */
         .input-group { margin-bottom: 12px; }
         .input-group label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; color: var(--secondary-wood); text-transform: uppercase; }
         .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 10px; border: 1px solid var(--border-soft); border-radius: 8px; font-family: inherit; font-size: 0.9rem; background: #fff; transition: border 0.3s; }
-        .input-group input:focus, .input-group select:focus { border-color: var(--accent-gold); outline: none; }
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus { border-color: var(--accent-gold); outline: none; }
+        .input-group textarea { resize: vertical; min-height: 80px; }
 
         .btn-block { display: block; width: 100%; padding: 14px; text-align: center; background-color: #e0e0e0; color: var(--primary-dark); border: none; border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; margin-bottom: 10px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
         .btn-block.action-btn { background-color: var(--accent-gold); color: #fff; }
         .btn-block.success { background-color: var(--earth-green); color: #fff; }
+        .btn-block.primary { background-color: var(--ai-blue); color: #fff; }
         .btn-block.danger { background-color: var(--warning-red); color: #fff; }
         .btn-block.recording { background-color: var(--warning-red); color: #fff; animation: pulse 1.5s infinite; }
         .btn-block:active { transform: scale(0.98); }
@@ -98,718 +94,711 @@
 
         .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .grid-3-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .grid-4-col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 
-        .module-card { background: #fff; border-left: 5px solid var(--accent-gold); padding: 15px; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); transition: 0.3s; }
+        /* ================== CARDS & VISUALS ================== */
+        .module-card { background: #fff; border-left: 5px solid var(--accent-gold); padding: 15px; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); transition: 0.3s; cursor: pointer; position: relative; }
         .module-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .module-card.highlighted { border-left: 5px solid var(--ai-blue); background-color: #f0f8ff; }
-        .module-card h4 { margin-bottom: 5px; color: var(--primary-dark); font-size: 0.9rem; text-transform: uppercase; }
-        .module-card p { font-size: 0.8rem; color: #666; margin-bottom: 3px; }
-
-        .cad-section { background: #f0f4f8; padding: 12px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid var(--ai-blue); }
-        .cad-section h5 { color: var(--ai-blue); margin-bottom: 10px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .module-card.selected { border-left-color: var(--ai-blue); background: #eff6ff; }
+        .module-card h4 { margin-bottom: 5px; color: var(--primary-dark); font-size: 0.95rem; text-transform: uppercase; font-weight: 700; }
+        .module-card p { font-size: 0.8rem; color: #666; margin-bottom: 8px; }
+        .oracle-badge { display: inline-block; padding: 4px 8px; background: #d1fae5; color: #065f46; font-size: 0.7rem; border-radius: 4px; font-weight: 600; }
 
         .price-summary { margin-top: 20px; padding: 20px; background-color: #fff; border: 2px dashed var(--accent-gold); border-radius: var(--border-radius); text-align: center; }
-        .price-summary p { font-size: 2.2rem; font-weight: 700; color: var(--earth-green); margin-top: 10px; }
+        .price-summary h4 { color: var(--primary-dark); font-size: 1rem; margin-bottom: 5px; text-transform: uppercase; }
+        .price-summary p { font-size: 2.2rem; font-weight: 700; color: var(--earth-green); margin-top: 5px; margin-bottom: 15px; }
+        .bom-detail { font-size: 0.8rem; color: #555; text-transform: uppercase; font-weight: 600; display: flex; justify-content: space-between; border-top: 1px solid #eee; padding-top: 8px; margin-top: 4px; }
 
-        /* ================== UTILS & MODALS ================== */
+        /* ================== FEEDBACK, MODALS & LOADING ================== */
         #longPressIndicator { position: fixed; width: 50px; height: 50px; border: 5px solid var(--ai-blue); border-radius: 50%; border-top-color: transparent; animation: spin 0.5s linear infinite; display: none; z-index: 500; pointer-events: none; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
+        
         #imgPreviewContainer { margin-top: 10px; text-align: center; display: none; background: #eee; border-radius: 10px; padding: 5px; border: 1px dashed #ccc; }
         #imgPreviewContainer img { max-width: 100%; max-height: 150px; border-radius: 6px; object-fit: contain; }
 
-        .modal-overlay, .status-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 999; backdrop-filter: blur(3px); }
+        .modal-overlay, .status-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 999; backdrop-filter: blur(4px); }
         .modal-content { background: var(--light-cream); padding: 30px; border-radius: var(--border-radius); width: 90%; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         
         .loader { border: 6px solid #f3f3f3; border-top: 6px solid var(--accent-gold); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         .status-overlay p { color: white; font-weight: bold; font-size: 1.2rem; text-align: center; letter-spacing: 1px; }
         .error-box { color: var(--warning-red); font-size: 0.9rem; margin-top: 10px; font-weight: 600; text-align: center; background: #ffebee; padding: 10px; border-radius: 6px; display: none; }
         
-        #toast { visibility: hidden; min-width: 250px; background-color: var(--primary-dark); color: #fff; text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 1rem; box-shadow: 0px 4px 15px rgba(0,0,0,0.4); font-weight: 600; }
-        #toast.show { visibility: visible; animation: fadein 0.4s, fadeout 0.4s 2.6s; }
-        @keyframes fadein { from {bottom: 0; opacity: 0; transform: translate(-50%, 20px);} to {bottom: 30px; opacity: 1; transform: translate(-50%, 0);} }
-        @keyframes fadeout { from {bottom: 30px; opacity: 1; transform: translate(-50%, 0);} to {bottom: 0; opacity: 0; transform: translate(-50%, 20px);} }
+        #toast { visibility: hidden; min-width: 280px; background-color: var(--primary-dark); color: #fff; text-align: center; border-radius: 30px; padding: 16px 20px; position: fixed; z-index: 2000; left: 50%; bottom: 100px; transform: translateX(-50%); font-size: 0.95rem; box-shadow: 0px 10px 25px rgba(0,0,0,0.4); font-weight: 600; border: 2px solid rgba(255,255,255,0.1); }
+        #toast.show { visibility: visible; animation: fadein 0.4s, fadeout 0.4s 3.6s forwards; }
+        #toast.success { border-color: var(--success-green); }
+        #toast.error { background-color: var(--warning-red); border-color: #ff9999; }
+        
+        @keyframes fadein { from {bottom: 50px; opacity: 0;} to {bottom: 100px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 100px; opacity: 1;} to {bottom: 50px; opacity: 0;} }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <!-- CABEÇALHO OFICIAL -->
+    <!-- HEADER OFICIAL -->
     <header class="app-header">
         <h1><i class="fas fa-cube"></i> <span class="brand">thIAguinho Soluções</span> | CAD</h1>
-        <button class="icon-btn" onclick="toggleModal('modalSettings')"><i class="fas fa-sliders-h"></i></button>
+        <button class="icon-btn" onclick="App.ui.toggleModal('modalSettings')"><i class="fas fa-sliders-h"></i></button>
     </header>
 
-    <!-- MOTOR DE RENDERIZAÇÃO E AR -->
-    <div id="canvas-container"></div>
+    <!-- ÁREA 3D -->
+    <div id="canvas-container">
+        <canvas id="cad-canvas"></canvas>
+    </div>
+    
     <div id="longPressIndicator"></div>
-    <div class="footer-signature">POWERED BY THIAGUINHO SOLUÇÕES</div>
+    <div class="footer-signature">ENGINE: ORÁCULO 1000/1000</div>
 
-    <!-- EDITOR CAD AO VIVO (FLUTUANTE) -->
-    <div id="floatingEditor" class="floating-editor"></div>
-
-    <!-- CONTROLES INFERIORES -->
+    <!-- CONTROLES INFERIORES CRM (FABS) -->
     <div class="floating-controls">
-        <button class="fab-btn primary" onclick="abrirHUD('hudIA')"><i class="fas fa-brain"></i><span>Assistente</span></button>
-        <button class="fab-btn" onclick="abrirHUD('hudLista')"><i class="fas fa-cubes"></i><span>Módulos</span></button>
-        <button class="fab-btn" onclick="abrirHUD('perspectiveHUD')"><i class="fas fa-vr-cardboard"></i><span>AR / Cam</span></button>
-        <button class="fab-btn success" onclick="abrirHUD('hudOrcamento')"><i class="fas fa-file-invoice-dollar"></i><span>Custos</span></button>
+        <button class="fab-btn primary" onclick="App.ui.abrirHUD('hudIA')">
+            <i class="fas fa-brain"></i><span>Assistente</span>
+        </button>
+        <button class="fab-btn" onclick="App.ui.abrirHUD('hudLista')">
+            <i class="fas fa-cubes"></i><span>Módulos</span>
+        </button>
+        <button class="fab-btn" onclick="App.ui.abrirHUD('perspectiveHUD')">
+            <i class="fas fa-vr-cardboard"></i><span>AR / Cam</span>
+        </button>
+        <button class="fab-btn success" onclick="App.ui.abrirHUD('hudOrcamento')">
+            <i class="fas fa-file-invoice-dollar"></i><span>Custos</span>
+        </button>
     </div>
 
-    <div id="statusOverlay" class="status-overlay">
-        <div style="display:flex; flex-direction:column; align-items:center;">
-            <div class="loader"></div>
-            <p id="statusText">Processando Oráculo 3D...</p>
-        </div>
-    </div>
-
-    <div id="toast">Notificação</div>
-
-    <!-- ======================================================== -->
-    <!-- HUDs - MENUS DESLIZANTES                                 -->
-    <!-- ======================================================== -->
-
-    <!-- HUD IA: ENTRADA MULTIMODAL AVANÇADA -->
+    <!-- HUD IA MULTIMODAL -->
     <div id="hudIA" class="bottom-sheet">
         <div class="sheet-header">
-            <h3><i class="fas fa-robot"></i> Oráculo IA - thIAguinho Soluções</h3>
-            <button class="close-btn" onclick="fecharHUDs()"><i class="fas fa-times"></i></button>
+            <h3><i class="fas fa-robot"></i> Assistente Oráculo IA</h3>
+            <button class="close-btn" onclick="App.ui.fecharHUDs()"><i class="fas fa-times"></i></button>
         </div>
         <div class="sheet-body">
             <div class="grid-2-col">
-                <button class="btn-block" id="btnRecord" onmousedown="startRecording()" onmouseup="stopRecording()" ontouchstart="startRecording()" ontouchend="stopRecording()">
+                <button class="btn-block" id="btnRecord" onclick="App.ai.toggleRecording()">
                     <i class="fas fa-microphone"></i> Gravar Voz
                 </button>
                 <div class="input-group" style="margin: 0;">
-                    <input type="file" id="audioFile" accept="audio/*" style="display:none;" onchange="uploadAudio(this)">
+                    <input type="file" id="audioFile" accept="audio/*" style="display:none;" onchange="App.ai.uploadAudio(this)">
                     <label for="audioFile" class="btn-block" style="background:#6c757d; color:#fff; cursor:pointer; margin:0;"><i class="fas fa-upload"></i> Enviar Áudio</label>
                 </div>
             </div>
-            <p id="transcriptionText" style="font-size:0.8rem; color:var(--earth-green); text-align:center; margin-top:5px; margin-bottom:15px;"></p>
+            <p id="transcriptionText" style="font-size:0.8rem; color:var(--earth-green); text-align:center; margin-top:5px; margin-bottom:15px; font-weight:bold;"></p>
 
             <div class="input-group">
-                <textarea id="textoAdicional" placeholder="Instruções completas (ex: Quero um balcão com duas portas embaixo e uma gaveta em cima)..."></textarea>
+                <textarea id="textoAdicional" placeholder="Instruções completas (ex: Quero um balcão de 1.20m com duas portas embaixo e uma gaveta em cima)..."></textarea>
             </div>
 
             <div class="input-group">
-                <input type="file" id="fotoCliente" accept="image/*" class="file-input">
-                <label for="fotoCliente" class="btn-block action-btn" style="margin:0;"><i class="fas fa-camera"></i> Foto da Parede / Ambiente</label>
+                <input type="file" id="fotoCliente" accept="image/*" class="file-input" style="display:none;" onchange="App.ai.processPhoto(this)">
+                <label for="fotoCliente" class="btn-block action-btn" style="margin:0; cursor:pointer;"><i class="fas fa-camera"></i> Anexar Foto do Ambiente</label>
             </div>
             
             <div id="imgPreviewContainer">
                 <img id="imagePreview" src="">
             </div>
             
-            <button class="btn-block success" style="margin-top:15px; font-size:1rem; padding:15px;" onclick="analisarComIA()">
-                <i class="fas fa-hammer"></i> Acionar Oráculo de Marcenaria
+            <button class="btn-block success" style="margin-top:15px; font-size:1rem; padding:15px;" onclick="App.ai.generateWithOracle()">
+                <i class="fas fa-hammer"></i> Gerar Projeto Inteligente
             </button>
             <div id="iaErrorBox" class="error-box"></div>
         </div>
     </div>
 
-    <!-- HUD LISTA DE MÓDULOS -->
+    <!-- HUD LISTA MÓDULOS -->
     <div id="hudLista" class="bottom-sheet">
         <div class="sheet-header">
-            <h3>Módulos do Projeto</h3>
-            <button class="close-btn" onclick="fecharHUDs()"><i class="fas fa-times"></i></button>
+            <h3><i class="fas fa-list"></i> Módulos do Projeto</h3>
+            <button class="close-btn" onclick="App.ui.fecharHUDs()"><i class="fas fa-times"></i></button>
         </div>
         <div class="sheet-body">
-            <p style="font-size: 0.8rem; color: #666; margin-bottom:15px; text-align:center;"><i class="fas fa-info-circle"></i> Segure o dedo sobre o móvel no 3D para abrir o Editor Live.</p>
+            <p style="font-size: 0.8rem; color: #666; margin-bottom:15px; text-align:center;"><i class="fas fa-info-circle"></i> Segure o dedo sobre o móvel no 3D para editar engenharia.</p>
             <div id="listaModulosContainer"></div>
-            <button class="btn-block success" onclick="adicionarModuloManual()"><i class="fas fa-plus"></i> Novo Módulo Avulso</button>
+            <button class="btn-block primary" style="margin-top:10px;" onclick="App.modules.addGeneric()"><i class="fas fa-plus"></i> Novo Módulo Físico</button>
         </div>
     </div>
 
-    <!-- HUD PERSPECTIVA & AR -->
+    <!-- HUD AR (PERSPECTIVA) -->
     <div id="perspectiveHUD" class="bottom-sheet">
         <div class="sheet-header">
-            <h3>Realidade Aumentada (AR) e Câmera</h3>
-            <button class="close-btn" onclick="fecharHUDs()"><i class="fas fa-times"></i></button>
+            <h3><i class="fas fa-vr-cardboard"></i> Realidade Aumentada (AR)</h3>
+            <button class="close-btn" onclick="App.ui.fecharHUDs()"><i class="fas fa-times"></i></button>
         </div>
         <div class="sheet-body">
-            <button class="btn-block" id="btnToggleAR" style="background:var(--ai-blue); color:#fff; padding: 18px; font-size:1.05rem;" onclick="toggleARMode()">
+            <button class="btn-block primary" id="btnToggleAR" style="padding: 16px; font-size:1rem;" onclick="App.ar.toggle()">
                 <i class="fas fa-expand"></i> <span id="arBtnText">Projetar Móveis na Foto Real (AR)</span>
             </button>
-            <p style="font-size: 0.75rem; text-align:center; color:#666; margin-top:5px;">Necessário carregar uma foto no Assistente IA antes.</p>
-            
-            <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-soft);">
+            <p style="font-size: 0.75rem; text-align:center; color:#666; margin-top:5px; margin-bottom: 20px;">Necessário carregar uma foto no Assistente IA antes.</p>
             
             <div class="input-group">
-                <label>Inclinação da Parede (Encaixe Vertical)</label>
-                <input type="range" id="camRotX" min="-1.5" max="1.5" step="0.01" value="0" oninput="ajustarPerspectivaManual()">
+                <label>Giro Câmera X (Inclinação Parede)</label>
+                <input type="range" id="camRotX" min="-1.5" max="1.5" step="0.01" value="0" oninput="App.ar.applyPerspective()">
             </div>
-            <div class="grid-2-col">
-                <button class="btn-block" onclick="autoEncaixarIA()"><i class="fas fa-magic"></i> Encaixe Auto</button>
-                <button class="btn-block danger" onclick="resetCamera()"><i class="fas fa-video"></i> Resetar Cam</button>
+            <div class="input-group">
+                <label>Giro Câmera Y (Rotação Lateral)</label>
+                <input type="range" id="camRotY" min="-1.5" max="1.5" step="0.01" value="0" oninput="App.ar.applyPerspective()">
+            </div>
+            
+            <div class="grid-2-col" style="margin-top:20px;">
+                <button class="btn-block success" onclick="App.ar.autoFit()"><i class="fas fa-magic"></i> Encaixe Auto</button>
+                <button class="btn-block danger" onclick="App.ar.reset()"><i class="fas fa-video"></i> Resetar</button>
             </div>
         </div>
     </div>
 
-    <!-- HUD ORÇAMENTO (CUSTOS PROFISSIONAIS) -->
+    <!-- HUD ORÇAMENTO (BOM) -->
     <div id="hudOrcamento" class="bottom-sheet">
         <div class="sheet-header">
-            <h3>Custos e Orçamento (BOM)</h3>
-            <button class="close-btn" onclick="fecharHUDs()"><i class="fas fa-times"></i></button>
+            <h3><i class="fas fa-calculator"></i> Orçamento de Fábrica</h3>
+            <button class="close-btn" onclick="App.ui.fecharHUDs()"><i class="fas fa-times"></i></button>
         </div>
         <div class="sheet-body">
+            <p style="font-size: 0.75rem; color:#666; margin-bottom:15px; text-align:center;">Cálculo exato por m² de chapas físicas (com 15% de perda na serra).</p>
             <div class="grid-2-col">
-                <div class="input-group"><label>MDF/Material (R$)</label><input type="number" id="costMaterial" value="1500" oninput="calcularTotal()"></div>
-                <div class="input-group"><label>Mão de Obra (R$)</label><input type="number" id="costLabor" value="1200" oninput="calcularTotal()"></div>
-                <div class="input-group"><label>Ferragens (R$)</label><input type="number" id="costHardware" value="500" oninput="calcularTotal()"></div>
-                <div class="input-group"><label>Outros/Frete (R$)</label><input type="number" id="costOther" value="150" oninput="calcularTotal()"></div>
-                <div class="input-group" style="grid-column: span 2;"><label>Margem de Lucro Desejada (%)</label><input type="number" id="profitMargin" value="45" oninput="calcularTotal()"></div>
+                <div class="input-group"><label>Valor MDF (R$/m²)</label><input type="number" id="cost-mdf" value="85.00" onchange="App.bom.updateParams()"></div>
+                <div class="input-group"><label>Mão de Obra (R$/m²)</label><input type="number" id="cost-labor" value="80.00" onchange="App.bom.updateParams()"></div>
+                <div class="input-group"><label>Hardware Fixo (R$)</label><input type="number" id="cost-hardware" value="0.00" onchange="App.bom.updateParams()"></div>
+                <div class="input-group"><label>Margem Lucro (%)</label><input type="number" id="cost-margin" value="40" onchange="App.bom.updateParams()"></div>
             </div>
             <div class="price-summary">
-                <h4>Preço de Venda Sugerido:</h4>
-                <p id="totalProjectCost">R$ 0,00</p>
+                <h4>Preço de Venda Sugerido</h4>
+                <p id="bom-price">R$ 0,00</p>
+                <div class="bom-detail"><span>Área Real MDF:</span> <span id="bom-area">0.00 m²</span></div>
+                <div class="bom-detail"><span>MDF + Ferragens:</span> <span id="bom-mat">R$ 0,00</span></div>
+                <div class="bom-detail"><span>Custo Operação:</span> <span id="bom-mobra">R$ 0,00</span></div>
+                <div class="bom-detail" style="color:var(--success-green); border-top: 2px dashed #ccc; padding-top:10px;"><span>Lucro Limpo:</span> <span id="bom-profit">R$ 0,00</span></div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL CONFIGURAÇÕES API -->
+    <!-- EDITOR LIVE (ENGENHARIA DA PEÇA) -->
+    <div id="floatingEditor" class="floating-editor">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom: 1px solid #ddd; padding-bottom:10px;">
+            <h4 style="color:var(--ai-blue); font-size: 1.1rem; margin:0;"><i class="fas fa-tools"></i> Editar Engenharia</h4>
+            <button class="close-btn" style="background:var(--warning-red); color:#fff;" onclick="App.ui.fecharEditor()"><i class="fas fa-times"></i></button>
+        </div>
+        <input type="hidden" id="eId">
+        
+        <div class="input-group">
+            <label>Geometria (Larg x Alt x Prof) mm</label>
+            <div class="grid-3-col">
+                <input type="number" id="eL" title="Largura" placeholder="L" oninput="App.ui.updateModuleFromEditor()">
+                <input type="number" id="eAl" title="Altura" placeholder="A" oninput="App.ui.updateModuleFromEditor()">
+                <input type="number" id="eP" title="Profundidade" placeholder="P" oninput="App.ui.updateModuleFromEditor()">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Divisões (Portas / Gavetas / Prateleiras)</label>
+            <div class="grid-3-col">
+                <input type="number" id="ePo" title="Portas" placeholder="Port" oninput="App.ui.updateModuleFromEditor()">
+                <input type="number" id="eG" title="Gavetas" placeholder="Gav" oninput="App.ui.updateModuleFromEditor()">
+                <input type="number" id="ePr" title="Prateleiras" placeholder="Prat" oninput="App.ui.updateModuleFromEditor()">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Tipo & Sistema</label>
+            <div class="grid-2-col">
+                <select id="eT" onchange="App.ui.updateModuleFromEditor()">
+                    <option value="balcao">Balcão</option><option value="guarda_roupa">Guarda-Roupa</option><option value="armario">Armário</option>
+                </select>
+                <select id="eA" onchange="App.ui.updateModuleFromEditor()">
+                    <option value="giro">Giro (Dobradiça)</option><option value="correr">Correr (Trilho)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Espaço 3D (X / Y / Z / Giroº)</label>
+            <div class="grid-4-col">
+                <input type="number" id="ePx" title="Eixo X" placeholder="X" oninput="App.ui.updateModuleFromEditor()">
+                <input type="number" id="ePy" title="Eixo Y" placeholder="Y" oninput="App.ui.updateModuleFromEditor()">
+                <input type="number" id="ePz" title="Eixo Z" placeholder="Z" oninput="App.ui.updateModuleFromEditor()">
+                <input type="number" id="eRy" title="Giro" placeholder="º" oninput="App.ui.updateModuleFromEditor()">
+            </div>
+        </div>
+
+        <div class="grid-2-col" style="margin-top: 20px;">
+            <input type="color" id="eC" style="height: 48px; width: 100%; padding:2px; cursor:pointer;" oninput="App.ui.updateModuleFromEditor()">
+            <button class="btn-block danger" style="margin:0; padding: 14px;" onclick="App.modules.removeCurrent()"><i class="fas fa-trash"></i> Excluir</button>
+        </div>
+    </div>
+
+    <!-- MODAL API -->
     <div id="modalSettings" class="modal-overlay">
         <div class="modal-content">
-            <h2 style="color:var(--primary-dark); margin-bottom:15px;"><i class="fas fa-cogs"></i> API Settings</h2>
+            <h2 style="color:var(--primary-dark); margin-bottom:15px; font-size:1.2rem;"><i class="fas fa-cogs"></i> API Settings</h2>
             <div class="input-group">
                 <label>Gemini 2.5 Flash Key (Cérebro/Visão)</label>
-                <input type="password" id="keyGemini" placeholder="AIzaSy...">
+                <input type="password" id="api-gemini" placeholder="AIzaSy...">
             </div>
             <div class="input-group">
                 <label>Groq API Key (Áudio Whisper)</label>
-                <input type="password" id="keyGroq" placeholder="gsk_...">
+                <input type="password" id="api-groq" placeholder="gsk_...">
             </div>
             <div class="grid-2-col" style="margin-top:20px;">
-                <button class="btn-block" onclick="toggleModal('modalSettings')">Cancelar</button>
-                <button class="btn-block success" onclick="salvarAPIs()">Salvar Chaves</button>
+                <button class="btn-block" onclick="App.ui.toggleModal('modalSettings')">Cancelar</button>
+                <button class="btn-block success" onclick="App.api.saveKeys()">Salvar Chaves</button>
             </div>
         </div>
     </div>
 
-    <!-- ======================================================== -->
-    <!-- JAVASCRIPT: MOTOR 3D, FÍSICA E INTELIGÊNCIA ORÁCULO      -->
-    <!-- ======================================================== -->
+    <!-- STATUS OVERLAYS -->
+    <div id="statusOverlay" class="status-overlay">
+        <div style="display:flex; flex-direction:column; align-items:center;">
+            <div class="loader"></div>
+            <p id="statusText">Processando Oráculo 3D...</p>
+        </div>
+    </div>
+    <div id="toast">Notificação</div>
+
+    <!-- ================== MOTOR JAVASCRIPT (1000/1000) ================== -->
     <script>
+        /**
+         * thIAguinho Soluções CAD - ENGINE ORÁCULO CRM 1000/1000
+         * Combinação Absoluta: UI de Aplicativo/CRM + Física Paramétrica + IA Extrema
+         */
+
         const AppState = {
-            modulos: [], modoAR: false, arrastando: null, animacoesAtivas: [], transcricaoAtual: "",
-            imagemFundoBase64: null, imagemFundoURL: null,
-            modoOraculo: true, // Ativa a camada de inteligência estrutural profunda
-            chavesAPI: { gemini: localStorage.getItem('ak_gemini_cad') || '', groq: localStorage.getItem('ak_groq_cad') || '' }
+            modoOraculo: true,
+            modules: [],
+            selectedModule: null,
+            costs: { mdf: 85.00, labor: 80.00, hardware: 0.00, others: 0.00, margin: 40 },
+            apiKeys: { gemini: localStorage.getItem('ak_gemini_cad')||'', groq: localStorage.getItem('ak_groq_cad')||'' },
+            arActive: false,
+            animacoesAtivas: [],
+            transcricaoAtual: "",
+            imagemFundoBase64: null,
+            imagemFundoURL: null,
+            mediaRecorder: null,
+            audioChunks: []
         };
 
-        let scene, camera, renderer, controls, raycaster, pointer, groundPlane, rootNode;
-        const CLICK_TOLERANCE = 5; 
-        let pointerDownPos = { x: 0, y: 0 };
-        let isPointerDown = false;
-        let pressTimer;
-        let longPressTriggered = false;
-        let mediaRecorder, audioChunks = [];
+        // --- ORACLE ENGINE (Engenharia Analítica) ---
+        const OracleEngine = {
+            rules: {
+                balcao: { label: 'Balcão de Atendimento', validate: (m) => { let f=[]; if(m.gavetas<1)f.push({k:'gavetas',v:2,msg:'Gavetas p/ operação.'}); if(m.portas<2)f.push({k:'portas',v:2,msg:'Portas p/ estoque.'}); return f; }},
+                guarda_roupa: { label: 'Guarda-Roupa', validate: (m) => { let f=[]; if(m.altura<1800)f.push({k:'altura',v:2200,msg:'Altura corrigida (>1.8m)'}); if(m.gavetas<2)f.push({k:'gavetas',v:3,msg:'Gaveteiro obrigatório.'}); return f; }},
+                armario: { label: 'Armário Custom', validate: () => [] }
+            },
+            validateAndFix: (mod) => {
+                if(!AppState.modoOraculo) return;
+                const rule = OracleEngine.rules[mod.tipo] || OracleEngine.rules.armario;
+                rule.validate(mod).forEach(f => { mod[f.k] = f.v; App.ui.toast(`Oráculo: ${f.msg}`, 'info'); });
+            }
+        };
 
-        window.addEventListener('DOMContentLoaded', () => {
-            initThreeJS(); carregarChaves();
-            // Módulo de boas vindas com configuração MISTA de gavetas e portas
-            AppState.modulos.push({ id: Date.now(), tipo: "balcao", nome: "Balcão Atendimento", largura: 1200, altura: 900, profundidade: 600, portas: 2, gavetas: 2, prateleiras: 1, abertura: "giro", cor: "#FFFFFF", posX: 0, posY: 0, posZ: 0, rotY: 0 });
-            reconstruirCena(); atualizarHUDLista(); calcularTotal();
-            setupImageUploader();
-        });
+        // --- BOM ENGINE (Orçamento Real Físico) ---
+        const BOMEngine = {
+            calculateModule: (mod) => {
+                const w = mod.largura/1000, h = mod.altura/1000, d = mod.profundidade/1000;
+                let area = (h*d*2) + (w*d*2) + (w*h); // Laterais, Base, Teto, Fundo
+                let hwCusto = 0;
+                if(mod.prateleiras) area += mod.prateleiras * (w*d);
+                if(mod.gavetas) { area += mod.gavetas * (w*0.3 + d*0.3*2 + w*d); hwCusto += mod.gavetas * 25.0; } // Corrediças
+                if(mod.portas) { area += (w*h); hwCusto += mod.portas * 15.0; } // Dobradiças
+                return { area: area * 1.15, hardware: hwCusto }; // 15% perda
+            },
+            update: () => {
+                let tArea = 0, tHWDyn = 0, tHWFix = parseFloat(AppState.costs.hardware);
+                AppState.modules.forEach(m => { const b = BOMEngine.calculateModule(m); tArea += b.area; tHWDyn += b.hardware; });
+                
+                const cMDF = tArea * AppState.costs.mdf;
+                const cHW = tHWFix + tHWDyn;
+                const cLabor = tArea * AppState.costs.labor;
+                const cTotal = cMDF + cHW + cLabor;
+                const profit = cTotal * (AppState.costs.margin / 100);
+                const price = cTotal + profit;
+                
+                const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                document.getElementById('bom-price').innerText = fmt(price);
+                document.getElementById('bom-area').innerText = tArea.toFixed(2) + ' m²';
+                document.getElementById('bom-mat').innerText = fmt(cMDF + cHW);
+                document.getElementById('bom-mobra').innerText = fmt(cLabor);
+                document.getElementById('bom-profit').innerText = fmt(profit);
+            }
+        };
 
-        // UTILITÁRIOS UI
-        function showToast(msg) { 
-            const toast = document.getElementById("toast"); toast.innerText = msg; toast.className = "show"; 
-            setTimeout(() => { toast.className = ""; }, 3000); 
-        }
-        function abrirHUD(id) { 
-            fecharHUDs(); fecharEditor(); 
-            document.getElementById(id).classList.add('active'); 
-        }
-        function fecharHUDs() { document.querySelectorAll('.bottom-sheet').forEach(s => s.classList.remove('active')); }
-        function toggleModal(id) { const m = document.getElementById(id); m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; }
-        
-        function carregarChaves() { document.getElementById('keyGemini').value = AppState.chavesAPI.gemini; document.getElementById('keyGroq').value = AppState.chavesAPI.groq; }
-        function salvarAPIs() {
-            AppState.chavesAPI.gemini = document.getElementById('keyGemini').value.trim(); AppState.chavesAPI.groq = document.getElementById('keyGroq').value.trim();
-            localStorage.setItem('ak_gemini_cad', AppState.chavesAPI.gemini); localStorage.setItem('ak_groq_cad', AppState.chavesAPI.groq);
-            toggleModal('modalSettings'); showToast("Chaves thIAguinho Soluções salvas!");
-        }
-        function showLoading(msg) { document.getElementById('statusText').innerText = msg; document.getElementById('statusOverlay').style.display = 'flex'; }
-        function hideLoading() { document.getElementById('statusOverlay').style.display = 'none'; }
-        function showError(msg) { const err = document.getElementById('iaErrorBox'); err.innerText = msg; err.style.display = 'block'; setTimeout(()=> err.style.display = 'none', 5000); }
+        // --- THREE ENGINE (Fábrica 3D e Interação) ---
+        const ThreeEngine = {
+            scene: null, camera: null, renderer: null, controls: null, rootNode: null, ground: null,
+            raycaster: new THREE.Raycaster(), pointer: new THREE.Vector2(),
+            pointerDownPos: {x:0,y:0}, isPointerDown: false, pressTimer: null, longPress: false, arrastando: null,
 
-        // FOTOGRAFIA & AR
-        function setupImageUploader() {
-            document.getElementById('fotoCliente').addEventListener('change', async function(e) {
-                if(e.target.files.length > 0) {
-                    const file = e.target.files[0];
-                    AppState.imagemFundoURL = URL.createObjectURL(file);
-                    document.getElementById('imagePreview').src = AppState.imagemFundoURL;
-                    document.getElementById('imgPreviewContainer').style.display = 'block';
-                    const r = new FileReader(); r.readAsDataURL(file);
-                    r.onload = () => { AppState.imagemFundoBase64 = r.result.split(',')[1]; showToast("Foto Ambiente Processada!"); };
-                }
-            });
-        }
-
-        function toggleARMode() {
-            AppState.modoAR = !AppState.modoAR;
-            const container = document.getElementById('canvas-container');
-            if (AppState.modoAR) {
-                container.style.background = 'none';
-                if(AppState.imagemFundoURL) {
-                    container.style.backgroundImage = `url(${AppState.imagemFundoURL})`;
-                    container.style.backgroundSize = 'cover'; container.style.backgroundPosition = 'center';
+            init: () => {
+                const container = document.getElementById('canvas-container');
+                const canvas = document.getElementById('cad-canvas');
+                
+                ThreeEngine.scene = new THREE.Scene();
+                ThreeEngine.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+                const dl = new THREE.DirectionalLight(0xffffff, 0.7); dl.position.set(5, 10, 7); dl.castShadow = true; ThreeEngine.scene.add(dl);
+                
+                ThreeEngine.camera = new THREE.PerspectiveCamera(45, container.clientWidth/container.clientHeight, 0.1, 100);
+                ThreeEngine.camera.position.set(0, 1.5, 5);
+                
+                ThreeEngine.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+                ThreeEngine.renderer.setSize(container.clientWidth, container.clientHeight);
+                ThreeEngine.renderer.shadowMap.enabled = true;
+                
+                ThreeEngine.controls = new THREE.OrbitControls(ThreeEngine.camera, canvas);
+                ThreeEngine.controls.enableDamping = true; ThreeEngine.controls.target.set(0, 0.8, 0);
+                
+                ThreeEngine.scene.add(new THREE.GridHelper(10, 20, 0x94a3b8, 0xcbd5e1));
+                ThreeEngine.ground = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshBasicMaterial({visible:false}));
+                ThreeEngine.ground.rotation.x = -Math.PI/2; ThreeEngine.scene.add(ThreeEngine.ground);
+                
+                ThreeEngine.rootNode = new THREE.Group(); ThreeEngine.scene.add(ThreeEngine.rootNode);
+                
+                canvas.addEventListener('pointerdown', ThreeEngine.onPointerDown);
+                canvas.addEventListener('pointermove', ThreeEngine.onPointerMove);
+                canvas.addEventListener('pointerup', ThreeEngine.onPointerUp);
+                window.addEventListener('resize', ThreeEngine.onResize);
+                
+                ThreeEngine.animate();
+            },
+            onResize: () => {
+                const c = document.getElementById('canvas-container');
+                ThreeEngine.camera.aspect = c.clientWidth/c.clientHeight; ThreeEngine.camera.updateProjectionMatrix();
+                ThreeEngine.renderer.setSize(c.clientWidth, c.clientHeight);
+            },
+            getPointer: (e) => {
+                const rect = ThreeEngine.renderer.domElement.getBoundingClientRect();
+                const x = e.touches ? e.touches[0].clientX : e.clientX, y = e.touches ? e.touches[0].clientY : e.clientY;
+                ThreeEngine.pointer.x = ((x - rect.left)/rect.width)*2 - 1; ThreeEngine.pointer.y = -((y - rect.top)/rect.height)*2 + 1;
+                return {x, y};
+            },
+            onPointerDown: (e) => {
+                const pos = ThreeEngine.getPointer(e);
+                ThreeEngine.pointerDownPos = pos; ThreeEngine.isPointerDown = true; ThreeEngine.longPress = false;
+                ThreeEngine.raycaster.setFromCamera(ThreeEngine.pointer, ThreeEngine.camera);
+                
+                const hits = ThreeEngine.raycaster.intersectObjects(ThreeEngine.rootNode.children, true);
+                if (hits.length > 0) {
+                    let obj = hits[0].object; while(obj && !obj.userData.isRootModule && obj.parent) obj = obj.parent;
+                    if(obj && obj.userData.isRootModule) {
+                        App.modules.select(obj.userData.id);
+                        if(AppState.arActive) { ThreeEngine.arrastando = obj; ThreeEngine.controls.enabled = false; }
+                        
+                        // LONG PRESS DETECT
+                        const ind = document.getElementById('longPressIndicator');
+                        ind.style.display = 'block'; ind.style.left = (pos.x - 25) + 'px'; ind.style.top = (pos.y - 25) + 'px';
+                        ThreeEngine.pressTimer = setTimeout(() => {
+                            ThreeEngine.longPress = true; ind.style.display = 'none'; App.ui.openLiveEditor(obj.userData.id);
+                        }, 600);
+                    }
                 } else {
-                    showToast("Aviso: Carregue uma foto no Assistente para ter a experiência AR real.");
+                    App.modules.select(null);
                 }
-                document.getElementById('arBtnText').innerText = "Encerrar AR Mode";
-                fecharHUDs(); fecharEditor();
-            } else {
-                container.style.background = 'radial-gradient(circle, #ffffff 0%, #e0e0e0 100%)';
-                container.style.backgroundImage = 'none';
-                document.getElementById('arBtnText').innerText = "Projetar Móveis na Foto Real (AR)";
-            }
-        }
-
-        // ÁUDIO GROQ WHISPER
-        function uploadAudio(input) { if(input.files.length > 0) processarAudioGroq(input.files[0]); }
-        
-        async function startRecording() {
-            if (!AppState.chavesAPI.groq) return showError("Configure a chave da API Groq.");
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.onstop = () => processarAudioGroq(new Blob(audioChunks, { type: 'audio/webm' }));
-                audioChunks = []; mediaRecorder.start();
-                const btn = document.getElementById('btnRecord'); btn.innerHTML = "<i class='fas fa-microphone'></i> Ouvindo... (Solte)"; btn.classList.add('recording');
-            } catch (err) { showError("Permissão de Microfone negada."); }
-        }
-        function stopRecording() { if(mediaRecorder && mediaRecorder.state !== "inactive") { mediaRecorder.stop(); const btn = document.getElementById('btnRecord'); btn.innerHTML = "<i class='fas fa-microphone'></i> Gravar Voz"; btn.classList.remove('recording'); } }
-
-        async function processarAudioGroq(blob) {
-            showLoading("Transcrevendo Inteligência...");
-            const formData = new FormData(); formData.append("file", new File([blob], "audio.webm")); formData.append("model", "whisper-large-v3");
-            try {
-                const res = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", { method: "POST", headers: { "Authorization": `Bearer ${AppState.chavesAPI.groq}` }, body: formData });
-                const data = await res.json();
-                if (data.text) { AppState.transcricaoAtual = data.text; document.getElementById('transcriptionText').innerText = `"${data.text}"`; showToast("Áudio transcrito!"); }
-                else throw new Error("Retorno vazio.");
-            } catch(e) { showError("Falha na transcrição. Verifique a API Groq."); } finally { hideLoading(); }
-        }
-
-        // MOTOR 3D & FÍSICA
-        function initThreeJS() {
-            const container = document.getElementById('canvas-container');
-            scene = new THREE.Scene();
-            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-            const dl = new THREE.DirectionalLight(0xffffff, 0.6); dl.position.set(10, 20, 10); dl.castShadow = true; scene.add(dl);
-            
-            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100); 
-            camera.position.set(0, 1.5, 6);
-            
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); 
-            renderer.setSize(container.clientWidth, container.clientHeight); 
-            renderer.shadowMap.enabled = true; 
-            container.appendChild(renderer.domElement);
-            
-            controls = new THREE.OrbitControls(camera, renderer.domElement); 
-            controls.enableDamping = true; controls.target.set(0, 1, 0);
-            
-            scene.add(new THREE.GridHelper(10, 20, 0x000000, 0xdddddd));
-            
-            groundPlane = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshBasicMaterial({ visible: false })); 
-            groundPlane.rotation.x = -Math.PI/2; scene.add(groundPlane);
-            
-            rootNode = new THREE.Group(); scene.add(rootNode);
-            raycaster = new THREE.Raycaster(); pointer = new THREE.Vector2();
-            
-            renderer.domElement.addEventListener('pointerdown', onPointerDown); 
-            renderer.domElement.addEventListener('pointermove', onPointerMove); 
-            renderer.domElement.addEventListener('pointerup', onPointerUp);
-            
-            window.addEventListener('resize', () => { camera.aspect = container.clientWidth/container.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(container.clientWidth, container.clientHeight); });
-            animate();
-        }
-
-        function onPointerDown(e) {
-            const x = e.touches ? e.touches[0].clientX : e.clientX; const y = e.touches ? e.touches[0].clientY : e.clientY;
-            pointerDownPos = { x, y }; isPointerDown = true; updatePointer(x, y); raycaster.setFromCamera(pointer, camera); longPressTriggered = false;
-            
-            if (AppState.modoAR) {
-                controls.enabled = false;
-                const hits = raycaster.intersectObjects(rootNode.children, true);
-                if (hits.length > 0) { let obj = hits[0].object; while (obj && !obj.userData.isRootModule && obj.parent) obj = obj.parent; if (obj && obj.userData.isRootModule) AppState.arrastando = obj; }
-            }
-            
-            const hits = raycaster.intersectObjects(rootNode.children, true);
-            if(hits.length > 0 && !AppState.arrastando) {
-                let obj = hits[0].object; while (obj && !obj.userData.isRootModule && obj.parent) obj = obj.parent;
-                if (obj && obj.userData.isRootModule) {
-                    const id = obj.userData.rawData.id;
-                    const ind = document.getElementById('longPressIndicator');
-                    ind.style.display = 'block'; ind.style.left = (x - 25) + 'px'; ind.style.top = (y - 25) + 'px';
-                    pressTimer = setTimeout(() => { longPressTriggered = true; ind.style.display = 'none'; abrirEditorAoVivo(id); }, 600);
+            },
+            onPointerMove: (e) => {
+                if(!ThreeEngine.isPointerDown) return;
+                const pos = ThreeEngine.getPointer(e);
+                if(Math.hypot(pos.x - ThreeEngine.pointerDownPos.x, pos.y - ThreeEngine.pointerDownPos.y) > 5) {
+                    clearTimeout(ThreeEngine.pressTimer); document.getElementById('longPressIndicator').style.display = 'none';
                 }
-            }
-        }
-
-        function onPointerMove(e) {
-            if (!isPointerDown) return;
-            const x = e.touches ? e.touches[0].clientX : e.clientX; const y = e.touches ? e.touches[0].clientY : e.clientY;
-            
-            if(Math.sqrt(Math.pow(x - pointerDownPos.x, 2) + Math.pow(y - pointerDownPos.y, 2)) > CLICK_TOLERANCE) { 
-                clearTimeout(pressTimer); document.getElementById('longPressIndicator').style.display = 'none'; 
-            }
-            
-            if (AppState.modoAR && AppState.arrastando) {
-                updatePointer(x, y); raycaster.setFromCamera(pointer, camera);
-                const hits = raycaster.intersectObject(groundPlane);
-                if (hits.length > 0) {
-                    AppState.arrastando.position.x = hits[0].point.x; AppState.arrastando.position.z = hits[0].point.z;
-                    const mod = AppState.modulos.find(m => m.id === AppState.arrastando.userData.rawData.id);
-                    if(mod) { 
-                        mod.posX = hits[0].point.x * 1000; mod.posZ = hits[0].point.z * 1000; 
-                        if(document.getElementById('ePx')) { document.getElementById('ePx').value = mod.posX.toFixed(0); document.getElementById('ePz').value = mod.posZ.toFixed(0); } 
+                if (AppState.arActive && ThreeEngine.arrastando) {
+                    ThreeEngine.raycaster.setFromCamera(ThreeEngine.pointer, ThreeEngine.camera);
+                    const hits = ThreeEngine.raycaster.intersectObject(ThreeEngine.ground);
+                    if (hits.length > 0) {
+                        ThreeEngine.arrastando.position.x = hits[0].point.x; ThreeEngine.arrastando.position.z = hits[0].point.z;
+                        const mod = AppState.modules.find(m => m.id === ThreeEngine.arrastando.userData.id);
+                        if(mod) { mod.posX = hits[0].point.x*1000; mod.posZ = hits[0].point.z*1000; App.ui.syncLiveEditor(); }
                     }
                 }
-            }
-        }
-
-        function onPointerUp(e) {
-            isPointerDown = false; controls.enabled = true; clearTimeout(pressTimer); document.getElementById('longPressIndicator').style.display = 'none';
-            if (AppState.arrastando) { AppState.arrastando = null; return; }
-            if (longPressTriggered) return;
-            
-            const x = e.changedTouches ? e.changedTouches[0].clientX : e.clientX; const y = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
-            if (Math.abs(x - pointerDownPos.x) < CLICK_TOLERANCE) {
-                updatePointer(x, y); raycaster.setFromCamera(pointer, camera); const hits = raycaster.intersectObjects(rootNode.children, true);
-                if (hits.length > 0) {
-                    let curr = hits[0].object; let animatable = null;
-                    while(curr && curr.parent) { if(curr.userData.isAnimatable) { animatable = curr; break; } curr = curr.parent; }
-                    if (animatable) {
-                        animatable.userData.isOpen = !animatable.userData.isOpen;
-                        AppState.animacoesAtivas = AppState.animacoesAtivas.filter(a => a.obj !== animatable);
-                        AppState.animacoesAtivas.push({ obj: animatable, type: animatable.userData.type, target: animatable.userData.isOpen });
-                    }
-                }
-            }
-        }
-
-        function updatePointer(x, y) { const r = renderer.domElement.getBoundingClientRect(); pointer.x = ((x - r.left) / r.width) * 2 - 1; pointer.y = -((y - r.top) / r.height) * 2 + 1; }
-
-        function animate() {
-            requestAnimationFrame(animate); const speed = 0.15;
-            for (let i = AppState.animacoesAtivas.length - 1; i >= 0; i--) {
-                const anim = AppState.animacoesAtivas[i]; const obj = anim.obj;
-                if (anim.type === 'door_hinge') {
-                    const angle = obj.userData.hinge === 'left' ? Math.PI/1.8 : -Math.PI/1.8;
-                    const target = anim.target ? angle : 0;
-                    obj.rotation.y += (target - obj.rotation.y) * speed;
-                    if (Math.abs(obj.rotation.y - target) < 0.01) { obj.rotation.y = target; AppState.animacoesAtivas.splice(i, 1); }
-                } else if (anim.type === 'door_slide' || anim.type === 'window_slide') {
-                    const tx = anim.target ? obj.userData.travelX : 0;
-                    obj.position.x += (tx - obj.position.x) * speed;
-                    if (Math.abs(obj.position.x - tx) < 0.001) { obj.position.x = tx; AppState.animacoesAtivas.splice(i, 1); }
-                } else if (anim.type === 'drawer') {
-                    const tz = anim.target ? obj.userData.depth * 0.8 : 0;
-                    obj.position.z += (tz - obj.position.z) * speed;
-                    if (Math.abs(obj.position.z - tz) < 0.001) { obj.position.z = tz; AppState.animacoesAtivas.splice(i, 1); }
-                }
-            }
-            controls.update(); renderer.render(scene, camera);
-        }
-
-        // ================= FÁBRICA PARAMÉTRICA UNIVERSAL (ORÁCULO 3D) =================
-        function reconstruirCena() {
-            while(rootNode.children.length > 0) rootNode.remove(rootNode.children[0]);
-            let autoX = 0;
-            AppState.modulos.forEach(mod => {
-                const w = mod.largura/1000, h = mod.altura/1000, d = mod.profundidade/1000, color = mod.cor || "#FFFFFF";
-                const g = new THREE.Group(); g.userData = { isRootModule: true, rawData: mod };
+            },
+            onPointerUp: (e) => {
+                ThreeEngine.isPointerDown = false; ThreeEngine.controls.enabled = true;
+                clearTimeout(ThreeEngine.pressTimer); document.getElementById('longPressIndicator').style.display = 'none';
+                if(ThreeEngine.arrastando) { ThreeEngine.arrastando = null; return; }
+                if(ThreeEngine.longPress) return;
                 
-                const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.8, metalness: 0.05 });
-                const matGlass = new THREE.MeshStandardMaterial({ color: 0x88ccff, transparent: true, opacity: 0.35, roughness: 0.1, metalness: 0.9 });
-                const lineMat = new THREE.LineBasicMaterial({ color: 0x333333 });
-                
-                const createPart = (geo, px, py, pz, customMat=null) => {
-                    const m = new THREE.Mesh(geo, customMat || mat); m.position.set(px, py, pz); m.castShadow = true; m.receiveShadow = true;
-                    const e = new THREE.LineSegments(new THREE.EdgesGeometry(geo), lineMat); e.raycast = () => {}; m.add(e); return m;
-                };
-
-                const type = mod.tipo.toLowerCase();
-                const op = mod.abertura || "giro";
-
-                if (type === 'sofa') {
-                    g.add(createPart(new THREE.BoxGeometry(w, 0.4, d), 0, 0.2, 0));
-                    g.add(createPart(new THREE.BoxGeometry(w, h-0.4, 0.2), 0, 0.4 + (h-0.4)/2, -d/2+0.1));
-                } else if (type === 'mesa' || type === 'escrivaninha') {
-                    g.add(createPart(new THREE.BoxGeometry(w, 0.03, d), 0, h, 0));
-                    const lW = 0.05;
-                    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p => g.add(createPart(new THREE.BoxGeometry(lW, h, lW), p[0]*(w/2-lW), h/2, p[1]*(d/2-lW))));
-                } else if (type === 'painel_tv') {
-                    g.add(createPart(new THREE.BoxGeometry(w, h, 0.03), 0, h/2, -d/2));
-                    g.add(createPart(new THREE.BoxGeometry(w*0.6, h*0.4, 0.05), 0, h/2, -d/2+0.04, new THREE.MeshStandardMaterial({color:0x000, roughness:0})));
-                    if (mod.prateleiras > 0) g.add(createPart(new THREE.BoxGeometry(w*0.8, 0.03, d*0.8), 0, h*0.2, -d/2 + 0.03 + (d*0.8)/2));
-                } else if (type === 'vitrine' || type === 'expositor') {
-                    g.add(createPart(new THREE.BoxGeometry(w, 0.03, d), 0, 0.015, 0)); 
-                    g.add(createPart(new THREE.BoxGeometry(w, 0.015, d), 0, h, 0, matGlass)); 
-                    g.add(createPart(new THREE.BoxGeometry(0.01, h, d), -w/2, h/2, 0, matGlass)); 
-                    g.add(createPart(new THREE.BoxGeometry(0.01, h, d), w/2, h/2, 0, matGlass)); 
-                    g.add(createPart(new THREE.BoxGeometry(w, h, 0.01), 0, h/2, -d/2, matGlass)); 
-                    if (mod.prateleiras > 0) {
-                        const esp = h / (mod.prateleiras + 1);
-                        for (let p = 1; p <= mod.prateleiras; p++) g.add(createPart(new THREE.BoxGeometry(w-0.02, 0.01, d-0.02), 0, esp*p, 0, matGlass));
-                    }
-                    if(mod.portas > 0) {
-                        const pW = w/mod.portas;
-                        for(let i=0; i<mod.portas; i++) {
-                            const pGrp = new THREE.Group(); pGrp.userData = { isAnimatable:true, type:'door_slide', isOpen:false, travelX: (i%2===0?pW*0.9:-pW*0.9) };
-                            pGrp.position.set(-w/2 + pW/2 + (i*pW), h/2, d/2 + (i%2===0?0.01:0.02));
-                            pGrp.add(createPart(new THREE.BoxGeometry(pW+0.01, h, 0.01), 0, 0, 0, matGlass));
-                            g.add(pGrp);
+                const pos = e.changedTouches ? e.changedTouches[0] : e;
+                if(Math.hypot(pos.clientX - ThreeEngine.pointerDownPos.x, pos.clientY - ThreeEngine.pointerDownPos.y) < 5) {
+                    ThreeEngine.raycaster.setFromCamera(ThreeEngine.pointer, ThreeEngine.camera);
+                    const hits = ThreeEngine.raycaster.intersectObjects(ThreeEngine.rootNode.children, true);
+                    if(hits.length > 0) {
+                        let curr = hits[0].object; let anim = null;
+                        while(curr && curr.parent) { if(curr.userData.isAnimatable) { anim = curr; break; } curr = curr.parent; }
+                        if(anim) {
+                            anim.userData.isOpen = !anim.userData.isOpen;
+                            AppState.animacoesAtivas = AppState.animacoesAtivas.filter(a => a.obj !== anim);
+                            AppState.animacoesAtivas.push({ obj: anim, type: anim.userData.type, target: anim.userData.isOpen });
                         }
                     }
-                } else if (type === 'prateleira') {
-                    g.add(createPart(new THREE.BoxGeometry(w, 0.03, d), 0, 0, 0));
-                } else {
-                    // CAIXARIA ESTRUTURAL MISTA: Balcões, Armários, Guarda-roupas
-                    g.add(createPart(new THREE.BoxGeometry(w, 0.015, d), 0, 0.0075, 0)); 
-                    g.add(createPart(new THREE.BoxGeometry(w, 0.015, d), 0, h-0.0075, 0)); 
-                    g.add(createPart(new THREE.BoxGeometry(0.015, h, d), -w/2+0.0075, h/2, 0)); 
-                    g.add(createPart(new THREE.BoxGeometry(0.015, h, d), w/2-0.0075, h/2, 0)); 
-                    g.add(createPart(new THREE.BoxGeometry(w, h, 0.006), 0, h/2, -d/2+0.003)); 
-
-                    // Detalhe Exclusivo Guarda-Roupa: Cabideiro
-                    if (type === 'guarda_roupa') {
-                        const cabMat = new THREE.MeshStandardMaterial({color: 0xcccccc, metalness: 0.9, roughness: 0.2});
-                        const cabideiroGeo = new THREE.CylinderGeometry(0.012, 0.012, w - 0.03, 16);
-                        const cabideiro = new THREE.Mesh(cabideiroGeo, cabMat);
-                        cabideiro.rotation.z = Math.PI / 2;
-                        cabideiro.position.set(0, h * 0.85, 0); // Fica no alto
-                        g.add(cabideiro);
-                    }
-
-                    if (mod.prateleiras > 0) {
-                        const esp = h / (mod.prateleiras + 1);
-                        for (let p = 1; p <= mod.prateleiras; p++) g.add(createPart(new THREE.BoxGeometry(w-0.03, 0.015, d-0.02), 0, esp*p, -0.01));
-                    }
-
-                    buildPortasEGavetas(g, mod, w, h, d, op, createPart);
                 }
+            },
+            animate: () => {
+                requestAnimationFrame(ThreeEngine.animate);
+                for(let i = AppState.animacoesAtivas.length -1; i>=0; i--) {
+                    const a = AppState.animacoesAtivas[i]; const obj = a.obj;
+                    if(a.type === 'door_hinge') {
+                        const tgt = a.target ? (obj.userData.hinge==='left'?Math.PI/1.8:-Math.PI/1.8) : 0;
+                        obj.rotation.y += (tgt - obj.rotation.y)*0.15;
+                        if(Math.abs(obj.rotation.y-tgt)<0.01) { obj.rotation.y=tgt; AppState.animacoesAtivas.splice(i,1); }
+                    } else if(a.type === 'door_slide') {
+                        const tgt = a.target ? obj.userData.travelX : 0;
+                        obj.position.x += (tgt - obj.position.x)*0.15;
+                        if(Math.abs(obj.position.x-tgt)<0.001) { obj.position.x=tgt; AppState.animacoesAtivas.splice(i,1); }
+                    } else if(a.type === 'drawer') {
+                        const tgt = a.target ? obj.userData.depth*0.8 : 0;
+                        obj.position.z += (tgt - obj.position.z)*0.15;
+                        if(Math.abs(obj.position.z-tgt)<0.001) { obj.position.z=tgt; AppState.animacoesAtivas.splice(i,1); }
+                    }
+                }
+                ThreeEngine.controls.update(); ThreeEngine.renderer.render(ThreeEngine.scene, ThreeEngine.camera);
+            },
+            rebuildScene: () => {
+                while(ThreeEngine.rootNode.children.length > 0) ThreeEngine.rootNode.remove(ThreeEngine.rootNode.children[0]);
+                let autoX = 0;
+                AppState.modules.forEach(mod => {
+                    const w = mod.largura/1000, h = mod.altura/1000, d = mod.profundidade/1000;
+                    const esp = 0.015; // 15mm
+                    const g = new THREE.Group(); g.userData = { id: mod.id, isRootModule: true };
+                    const mat = new THREE.MeshStandardMaterial({ color: mod.cor || "#DDA15E", roughness: 0.8 });
+                    const selMat = new THREE.MeshStandardMaterial({ color: mod.cor || "#DDA15E", emissive: 0x222222, roughness: 0.8 });
+                    const lineMat = new THREE.LineBasicMaterial({ color: 0x333333, transparent: true, opacity: 0.3 });
+                    const activeMat = (AppState.selectedModule === mod.id) ? selMat : mat;
 
-                // MATRIZ CAD (Inclui elevação Y)
-                const fx = mod.posX !== undefined ? mod.posX/1000 : (autoX + w/2);
-                const fy = mod.posY !== undefined ? mod.posY/1000 : 0; 
-                const fz = mod.posZ !== undefined ? mod.posZ/1000 : 0;
-                
-                g.position.set(fx, fy, fz); 
-                if(mod.rotY) g.rotation.y = THREE.MathUtils.degToRad(mod.rotY);
-                autoX = fx + w/2 + 0.2; rootNode.add(g);
-            });
-            controls.update();
-        }
+                    const criarChapa = (gw, gh, gd, px, py, pz) => {
+                        const m = new THREE.Mesh(new THREE.BoxGeometry(gw, gh, gd), activeMat);
+                        m.position.set(px, py, pz); m.castShadow = true; m.receiveShadow = true;
+                        m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), lineMat));
+                        g.add(m); return m;
+                    };
 
-        // MOTOR MISTO (GAVETAS + PORTAS SIMULTÂNEAS)
-        function buildPortasEGavetas(g, mod, w, h, d, op, createPart) {
-            const thickness = 0.015;
-            let startYPortas = 0, heightPortas = h - (thickness * 2);
-            let startYGavetas = 0, heightGavetas = h - (thickness * 2);
+                    criarChapa(w, esp, d, 0, esp/2, 0); // Base
+                    criarChapa(w, esp, d, 0, h-esp/2, 0); // Teto
+                    criarChapa(esp, h-esp*2, d, -w/2+esp/2, h/2, 0); // Esq
+                    criarChapa(esp, h-esp*2, d, w/2-esp/2, h/2, 0); // Dir
+                    criarChapa(w-esp*2, h-esp*2, 0.006, 0, h/2, -d/2+0.003); // Fundo
 
-            // Lógica do Oráculo: Se tem portas E gavetas, divide o espaço (Típico de Balcões).
-            if (mod.gavetas > 0 && mod.portas > 0) {
-                heightGavetas = (h - thickness * 2) * 0.25; // 25% superior para gavetas
-                heightPortas = (h - thickness * 2) * 0.75; // 75% inferior para portas
-                startYPortas = thickness;
-                startYGavetas = thickness + heightPortas;
-            } else {
-                startYPortas = thickness;
-                startYGavetas = thickness;
+                    if(mod.tipo === 'guarda_roupa') {
+                        const cab = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, w-esp*2, 16), new THREE.MeshStandardMaterial({color:0xccc, metalness:0.9}));
+                        cab.rotation.z = Math.PI/2; cab.position.set(0, h*0.85, 0); g.add(cab);
+                    }
+                    if(mod.prateleiras > 0) {
+                        const ep = (h-esp*2)/(mod.prateleiras+1);
+                        for(let i=1; i<=mod.prateleiras; i++) criarChapa(w-esp*2, esp, d-0.02, 0, esp+ep*i, -0.01);
+                    }
+
+                    let startYP = esp, hP = h-esp*2, startYG = esp, hG = h-esp*2;
+                    if(mod.gavetas > 0 && mod.portas > 0) { hG = (h-esp*2)*0.25; hP = (h-esp*2)*0.75; startYG = esp + hP; }
+
+                    if(mod.gavetas > 0) {
+                        const gH = hG/mod.gavetas; const gW = w-esp*2;
+                        for(let i=0; i<mod.gavetas; i++) {
+                            const grp = new THREE.Group(); grp.userData = { isAnimatable:true, type:'drawer', isOpen:false, depth:d };
+                            grp.position.set(0, startYG + gH*i + gH/2, 0);
+                            const mF = new THREE.Mesh(new THREE.BoxGeometry(gW-0.01, gH-0.005, esp), activeMat); mF.position.set(0,0,d/2);
+                            const mC = new THREE.Mesh(new THREE.BoxGeometry(gW-0.05, gH*0.6, d-0.05), activeMat); mC.position.set(0,-gH*0.1,0);
+                            mF.add(new THREE.LineSegments(new THREE.EdgesGeometry(mF.geometry), lineMat));
+                            mC.add(new THREE.LineSegments(new THREE.EdgesGeometry(mC.geometry), lineMat));
+                            grp.add(mF); grp.add(mC); g.add(grp);
+                        }
+                    }
+
+                    if(mod.portas > 0) {
+                        const pW = (w-esp*2)/mod.portas;
+                        for(let i=0; i<mod.portas; i++) {
+                            const grp = new THREE.Group();
+                            if(mod.abertura === 'correr' || mod.tipo === 'guarda_roupa') {
+                                grp.userData = { isAnimatable:true, type:'door_slide', isOpen:false, travelX:(i%2===0?pW*0.95:-pW*0.95) };
+                                grp.position.set(-w/2+esp+pW/2+i*pW, startYP+hP/2, d/2+(i%2===0?0.01:0.03));
+                                const pM = new THREE.Mesh(new THREE.BoxGeometry(pW+0.02, hP, esp), activeMat);
+                                pM.add(new THREE.LineSegments(new THREE.EdgesGeometry(pM.geometry), lineMat)); grp.add(pM);
+                            } else {
+                                const left = i%2===0; grp.userData = { isAnimatable:true, type:'door_hinge', isOpen:false, hinge:left?'left':'right' };
+                                grp.position.set(-w/2+esp+i*pW+(left?0:pW), startYP+hP/2, d/2);
+                                const pM = new THREE.Mesh(new THREE.BoxGeometry(pW-0.005, hP-0.005, esp), activeMat); pM.position.x = left?pW/2:-pW/2;
+                                pM.add(new THREE.LineSegments(new THREE.EdgesGeometry(pM.geometry), lineMat));
+                                const pux = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.15, 0.02), new THREE.MeshStandardMaterial({color:0x888, metalness:1}));
+                                pux.position.set(left?pW-0.04:-pW+0.04, 0, 0.015); pM.add(pux); grp.add(pM);
+                            }
+                            g.add(grp);
+                        }
+                    }
+
+                    const fx = mod.posX/1000 || (autoX + w/2);
+                    g.position.set(fx, mod.posY/1000 || 0, mod.posZ/1000 || 0);
+                    g.rotation.y = THREE.MathUtils.degToRad(mod.rotY || 0);
+                    autoX = fx + w/2 + 0.2;
+                    ThreeEngine.rootNode.add(g);
+                });
             }
+        };
 
-            // ================= GAVETAS =================
-            if (mod.gavetas > 0) {
-                const gH = heightGavetas / mod.gavetas;
-                const gavW = w - (thickness * 2);
-                for(let i=0; i<mod.gavetas; i++) {
-                    const grp = new THREE.Group(); grp.userData = { isAnimatable:true, type:'drawer', isOpen:false, depth:d };
-                    grp.position.set(0, startYGavetas + (gH*i) + gH/2, 0);
-                    grp.add(createPart(new THREE.BoxGeometry(gavW-0.01, gH-0.005, thickness), 0, 0, d/2)); // Frente da Gaveta
-                    grp.add(createPart(new THREE.BoxGeometry(gavW-0.05, gH*0.6, d-0.05), 0, -gH*0.1, 0)); // Caixote interno
-                    g.add(grp);
+        // --- CORE & CONTROLLERS ---
+        const App = {
+            init: () => {
+                App.config.load();
+                ThreeEngine.init();
+                App.modules.add('balcao', { largura: 1200, altura: 900, profundidade: 600, portas: 2, gavetas: 2, prateleiras: 1 });
+                App.ui.toast('Oráculo Inicializado. Sistema pronto.', 'success');
+            },
+
+            modules: {
+                add: (tipo, overrides = {}) => {
+                    const id = Date.now().toString();
+                    const mod = { id, tipo, nome: OracleEngine.rules[tipo]?.label || "Móvel", largura: 800, altura: 800, profundidade: 500, portas: 2, gavetas: 0, prateleiras: 1, abertura: 'giro', cor: '#7F5539', posX: 0, posY: 0, posZ: 0, rotY: 0, ...overrides };
+                    OracleEngine.validateAndFix(mod); AppState.modules.push(mod); App.modules.select(id); App.modules.refreshAll();
+                },
+                addGeneric: () => { App.ui.fecharHUDs(); App.modules.add('armario', {nome: "Móvel Custom"}); },
+                select: (id) => {
+                    AppState.selectedModule = id; ThreeEngine.rebuildScene(); App.ui.renderList();
+                    if(id && document.getElementById('floatingEditor').classList.contains('active')) App.ui.openLiveEditor(id);
+                },
+                removeCurrent: () => {
+                    if(!AppState.selectedModule || !confirm("Excluir este módulo?")) return;
+                    AppState.modules = AppState.modules.filter(m => m.id !== AppState.selectedModule);
+                    App.modules.select(null); App.ui.fecharEditor(); App.modules.refreshAll();
+                },
+                refreshAll: () => { ThreeEngine.rebuildScene(); BOMEngine.update(); App.ui.renderList(); }
+            },
+
+            ui: {
+                toast: (msg, type='info') => {
+                    const t = document.getElementById('toast'); t.innerText = msg;
+                    t.className = `show ${type}`; setTimeout(() => t.className = t.className.replace('show', ''), 4000);
+                },
+                abrirHUD: (id) => { App.ui.fecharHUDs(); App.ui.fecharEditor(); const e = document.getElementById(id); if(e) e.classList.add('active'); },
+                fecharHUDs: () => { document.querySelectorAll('.bottom-sheet').forEach(s => s.classList.remove('active')); },
+                fecharEditor: () => { document.getElementById('floatingEditor').classList.remove('active'); },
+                toggleModal: (id) => { const m = document.getElementById(id); m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; },
+                showLoader: (msg) => { document.getElementById('statusText').innerText=msg; document.getElementById('statusOverlay').style.display='flex'; },
+                hideLoader: () => { document.getElementById('statusOverlay').style.display='none'; },
+                
+                renderList: () => {
+                    const c = document.getElementById('listaModulosContainer'); if(!c) return;
+                    c.innerHTML = '';
+                    AppState.modules.forEach(m => {
+                        const div = document.createElement('div');
+                        div.className = `module-card ${AppState.selectedModule === m.id ? 'selected' : ''}`;
+                        div.onclick = () => { App.modules.select(m.id); App.ui.fecharHUDs(); App.ui.openLiveEditor(m.id); };
+                        div.innerHTML = `<h4>${m.nome}</h4><p>${m.largura}x${m.altura}x${m.profundidade}mm</p><span class="oracle-badge">Engenharia Validada</span>`;
+                        c.appendChild(div);
+                    });
+                },
+
+                openLiveEditor: (id) => {
+                    const m = AppState.modules.find(x => x.id === id); if(!m) return;
+                    document.getElementById('eId').value = m.id;
+                    const map = {eT:'tipo', eA:'abertura', eL:'largura', eAl:'altura', eP:'profundidade', ePo:'portas', eG:'gavetas', ePr:'prateleiras', ePx:'posX', ePy:'posY', ePz:'posZ', eRy:'rotY', eC:'cor'};
+                    Object.keys(map).forEach(k => { const el = document.getElementById(k); if (el) el.value = m[map[k]] !== undefined ? m[map[k]] : ''; });
+                    App.ui.fecharHUDs(); document.getElementById('floatingEditor').classList.add('active');
+                },
+                syncLiveEditor: () => { if(AppState.selectedModule && document.getElementById('floatingEditor').classList.contains('active')) App.ui.openLiveEditor(AppState.selectedModule); },
+                
+                updateModuleFromEditor: () => {
+                    const id = document.getElementById('eId').value; const m = AppState.modules.find(x => x.id === id); if(!m) return;
+                    const map = {eT:'tipo', eA:'abertura', eL:'largura', eAl:'altura', eP:'profundidade', ePo:'portas', eG:'gavetas', ePr:'prateleiras', ePx:'posX', ePy:'posY', ePz:'posZ', eRy:'rotY', eC:'cor'};
+                    Object.keys(map).forEach(k => { const el = document.getElementById(k); if (el) m[map[k]] = (k==='eT'||k==='eA'||k==='eC') ? el.value : parseFloat(el.value)||0; });
+                    OracleEngine.validateAndFix(m); App.modules.refreshAll(); App.ui.syncLiveEditor();
                 }
-            } 
-            
-            // ================= PORTAS =================
-            if (mod.portas > 0) {
-                const pW = (w - (thickness * 2)) / mod.portas;
-                for(let i=0; i<mod.portas; i++) {
-                    const pGrp = new THREE.Group();
-                    if(op === 'correr' || mod.tipo === 'guarda_roupa') {
-                        pGrp.userData = { isAnimatable:true, type:'door_slide', isOpen:false, travelX: (i%2===0?pW*0.95:-pW*0.95) };
-                        pGrp.position.set(-w/2 + thickness + pW/2 + (i*pW), startYPortas + heightPortas/2, d/2 + (i%2===0?0.01:0.03));
-                        pGrp.add(createPart(new THREE.BoxGeometry(pW+0.02, heightPortas, thickness), 0, 0, 0));
+            },
+
+            ar: {
+                toggle: () => {
+                    AppState.arActive = !AppState.arActive;
+                    const c = document.getElementById('canvas-container'), btn = document.getElementById('btnToggleAR'), txt = document.getElementById('arBtnText');
+                    if(AppState.arActive) {
+                        c.style.background = 'none'; btn.classList.replace('primary', 'danger'); txt.innerText = "Encerrar AR Mode"; App.ui.fecharHUDs();
+                        if(AppState.imagemFundoURL) { c.style.backgroundImage = `url(${AppState.imagemFundoURL})`; c.style.backgroundSize = 'cover'; c.style.backgroundPosition = 'center'; }
+                        App.ui.toast("AR Ativo. Arraste os móveis com o dedo.", "success");
                     } else {
-                        const left = (i%2===0); 
-                        pGrp.userData = { isAnimatable:true, type:'door_hinge', isOpen:false, hinge: left?'left':'right' };
-                        pGrp.position.set(-w/2 + thickness + (i*pW) + (left?0:pW), startYPortas + heightPortas/2, d/2);
-                        const msh = createPart(new THREE.BoxGeometry(pW-0.005, heightPortas-0.005, thickness), left?pW/2:-pW/2, 0, 0);
-                        const handle = createPart(new THREE.BoxGeometry(0.015, 0.15, 0.02), left?pW-0.04:-pW+0.04, 0, 0.015, new THREE.MeshStandardMaterial({color:0x888, metalness:1}));
-                        msh.add(handle); pGrp.add(msh);
+                        c.style.background = 'radial-gradient(circle, #ffffff 0%, #e0e0e0 100%)'; c.style.backgroundImage = 'none';
+                        btn.classList.replace('danger', 'primary'); txt.innerText = "Projetar Móveis na Foto Real (AR)";
                     }
-                    g.add(pGrp);
+                },
+                reset: () => { ThreeEngine.rootNode.rotation.set(0,0,0); document.getElementById('camRotX').value=0; document.getElementById('camRotY').value=0; ThreeEngine.camera.position.set(0,1.5,5); ThreeEngine.controls.target.set(0,0.8,0); ThreeEngine.controls.update(); },
+                applyPerspective: () => { const rx = parseFloat(document.getElementById('camRotX').value)||0, ry = parseFloat(document.getElementById('camRotY').value)||0; ThreeEngine.rootNode.rotation.set(rx, ry, 0); },
+                autoFit: () => { let f=0; const a=()=>{ f++; ThreeEngine.rootNode.rotation.x += (-0.15 - ThreeEngine.rootNode.rotation.x)*0.1; document.getElementById('camRotX').value = ThreeEngine.rootNode.rotation.x; if(f<30) requestAnimationFrame(a); }; a(); }
+            },
+
+            ai: {
+                toggleRecording: async () => {
+                    if(!AppState.apiKeys.groq) { App.ui.toggleModal('modalSettings'); return App.ui.toast("Configure a chave da API Groq.", "error"); }
+                    const btn = document.getElementById('btnRecord');
+                    if(AppState.mediaRecorder && AppState.mediaRecorder.state !== "inactive") {
+                        AppState.mediaRecorder.stop(); btn.classList.remove('recording'); btn.innerHTML = "<i class='fas fa-microphone'></i> Gravar Voz";
+                    } else {
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                            AppState.mediaRecorder = new MediaRecorder(stream);
+                            AppState.mediaRecorder.ondataavailable = e => AppState.audioChunks.push(e.data);
+                            AppState.mediaRecorder.onstop = () => App.ai.processAudioBlob(new Blob(AppState.audioChunks, { type: 'audio/webm' }));
+                            AppState.audioChunks = []; AppState.mediaRecorder.start();
+                            btn.classList.add('recording'); btn.innerHTML = "<i class='fas fa-stop'></i> Gravando...";
+                        } catch(e) { App.ui.toast("Permissão de Microfone negada.", "error"); }
+                    }
+                },
+                uploadAudio: (input) => { if(input.files[0]) App.ai.processAudioBlob(input.files[0]); },
+                processAudioBlob: async (blob) => {
+                    App.ui.showLoader("Transcrevendo Inteligência...");
+                    const fd = new FormData(); fd.append("file", new File([blob], "audio.webm")); fd.append("model", "whisper-large-v3");
+                    try {
+                        const res = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", { method: "POST", headers: { "Authorization": `Bearer ${AppState.apiKeys.groq}` }, body: fd });
+                        const data = await res.json();
+                        if(data.text) { AppState.transcricaoAtual = data.text; document.getElementById('transcriptionText').innerText = `"${data.text}"`; App.ui.toast("Áudio capturado!", "success"); }
+                    } catch(e) { App.ui.toast("Falha na transcrição Groq.", "error"); } finally { App.ui.hideLoader(); }
+                },
+                processPhoto: (input) => {
+                    if (input.files && input.files[0]) {
+                        const f = input.files[0]; AppState.imagemFundoURL = URL.createObjectURL(f);
+                        document.getElementById('imagePreview').src = AppState.imagemFundoURL; document.getElementById('imgPreviewContainer').style.display = 'block';
+                        const r = new FileReader();
+                        r.onload = () => { AppState.imagemFundoBase64 = r.result.split(',')[1]; App.ui.toast("Foto carregada com sucesso.", "success"); };
+                        r.readAsDataURL(f);
+                    }
+                },
+                generateWithOracle: async () => {
+                    const txt = document.getElementById('textoAdicional').value.trim(); const key = AppState.apiKeys.gemini;
+                    if(!key) { App.ui.toggleModal('modalSettings'); return App.ui.toast("Configure a chave Gemini da thIAguinho Soluções!", "error"); }
+                    if(!AppState.imagemFundoBase64 && !AppState.transcricaoAtual && !txt) return App.ui.toast("Envie áudio, texto ou foto para o Oráculo analisar.", "error");
+                    
+                    App.ui.showLoader("Oráculo projetando estrutura física...");
+                    try {
+                        const prompt = `Você é o Oráculo Marceneiro Sênior. REGRAS RÍGIDAS: Balcão precisa de portas E gavetas. Cozinha exige subdivisões. Analise a intenção e retorne APENAS um JSON válido.
+                        VOZ/TEXTO: "${AppState.transcricaoAtual} ${txt}"
+                        JSON ESPERADO: {"modulos": [{"tipo": "balcao", "nome": "Balcão Auto", "largura": 1000, "altura": 900, "profundidade": 500, "portas": 2, "gavetas": 2, "prateleiras": 1, "abertura": "giro", "cor": "#DDA15E", "posX": 0, "posY": 0, "posZ": 0, "rotY": 0}]}`;
+                        
+                        const parts = [{ text: prompt }];
+                        if (AppState.imagemFundoBase64) parts.push({ inlineData: { mimeType: "image/jpeg", data: AppState.imagemFundoBase64 } });
+                        
+                        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts }] }) });
+                        const data = await res.json(); if(data.error) throw new Error(data.error.message);
+                        const jsonStr = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
+                        const json = JSON.parse(jsonStr);
+                        
+                        if (json.modulos && json.modulos.length > 0) { 
+                            json.modulos.forEach(m => App.modules.add(m.tipo || 'armario', m));
+                            App.ui.fecharHUDs(); App.ui.toast("Projeto Oráculo Gerado com Sucesso!", "success");
+                        }
+                    } catch(e) { App.ui.toast("Oráculo falhou: " + e.message, "error"); } finally { App.ui.hideLoader(); }
+                }
+            },
+
+            bom: {
+                updateParams: () => {
+                    ['mdf','labor','hardware','margin'].forEach(k => { const el = document.getElementById(`cost-${k}`); if(el) AppState.costs[k] = parseFloat(el.value)||0; });
+                    BOMEngine.update(); App.config.save();
+                }
+            },
+
+            api: {
+                saveKeys: () => {
+                    AppState.apiKeys.gemini = document.getElementById('api-gemini').value.trim(); AppState.apiKeys.groq = document.getElementById('api-groq').value.trim();
+                    App.config.save(); App.ui.toggleModal('modalSettings'); App.ui.toast('Chaves Operacionais Salvas.', 'success');
+                }
+            },
+
+            config: {
+                save: () => { localStorage.setItem('ak_gemini_cad', AppState.apiKeys.gemini); localStorage.setItem('ak_groq_cad', AppState.apiKeys.groq); },
+                load: () => {
+                    const eG = document.getElementById('api-gemini'); if(eG) eG.value = AppState.apiKeys.gemini; 
+                    const eQ = document.getElementById('api-groq'); if(eQ) eQ.value = AppState.apiKeys.groq; 
                 }
             }
-        }
+        };
 
-        // ================= IA MULTIMODAL (PROMPT SUPREMO) =================
-        async function analisarComIA() {
-            const txt = document.getElementById('textoAdicional').value.trim(); const key = AppState.chavesAPI.gemini;
-            if (!key) return showError("Falta Key Gemini da thIAguinho Soluções!");
-            if (!AppState.imagemFundoBase64 && !AppState.transcricaoAtual && !txt) return showError("Envie foto ou áudio.");
-            
-            showLoading("Oráculo de Marcenaria 3D processando engenharia...");
-            
-            try {
-                const prompt = `
-                PROMPT SUPREMO — ORÁCULO DE MARCENARIA 3D (ENGENHARIA + DESIGN REAL)
-                
-                Você atua simultaneamente como: Engenheiro de Software Sênior, Arquiteto de Sistemas, Marceneiro Profissional, Designer de Interiores e Orçamentista.
-                
-                🔴 REGRA DE OURO (ABSOLUTA)
-                Você NÃO pode inventar dados, supor medidas sem validação, nem gerar caixotes vazios genéricos.
-                Seja 100% aderente ao áudio e texto do cliente. Analise a imagem de fundo para deduzir proporção.
-
-                REGRAS REAIS DE MARCENARIA:
-                - BALCÃO: Deve ter gavetas no topo e portas embaixo (ex: gavetas: 2, portas: 2 no mesmo bloco).
-                - GUARDA_ROUPA: Tem que ter gavetas internas e portas de correr, ou estrutura mista.
-                - COZINHA: Aéreos (posY > 1400) e bases inferiores com gavetões.
-                
-                TIPOS PERMITIDOS: armario, guarda_roupa, rack, criado_mudo, aparador, painel_tv, mesa, escrivaninha, cadeira, banco, sofa, estante, nicho, prateleira, vitrine, expositor, balcao, porta, janela.
-                
-                Extraia a física CAD exata. Dê posX e posZ (mm) estimando a escala da foto. Se for aéreo, dê 'posY' (elevação do chão). Cor em Hexadecimal real.
-                
-                CONTEXTO ATUAL:
-                Áudio do Cliente: "${AppState.transcricaoAtual}"
-                Texto do Cliente: "${txt}"
-                
-                GERAÇÃO OBRIGATÓRIA NESTE JSON EXATO:
-                {"modulos": [{"tipo": "balcao", "nome": "Balcão Misto", "largura": 1200, "altura": 900, "profundidade": 600, "portas": 2, "gavetas": 2, "prateleiras": 1, "abertura": "giro", "cor": "#4A3C30", "posX": 0, "posY": 0, "posZ": 0, "rotY": 0}]}
-                `;
-                
-                const parts = [{ text: prompt }];
-                if (AppState.imagemFundoBase64) parts.push({ inlineData: { mimeType: "image/jpeg", data: AppState.imagemFundoBase64 } });
-                
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts }] }) });
-                const data = await res.json();
-                if(data.error) throw new Error(data.error.message);
-                
-                const jsonStr = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
-                const json = JSON.parse(jsonStr);
-                
-                if (json.modulos) { 
-                    AppState.modulos = json.modulos.map((m,i) => ({...m, id: Date.now()+i})); 
-                    reconstruirCena(); atualizarHUDLista(); calcularTotal(); fecharHUDs(); 
-                    showToast("Oráculo Finalizado! Projeto CAD thIAguinho Gerado."); 
-                }
-            } catch(e) { showError("Oráculo falhou: " + e.message); } finally { hideLoading(); }
-        }
-
-        // ================= EDITOR LIVE (NÃO OBSTRUTIVO) =================
-        function abrirEditorAoVivo(id) {
-            fecharHUDs(); const idx = AppState.modulos.findIndex(m => m.id === id); if(idx === -1) return;
-            const m = AppState.modulos[idx];
-            document.getElementById('floatingEditor').innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom: 1px solid #ddd; padding-bottom:10px;">
-                    <h4 style="color:var(--ai-blue); font-size: 1.1rem; margin:0;"><i class="fas fa-tools"></i> Editar Físico</h4>
-                    <button class="close-btn" style="background:var(--warning-red); color:#fff;" onclick="fecharEditor()"><i class="fas fa-times"></i></button>
-                </div>
-                
-                <div class="cad-section">
-                    <h5>Eixos e Posição (AR)</h5>
-                    <div class="grid-3-col">
-                        <div class="input-group"><label title="Direita/Esquerda">Eixo X</label><input type="number" id="ePx" value="${m.posX||0}" oninput="updateLive(${idx})"></div>
-                        <div class="input-group"><label title="Altura do Chão">Eixo Y</label><input type="number" id="ePy" value="${m.posY||0}" oninput="updateLive(${idx})"></div>
-                        <div class="input-group"><label title="Frente/Trás">Eixo Z</label><input type="number" id="ePz" value="${m.posZ||0}" oninput="updateLive(${idx})"></div>
-                        <div class="input-group"><label>Giro (º)</label><input type="number" id="eRy" value="${m.rotY||0}" oninput="updateLive(${idx})"></div>
-                    </div>
-                </div>
-
-                <div class="grid-2-col">
-                    <div class="input-group">
-                        <label>Categoria</label>
-                        <select id="eT" onchange="updateLive(${idx})">
-                            <option value="armario" ${m.tipo==='armario'?'selected':''}>Armário / Aéreo</option>
-                            <option value="balcao" ${m.tipo==='balcao'?'selected':''}>Balcão (Tampo Duplo)</option>
-                            <option value="guarda_roupa" ${m.tipo==='guarda_roupa'?'selected':''}>Guarda-Roupa</option>
-                            <option value="painel_tv" ${m.tipo==='painel_tv'?'selected':''}>Painel TV</option>
-                            <option value="rack" ${m.tipo==='rack'?'selected':''}>Rack</option>
-                            <option value="mesa" ${m.tipo==='mesa'?'selected':''}>Mesa</option>
-                            <option value="escrivaninha" ${m.tipo==='escrivaninha'?'selected':''}>Escrivaninha</option>
-                            <option value="cadeira" ${m.tipo==='cadeira'?'selected':''}>Cadeira / Banco</option>
-                            <option value="sofa" ${m.tipo==='sofa'?'selected':''}>Sofá</option>
-                            <option value="estante" ${m.tipo==='estante'?'selected':''}>Estante Aberta</option>
-                            <option value="nicho" ${m.tipo==='nicho'?'selected':''}>Nicho</option>
-                            <option value="prateleira" ${m.tipo==='prateleira'?'selected':''}>Prateleira Solta</option>
-                            <option value="vitrine" ${m.tipo==='vitrine'?'selected':''}>Vitrine (Vidro)</option>
-                            <option value="expositor" ${m.tipo==='expositor'?'selected':''}>Expositor Comercial</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label>Dobradiça / Trilho</label>
-                        <select id="eA" onchange="updateLive(${idx})">
-                            <option value="giro" ${m.abertura==='giro'?'selected':''}>Giro (Normal)</option>
-                            <option value="correr" ${m.abertura==='correr'?'selected':''}>Correr (Trilho)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid-3-col">
-                    <div class="input-group"><label>Larg(mm)</label><input type="number" id="eL" value="${m.largura}" oninput="updateLive(${idx})"></div>
-                    <div class="input-group"><label>Alt(mm)</label><input type="number" id="eAl" value="${m.altura}" oninput="updateLive(${idx})"></div>
-                    <div class="input-group"><label>Prof(mm)</label><input type="number" id="eP" value="${m.profundidade}" oninput="updateLive(${idx})"></div>
-                </div>
-                
-                <div class="grid-3-col">
-                    <div class="input-group"><label>Portas</label><input type="number" id="ePo" value="${m.portas}" oninput="updateLive(${idx})"></div>
-                    <div class="input-group"><label>Gavetas</label><input type="number" id="eG" value="${m.gavetas}" oninput="updateLive(${idx})"></div>
-                    <div class="input-group"><label>Prats</label><input type="number" id="ePr" value="${m.prateleiras||0}" oninput="updateLive(${idx})"></div>
-                </div>
-
-                <div class="input-group"><label>MDF/Laca (Hex)</label><input type="color" id="eC" value="${m.cor}" style="height:45px; padding:2px; cursor:pointer;" oninput="updateLive(${idx})"></div>
-                <button class="btn-block danger" style="padding:12px; font-size:0.85rem; margin-top:20px;" onclick="removerModulo(${idx})"><i class="fas fa-trash"></i> Deletar Móvel da Cena</button>
-            `;
-            document.getElementById('floatingEditor').classList.add('active');
-        }
-
-        function fecharEditor() { document.getElementById('floatingEditor').classList.remove('active'); }
-        
-        function updateLive(idx) {
-            const m = AppState.modulos[idx];
-            m.posX = parseFloat(document.getElementById('ePx').value)||0; 
-            m.posY = parseFloat(document.getElementById('ePy').value)||0; 
-            m.posZ = parseFloat(document.getElementById('ePz').value)||0; 
-            m.rotY = parseFloat(document.getElementById('eRy').value)||0;
-            m.tipo = document.getElementById('eT').value; m.abertura = document.getElementById('eA').value; 
-            m.largura = parseFloat(document.getElementById('eL').value)||0; m.altura = parseFloat(document.getElementById('eAl').value)||0; 
-            m.profundidade = parseFloat(document.getElementById('eP').value)||0;
-            m.portas = parseInt(document.getElementById('ePo').value)||0; m.gavetas = parseInt(document.getElementById('eG').value)||0; 
-            m.prateleiras = parseInt(document.getElementById('ePr').value)||0; m.cor = document.getElementById('eC').value;
-            reconstruirCena(); calcularTotal();
-        }
-
-        function atualizarHUDLista() {
-            const c = document.getElementById('listaModulosContainer'); c.innerHTML = '';
-            AppState.modulos.forEach(m => c.innerHTML += `<div class="module-card"><h4>${m.nome}</h4><p>L: ${m.largura} A: ${m.altura} P: ${m.profundidade}</p><button class="btn-block action-btn" style="padding:10px; font-size:0.8rem;" onclick="abrirEditorAoVivo(${m.id})">Editar no CAD 3D</button></div>`);
-        }
-        function removerModulo(i) { AppState.modulos.splice(i, 1); reconstruirCena(); atualizarHUDLista(); calcularTotal(); fecharEditor(); }
-        function adicionarModuloManual() { AppState.modulos.push({ id: Date.now(), tipo: "armario", nome: "Móvel Custom thIAguinho", largura: 800, altura: 800, profundidade: 500, portas: 2, gavetas: 0, prateleiras: 1, abertura: "giro", cor: "#8B5A2B", posX: 0, posY: 0, posZ: 0, rotY: 0 }); reconstruirCena(); atualizarHUDLista(); calcularTotal(); }
-        
-        function calcularTotal() {
-            const m = parseFloat(document.getElementById('costMaterial').value)||0, mo = parseFloat(document.getElementById('costLabor').value)||0, h = parseFloat(document.getElementById('costHardware').value)||0, o = parseFloat(document.getElementById('costOther').value)||0, p = parseFloat(document.getElementById('profitMargin').value)||0;
-            document.getElementById('totalProjectCost').innerText = new Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format((m+mo+h+o) / (1-(p/100)));
-        }
-
-        // CÂMERA
-        function ajustarPerspectivaManual() { if(rootNode) rootNode.rotation.x = parseFloat(document.getElementById('camRotX').value); }
-        function autoEncaixarIA() { if(rootNode) { let f=0; const anim=()=>{ f++; rootNode.rotation.x += (-0.15 - rootNode.rotation.x)*0.1; document.getElementById('camRotX').value = rootNode.rotation.x; if(f<30) requestAnimationFrame(anim); }; anim(); } }
-        function resetCamera() { if(rootNode) { rootNode.rotation.x = 0; document.getElementById('camRotX').value = 0; controls.target.set(0,1,0); camera.position.set(0, 1.5, 6); controls.update(); } }
+        window.addEventListener('DOMContentLoaded', App.init);
     </script>
 </body>
 </html>
