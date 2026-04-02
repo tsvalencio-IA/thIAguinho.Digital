@@ -1009,7 +1009,7 @@
                 if (mod.material === 'tecido') custM2 = 100; 
 
                 return { 
-                    area: area * 1.15, // 15% DE PERDA
+                    area: area * 1.15, // 15% DE PERDA NA SERRAGEM
                     hardwareCost: hwCusto, 
                     laborMult: laborMult, 
                     customMatCost: custM2,
@@ -1202,7 +1202,7 @@
                 
                 if (window.ThreeEngine.dragObj) { window.ThreeEngine.dragObj = null; return; }
                 
-                // LÓGICA DE ABERTURA INDEPENDENTE EXAUSTIVA E CORRIGIDA (Bug da iteração arrumado!)
+                // LÓGICA DE ABERTURA INDEPENDENTE EXAUSTIVA E CORRIGIDA
                 if (window.AppState.tool === 'orbit') {
                     const cX = e.clientX !== undefined ? e.clientX : (e.changedTouches && e.changedTouches[0].clientX);
                     const cY = e.clientY !== undefined ? e.clientY : (e.changedTouches && e.changedTouches[0].clientY);
@@ -1244,7 +1244,6 @@
             animate: () => {
                 requestAnimationFrame(window.ThreeEngine.animate);
                 
-                // Loop Seguro e Reverso que não perde nenhum item na física
                 for (let i = window.AppState.animacoesAtivas.length - 1; i >= 0; i--) {
                     const a = window.AppState.animacoesAtivas[i]; 
                     const obj = a.obj; 
@@ -1290,7 +1289,7 @@
             },
             
             rebuildScene: () => {
-                window.AppState.animacoesAtivas = []; // Limpa animações fantasmas
+                window.AppState.animacoesAtivas = []; 
                 while(window.ThreeEngine.rootNode.children.length > 0) {
                     window.ThreeEngine.rootNode.remove(window.ThreeEngine.rootNode.children[0]);
                 }
@@ -1696,36 +1695,42 @@
                 openLiveEditor: (id) => {
                     const m = window.AppState.modules.find(x => x.id === id); 
                     if(!m) return;
-                    document.getElementById('eId').value = m.id;
+                    document.getElementById('editorId').value = m.id;
                     const props = ['tipo','formato','layoutInterno','dobradicaLado','material','abertura','largura','altura','profundidade','retornoL','portas','gavetas','prateleiras','prateleirasExternas','posX','posY','posZ','rotY'];
-                    const keys = ['eT','eFormato','eLayoutInt','eDobradica','eMat','eA','eL','eAl','eP','eRetL','ePo','eG','ePr','ePratExt','ePx','ePy','ePz','eRy'];
+                    const keys = ['editorTipo','editorFormato','editorLayoutInt','editorDobradica','editorMat','editorAbertura','editorL','editorAl','editorP','editorRetL','editorPo','editorG','editorPr','editorPratExt','editorPx','editorPy','editorPz','editorRy'];
                     keys.forEach((k, i) => { 
                         const el = document.getElementById(k); 
-                        if(el) el.value = m[props[i]] !== undefined ? m[props[i]] : (['eT','eFormato','eLayoutInt','eDobradica','eMat','eA'].includes(k)?'':0); 
+                        if(el) el.value = m[props[i]] !== undefined ? m[props[i]] : (['editorTipo','editorFormato','editorLayoutInt','editorDobradica','editorMat','editorAbertura'].includes(k)?'':0); 
                     });
-                    document.getElementById('eRipado').checked = m.ripadoFrontal; 
-                    document.getElementById('eVidro').checked = m.tampoVidro;
+                    const checkRipado = document.getElementById('editorRipado');
+                    if (checkRipado) checkRipado.checked = m.ripadoFrontal; 
+                    const checkVidro = document.getElementById('editorVidro');
+                    if (checkVidro) checkVidro.checked = m.tampoVidro;
                     document.getElementById('floatingEditor').classList.add('active');
                 },
                 syncToState: () => {
-                    const m = window.AppState.modules.find(x => x.id === document.getElementById('eId').value); 
+                    const m = window.AppState.modules.find(x => x.id === document.getElementById('editorId').value); 
                     if(!m) return;
                     const props = ['tipo','formato','layoutInterno','dobradicaLado','material','abertura','largura','altura','profundidade','retornoL','portas','gavetas','prateleiras','prateleirasExternas','posX','posY','posZ','rotY'];
-                    const keys = ['eT','eFormato','eLayoutInt','eDobradica','eMat','eA','eL','eAl','eP','eRetL','ePo','eG','ePr','ePratExt','ePx','ePy','ePz','eRy'];
+                    const keys = ['editorTipo','editorFormato','editorLayoutInt','editorDobradica','editorMat','editorAbertura','editorL','editorAl','editorP','editorRetL','editorPo','editorG','editorPr','editorPratExt','editorPx','editorPy','editorPz','editorRy'];
                     keys.forEach((k, i) => { 
                         const el = document.getElementById(k); 
-                        if(el) m[props[i]] = ['eT','eFormato','eLayoutInt','eDobradica','eMat','eA'].includes(k) ? el.value : parseFloat(el.value)||0; 
+                        if(el) m[props[i]] = ['editorTipo','editorFormato','editorLayoutInt','editorDobradica','editorMat','editorAbertura'].includes(k) ? el.value : parseFloat(el.value)||0; 
                     });
-                    m.ripadoFrontal = document.getElementById('eRipado').checked; 
-                    m.tampoVidro = document.getElementById('eVidro').checked;
+                    const checkRipado = document.getElementById('editorRipado');
+                    if (checkRipado) m.ripadoFrontal = checkRipado.checked; 
+                    const checkVidro = document.getElementById('editorVidro');
+                    if (checkVidro) m.tampoVidro = checkVidro.checked;
                     window.OracleEngine.validateAndFix(m); 
                     window.App.modules.refreshAll(); 
                 },
                 syncToStateNoRebuild: () => {
-                    const m = window.AppState.modules.find(x => x.id === document.getElementById('eId').value); 
+                    const m = window.AppState.modules.find(x => x.id === document.getElementById('editorId').value); 
                     if(!m) return;
-                    document.getElementById('ePx').value = m.posX;
-                    document.getElementById('ePz').value = m.posZ;
+                    const pxEl = document.getElementById('editorPx');
+                    if (pxEl) pxEl.value = m.posX;
+                    const pzEl = document.getElementById('editorPz');
+                    if (pzEl) pzEl.value = m.posZ;
                 }
             },
             
