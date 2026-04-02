@@ -93,12 +93,13 @@
         th { background-color: var(--primary-dark); color: white; font-weight: 600; white-space: nowrap; }
         tr:hover { background-color: var(--soft-beige); }
 
-        #summary { margin-top: 40px; padding: 30px; background-color: #F2E8DC; border-radius: var(--border-radius-soft); border: 1px solid #dccca0; text-align: center; }
+        #summary { margin-top: 40px; padding: 30px; background-color: #F2E8DC; border-radius: var(--border-radius-soft); border: 1px solid #dccca0; text-align: center; box-shadow: inset 0 1px 5px rgba(0,0,0,0.03); }
         #summary p { font-size: 1.6em; font-weight: 700; color: var(--primary-dark); margin: 15px 0; }
         .summary-details { display: inline-block; text-align: left; background: #fff; padding: 15px; border-radius: 8px; border: 1px dashed var(--border-soft); font-size: 0.9em; margin-bottom: 15px; }
 
         .api-config-section { background-color: var(--bg-light-panel); border: 1px solid var(--border-soft); border-radius: var(--border-radius-soft); padding: 20px; margin-bottom: 30px; }
         .error-message { background-color: #ffebee; border-left: 5px solid #f44336; padding: 15px; margin-top: 15px; border-radius: 5px; color: #c62828; font-size: 0.9em; display: none; }
+        .designer-insight { background-color: #fff3e0; border-left: 5px solid #ff9800; padding: 15px; margin-top: 15px; border-radius: 4px; font-style: italic; color: #555; font-size: 0.95em; margin-bottom: 15px; display: none; }
         
         .ai-log-box { background: #1e1e1e; color: #a5d6a7; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.9em; margin-top: 15px; display: none; }
         .ai-log-box .log-item { margin-bottom: 5px; }
@@ -180,6 +181,10 @@
         <section id="aiDesignSection" class="section-panel" style="display: none;">
             <h2 style="margin-top: 0;"><i class="fas fa-cube"></i> Gémeo Digital 3D (Com Física)</h2>
             
+            <div id="designerInsight" class="designer-insight">
+                <i class="fas fa-hard-hat"></i> <b>Engenharia Aplicada:</b> <span id="textoDesigner"></span>
+            </div>
+
             <div class="action-buttons" style="justify-content: flex-start; margin-bottom: 15px; margin-top: 0;">
                 <button id="btnAR" class="success" onclick="alternarModoAR()" style="display: none;">
                     <i class="fas fa-expand-arrows-alt"></i> Encaixar na Foto (AR)
@@ -329,7 +334,7 @@
         let motor3DIniciado = false;
         let raycaster = new THREE.Raycaster(), mouse = new THREE.Vector2();
         let objetosInterativos = [];
-        let rootNode = null, grupoMovel = null, boxHelper = null;
+        let rootNode = null, grupoCozinha = null, boxHelper = null;
 
         let pressTimer, startTouchX, startTouchY, isEditingMode = false;
 
@@ -740,7 +745,7 @@ GERE EXCLUSIVAMENTE UM JSON:
                             for(let i=0; i<pts; i++) {
                                 const bG = new THREE.Group(); bG.position.set(0, E + (i*hI) + hI, D+E/2); 
                                 const pM = placa(W-E*2-F*2, hI-F, E, mP, 0, -hI/2, 0, bG, true);
-                                bG.userData = { animavel: true, tipo: 'basculante', aberto: false, rot: -Math.PI/2.2 };
+                                bG.userData = { animavel: true, tipo: 'basculante', aberto: false, rotAbre: -Math.PI/2.2 };
                                 pM.userData.grupoPai = bG; mG.add(bG); objetosInterativos.push(pM);
                             }
                         } else {
@@ -750,7 +755,7 @@ GERE EXCLUSIVAMENTE UM JSON:
                                 bG.position.set(sX + i*(wI+F) + (esq?-wI/2:wI/2), E + hPor/2, D+E/2);
                                 const dx = esq ? wI/2 : -wI/2;
                                 const pM = placa(wI, hPor-F, E, mP, dx, 0, 0, bG, true);
-                                bG.userData = { animavel: true, tipo: 'giro', aberto: false, rot: esq ? -Math.PI/1.8 : Math.PI/1.8 };
+                                bG.userData = { animavel: true, tipo: 'giro', aberto: false, rotAbre: esq ? -Math.PI/1.8 : Math.PI/1.8 };
                                 pM.userData.grupoPai = bG; mG.add(bG); objetosInterativos.push(pM);
                             }
                         }
@@ -853,12 +858,12 @@ GERE EXCLUSIVAMENTE UM JSON:
         }
 
         function alternarModoAR() {
-            if (!base64ImagemGlobal) { alert("Envie a foto do local primeiro!"); return; }
+            if (!base64Img) { alert("Envie a foto do local primeiro!"); return; }
             const w = document.getElementById('container3DWrapper'); const bg = document.getElementById('arBackgroundImage'); const uT = document.getElementById('arUITop');
             modoARAtivo = !modoARAtivo;
             
             if (modoARAtivo) {
-                w.classList.add('fullscreen-ar'); bg.src = base64ImagemGlobal; bg.style.display = 'block'; uT.style.display = 'flex';
+                w.classList.add('fullscreen-ar'); bg.src = base64Img; bg.style.display = 'block'; uT.style.display = 'flex';
                 document.getElementById('info3D').style.display = 'none'; document.getElementById('instrucao3D').style.display = 'none';
                 controles3D.target.set(0, 0, 0); camera3D.position.set(0, 0, 5); controles3D.update();
             } else {
