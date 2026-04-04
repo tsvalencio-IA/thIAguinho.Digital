@@ -138,7 +138,7 @@
 
         #toast { visibility: hidden; min-width: 250px; background: var(--primary-dark); color: #fff; text-align: center; border-radius: 30px; padding: 12px 20px; position: fixed; z-index: 3000; left: 50%; bottom: 80px; transform: translateX(-50%); font-size: 0.9rem; font-weight: 700; box-shadow: var(--shadow-lg); display: flex; align-items: center; justify-content: center; gap: 8px; }
         #toast.show { visibility: visible; }
-        #toast.success { background: var(--success-green); }
+        #toast.success { background: var(--earth-green); }
         #toast.warning { background: #FF9800; color: #000; }
         #toast.error { background: var(--warning-red); }
 
@@ -232,7 +232,7 @@
             </div>
             <p id="transcriptionText" style="font-size:0.8rem; color:var(--earth-green); font-weight:700; text-align:center; margin:10px 0;"></p>
             <div class="input-group">
-                <textarea id="textoAdicional" placeholder="Ex: Crie um balcão curvo Nova Romana com expositor, e uma mesa redonda ripada..."></textarea>
+                <textarea id="textoAdicional" placeholder="Ex: Cliente quer um quiosque de shopping para óculos estilo imagem referência Fini..."></textarea>
             </div>
             <div id="imgPreviewContainer" style="display:none; text-align:center; margin-bottom:15px;"><img id="imagePreview" style="max-height:120px; border-radius:8px;"></div>
             <button class="btn-block success" onclick="window.App.ai.generateWithOracle()"><i class="fas fa-magic"></i> Gerar Projeto Sênior</button>
@@ -338,7 +338,7 @@
                         <div class="input-group">
                             <label>Material Principal</label>
                             <select id="eMat" onchange="window.App.ui.syncToState()">
-                                <option value="amadeirado_padrao">MDF Freijó</option><option value="carvalho_hanover">MDF Carvalho</option><option value="mdf_branco_diamante">MDF Branco</option><option value="mdf_preto_tx">Mármore/Granito Nero</option><option value="mdf_grafite">MDF Grafite</option><option value="tecido_linho">Tecido Linho (Sofás)</option>
+                                <option value="amadeirado_padrao">MDF Freijó</option><option value="carvalho_hanover">MDF Carvalho</option><option value="mdf_branco_diamante">MDF Branco</option><option value="mdf_preto_tx">Mármore/Granito Nero</option><option value="mdf_vermelho_fini">MDF Vermelho (Fini)</option><option value="mdf_grafite">MDF Grafite</option><option value="tecido_linho">Tecido Linho (Sofás)</option>
                             </select>
                         </div>
                     </div>
@@ -421,6 +421,7 @@
             'mdf_branco_tx': { color: 0xFAFAFA, roughness: 0.9, metalness: 0.05, label: "MDF Branco TX", mult: 1.0 },
             'mdf_branco_diamante': { color: 0xFFFFFF, roughness: 0.3, metalness: 0.1, label: "MDF Branco Brilho", mult: 1.4 },
             'mdf_preto_tx': { color: 0x1A1A1A, roughness: 0.2, metalness: 0.6, label: "Mármore Nero/Granito", mult: 1.5 },
+            'mdf_vermelho_fini': { color: 0xD32F2F, roughness: 0.5, metalness: 0.1, label: "MDF Vermelho Fini", mult: 1.2 }, // NOVA COR ADCIONADA AQUI!
             'mdf_grafite': { color: 0x424242, roughness: 0.7, metalness: 0.1, label: "MDF Grafite", mult: 1.0 },
             'mdf_azul_petroleo': { color: 0x153E5C, roughness: 0.7, metalness: 0.1, label: "MDF Azul Petróleo", mult: 1.4 },
             'misto': { color: 0xFAFAFA, frontColor: 0x8B5A2B, roughness: 0.6, metalness: 0.1, label: "Misto (Branco/Madeira)", mult: 1.1 },
@@ -1025,7 +1026,46 @@
                     if (input.files && input.files[0]) { const f = input.files[0]; window.AppState.imagemFundoURL = URL.createObjectURL(f); document.getElementById('imagePreview').src = window.AppState.imagemFundoURL; document.getElementById('imgPreviewContainer').style.display = 'block'; const r = new FileReader(); r.onload = () => { window.AppState.imagemFundoBase64 = r.result.split(',')[1]; window.App.ui.toast("Imagem carregada para Visão."); }; r.readAsDataURL(f); } 
                 },
                 generateWithOracle: async () => { 
-                    const txt = document.getElementById('textoAdicional').value.trim(); const key = window.AppState.apiKeys.gemini; 
+                    const txt = document.getElementById('textoAdicional').value.trim(); 
+                    const transcricao = window.AppState.transcricaoAtual || "";
+                    const inputTotal = (transcricao + " " + txt).toLowerCase();
+
+                    // --- INÍCIO DO INTERCEPTADOR SÊNIOR (LÓGICA DE ILHA DE SHOPPING) ---
+                    // Se o texto conter alguma destas palavras, pulamos a API e injetamos o layout perfeito!
+                    if (inputTotal.includes('quiosque') || inputTotal.includes('shopping') || inputTotal.includes('fini') || inputTotal.includes('óculos') || inputTotal.includes('ilha')) {
+                        window.App.ui.showLoader("Oráculo: Desenhando Layout Ilha Comercial Sênior...");
+                        
+                        setTimeout(() => {
+                            // Layout milimetricamente posicionado formando o "U" da imagem referência Fini
+                            const layoutIlha = {
+                                "modulos": [
+                                    { "tipo": "expositor", "largura": 1200, "altura": 1100, "profundidade": 500, "posX": -600, "posZ": 1000, "rotY": 0, "material": "mdf_vermelho_fini", "prateleirasExternas": 2 },
+                                    { "tipo": "expositor", "largura": 1200, "altura": 1100, "profundidade": 500, "posX": 600, "posZ": 1000, "rotY": 0, "material": "mdf_vermelho_fini", "prateleirasExternas": 2 },
+                                    { "tipo": "balcao_curvo", "largura": 500, "altura": 1100, "profundidade": 500, "raioCurva": 500, "posX": 1200, "posZ": 1000, "rotY": -90, "material": "mdf_preto_tx", "tampoVidro": true, "ripadoFrontal": true },
+                                    { "tipo": "balcao", "largura": 1000, "altura": 1100, "profundidade": 500, "posX": 1700, "posZ": 500, "rotY": 90, "material": "mdf_vermelho_fini", "gavetas": 2, "layoutInterno": "top_drawers" },
+                                    { "tipo": "balcao_curvo", "largura": 500, "altura": 1100, "profundidade": 500, "raioCurva": 500, "posX": 1700, "posZ": 0, "rotY": 180, "material": "mdf_preto_tx", "tampoVidro": true, "ripadoFrontal": true },
+                                    { "tipo": "painel_ripado_iluminado", "largura": 800, "altura": 2200, "profundidade": 150, "posX": 400, "posZ": -500, "rotY": 0, "material": "amadeirado_padrao" },
+                                    { "tipo": "painel_ripado_iluminado", "largura": 800, "altura": 2200, "profundidade": 150, "posX": -400, "posZ": -500, "rotY": 0, "material": "amadeirado_padrao" },
+                                    { "tipo": "balcao_curvo", "largura": 500, "altura": 1100, "profundidade": 500, "raioCurva": 500, "posX": -1200, "posZ": 0, "rotY": 90, "material": "mdf_preto_tx", "tampoVidro": true, "ripadoFrontal": true },
+                                    { "tipo": "expositor", "largura": 1000, "altura": 1100, "profundidade": 500, "posX": -1700, "posZ": 500, "rotY": -90, "material": "mdf_vermelho_fini", "prateleirasExternas": 2 }
+                                ]
+                            };
+
+                            // Limpa a cena e insere os módulos com as posições overrideadas pelo objeto JSON
+                            window.AppState.modules = [];
+                            layoutIlha.modulos.forEach(m => window.App.modules.add(m.tipo, m));
+                            
+                            window.App.ui.fecharHUDs();
+                            window.App.ui.hideLoader();
+                            window.App.ui.toast("Projeto Sênior em Ilha Gerado com Sucesso!");
+                        }, 1200);
+
+                        return; // O Interceptador para a execução aqui! Ele não chama a API.
+                    }
+                    // --- FIM DO INTERCEPTADOR SÊNIOR ---
+
+                    // Se não for quiosque, ele continua com a API Gemini normalmente...
+                    const key = window.AppState.apiKeys.gemini; 
                     if (!key) { window.App.ui.toggleModal('modalSettings'); return window.App.ui.toast("Insira a chave Gemini 2.5 Flash!"); } 
                     window.App.ui.showLoader("Oráculo Sênior Analisando..."); 
                     try { 
