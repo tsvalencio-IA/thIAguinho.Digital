@@ -3,173 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CAD Marcenaria Sênior - thIAguinho Soluções</title>
+    <title>thIAguinho CAD - Marcenaria Sênior</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <style>
         :root {
-            /* Paleta thIAguinho Soluções Sênior */
-            --primary-dark: #1A1A1A;     
-            --secondary-wood: #5C4033;   
-            --accent-gold: #DDA15E;      
-            --light-cream: #F5F5F5;      
-            --soft-beige: #EAEAEA;       
+            /* Paleta Ultra Premium thIAguinho */
+            --bg-color: #F8F9FA;
+            --surface-color: #FFFFFF;
+            --primary-dark: #1A1A1D;     
+            --secondary-wood: #6D4C41;   
+            --accent-gold: #D4AF37;      
             --earth-green: #2E7D32;      
-            --text-color: #111111;       
-            --border-soft: #CCCCCC;      
             --warning-red: #D32F2F;      
-            --success-green: #1B5E20;
             --ai-blue: #0D47A1;
-            --shadow-subtle: 0 8px 30px rgba(0, 0, 0, 0.08);
-            --shadow-heavy: 0 15px 50px rgba(0, 0, 0, 0.4);
-            --border-radius-lg: 24px;
-            --border-radius-md: 16px;
-            --border-radius-sm: 8px;
+            --text-main: #212529;
+            --text-muted: #6C757D;
+            --border-light: #E9ECEF;
+            
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.1);
+            --shadow-lg: 0 20px 40px rgba(0,0,0,0.2);
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Montserrat', sans-serif; background-color: var(--light-cream); color: var(--text-color); overflow: hidden; width: 100vw; height: 100vh; display: flex; flex-direction: column; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); overflow: hidden; width: 100vw; height: 100vh; display: flex; flex-direction: column; }
+        h1, h2, h3, h4, h5, .montserrat { font-family: 'Montserrat', sans-serif; }
 
-        .app-header { background-color: var(--primary-dark); color: #FFF; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-bottom: 3px solid var(--accent-gold); }
-        .app-header h1 { font-size: 1.3rem; font-weight: 900; letter-spacing: 0.5px; margin: 0; display: flex; align-items: center; gap: 12px; text-transform: uppercase; }
+        /* --- HEADER --- */
+        .app-header { background-color: var(--primary-dark); color: #FFF; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; box-shadow: var(--shadow-sm); border-bottom: 2px solid var(--accent-gold); }
+        .app-header h1 { font-size: 1.1rem; font-weight: 900; letter-spacing: 0.5px; margin: 0; display: flex; align-items: center; gap: 10px; text-transform: uppercase; }
         .app-header h1 span.brand { color: var(--accent-gold); }
-        .icon-btn { background: none; border: none; color: var(--accent-gold); font-size: 1.8rem; cursor: pointer; transition: transform 0.3s ease; }
-        .icon-btn:hover { transform: rotate(90deg) scale(1.1); }
+        .icon-btn { background: none; border: none; color: var(--accent-gold); font-size: 1.4rem; cursor: pointer; transition: transform 0.3s; padding: 5px; }
 
-        .footer-signature { position: absolute; top: 90px; left: 25px; font-size: 0.75rem; color: rgba(0,0,0,0.6); font-weight: 900; pointer-events: none; z-index: 40; text-transform: uppercase; letter-spacing: 2px; }
+        /* --- WATERMARK --- */
+        .footer-signature { position: absolute; top: 70px; left: 20px; font-size: 0.65rem; color: rgba(0,0,0,0.4); font-weight: 800; pointer-events: none; z-index: 40; text-transform: uppercase; letter-spacing: 1px; }
 
-        .top-tools { position: absolute; top: 90px; right: 25px; display: flex; gap: 10px; z-index: 50; flex-wrap: wrap; justify-content: flex-end; max-width: 80vw; }
-        .tool-btn { background: rgba(255,255,255,0.95); border: 2px solid var(--border-soft); color: var(--primary-dark); padding: 12px 18px; border-radius: var(--border-radius-md); font-weight: 800; font-family: 'Montserrat'; cursor: pointer; box-shadow: var(--shadow-subtle); display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; font-size: 0.9rem; text-transform: uppercase; }
-        .tool-btn:hover { border-color: var(--accent-gold); transform: translateY(-2px); }
-        .tool-btn.active { background: var(--ai-blue); color: white; border-color: var(--ai-blue); box-shadow: 0 8px 25px rgba(13, 71, 161, 0.4); }
-        .tool-btn.eraser.active { background: var(--warning-red); border-color: var(--warning-red); box-shadow: 0 8px 25px rgba(211, 47, 47, 0.4); }
+        /* --- TOP TOOLS (MINIMALISTA) --- */
+        .top-tools { position: absolute; top: 70px; right: 15px; display: flex; flex-direction: column; gap: 8px; z-index: 50; }
+        .tool-btn { background: var(--surface-color); border: 1px solid var(--border-light); color: var(--primary-dark); width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.1rem; cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.2s; }
+        .tool-btn span { display: none; } /* Oculta texto em mobile */
+        .tool-btn.active { background: var(--ai-blue); color: #FFF; border-color: var(--ai-blue); box-shadow: 0 4px 15px rgba(13,71,161,0.3); }
+        .tool-btn.eraser { color: var(--warning-red); }
+        .tool-btn.eraser.active { background: var(--warning-red); color: #FFF; border-color: var(--warning-red); box-shadow: 0 4px 15px rgba(211,47,47,0.3); }
 
-        #canvas-container { flex: 1; position: relative; width: 100%; height: 100%; background: radial-gradient(circle, #f0f4f8 0%, #cfd9df 100%); touch-action: none; }
-        canvas { display: block; width: 100% !important; height: 100% !important; outline: none; touch-action: none; }
+        /* --- CANVAS --- */
+        #canvas-container { flex: 1; position: relative; width: 100%; height: 100%; background: radial-gradient(circle, #FFFFFF 0%, #DCE2E8 100%); touch-action: none; margin-bottom: 65px; }
+        canvas { display: block; width: 100% !important; height: 100% !important; outline: none; }
 
-        .floating-controls { position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 50; background: rgba(255, 255, 255, 0.95); padding: 15px 30px; border-radius: 50px; box-shadow: var(--shadow-heavy); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); }
-        .fab-btn { background: transparent; border: none; color: var(--primary-dark); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.2s ease; min-width: 80px; gap: 8px; }
-        .fab-btn i { font-size: 1.8rem; color: var(--secondary-wood); transition: transform 0.2s ease; }
-        .fab-btn span { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-        .fab-btn.primary i { color: var(--ai-blue); }
-        .fab-btn.success i { color: var(--earth-green); }
-        .fab-btn:hover i { transform: translateY(-4px); color: var(--accent-gold); }
-        .fab-btn:active i { transform: scale(0.9); }
+        /* --- BOTTOM NAVIGATION BAR --- */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; align-items: center; background: var(--surface-color); padding: 10px 5px; box-shadow: 0 -2px 15px rgba(0,0,0,0.05); z-index: 90; padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+        .nav-item { background: transparent; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; flex: 1; transition: color 0.2s; }
+        .nav-item i { font-size: 1.4rem; transition: transform 0.2s; }
+        .nav-item span { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; font-family: 'Montserrat'; }
+        .nav-item.active { color: var(--ai-blue); }
+        .nav-item.active i { transform: translateY(-2px); }
+        .nav-item.highlight { color: var(--earth-green); }
 
-        .floating-buttons { position: fixed; bottom: 35px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 1000; }
-        .floating-button { background-color: var(--secondary-wood); color: white; padding: 15px 25px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); font-size: 1.05em; font-weight: 700; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 12px; border: none; cursor: pointer; font-family: 'Montserrat'; text-transform: uppercase; }
-        .floating-button.mascote { background-color: #FFC107; color: var(--primary-dark); font-weight: 900; letter-spacing: 1px; border: 2px solid #FFA000; }
-        .floating-button.mascote:hover { background-color: #FFA000; transform: scale(1.05); box-shadow: 0 6px 20px rgba(255, 193, 7, 0.5); }
+        /* --- MASCOTE --- */
+        .mascote-btn { position: fixed; bottom: 85px; right: 15px; background: #FFC107; color: var(--primary-dark); width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; box-shadow: var(--shadow-md); border: 2px solid #FF9800; cursor: pointer; z-index: 85; transition: transform 0.3s; }
+        .mascote-btn:hover { transform: scale(1.1); }
 
-        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 85vh; background-color: var(--soft-beige); border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0; box-shadow: var(--shadow-heavy); z-index: 200; transition: bottom 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; }
+        /* --- BOTTOM SHEETS --- */
+        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 85vh; background: var(--bg-color); border-radius: var(--radius-lg) var(--radius-lg) 0 0; box-shadow: var(--shadow-lg); z-index: 200; transition: bottom 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; }
         .bottom-sheet.active { bottom: 0; }
-        .sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 25px 30px; border-bottom: 2px solid var(--border-soft); background-color: #FFF; border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0; }
-        .sheet-header h3 { color: var(--primary-dark); margin: 0; font-size: 1.3rem; font-weight: 900; display: flex; align-items: center; gap: 12px; text-transform: uppercase; }
-        .close-btn { background: #EEE; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-weight: bold; color: var(--warning-red); display: flex; justify-content: center; align-items: center; transition: all 0.3s ease; font-size: 1.5rem; }
-        .close-btn:hover { background: var(--warning-red); color: white; transform: rotate(90deg); }
-        .sheet-body { padding: 30px; overflow-y: auto; flex: 1; scrollbar-width: none; }
-        .sheet-body::-webkit-scrollbar { display: none; }
+        .sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: var(--surface-color); border-radius: var(--radius-lg) var(--radius-lg) 0 0; border-bottom: 1px solid var(--border-light); }
+        .sheet-header h3 { margin: 0; font-size: 1.1rem; font-weight: 900; display: flex; align-items: center; gap: 10px; color: var(--primary-dark); text-transform: uppercase; }
+        .close-btn { background: var(--border-light); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; color: var(--text-muted); font-size: 1.2rem; transition: all 0.2s; }
+        .close-btn:hover { background: var(--warning-red); color: #FFF; }
+        .sheet-body { padding: 20px; overflow-y: auto; flex: 1; padding-bottom: 40px; }
 
-        .floating-editor { position: fixed; bottom: -100%; right: 0; width: 100%; max-height: 50vh; background: #FFF; box-shadow: var(--shadow-heavy); z-index: 300; transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); overflow-y: auto; padding: 25px; border-top: 8px solid var(--ai-blue); border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0; }
+        /* --- EDITOR DA PEÇA (RETRÁTIL / ACCORDION) --- */
+        .floating-editor { position: fixed; bottom: -100%; right: 0; width: 100%; max-height: 80vh; background: var(--surface-color); box-shadow: var(--shadow-lg); z-index: 300; transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; border-top: 4px solid var(--ai-blue); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
         .floating-editor.active { bottom: 0; }
+        .editor-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); }
+        .editor-header h4 { margin: 0; font-size: 1.1rem; color: var(--ai-blue); font-family: 'Montserrat'; font-weight: 900; text-transform: uppercase; }
+        .editor-body { padding: 20px; overflow-y: auto; flex: 1; padding-bottom: 50px; }
+        
+        details.accordion { background: var(--bg-color); border: 1px solid var(--border-light); border-radius: var(--radius-sm); margin-bottom: 10px; overflow: hidden; }
+        details.accordion summary { padding: 15px; font-weight: 700; font-size: 0.9rem; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; color: var(--primary-dark); font-family: 'Montserrat'; text-transform: uppercase; user-select: none; }
+        details.accordion summary::after { content: '\f078'; font-family: 'Font Awesome 5 Free'; font-weight: 900; color: var(--text-muted); transition: transform 0.3s; }
+        details.accordion[open] summary::after { transform: rotate(180deg); }
+        details.accordion[open] summary { border-bottom: 1px solid var(--border-light); background: var(--surface-color); }
+        .accordion-content { padding: 15px; background: var(--surface-color); }
 
-        @media(min-width: 1024px) {
-            .floating-editor { top: 100px; bottom: 30px; right: 30px; width: 650px; max-height: calc(100vh - 130px); border-radius: var(--border-radius-lg); transform: translateX(120%); opacity: 0; border: 1px solid var(--border-soft); }
-            .floating-editor.active { transform: translateX(0); opacity: 1; bottom: auto; }
-            .bottom-sheet { width: 550px; left: 30px; bottom: 130px; border-radius: var(--border-radius-lg); max-height: 75vh; border: 1px solid var(--border-soft); }
-        }
+        /* --- COMPONENTES UI --- */
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 6px; color: var(--text-muted); text-transform: uppercase; }
+        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 12px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; font-size: 0.95rem; background: var(--bg-color); color: var(--text-main); transition: border-color 0.2s; }
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus { border-color: var(--ai-blue); outline: none; background: var(--surface-color); }
+        
+        .checkbox-group { display: flex; align-items: center; gap: 10px; padding: 10px 0; font-size: 0.9rem; font-weight: 600; color: var(--text-main); }
+        .checkbox-group input { width: 20px; height: 20px; accent-color: var(--ai-blue); }
 
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; font-size: 0.85rem; font-weight: 900; margin-bottom: 8px; color: var(--primary-dark); text-transform: uppercase; letter-spacing: 0.5px; }
-        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 14px; border: 2px solid var(--border-soft); border-radius: var(--border-radius-sm); font-family: inherit; font-size: 1rem; background: #FAFAFA; color: var(--text-color); font-weight: 600; transition: all 0.3s; }
-        .input-group input:focus, .input-group select:focus, .input-group textarea:focus { border-color: var(--ai-blue); background: #FFF; outline: none; box-shadow: 0 0 0 4px rgba(13, 71, 161, 0.1); }
-        .input-group textarea { resize: vertical; min-height: 120px; }
-
-        .checkbox-group { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; font-size: 0.95rem; font-weight: 700; color: var(--primary-dark); cursor: pointer; padding: 12px; background: #FFF; border: 2px solid var(--border-soft); border-radius: var(--border-radius-sm); transition: all 0.3s ease; }
-        .checkbox-group:hover { border-color: var(--ai-blue); background-color: #F0F4F8; }
-        .checkbox-group input { width: 24px; height: 24px; accent-color: var(--ai-blue); cursor: pointer; margin: 0; }
-
-        .btn-block { display: flex; width: 100%; padding: 18px; justify-content: center; align-items: center; border: none; border-radius: var(--border-radius-sm); font-weight: 900; font-size: 1.05rem; cursor: pointer; margin-bottom: 15px; gap: 12px; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 1px; background-color: #E0E0E0; color: var(--primary-dark); }
-        .btn-block.action-btn { background-color: var(--accent-gold); color: #FFF; box-shadow: 0 6px 20px rgba(221, 161, 94, 0.4); }
-        .btn-block.success { background-color: var(--earth-green); color: #FFF; box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4); }
-        .btn-block.primary { background-color: var(--ai-blue); color: #FFF; box-shadow: 0 6px 20px rgba(13, 71, 161, 0.4); }
-        .btn-block.danger { background-color: var(--warning-red); color: #FFF; box-shadow: 0 6px 20px rgba(198, 40, 40, 0.4); }
-        .btn-block.recording { background-color: var(--warning-red); color: #fff; animation: pulseRecord 1.5s infinite; }
-        .btn-block:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn-block { display: flex; width: 100%; padding: 15px; justify-content: center; align-items: center; border: none; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.95rem; cursor: pointer; gap: 8px; font-family: 'Montserrat'; text-transform: uppercase; transition: transform 0.1s, filter 0.2s; margin-bottom: 10px; }
         .btn-block:active { transform: scale(0.98); }
+        .btn-block.primary { background: var(--ai-blue); color: #FFF; }
+        .btn-block.success { background: var(--earth-green); color: #FFF; }
+        .btn-block.danger { background: var(--warning-red); color: #FFF; }
+        .btn-block.action { background: var(--accent-gold); color: #FFF; }
 
-        @keyframes pulseRecord { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7); } 50% { transform: scale(1.02); box-shadow: 0 0 0 15px rgba(211, 47, 47, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); } }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 
-        .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .grid-4-col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .module-card { background: var(--surface-color); border-left: 6px solid var(--accent-gold); padding: 15px; margin-bottom: 15px; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); border-top: 1px solid var(--border-light); border-right: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); }
+        .module-card h4 { margin-bottom: 5px; color: var(--primary-dark); font-size: 1rem; }
+        .module-card p { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
 
-        .module-card { background: #FFF; border-left: 8px solid var(--accent-gold); padding: 20px; margin-bottom: 20px; border-radius: var(--border-radius-md); box-shadow: var(--shadow-subtle); cursor: pointer; border-right: 1px solid #EEE; border-top: 1px solid #EEE; border-bottom: 1px solid #EEE; transition: all 0.3s ease; }
-        .module-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-heavy); }
-        .module-card.selected { border-left-color: var(--ai-blue); background: #E3F2FD; }
-        .module-card h4 { margin-bottom: 8px; color: var(--primary-dark); font-size: 1.1rem; text-transform: uppercase; font-weight: 900; }
-        .module-card p { font-size: 0.95rem; color: #555; margin-bottom: 12px; font-weight: 600; }
+        /* --- PREÇO E BOM --- */
+        .price-box { background: var(--surface-color); border: 2px dashed var(--accent-gold); border-radius: var(--radius-md); padding: 20px; text-align: center; margin-bottom: 20px; }
+        .price-box h4 { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; }
+        .price-box .value { font-size: 2.5rem; font-weight: 900; color: var(--earth-green); margin: 0; font-family: 'Montserrat'; letter-spacing: -1px; }
 
-        .price-summary { margin-top: 30px; padding: 35px 20px; background-color: #FFF; border: 3px dashed var(--accent-gold); border-radius: var(--border-radius-lg); text-align: center; }
-        .price-summary h4 { color: var(--primary-dark); font-size: 1.3rem; margin-bottom: 10px; text-transform: uppercase; font-weight: 900; }
-        .price-summary p { font-size: 3.5rem; font-weight: 900; color: var(--earth-green); letter-spacing: -1px; margin: 15px 0; }
+        .bom-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 0.85rem; font-weight: 600; }
+        .bom-row:last-child { border-bottom: none; }
+        .bom-val { color: var(--primary-dark); font-weight: 800; }
 
-        .bom-detail { font-size: 0.95rem; color: #333; text-transform: uppercase; font-weight: 800; display: flex; justify-content: space-between; border-top: 1px solid #DDD; padding-top: 15px; margin-top: 10px; }
-        .bom-hardware-list { font-size: 0.85rem; color: var(--ai-blue); font-weight: 700; text-align: right; margin-top: 5px; text-transform: none; }
+        /* --- INDICADORES --- */
+        #longPressIndicator { position: fixed; width: 50px; height: 50px; border: 5px solid var(--ai-blue); border-radius: 50%; border-top-color: transparent; animation: spin 0.8s linear infinite; display: none; z-index: 1000; pointer-events: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .switch-container { display: flex; background: #E0E0E0; border-radius: var(--border-radius-sm); padding: 6px; margin-bottom: 25px; }
-        .switch-btn { flex: 1; padding: 15px; text-align: center; font-size: 0.95rem; font-weight: 800; border-radius: 6px; cursor: pointer; transition: all 0.3s; color: #555; text-transform: uppercase; }
-        .switch-btn.active { background: var(--ai-blue); color: white; box-shadow: var(--shadow-subtle); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(4px); }
+        .modal-content { background: var(--surface-color); padding: 25px; border-radius: var(--radius-md); width: 90%; max-width: 400px; }
+        .loader { border: 6px solid var(--border-light); border-top: 6px solid var(--accent-gold); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin-bottom: 20px; }
 
-        #longPressIndicator { position: fixed; width: 80px; height: 80px; border: 8px solid var(--ai-blue); border-radius: 50%; border-top-color: transparent; animation: spinLoad 0.6s cubic-bezier(0.5, 0, 0.5, 1) infinite; display: none; z-index: 1000; pointer-events: none; }
-        #imgPreviewContainer { margin-top: 20px; text-align: center; display: none; background: #fff; border-radius: var(--border-radius-md); padding: 15px; border: 2px dashed var(--border-soft); }
-        #imgPreviewContainer img { max-width: 100%; max-height: 250px; border-radius: var(--border-radius-sm); object-fit: contain; }
+        #toast { visibility: hidden; min-width: 250px; background: var(--primary-dark); color: #fff; text-align: center; border-radius: 30px; padding: 12px 20px; position: fixed; z-index: 3000; left: 50%; bottom: 80px; transform: translateX(-50%); font-size: 0.9rem; font-weight: 700; box-shadow: var(--shadow-lg); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        #toast.show { visibility: visible; }
+        #toast.success { background: var(--success-green); }
+        #toast.warning { background: #FF9800; color: #000; }
+        #toast.error { background: var(--warning-red); }
 
-        .modal-overlay, .status-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(10px); }
-        .modal-content { background: #FFF; padding: 40px; border-radius: var(--border-radius-lg); width: 90%; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
-
-        .loader { border: 8px solid rgba(255,255,255,0.1); border-top: 8px solid var(--accent-gold); border-radius: 50%; width: 80px; height: 80px; animation: spinLoad 1s linear infinite; margin-bottom: 30px; }
-        .status-overlay p { color: white; font-weight: 900; font-size: 1.5rem; text-align: center; letter-spacing: 1px; text-transform: uppercase; }
-
-        #toast { visibility: hidden; min-width: 350px; background-color: var(--primary-dark); color: #fff; text-align: center; border-radius: 40px; padding: 20px 30px; position: fixed; z-index: 3000; left: 50%; bottom: 140px; transform: translateX(-50%); font-size: 1.1rem; box-shadow: 0px 20px 50px rgba(0,0,0,0.6); font-weight: 800; border: 2px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; gap: 12px; }
-        #toast.show { visibility: visible; animation: fadeinToast 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), fadeoutToast 0.4s 4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        #toast.success { border-color: var(--success-green); background-color: var(--success-green); }
-        #toast.error { background-color: var(--warning-red); border-color: #FFCDD2; }
-        #toast.warning { background-color: #FF9800; border-color: #FFE082; color: #111; }
-
-        @keyframes fadeinToast { from {bottom: 100px; opacity: 0;} to {bottom: 140px; opacity: 1;} }
-        @keyframes fadeoutToast { from {bottom: 140px; opacity: 1;} to {bottom: 100px; opacity: 0;} }
-        @keyframes spinLoad { to { transform: rotate(360deg); } }
-
-        .cut-board { background: #d7ccc8; border: 2px solid #5d4037; position: relative; margin-bottom: 20px; border-radius: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        .cut-part { position: absolute; background: rgba(255,255,255,0.8); border: 1px solid #3e2723; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; overflow: hidden; color: #3e2723; text-align: center; }
+        /* MODO DESKTOP ADAPTAÇÃO */
+        @media(min-width: 768px) {
+            .top-tools { flex-direction: row; right: 20px; top: 85px; }
+            .tool-btn { width: auto; border-radius: var(--radius-sm); padding: 10px 15px; }
+            .tool-btn span { display: inline; }
+            .bottom-nav { display: none; }
+            #canvas-container { margin-bottom: 0; }
+            .floating-controls { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; background: var(--surface-color); padding: 15px 30px; border-radius: 50px; box-shadow: var(--shadow-md); border: 1px solid var(--border-light); gap: 20px; }
+            .fab-btn { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; color: var(--text-muted); }
+            .fab-btn i { font-size: 1.5rem; color: var(--primary-dark); }
+            .fab-btn span { font-size: 0.7rem; font-weight: 800; font-family: 'Montserrat'; text-transform: uppercase; }
+            .floating-editor { top: 80px; bottom: 30px; right: 30px; width: 450px; max-height: calc(100vh - 110px); border-radius: var(--radius-md); transform: translateX(120%); border: 1px solid var(--border-light); border-top: 6px solid var(--ai-blue); }
+            .floating-editor.active { transform: translateX(0); }
+            .bottom-sheet { width: 400px; left: 30px; bottom: 30px; border-radius: var(--radius-md); max-height: 80vh; border: 1px solid var(--border-light); }
+            .mascote-btn { bottom: 30px; right: 30px; width: 60px; height: 60px; font-size: 1.8rem; }
+        }
     </style>
 </head>
 <body>
 
     <header class="app-header" id="mainHeader">
-        <h1><i class="fas fa-cube"></i> <span class="brand">thIAguinho Soluções</span> | CAD CRM Sênior</h1>
-        <button class="icon-btn" onclick="window.App.ui.toggleModal('modalSettings')"><i class="fas fa-sliders-h"></i></button>
+        <h1><i class="fas fa-cube"></i> <span class="brand">thIAguinho</span> | CAD</h1>
+        <button class="icon-btn" onclick="window.App.ui.toggleModal('modalSettings')"><i class="fas fa-cog"></i></button>
     </header>
 
-    <div class="footer-signature" id="mainSignature">ENGINE: ORÁCULO ABSOLUTO & CSG SWEEPING (100% REAL)</div>
+    <div class="footer-signature" id="mainSignature">ENGINE: CSG & MODULARIDADE (NÍVEL INDUSTRIAL)</div>
 
+    <!-- Ferramentas Flutuantes -->
     <div class="top-tools" id="toolModeContainer">
-        <button class="tool-btn active" id="btnOrbit" onclick="window.App.ar.setModoCamera('orbit')">
-            <i class="fas fa-hand-pointer"></i> Interagir (Tocar/Abrir)
+        <button class="tool-btn active" onclick="window.App.ar.setModoCamera('orbit', this)">
+            <i class="fas fa-hand-pointer"></i> <span>Interagir</span>
         </button>
-        <button class="tool-btn" id="btnMove" onclick="window.App.ar.setModoCamera('move')">
-            <i class="fas fa-arrows-alt"></i> Mover Móvel
+        <button class="tool-btn" onclick="window.App.ar.setModoCamera('move', this)">
+            <i class="fas fa-arrows-alt"></i> <span>Mover</span>
         </button>
-        <button class="tool-btn" id="btnAddComp" onclick="window.App.ar.setModoCamera('add_comp')">
-            <i class="fas fa-plus"></i> Inserir Porta (Clique)
+        <button class="tool-btn" onclick="window.App.ar.setModoCamera('add_comp', this)">
+            <i class="fas fa-plus"></i> <span>Inserir</span>
         </button>
-        <button class="tool-btn" id="btnRemovePart" onclick="window.App.ar.setModoCamera('remove_part')" style="color: var(--warning-red); border-color: var(--warning-red);">
-            <i class="fas fa-eraser"></i> Destruir Peça (Borracha)
+        <button class="tool-btn eraser" onclick="window.App.ar.setModoCamera('remove_part', this)" title="Destruir Peça (Borracha)">
+            <i class="fas fa-eraser"></i> <span>Borracha</span>
         </button>
     </div>
 
@@ -179,478 +191,312 @@
     </div>
     <div id="longPressIndicator"></div>
 
-    <button id="btnExitPrint" onclick="window.App.ar.exitPrintMode()">SAIR DO MODO DE FOTOGRAFIA</button>
+    <!-- Botão da Mascote Promob -->
+    <button class="mascote-btn" onclick="window.App.ui.toast('Inteligência Artificial Sênior pronta para orçar e desenhar.','success')">
+        <i class="fas fa-headset"></i>
+    </button>
 
-    <div class="floating-controls" id="mainControls">
-        <button class="fab-btn primary" onclick="window.App.ui.abrirHUD('hudIA')">
+    <!-- Navegação Mobile Bottom -->
+    <div class="bottom-nav">
+        <button class="nav-item" onclick="window.App.ui.abrirHUD('hudIA')">
             <i class="fas fa-brain"></i><span>Sênior IA</span>
         </button>
-        <button class="fab-btn" onclick="window.App.ui.abrirHUD('hudLista')">
-            <i class="fas fa-cubes"></i><span>Cena Atual</span>
+        <button class="nav-item" onclick="window.App.ui.abrirHUD('hudLista')">
+            <i class="fas fa-cubes"></i><span>Cena</span>
         </button>
-        <button class="fab-btn" onclick="window.App.ui.abrirHUD('perspectiveHUD')">
-            <i class="fas fa-vr-cardboard"></i><span>Estúdio AR</span>
+        <button class="nav-item" onclick="window.App.ui.abrirHUD('perspectiveHUD')">
+            <i class="fas fa-vr-cardboard"></i><span>AR</span>
         </button>
-        <button class="fab-btn success" onclick="window.App.ui.abrirHUD('hudOrcamento')">
-            <i class="fas fa-file-invoice-dollar"></i><span>Custos Fabris</span>
+        <button class="nav-item highlight" onclick="window.App.ui.abrirHUD('hudOrcamento')">
+            <i class="fas fa-file-invoice-dollar"></i><span>Custos</span>
         </button>
     </div>
 
+    <!-- Navegação Desktop -->
+    <div class="floating-controls" style="display:none;" id="desktopNav">
+        <button class="fab-btn" onclick="window.App.ui.abrirHUD('hudIA')"><i class="fas fa-brain" style="color:var(--ai-blue)"></i><span>Sênior IA</span></button>
+        <button class="fab-btn" onclick="window.App.ui.abrirHUD('hudLista')"><i class="fas fa-cubes"></i><span>Cena Atual</span></button>
+        <button class="fab-btn" onclick="window.App.ui.abrirHUD('perspectiveHUD')"><i class="fas fa-vr-cardboard"></i><span>Estúdio AR</span></button>
+        <button class="fab-btn" onclick="window.App.ui.abrirHUD('hudOrcamento')"><i class="fas fa-file-invoice-dollar" style="color:var(--earth-green)"></i><span>Custos Fabris</span></button>
+    </div>
+
+    <!-- MENUS (BOTTOM SHEETS) -->
+    
+    <!-- 1. Menu Inteligência Artificial -->
     <div id="hudIA" class="bottom-sheet">
-        <div class="sheet-header">
-            <h3><i class="fas fa-robot"></i> Cérebro de Marcenaria IA</h3>
-            <button class="close-btn" onclick="window.App.ui.fecharHUDs()">×</button>
-        </div>
+        <div class="sheet-header"><h3><i class="fas fa-robot"></i> Cérebro IA</h3><button class="close-btn" onclick="window.App.ui.fecharHUDs()"><i class="fas fa-times"></i></button></div>
         <div class="sheet-body">
-            <div class="grid-2-col">
-                <button class="btn-block primary" id="btnRecord" onclick="window.App.ai.toggleRecording()">
-                    <i class="fas fa-microphone"></i> Gravar Voz
-                </button>
-                <div class="input-group" style="margin: 0;">
-                    <input type="file" id="audioFile" style="display:none;" onchange="window.App.ai.uploadAudio(this)">
-                    <label for="audioFile" class="btn-block" style="background:#546e7a; color:#fff; cursor:pointer; margin:0;">
-                        <i class="fas fa-upload"></i> Enviar Áudio
-                    </label>
-                </div>
+            <div class="grid-2">
+                <button class="btn-block primary" id="btnRecord" onclick="window.App.ai.toggleRecording()"><i class="fas fa-microphone"></i> Falar</button>
+                <div class="input-group" style="margin:0;"><input type="file" id="fotoCliente" accept="image/*" style="display:none;" onchange="window.App.ai.processPhoto(this)"><label for="fotoCliente" class="btn-block action" style="margin:0; cursor:pointer;"><i class="fas fa-camera"></i> Referência</label></div>
             </div>
-            <p id="transcriptionText" style="font-size:0.9rem; color:var(--success-green); font-weight:800; text-align:center; margin:15px 0;"></p>
+            <p id="transcriptionText" style="font-size:0.8rem; color:var(--earth-green); font-weight:700; text-align:center; margin:10px 0;"></p>
             <div class="input-group">
-                <label>Instruções Complexas (Prompt Livre)</label>
-                <textarea id="textoAdicional" placeholder="Ex: Crie um balcão curvo com ripado iluminado, um sofá curvo orgânico e uma mesa redonda ripada..."></textarea>
+                <textarea id="textoAdicional" placeholder="Ex: Crie um balcão curvo Nova Romana com expositor, e uma mesa redonda ripada..."></textarea>
             </div>
-            <div class="input-group">
-                <input type="file" id="fotoCliente" accept="image/*" style="display:none;" onchange="window.App.ai.processPhoto(this)">
-                <label for="fotoCliente" class="btn-block action-btn" style="margin:0; cursor:pointer;">
-                    <i class="fas fa-camera"></i> Anexar Foto do Ambiente/Ref
-                </label>
-            </div>
-            <div id="imgPreviewContainer"><img id="imagePreview" src=""></div>
-            <button class="btn-block success" style="margin-top:25px; padding:20px; font-size:1.1rem;" onclick="window.App.ai.generateWithOracle()">
-                <i class="fas fa-magic"></i> Gerar Projeto de Marcenaria
-            </button>
+            <div id="imgPreviewContainer" style="display:none; text-align:center; margin-bottom:15px;"><img id="imagePreview" style="max-height:120px; border-radius:8px;"></div>
+            <button class="btn-block success" onclick="window.App.ai.generateWithOracle()"><i class="fas fa-magic"></i> Gerar Projeto Sênior</button>
         </div>
     </div>
 
+    <!-- 2. Menu Lista de Cena -->
     <div id="hudLista" class="bottom-sheet">
-        <div class="sheet-header">
-            <h3><i class="fas fa-list"></i> Composição do Ambiente</h3>
-            <button class="close-btn" onclick="window.App.ui.fecharHUDs()">×</button>
-        </div>
+        <div class="sheet-header"><h3><i class="fas fa-list"></i> Peças da Cena</h3><button class="close-btn" onclick="window.App.ui.fecharHUDs()"><i class="fas fa-times"></i></button></div>
         <div class="sheet-body">
-            <p style="font-size: 0.9rem; color: #555; margin-bottom:20px; text-align:center; font-weight:700;">
-                <i class="fas fa-info-circle"></i> Pressione e segure o dedo sobre a peça no 3D para editar a engenharia. Use a ferramenta <i class="fas fa-eraser" style="color:red"></i> para destruir peças (fundo, teto, etc).
-            </p>
+            <p style="font-size:0.75rem; color:var(--text-muted); text-align:center;">Segure numa peça no 3D para editar. Use a borracha <i class="fas fa-eraser" style="color:red"></i> para destruir partes.</p>
             <div id="listaModulosContainer"></div>
-            <button class="btn-block primary" style="margin-top:20px;" onclick="window.App.modules.addGeneric()">
-                <i class="fas fa-plus"></i> Inserir Novo Módulo Manualmente
-            </button>
-            <button class="btn-block success" style="margin-top:15px;" onclick="window.App.modules.exportarProjeto()">
-                <i class="fas fa-file-export"></i> Exportar Projeto (JSON)
-            </button>
+            <button class="btn-block primary" onclick="window.App.modules.addGeneric()"><i class="fas fa-plus"></i> Novo Módulo</button>
+            <button class="btn-block action" onclick="window.App.modules.exportarProjeto()"><i class="fas fa-save"></i> Exportar Projeto</button>
         </div>
     </div>
 
+    <!-- 3. Menu AR / Estúdio -->
     <div id="perspectiveHUD" class="bottom-sheet">
-        <div class="sheet-header">
-            <h3><i class="fas fa-camera"></i> Estúdio de Posicionamento AR</h3>
-            <button class="close-btn" onclick="window.App.ui.fecharHUDs()">×</button>
-        </div>
+        <div class="sheet-header"><h3><i class="fas fa-vr-cardboard"></i> Estúdio AR</h3><button class="close-btn" onclick="window.App.ui.fecharHUDs()"><i class="fas fa-times"></i></button></div>
         <div class="sheet-body">
-            <div class="switch-container">
-                <div class="switch-btn" id="sw-peca" onclick="window.App.ar.setModoInteracao('peca')">Mover Peça Única</div>
-                <div class="switch-btn active" id="sw-projeto" onclick="window.App.ar.setModoInteracao('projeto')">Mover Todo O Projeto</div>
-            </div>
-            <button class="btn-block primary" onclick="window.App.ar.toggleAR()">
-                <i class="fas fa-image"></i> <span id="arBtnText">Ativar Fundo Real Fotográfico</span>
-            </button>
-            <div class="input-group" style="margin-top: 25px;">
-                <label>Escala do Projeto Geral</label>
-                <input type="range" id="camScale" min="0.1" max="5" step="0.05" value="1" oninput="window.App.ar.applyTransform()">
-            </div>
-            <div class="input-group">
-                <label>Giro do Ambiente (Eixo Y)</label>
-                <input type="range" id="camRotY" min="-3.14" max="3.14" step="0.05" value="0" oninput="window.App.ar.applyTransform()">
-            </div>
-            <div class="input-group">
-                <label>Inclinação da Parede (Eixo X)</label>
-                <input type="range" id="camRotX" min="-1.5" max="1.5" step="0.01" value="0" oninput="window.App.ar.applyTransform()">
-            </div>
-            <div class="grid-2-col" style="margin-top:30px;">
-                <button class="btn-block success" onclick="window.App.ar.enterPrintMode()"><i class="fas fa-camera"></i> Câmera Limpa (Foto)</button>
-                <button class="btn-block danger" onclick="window.App.ar.resetAR()"><i class="fas fa-undo"></i> Resetar Eixos</button>
+            <button class="btn-block primary" onclick="window.App.ar.toggleAR()"><i class="fas fa-image"></i> <span id="arBtnText">Ligar Fundo Foto</span></button>
+            <div class="input-group"><label>Escala Global</label><input type="range" id="camScale" min="0.1" max="5" step="0.05" value="1" oninput="window.App.ar.applyTransform()"></div>
+            <div class="input-group"><label>Giro Y</label><input type="range" id="camRotY" min="-3.14" max="3.14" step="0.05" value="0" oninput="window.App.ar.applyTransform()"></div>
+            <div class="input-group"><label>Tombamento X (Perspectiva)</label><input type="range" id="camRotX" min="-1.5" max="1.5" step="0.01" value="0" oninput="window.App.ar.applyTransform()"></div>
+            <div class="grid-2">
+                <button class="btn-block success" onclick="window.App.ui.toast('Câmera preparada','success')"><i class="fas fa-camera"></i> Foto</button>
+                <button class="btn-block danger" onclick="window.App.ar.resetAR()"><i class="fas fa-undo"></i> Reset</button>
             </div>
         </div>
     </div>
 
+    <!-- 4. Menu Custos e Corte -->
     <div id="hudOrcamento" class="bottom-sheet">
-        <div class="sheet-header">
-            <h3><i class="fas fa-calculator"></i> Orçamento Industrial Sênior</h3>
-            <button class="close-btn" onclick="window.App.ui.fecharHUDs()">×</button>
-        </div>
+        <div class="sheet-header"><h3><i class="fas fa-calculator"></i> Gestão de Custos</h3><button class="close-btn" onclick="window.App.ui.fecharHUDs()"><i class="fas fa-times"></i></button></div>
         <div class="sheet-body">
-            <div class="price-summary">
-                <h4>Valor Final Sugerido</h4>
-                <p id="bom-price">R$ 0,00</p>
+            <div class="price-box">
+                <h4>Sugestão de Venda</h4>
+                <p class="value" id="bom-price">R$ 0,00</p>
             </div>
-            <p style="font-size:0.85rem; color:#555; text-align:center; font-weight:700; margin-bottom: 25px;">
-                Cálculo de volumetria exata granular (+15% perda), ferragens unitárias e materiais customizados.
-            </p>
-            <div class="grid-2-col" style="margin-bottom: 25px;">
-                <button class="btn-block action-btn" onclick="window.CutPlanEngine.generate()"><i class="fas fa-border-all"></i> Analisar Plano Corte</button>
-                <button class="btn-block primary" onclick="window.ExportEngine.exportDXF()"><i class="fas fa-file-export"></i> Exportar DXF CNC</button>
+            <div class="grid-2">
+                <button class="btn-block action" onclick="window.CutPlanEngine.generate()"><i class="fas fa-border-all"></i> Nesting (Corte)</button>
+                <button class="btn-block primary" onclick="window.ExportEngine.exportDXF()"><i class="fas fa-file-export"></i> Exportar DXF</button>
             </div>
+            <div id="cutPlanContainer" style="margin: 15px 0;"></div>
             
-            <div id="cutPlanContainer" style="margin-bottom: 25px;"></div>
+            <details class="accordion">
+                <summary>Ajuste de Variáveis (R$)</summary>
+                <div class="accordion-content grid-2">
+                    <div class="input-group"><label>MDF (R$/m²)</label><input type="number" id="cost-mdf" value="85.00" onchange="window.App.bom.updateParams()"></div>
+                    <div class="input-group"><label>M. Obra (R$/m²)</label><input type="number" id="cost-labor" value="80.00" onchange="window.App.bom.updateParams()"></div>
+                    <div class="input-group"><label>Extra Hardware</label><input type="number" id="cost-hardware" value="0.00" onchange="window.App.bom.updateParams()"></div>
+                    <div class="input-group"><label>Lucro (%)</label><input type="number" id="cost-margin" value="40" onchange="window.App.bom.updateParams()"></div>
+                </div>
+            </details>
 
-            <div class="grid-2-col">
-                <div class="input-group"><label>MDF Base (R$/m²)</label><input type="number" id="cost-mdf" value="85.00" onchange="window.App.bom.updateParams()"></div>
-                <div class="input-group"><label>M. Obra Base (R$/m²)</label><input type="number" id="cost-labor" value="80.00" onchange="window.App.bom.updateParams()"></div>
-                <div class="input-group"><label>Ferragens Adicionais (R$)</label><input type="number" id="cost-hardware" value="0.00" onchange="window.App.bom.updateParams()"></div>
-                <div class="input-group"><label>Margem de Lucro (%)</label><input type="number" id="cost-margin" value="40" onchange="window.App.bom.updateParams()"></div>
-            </div>
-            <div class="bom-detail"><span>Consumo de Chapa Físico:</span><span id="bom-area" style="color:var(--primary-dark);">0.00 m²</span></div>
-            <div class="bom-detail">
-                <span>Ferragens Contabilizadas:</span> 
-                <div style="text-align: right;"><span id="bom-hw-cost" style="color:var(--primary-dark);">R$ 0,00</span><div class="bom-hardware-list" id="bom-hw-list">Nenhuma ferragem identificada.</div></div>
-            </div>
-            <div class="bom-detail"><span>Custos Materiais Total (MDF + HW):</span><span id="bom-mat" style="color:var(--primary-dark);">R$ 0,00</span></div>
-            <div class="bom-detail"><span>Custo Fabril (Mão de Obra Lógica):</span><span id="bom-mobra" style="color:var(--primary-dark);">R$ 0,00</span></div>
-            <div class="bom-detail" style="color:var(--success-green); border-top: 3px dashed #E0E0E0; padding-top:15px; margin-top: 15px;"><span>Lucro Estimado (Líquido):</span><span id="bom-profit">R$ 0,00</span></div>
+            <div class="bom-row"><span>Consumo de Chapa Físico:</span><span class="bom-val" id="bom-area">0.00 m²</span></div>
+            <div class="bom-row"><span>Ferragens / Mecanismos:</span> <span class="bom-val" id="bom-hw-cost">R$ 0,00</span></div>
+            <div class="bom-row"><span><i class="fas fa-info-circle"></i> Lista HW:</span> <span id="bom-hw-list" style="font-size:0.75rem; color:var(--text-muted); font-weight:500;">Nenhuma</span></div>
+            <div class="bom-row"><span>Custo Material Total:</span><span class="bom-val" id="bom-mat">R$ 0,00</span></div>
+            <div class="bom-row"><span>Custo Fabricação (MO):</span><span class="bom-val" id="bom-mobra">R$ 0,00</span></div>
+            <div class="bom-row" style="color:var(--earth-green); font-size:1rem; border-top:2px solid var(--border-light); padding-top:15px;"><span>Lucro Líquido:</span><span class="bom-val" id="bom-profit">R$ 0,00</span></div>
         </div>
     </div>
 
+    <!-- EDITOR FLUTUANTE DA PEÇA (ACCORDION MOBILE) -->
     <div id="floatingEditor" class="floating-editor">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 3px solid var(--border-soft); padding-bottom:15px; margin-bottom:20px;">
-            <h4 style="color:var(--ai-blue); font-size:1.1rem; font-weight:900; text-transform: uppercase;"><i class="fas fa-tools"></i> Engenharia da Peça</h4>
-            <button class="close-btn" onclick="window.App.ui.fecharEditor()">×</button>
+        <div class="editor-header">
+            <h4><i class="fas fa-tools"></i> Propriedades</h4>
+            <button class="close-btn" onclick="window.App.ui.fecharEditor()"><i class="fas fa-times"></i></button>
         </div>
-        <input type="hidden" id="eId">
-        
-        <div class="grid-2-col">
-            <div class="input-group">
-                <label>Categoria Tipológica (Comercial / Sênior)</label>
-                <select id="eT" onchange="window.App.ui.syncToState()">
-                    <option value="mesa_redonda_ripada">Mesa Redonda Ripada (Ref)</option>
-                    <option value="sofa_curvo">Sofá Curvo Orgânico (Ref)</option>
-                    <option value="painel_ripado_iluminado">Painel Ripado Iluminado (Ref)</option>
-                    <option value="balcao_curvo">Balcão Comercial Curvo</option>
-                    <option value="expositor">Expositor Inclinado Comercial</option>
-                    <option value="nicho_iluminado">Nicho com Iluminação LED</option>
-                    <option value="armario">Armário / Caixaria Padrão</option>
-                    <option value="balcao">Balcão de Atendimento Reto</option>
-                    <option value="guarda_roupa">Guarda-Roupa</option>
-                    <option value="mesa">Mesa (Trabalho/Jantar)</option>
-                    <option value="painel_tv">Painel de TV / Home</option>
-                    <option value="porta_avulsa">Porta Avulsa (Solo)</option>
-                    <option value="gaveta_avulsa">Gaveta Avulsa (Solo)</option>
-                    <option value="painel_fixo">Painel Fixo (Madeira)</option>
-                    <option value="sofa">Sofá Reto / Poltrona</option>
-                    <option value="puff">Puff</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>Formato Geométrico (Se aplicável)</label>
-                <select id="eFormato" onchange="window.App.ui.syncToState()">
-                    <option value="reto">Linha Reta (Padrão)</option><option value="L_esq">Módulo em L (Retorno Esquerdo)</option><option value="L_dir">Módulo em L (Retorno Direito)</option><option value="canto_obliquo">Canto Oblíquo (Quina 45º)</option><option value="canto_curvo">Canto Curvo</option><option value="redondo">Geometria Cilíndrica/Redonda</option>
-                </select>
-            </div>
-        </div>
+        <div class="editor-body">
+            <input type="hidden" id="eId">
+            
+            <details class="accordion" open>
+                <summary>Tipologia & Design Sênior</summary>
+                <div class="accordion-content">
+                    <div class="input-group">
+                        <label>Categoria (Móvel)</label>
+                        <select id="eT" onchange="window.App.ui.syncToState()">
+                            <option value="mesa_redonda_ripada">Mesa Redonda Ripada (Ref)</option>
+                            <option value="sofa_curvo">Sofá Curvo Orgânico (Ref)</option>
+                            <option value="painel_ripado_iluminado">Painel Ripado Iluminado</option>
+                            <option value="balcao_curvo">Balcão Comercial Curvo</option>
+                            <option value="expositor">Gôndola/Expositor Inclinado</option>
+                            <option value="nicho_iluminado">Nicho com Iluminação LED</option>
+                            <option value="armario">Armário / Caixaria Universal</option>
+                            <option value="balcao">Balcão Reto de Atendimento</option>
+                            <option value="guarda_roupa">Guarda-Roupa</option>
+                            <option value="mesa">Mesa Simples</option>
+                            <option value="painel_tv">Painel de TV</option>
+                            <option value="porta_avulsa">Porta Avulsa (Componente)</option>
+                            <option value="gaveta_avulsa">Gaveta Avulsa (Componente)</option>
+                        </select>
+                    </div>
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label>Formato de Planta</label>
+                            <select id="eFormato" onchange="window.App.ui.syncToState()">
+                                <option value="reto">Reta</option><option value="L_esq">L (Esquerdo)</option><option value="L_dir">L (Direito)</option><option value="redondo">Redondo</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Material Principal</label>
+                            <select id="eMat" onchange="window.App.ui.syncToState()">
+                                <option value="amadeirado_padrao">MDF Freijó</option><option value="carvalho_hanover">MDF Carvalho</option><option value="mdf_branco_diamante">MDF Branco</option><option value="mdf_preto_tx">Mármore/Granito Nero</option><option value="mdf_grafite">MDF Grafite</option><option value="tecido_linho">Tecido Linho (Sofás)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="padding-top:5px;">
+                        <label class="checkbox-group"><input type="checkbox" id="eRipado" onchange="window.App.ui.syncToState()"> Decorativo: Ripado Radial/Frontal</label>
+                        <label class="checkbox-group"><input type="checkbox" id="eVidro" onchange="window.App.ui.syncToState()"> Decorativo: Tampo Pedra/Vidro</label>
+                    </div>
+                </div>
+            </details>
 
-        <div class="input-group">
-            <label>Subdivisão de Chapa (Layout Interno)</label>
-            <div class="grid-2-col">
-                <select id="eLayoutInt" onchange="window.App.ui.syncToState()">
-                    <option value="apenas_portas">Volume Total p/ Portas</option><option value="apenas_gavetas">Volume Total p/ Gavetas</option><option value="top_drawers">Misto: Gavetas no Topo</option><option value="bottom_drawers">Misto: Gavetas na Base</option><option value="left_drawers">Misto: Gavetas à Esquerda</option><option value="right_drawers">Misto: Gavetas à Direita</option><option value="gavetas_internas">Gavetas Embutidas (Atrás da Porta)</option><option value="ilha_dupla">Ilha Dupla (Acesso Frente e Trás)</option>
-                </select>
-                <select id="eDobradica" onchange="window.App.ui.syncToState()">
-                    <option value="esq">Dobradiça Lado Esquerdo</option><option value="dir">Dobradiça Lado Direito</option>
-                </select>
-            </div>
-        </div>
+            <details class="accordion">
+                <summary>Divisões & Componentes</summary>
+                <div class="accordion-content">
+                    <div class="grid-2">
+                        <div class="input-group"><label>Portas</label><input type="number" id="ePo" oninput="window.App.ui.syncToState()"></div>
+                        <div class="input-group"><label>Gavetas</label><input type="number" id="eG" oninput="window.App.ui.syncToState()"></div>
+                        <div class="input-group"><label>Prat. Int</label><input type="number" id="ePr" oninput="window.App.ui.syncToState()"></div>
+                        <div class="input-group"><label>Prat. Ext</label><input type="number" id="ePratExt" oninput="window.App.ui.syncToState()"></div>
+                    </div>
+                    <div class="input-group">
+                        <label>Arranjo Interno</label>
+                        <select id="eLayoutInt" onchange="window.App.ui.syncToState()">
+                            <option value="apenas_portas">Apenas Portas</option><option value="apenas_gavetas">Apenas Gavetas</option><option value="top_drawers">Gavetas no Topo</option><option value="ilha_dupla">Ilha Dupla</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Mecanismo</label>
+                        <select id="eA" onchange="window.App.ui.syncToState()"><option value="giro">Dobradiça</option><option value="correr">Trilhos</option><option value="basculante">Pistão</option></select>
+                    </div>
+                </div>
+            </details>
 
-        <div class="grid-2-col">
-            <div class="input-group">
-                <label>Material Físico / Cor Global</label>
-                <select id="eMat" onchange="window.App.ui.syncToState()">
-                    <option value="amadeirado_padrao">MDF Amadeirado Padrão</option><option value="louro_freijo">MDF Louro Freijó</option><option value="carvalho_hanover">MDF Carvalho Hanover</option><option value="nogueira_cadiz">MDF Nogueira Cádiz</option><option value="mdf_branco_diamante">MDF Branco Diamante (Brilho)</option><option value="mdf_preto_tx">MDF Preto TX / Mármore</option><option value="mdf_grafite">MDF Grafite</option><option value="mdf_azul_petroleo">MDF Azul Petróleo</option><option value="mdf_verde_savia">MDF Verde Sálvia</option><option value="tecido_linho">Tecido Linho (Sofás/Puffs)</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>Mecanismo de Abertura</label>
-                <select id="eA" onchange="window.App.ui.syncToState()">
-                    <option value="giro">Dobradiça Tradicional</option><option value="correr">Trilhos de Alumínio</option><option value="basculante">Pistão a Gás</option>
-                </select>
-            </div>
-        </div>
+            <details class="accordion">
+                <summary>Dimensões & Posição 3D (mm)</summary>
+                <div class="accordion-content">
+                    <div class="grid-3">
+                        <div class="input-group"><label>Larg(W)</label><input type="number" id="eL" oninput="window.App.ui.syncToState()"></div>
+                        <div class="input-group"><label>Alt(H)</label><input type="number" id="eAl" oninput="window.App.ui.syncToState()"></div>
+                        <div class="input-group"><label>Prof(D)</label><input type="number" id="eP" oninput="window.App.ui.syncToState()"></div>
+                        <div class="input-group"><label>Raio/Braço</label><input type="number" id="eRetL" oninput="window.App.ui.syncToState()"></div>
+                        <div class="input-group"><label>Eixo X</label><input type="number" id="ePx" oninput="window.App.ui.syncToState()"></div>
+                        <div class="input-group"><label>Eixo Z</label><input type="number" id="ePz" oninput="window.App.ui.syncToState()"></div>
+                        <div class="input-group"><label>Giro Yº</label><input type="number" id="eRy" oninput="window.App.ui.syncToState()"></div>
+                    </div>
+                </div>
+            </details>
 
-        <div class="input-group">
-            <label>Opcionais Estruturais e de Luxo</label>
-            <div style="display:flex; gap:25px; flex-wrap:wrap;">
-                <label class="checkbox-group"><input type="checkbox" id="eRipado" onchange="window.App.ui.syncToState()"> Ripado Externo / Lateral</label>
-                <label class="checkbox-group"><input type="checkbox" id="eVidro" onchange="window.App.ui.syncToState()"> Tampo Vidro / Pedra</label>
-                <label class="checkbox-group"><input type="checkbox" id="eCantosArredondados" onchange="window.App.ui.syncToState()"> Quinas Arredondadas</label>
-                <label class="checkbox-group"><input type="checkbox" id="eFrentesInternas" onchange="window.App.ui.syncToState()"> Inverter Lado (Frentes Internas)</label>
+            <div style="margin-top: 20px;">
+                <button class="btn-block action" onclick="window.App.modules.restorePartsCurrent()"><i class="fas fa-hammer"></i> Restaurar Peças Apagadas</button>
+                <button class="btn-block danger" onclick="window.App.modules.removeCurrent()"><i class="fas fa-trash-alt"></i> Excluir Módulo Completo</button>
             </div>
-        </div>
-
-        <div class="input-group">
-            <label>Quantidade de Componentes</label>
-            <div class="grid-4-col">
-                <div><label>Portas</label><input type="number" id="ePo" title="Portas Físicas" oninput="window.App.ui.syncToState()"></div>
-                <div><label>Gavetas</label><input type="number" id="eG" title="Gavetas com Corrediça" oninput="window.App.ui.syncToState()"></div>
-                <div><label>Prat. In</label><input type="number" id="ePr" title="Prateleiras Internas" oninput="window.App.ui.syncToState()"></div>
-                <div><label>Prat. Ex</label><input type="number" id="ePratExt" title="Prateleiras Externas / Níveis Expositor" oninput="window.App.ui.syncToState()"></div>
-            </div>
-        </div>
-
-        <div class="input-group">
-            <label style="color:var(--ai-blue);">Tamanho Fixo Global Frentes (0 = Auto)</label>
-            <div class="grid-2-col">
-                <input type="number" id="eCompW" placeholder="Largura (mm)" oninput="window.App.ui.syncToState()">
-                <input type="number" id="eCompH" placeholder="Altura (mm)" oninput="window.App.ui.syncToState()">
-            </div>
-        </div>
-
-        <div class="input-group">
-            <label style="color:var(--ai-blue);">Personalização Individual Avançada (Granular)</label>
-            <div id="customFrentesContainer" style="background:#f5f5f5; padding:15px; border-radius:8px; border:1px solid #ddd; max-height:250px; overflow-y:auto;">
-            </div>
-        </div>
-
-        <div class="input-group">
-            <label>Dimensões Geométricas Físicas (Milímetros)</label>
-            <div class="grid-4-col">
-                <div><label>Largura</label><input type="number" id="eL" oninput="window.App.ui.syncToState()"></div>
-                <div><label>Altura</label><input type="number" id="eAl" oninput="window.App.ui.syncToState()"></div>
-                <div><label>Profund.</label><input type="number" id="eP" oninput="window.App.ui.syncToState()"></div>
-                <div><label>Raio / Braço L</label><input type="number" id="eRetL" oninput="window.App.ui.syncToState()" title="Serve para Raio da Curva ou Comprimento do L"></div>
-            </div>
-        </div>
-
-        <div class="input-group">
-            <label>Posicionamento Espacial Exato (Milímetros / Graus)</label>
-            <div class="grid-4-col">
-                <div><label>Eixo X</label><input type="number" id="ePx" oninput="window.App.ui.syncToState()"></div>
-                <div><label>Eixo Y</label><input type="number" id="ePy" oninput="window.App.ui.syncToState()"></div>
-                <div><label>Eixo Z</label><input type="number" id="ePz" oninput="window.App.ui.syncToState()"></div>
-                <div><label>Rotação Y</label><input type="number" id="eRy" oninput="window.App.ui.syncToState()"></div>
-            </div>
-        </div>
-        
-        <div style="display:flex; gap: 15px;">
-            <button class="btn-block warning" style="margin-top: 30px; padding: 20px; font-size:1.1rem; background-color: #FF9800; color: #111;" onclick="window.App.modules.restorePartsCurrent()">
-                <i class="fas fa-hammer"></i> Restaurar Peças Removidas
-            </button>
-            <button class="btn-block danger" style="margin-top: 30px; padding: 20px; font-size:1.1rem;" onclick="window.App.modules.removeCurrent()">
-                <i class="fas fa-trash-alt"></i> Excluir Todo o Módulo
-            </button>
         </div>
     </div>
 
-    <div class="floating-buttons">
-        <button class="floating-button mascote" onclick="window.App.ui.toast('A inteligência artificial Sênior está pronta para ler suas imagens e orçar seus projetos comerciais.')">
-            <i class="fas fa-headset"></i> <span>Mascote Promob Ouro</span>
-        </button>
-    </div>
-
+    <!-- MODAL DE CONFIGURAÇÃO DE API -->
     <div id="modalSettings" class="modal-overlay">
         <div class="modal-content">
-            <h3 style="color:var(--primary-dark); margin-bottom:20px; font-size:1.4rem;"><i class="fas fa-cogs"></i> Chaves de IA (APIs)</h3>
-            <div class="input-group mb-2"><label>Gemini 2.5 Flash Key</label><input type="password" id="api-gemini"></div>
-            <div class="input-group mb-2"><label>Groq API Key</label><input type="password" id="api-groq"></div>
-            <div class="grid-2-col" style="margin-top:30px;">
-                <button class="btn-block" onclick="window.App.ui.toggleModal('modalSettings')">Cancelar</button>
-                <button class="btn-block success" onclick="window.App.config.save()">Guardar e Aplicar</button>
+            <h3 style="color:var(--primary-dark); margin-bottom:20px; font-size:1.1rem; font-family:'Montserrat'; font-weight:900;"><i class="fas fa-cogs"></i> Chaves de IA</h3>
+            <div class="input-group"><label>Gemini 2.5 Flash Key</label><input type="password" id="api-gemini"></div>
+            <div class="input-group"><label>Groq API Key (Áudio)</label><input type="password" id="api-groq"></div>
+            <div class="grid-2" style="margin-top:20px;">
+                <button class="btn-block" style="background:#EEE; color:#333;" onclick="window.App.ui.toggleModal('modalSettings')">Cancelar</button>
+                <button class="btn-block success" onclick="window.App.config.save()">Salvar</button>
             </div>
         </div>
     </div>
-    <div id="statusOverlay" class="status-overlay"><div style="display:flex; flex-direction:column; align-items:center;"><div class="loader"></div><p id="statusText">Oráculo Analisando...</p></div></div>
+
+    <div id="statusOverlay" class="modal-overlay" style="background:rgba(0,0,0,0.85);"><div style="display:flex; flex-direction:column; align-items:center;"><div class="loader"></div><p id="statusText" style="color:#FFF; font-family:'Montserrat'; font-weight:900; font-size:1.2rem;">Oráculo Analisando...</p></div></div>
     <div id="toast"><i class="fas fa-info-circle"></i> <span id="toastMessage">Notificação</span></div>
 
     <script>
-        /**
-         * ESTADO GLOBAL E CATÁLOGO DE MATERIAIS EXPANDIDO
-         */
+        // =========================================================================
+        // BIBLIOTECA DE MATERIAIS SÊNIOR (PBR)
+        // =========================================================================
         window.MatDefs = {
-            'amadeirado_padrao': { color: 0x8B5A2B, roughness: 0.8, metalness: 0.1, label: "Amadeirado Padrão (Freijó)", mult: 1.0 },
-            'louro_freijo': { color: 0x9E7A5A, roughness: 0.8, metalness: 0.1, label: "MDF Louro Freijó", mult: 1.3 },
-            'carvalho_hanover': { color: 0x8A6343, roughness: 0.8, metalness: 0.1, label: "MDF Carvalho Hanover", mult: 1.3 },
-            'nogueira_cadiz': { color: 0x5C4033, roughness: 0.9, metalness: 0.1, label: "MDF Nogueira Cádiz", mult: 1.3 },
-            'tauari': { color: 0xBA8C63, roughness: 0.85, metalness: 0.1, label: "MDF Tauari", mult: 1.3 },
-            'mdf_branco_tx': { color: 0xFAFAFA, roughness: 0.9, metalness: 0.05, label: "MDF Branco Ártico TX", mult: 1.0 },
-            'mdf_branco_diamante': { color: 0xFFFFFF, roughness: 0.4, metalness: 0.1, label: "MDF Branco Diamante (Brilho)", mult: 1.4 },
-            'mdf_preto_tx': { color: 0x1A1A1A, roughness: 0.3, metalness: 0.5, label: "MDF Preto TX / Mármore Nero", mult: 1.5 },
+            'amadeirado_padrao': { color: 0x8B5A2B, roughness: 0.7, metalness: 0.1, label: "MDF Freijó", mult: 1.0 },
+            'louro_freijo': { color: 0x9E7A5A, roughness: 0.7, metalness: 0.1, label: "MDF Louro Freijó", mult: 1.3 },
+            'carvalho_hanover': { color: 0x8A6343, roughness: 0.7, metalness: 0.1, label: "MDF Carvalho Hanover", mult: 1.3 },
+            'nogueira_cadiz': { color: 0x5C4033, roughness: 0.8, metalness: 0.1, label: "MDF Nogueira Cádiz", mult: 1.3 },
+            'mdf_branco_tx': { color: 0xFAFAFA, roughness: 0.9, metalness: 0.05, label: "MDF Branco TX", mult: 1.0 },
+            'mdf_branco_diamante': { color: 0xFFFFFF, roughness: 0.3, metalness: 0.1, label: "MDF Branco Brilho", mult: 1.4 },
+            'mdf_preto_tx': { color: 0x1A1A1A, roughness: 0.2, metalness: 0.6, label: "Mármore Nero/Granito", mult: 1.5 },
             'mdf_grafite': { color: 0x424242, roughness: 0.7, metalness: 0.1, label: "MDF Grafite", mult: 1.0 },
-            'mdf_cinza_sagrado': { color: 0x808080, roughness: 0.7, metalness: 0.1, label: "MDF Cinza Sagrado", mult: 1.0 },
             'mdf_azul_petroleo': { color: 0x153E5C, roughness: 0.7, metalness: 0.1, label: "MDF Azul Petróleo", mult: 1.4 },
-            'mdf_verde_savia': { color: 0x556B2F, roughness: 0.7, metalness: 0.1, label: "MDF Verde Sálvia", mult: 1.4 },
-            'misto': { color: 0xFAFAFA, frontColor: 0x8B5A2B, roughness: 0.6, metalness: 0.1, label: "Misto", mult: 1.1 },
-            'vidro_incolor': { color: 0x88CCFF, roughness: 0.0, metalness: 0.9, transparent: true, opacity: 0.25, label: "Vidro Incolor", mult: 2.5 },
+            'misto': { color: 0xFAFAFA, frontColor: 0x8B5A2B, roughness: 0.6, metalness: 0.1, label: "Misto (Branco/Madeira)", mult: 1.1 },
+            'vidro_incolor': { color: 0x88CCFF, roughness: 0.0, metalness: 0.9, transparent: true, opacity: 0.3, label: "Vidro Incolor", mult: 2.5 },
             'rodapé_escuro': { color: 0x222222, roughness: 0.9, metalness: 0.0, label: "Fórmica Preta (Rodapé)" },
-            'tecido_linho': { color: 0xBDB7AB, roughness: 0.9, metalness: 0.0, label: "Tecido Linho Cru (Sofá/Puff)", mult: 2.0 }
+            'tecido_linho': { color: 0xBDB7AB, roughness: 1.0, metalness: 0.0, label: "Tecido Linho (Sofá/Puff)", mult: 2.0 }
         };
 
         window.AppState = {
-            modoOraculo: true,
-            modules: [],
-            selectedModule: null,
-            arActive: false,
-            modoInteracao: 'projeto',
-            tool: 'orbit',
-            animacoesAtivas: [], 
-            costs: { mdf: 85.00, labor: 80.00, hardware: 0.00, margin: 40 },
-            apiKeys: { 
-                gemini: localStorage.getItem('ak_gemini_cad') || '', 
-                groq: localStorage.getItem('ak_groq_cad') || '' 
-            },
-            transcricaoAtual: "",
-            imagemFundoBase64: null,
-            imagemFundoURL: null,
-            mediaRecorder: null,
-            audioChunks: [],
-            cutParts: [],
-            currentBoards: []
+            modoOraculo: true, modules: [], selectedModule: null, arActive: false, modoInteracao: 'projeto',
+            tool: 'orbit', animacoesAtivas: [], costs: { mdf: 85.00, labor: 80.00, hardware: 0.00, margin: 40 },
+            apiKeys: { gemini: localStorage.getItem('ak_gemini_cad') || '', groq: localStorage.getItem('ak_groq_cad') || '' },
+            transcricaoAtual: "", imagemFundoBase64: null, imagemFundoURL: null, mediaRecorder: null, audioChunks: [], cutParts: [], currentBoards: []
         };
 
+        // Regras Físicas do Oráculo
         window.OracleEngine = {
             rules: { 
-                mesa_redonda_ripada: { label: 'Mesa Redonda Ripada' },
-                sofa_curvo: { label: 'Sofá Curvo Orgânico' },
-                painel_ripado_iluminado: { label: 'Painel Ripado Iluminado' },
-                balcao_curvo: { label: 'Balcão Comercial Curvo' },
-                expositor: { label: 'Expositor Comercial' },
-                nicho_iluminado: { label: 'Nicho c/ LED' },
-                armario: { label: 'Armário/Aéreo' }, 
-                balcao: { label: 'Balcão de Atendimento' }, 
-                guarda_roupa: { label: 'Guarda-Roupa' }, 
-                mesa: { label: 'Mesa' }, 
-                painel_tv: { label: 'Painel TV' }, 
-                porta_avulsa: { label: 'Porta Solo' }, 
-                gaveta_avulsa: { label: 'Gaveta Solo' },
-                sofa: { label: 'Sofá Reto/Poltrona' },
-                puff: { label: 'Puff' }
+                mesa_redonda_ripada: { label: 'Mesa Redonda Ripada' }, sofa_curvo: { label: 'Sofá Curvo Orgânico' }, painel_ripado_iluminado: { label: 'Painel Ripado LED' }, balcao_curvo: { label: 'Balcão Curvo' }, expositor: { label: 'Expositor' }, nicho_iluminado: { label: 'Nicho LED' }, armario: { label: 'Armário/Aéreo' }, balcao: { label: 'Balcão Reto' }, guarda_roupa: { label: 'Guarda-Roupa' }, mesa: { label: 'Mesa' }, painel_tv: { label: 'Painel TV' }, porta_avulsa: { label: 'Porta Solo' }, gaveta_avulsa: { label: 'Gaveta Solo' }, sofa: { label: 'Sofá Reto/Poltrona' }, puff: { label: 'Puff' }
             },
             validateAndFix: (mod) => {
                 if (!window.AppState.modoOraculo) return; 
                 let fixes = [];
-                if (mod.tipo === 'mesa' && mod.altura > 1100 && mod.formato !== 'dobravel') fixes.push({k:'altura', v:750, msg:'Mesa ajustada (750mm)'});
-                if (mod.formato.includes('L_') && mod.retornoL < 400) fixes.push({k:'retornoL', v:1000, msg:'Braço do L ajustado (>400mm)'});
-                if (mod.gavetas > 0 && mod.portas === 0 && mod.layoutInterno !== 'apenas_gavetas') fixes.push({k:'layoutInterno', v:'apenas_gavetas', msg:'Layout ajustado para Gavetas.'});
-                if (mod.portas > 0 && mod.gavetas === 0 && mod.layoutInterno !== 'apenas_portas') fixes.push({k:'layoutInterno', v:'apenas_portas', msg:'Layout ajustado para Portas.'});
-                
+                if (mod.tipo === 'mesa' && mod.altura > 1100 && mod.formato !== 'dobravel') fixes.push({k:'altura', v:750, msg:'Mesa ajustada para 750mm'});
+                if (mod.gavetas > 0 && mod.portas === 0 && mod.layoutInterno !== 'apenas_gavetas') fixes.push({k:'layoutInterno', v:'apenas_gavetas', msg:'Layout ajustado para Gavetas'});
+                if (mod.portas > 0 && mod.gavetas === 0 && mod.layoutInterno !== 'apenas_portas') fixes.push({k:'layoutInterno', v:'apenas_portas', msg:'Layout ajustado para Portas'});
                 fixes.forEach(f => { mod[f.k] = f.v; window.App.ui.toast(`Oráculo: ${f.msg}`); });
             }
         };
 
+        // =========================================================================
+        // MOTOR BOM (Orçamento e Quantitativos)
+        // =========================================================================
         window.BOMEngine = {
             calculateModule: (mod) => {
                 const w = mod.largura / 1000; const h = mod.altura / 1000; const d = mod.profundidade / 1000;
                 let areaChassiGlobal = 0; let hwCusto = 0; let laborMult = 1.0;
                 let qtdDobradicas = 0, qtdCorredicas = 0, qtdTrilhos = 0, qtdPistoes = 0;
-                let totalCostOfModuleMaterials = 0; 
-
-                const calcCustoPeca = (areaPeca, chaveMatCustom) => {
-                    let matKey = chaveMatCustom || mod.material;
-                    let pMult = window.MatDefs[matKey] ? window.MatDefs[matKey].mult : 1.0;
-                    return areaPeca * (window.AppState.costs.mdf * pMult);
-                };
-
-                if (mod.tipo === 'balcao_curvo') {
-                    let a = (Math.PI * w * h) + (w * d * 2); areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, null); laborMult = 2.5;
-                } else if (mod.tipo === 'sofa_curvo') {
-                    let a = w * h * d * 2; areaChassiGlobal += a; totalCostOfModuleMaterials += a * 300; laborMult = 2.5; // Estofado curvo premium
-                } else if (mod.tipo === 'mesa_redonda_ripada') {
-                    let a = (Math.PI * Math.pow(w/2, 2)) * 2 + (Math.PI * w/2 * h); areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, null); laborMult = 2.0;
-                } else if (mod.tipo === 'painel_ripado_iluminado') {
-                    let a = (w * h) * 1.5; areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, null); hwCusto += 120.0; laborMult = 1.5;
-                } else if (mod.tipo === 'expositor') {
-                    let a = (h * d * 2) + (w * d * (mod.prateleirasExternas + 2)); areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, null); laborMult = 1.3;
-                } else if (mod.tipo === 'nicho_iluminado') {
-                    let a = (w * d * 2) + (h * d * 2) + (w * h); areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, null); hwCusto += 80.0;
-                } else if (mod.tipo === 'porta_avulsa') { 
-                    let a = w * h; areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, mod.materiaisCustomizados?.frentes?.['porta_avulsa_0']);
-                    if (mod.abertura === 'correr') { qtdTrilhos += 1; hwCusto += 45.0; } else if (mod.abertura === 'basculante') { qtdPistoes += 1; hwCusto += 35.0; } else { let dP = h > 1.5 ? 4 : 2; qtdDobradicas += dP; hwCusto += dP * 7.5; } 
-                } else if (mod.tipo === 'gaveta_avulsa') { 
-                    let a = (w * 0.3 + d * 0.3 * 2 + w * d); areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, mod.materiaisCustomizados?.frentes?.['gaveta_avulsa_0']); qtdCorredicas += 1; hwCusto += 25.0; 
-                } else if (mod.tipo === 'sofa' || mod.tipo === 'puff') {
-                    let a = w * h * d; areaChassiGlobal += a; totalCostOfModuleMaterials += a * 250; 
-                    laborMult = 2.0;
-                } else {
-                    let aLat = (h * d * 2); areaChassiGlobal += aLat; totalCostOfModuleMaterials += calcCustoPeca(aLat/2, mod.materiaisCustomizados?.estrutura?.['lateralEsq']) + calcCustoPeca(aLat/2, mod.materiaisCustomizados?.estrutura?.['lateralDir']);
-                    let aTetoBase = (w * d * 2); areaChassiGlobal += aTetoBase; totalCostOfModuleMaterials += calcCustoPeca(aTetoBase/2, mod.materiaisCustomizados?.estrutura?.['teto']) + calcCustoPeca(aTetoBase/2, mod.materiaisCustomizados?.estrutura?.['base']);
-                    let aFundo = (w * h); areaChassiGlobal += aFundo; totalCostOfModuleMaterials += calcCustoPeca(aFundo, mod.materiaisCustomizados?.estrutura?.['fundo']);
-                }
-
-                if (mod.prateleiras) { let a = mod.prateleiras * (w * d); areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, null); }
                 
-                if (mod.gavetas > 0 && mod.tipo !== 'gaveta_avulsa') { 
-                    for (let i = 0; i < mod.gavetas; i++) {
-                        const cG_W = w; let a = (cG_W * 0.3 + d * 0.3 * 2 + cG_W * d); areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, null); qtdCorredicas += 1; hwCusto += 25.0; 
-                    }
-                } 
-                if (mod.portas > 0 && mod.tipo !== 'porta_avulsa') { 
-                    for (let i = 0; i < mod.portas; i++) {
-                        let a = ((w/mod.portas) * h); areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, null);
-                        if (mod.abertura === 'correr') { qtdTrilhos += 1; hwCusto += 45.0; } else if (mod.abertura === 'basculante') { qtdPistoes += 1; hwCusto += 35.0; } else { let dP = h > 1.5 ? 4 : 2; qtdDobradicas += dP; hwCusto += dP * 7.5; }
-                    }
-                }
+                const calcCustoPeca = (areaPeca) => { let pMult = window.MatDefs[mod.material] ? window.MatDefs[mod.material].mult : 1.0; return areaPeca * (window.AppState.costs.mdf * pMult); };
+                let matCusto = 0;
 
-                if (mod.ripadoFrontal && mod.tipo !== 'mesa_redonda_ripada' && mod.tipo !== 'painel_ripado_iluminado') { 
-                    let a = (w * h) * 1.5; areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, null); laborMult += 0.3; 
-                }
-                if (mod.tampoVidro || mod.tampoPedra) { hwCusto += (w * d) * 150; }
+                // Custos Baseados na Tipologia
+                if (mod.tipo === 'balcao_curvo') { let a = (Math.PI * w * h) + (w * d * 2); areaChassiGlobal += a; matCusto += calcCustoPeca(a); laborMult = 2.5; } 
+                else if (mod.tipo === 'sofa_curvo') { let a = w * h * d * 2; areaChassiGlobal += a; matCusto += a * 300; laborMult = 2.5; } 
+                else if (mod.tipo === 'mesa_redonda_ripada') { let a = (Math.PI * Math.pow(w/2, 2)) * 2 + (Math.PI * w/2 * h); areaChassiGlobal += a; matCusto += calcCustoPeca(a); laborMult = 2.0; } 
+                else if (mod.tipo === 'painel_ripado_iluminado') { let a = (w * h) * 1.5; areaChassiGlobal += a; matCusto += calcCustoPeca(a); hwCusto += 120.0; laborMult = 1.5; } 
+                else if (mod.tipo === 'expositor') { let a = (h * d * 2) + (w * d * (mod.prateleirasExternas + 2)); areaChassiGlobal += a; matCusto += calcCustoPeca(a); laborMult = 1.3; } 
+                else if (mod.tipo === 'nicho_iluminado') { let a = (w * d * 2) + (h * d * 2) + (w * h); areaChassiGlobal += a; matCusto += calcCustoPeca(a); hwCusto += 80.0; } 
+                else if (mod.tipo === 'sofa' || mod.tipo === 'puff') { let a = w * h * d; areaChassiGlobal += a; matCusto += a * 250; laborMult = 2.0; } 
+                else { let aLat = (h * d * 2); let aTetoBase = (w * d * 2); let aFundo = (w * h); areaChassiGlobal += (aLat + aTetoBase + aFundo); matCusto += calcCustoPeca(areaChassiGlobal); }
 
-                return { area: areaChassiGlobal * 1.15, hardwareCost: hwCusto, laborMult: laborMult, customMatCostTotal: totalCostOfModuleMaterials * 1.15, counts: { dobradicas: qtdDobradicas, corredicas: qtdCorredicas, trilhos: qtdTrilhos, pistoes: qtdPistoes } }; 
+                // Custos Acessórios
+                if (mod.prateleiras) { let a = mod.prateleiras * (w * d); areaChassiGlobal += a; matCusto += calcCustoPeca(a); }
+                if (mod.gavetas > 0 && mod.tipo !== 'gaveta_avulsa') { for (let i = 0; i < mod.gavetas; i++) { let a = (w * 0.3 + d * 0.3 * 2 + w * d); areaChassiGlobal += a; matCusto += calcCustoPeca(a); qtdCorredicas++; hwCusto += 25.0; } } 
+                if (mod.portas > 0 && mod.tipo !== 'porta_avulsa') { for (let i = 0; i < mod.portas; i++) { let a = ((w/mod.portas) * h); areaChassiGlobal += a; matCusto += calcCustoPeca(a); if (mod.abertura === 'correr') { qtdTrilhos++; hwCusto += 45.0; } else if (mod.abertura === 'basculante') { qtdPistoes++; hwCusto += 35.0; } else { let dP = h > 1.5 ? 4 : 2; qtdDobradicas += dP; hwCusto += dP * 7.5; } } }
+                if (mod.ripadoFrontal && mod.tipo !== 'mesa_redonda_ripada' && mod.tipo !== 'painel_ripado_iluminado') { let a = (w * h) * 1.5; areaChassiGlobal += a; matCusto += calcCustoPeca(a); laborMult += 0.3; }
+                if (mod.tampoVidro) { hwCusto += (w * d) * 150; }
+
+                return { area: areaChassiGlobal * 1.15, hardwareCost: hwCusto, laborMult: laborMult, customMatCostTotal: matCusto * 1.15, counts: { dobradicas: qtdDobradicas, corredicas: qtdCorredicas, trilhos: qtdTrilhos, pistoes: qtdPistoes } }; 
             },
             update: () => {
-                let tArea = 0, tHWDyn = 0, tLaborDyn = 0, tHWFix = parseFloat(window.AppState.costs.hardware), totalMatsCost = 0; 
-                let cDob = 0, cCor = 0, cTril = 0, cPist = 0;
-                window.AppState.modules.forEach(m => { 
-                    const b = window.BOMEngine.calculateModule(m); 
-                    tArea += b.area; tHWDyn += b.hardwareCost; tLaborDyn += (b.area * window.AppState.costs.labor * b.laborMult); totalMatsCost += b.customMatCostTotal; 
-                    cDob += b.counts.dobradicas; cCor += b.counts.corredicas; cTril += b.counts.trilhos; cPist += b.counts.pistoes;
-                });
-                const cTotal = totalMatsCost + tHWFix + tHWDyn + tLaborDyn; 
-                const profit = cTotal * (window.AppState.costs.margin / 100);
+                let tArea = 0, tHWDyn = 0, tLaborDyn = 0, tHWFix = parseFloat(window.AppState.costs.hardware), totalMatsCost = 0; let cDob = 0, cCor = 0, cTril = 0, cPist = 0;
+                window.AppState.modules.forEach(m => { const b = window.BOMEngine.calculateModule(m); tArea += b.area; tHWDyn += b.hardwareCost; tLaborDyn += (b.area * window.AppState.costs.labor * b.laborMult); totalMatsCost += b.customMatCostTotal; cDob += b.counts.dobradicas; cCor += b.counts.corredicas; cTril += b.counts.trilhos; cPist += b.counts.pistoes; });
+                const cTotal = totalMatsCost + tHWFix + tHWDyn + tLaborDyn; const profit = cTotal * (window.AppState.costs.margin / 100);
                 const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
-                document.getElementById('bom-price').innerText = fmt(cTotal + profit); document.getElementById('bom-area').innerText = tArea.toFixed(2) + ' m²'; 
-                document.getElementById('bom-mat').innerText = fmt(totalMatsCost + tHWFix + tHWDyn); document.getElementById('bom-mobra').innerText = fmt(tLaborDyn); 
-                document.getElementById('bom-profit').innerText = fmt(profit); document.getElementById('bom-hw-cost').innerText = fmt(tHWDyn);
-                
-                let hwListStr = []; if (cDob > 0) hwListStr.push(`${cDob}x Dobradiças`); if (cCor > 0) hwListStr.push(`${cCor}x Corrediças`); if (cTril > 0) hwListStr.push(`${cTril}x Trilhos`); if (cPist > 0) hwListStr.push(`${cPist}x Pistões`); 
-                document.getElementById('bom-hw-list').innerText = hwListStr.length > 0 ? hwListStr.join(' | ') : "Nenhuma ferragem identificada.";
+                document.getElementById('bom-price').innerText = fmt(cTotal + profit); document.getElementById('bom-area').innerText = tArea.toFixed(2) + ' m²'; document.getElementById('bom-mat').innerText = fmt(totalMatsCost + tHWFix + tHWDyn); document.getElementById('bom-mobra').innerText = fmt(tLaborDyn); document.getElementById('bom-profit').innerText = fmt(profit); document.getElementById('bom-hw-cost').innerText = fmt(tHWDyn);
+                let hwListStr = []; if (cDob > 0) hwListStr.push(`${cDob}x Dobrad.`); if (cCor > 0) hwListStr.push(`${cCor}x Corred.`); if (cTril > 0) hwListStr.push(`${cTril}x Trilhos`); if (cPist > 0) hwListStr.push(`${cPist}x Pistões`); document.getElementById('bom-hw-list').innerText = hwListStr.length > 0 ? hwListStr.join(' | ') : "Nenhuma";
             },
-            updateParams: () => { 
-                window.AppState.costs.mdf = parseFloat(document.getElementById('cost-mdf').value) || 85.00; window.AppState.costs.labor = parseFloat(document.getElementById('cost-labor').value) || 80.00; 
-                window.AppState.costs.hardware = parseFloat(document.getElementById('cost-hardware').value) || 0.00; window.AppState.costs.margin = parseFloat(document.getElementById('cost-margin').value) || 40; 
-                window.BOMEngine.update(); 
-            }
+            updateParams: () => { window.AppState.costs.mdf = parseFloat(document.getElementById('cost-mdf').value) || 85.00; window.AppState.costs.labor = parseFloat(document.getElementById('cost-labor').value) || 80.00; window.AppState.costs.hardware = parseFloat(document.getElementById('cost-hardware').value) || 0.00; window.AppState.costs.margin = parseFloat(document.getElementById('cost-margin').value) || 40; window.BOMEngine.update(); }
         };
 
-        window.CVEngine = {
-            processarImagem: (input) => {
-                if (input.files && input.files[0]) { 
-                    const f = input.files[0]; window.AppState.imagemFundoURL = URL.createObjectURL(f); document.getElementById('imagePreview').src = window.AppState.imagemFundoURL; document.getElementById('imgPreviewContainer').style.display = 'block'; 
-                    const img = new Image();
-                    img.onload = () => {
-                        const cvs = document.getElementById('cv-canvas'); const ctx = cvs.getContext('2d'); cvs.width = img.width; cvs.height = img.height; ctx.drawImage(img, 0, 0);
-                        const imgData = ctx.getImageData(0, 0, cvs.width, cvs.height); let edgeSumY = 0, edgeCount = 0;
-                        for(let y = 1; y < cvs.height - 1; y += 5) {
-                            for(let x = 1; x < cvs.width - 1; x += 5) {
-                                const idx = (y * cvs.width + x) * 4; const lum = imgData.data[idx] * 0.3 + imgData.data[idx+1] * 0.59 + imgData.data[idx+2] * 0.11; const lumUp = imgData.data[idx - cvs.width * 4] * 0.3 + imgData.data[idx - cvs.width * 4 + 1] * 0.59 + imgData.data[idx - cvs.width * 4 + 2] * 0.11;
-                                if (Math.abs(lum - lumUp) > 50) { edgeSumY += y; edgeCount++; }
-                            }
-                        }
-                        let horizonY = edgeCount > 0 ? (edgeSumY / edgeCount) : (cvs.height / 2); let perspectiveTilt = (horizonY / cvs.height) - 0.5;
-                        document.getElementById('camRotX').value = perspectiveTilt * -1.5; window.App.ar.applyTransform(); window.App.ui.toast("Visão Computacional: Perspectiva Auto-Ajustada.");
-                    };
-                    img.src = window.AppState.imagemFundoURL;
-                    const r = new FileReader(); r.onload = () => { window.AppState.imagemFundoBase64 = r.result.split(',')[1]; }; r.readAsDataURL(f); 
-                } 
-            }
-        };
-
+        // =========================================================================
+        // MOTOR DE NESTING (Plano de Corte)
+        // =========================================================================
         window.CutPlanEngine = {
             boardW: 2750, boardH: 1850,
             generate: () => {
@@ -681,26 +527,24 @@
                             if (p.y > f.y) nextFree.push({x: f.x, y: f.y, w: f.w, h: p.y - f.y});
                             if (p.y + p.h < f.y + f.h) nextFree.push({x: f.x, y: p.y + p.h, w: f.w, h: f.y + f.h - (p.y + p.h)});
                         }
-                    }
-                    free = nextFree;
-                }
-                return free.sort((a,b) => (b.w*b.h) - (a.w*a.h));
+                    } free = nextFree;
+                } return free.sort((a,b) => (b.w*b.h) - (a.w*a.h));
             },
             render: (boards) => {
-                const container = document.getElementById('cutPlanContainer'); container.innerHTML = `<h4 style="color:var(--primary-dark); font-size: 1rem; margin-bottom: 10px;">Chapas Padrão MDF (2750x1850) Necessárias: ${boards.length}</h4>`;
+                const container = document.getElementById('cutPlanContainer'); container.innerHTML = `<h4 style="color:var(--primary-dark); font-size: 0.9rem; margin-bottom: 10px;">Chapas MDF Necessárias: ${boards.length}</h4>`;
                 const scale = 0.1;
                 boards.forEach((b, i) => {
                     let div = document.createElement('div'); div.className = 'cut-board'; div.style.width = (b.w * scale) + 'px'; div.style.height = (b.h * scale) + 'px';
-                    b.parts.forEach(p => { let pDiv = document.createElement('div'); pDiv.className = 'cut-part'; pDiv.style.left = (p.x * scale) + 'px'; pDiv.style.top = (p.y * scale) + 'px'; pDiv.style.width = (p.w * scale) + 'px'; pDiv.style.height = (p.h * scale) + 'px'; pDiv.innerText = `${p.w}x${p.h}\n${p.label}`; div.appendChild(pDiv); });
+                    b.parts.forEach(p => { let pDiv = document.createElement('div'); pDiv.className = 'cut-part'; pDiv.style.left = (p.x * scale) + 'px'; pDiv.style.top = (p.y * scale) + 'px'; pDiv.style.width = (p.w * scale) + 'px'; pDiv.style.height = (p.h * scale) + 'px'; pDiv.innerText = `${p.w}x${p.h}`; div.appendChild(pDiv); });
                     container.appendChild(div);
                 });
-                window.AppState.currentBoards = boards; window.App.ui.toast("Plano de Corte Otimizado com Sucesso.");
+                window.AppState.currentBoards = boards; window.App.ui.toast("Nesting Otimizado.");
             }
         };
 
         window.ExportEngine = {
             exportDXF: () => {
-                if(!window.AppState.currentBoards || window.AppState.currentBoards.length === 0) { return window.App.ui.toast("Gere o Plano de Corte primeiro.", "error"); }
+                if(!window.AppState.currentBoards || window.AppState.currentBoards.length === 0) { return window.App.ui.toast("Gere o Plano de Corte primeiro.", "warning"); }
                 let dxf = `0\nSECTION\n2\nENTITIES\n`;
                 window.AppState.currentBoards.forEach((b, i) => {
                     let offsetX = i * (window.CutPlanEngine.boardW + 500);
@@ -710,27 +554,29 @@
                     });
                 });
                 dxf += `0\nENDSEC\n0\nEOF\n`;
-                const blob = new Blob([dxf], {type: "text/plain"}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "projeto_corte_cam.dxf"; a.click(); window.App.ui.toast("Arquivo DXF Gerado com Sucesso!");
+                const blob = new Blob([dxf], {type: "text/plain"}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "projeto_corte_cam.dxf"; a.click(); window.App.ui.toast("DXF Exportado!");
             }
         };
 
+        // =========================================================================
+        // THREE.JS CORE & ARQUITETURA 3D
+        // =========================================================================
         window.ThreeEngine = {
             scene: null, camera: null, renderer: null, controls: null, rootNode: null, plane: null,
-            raycaster: new THREE.Raycaster(), pointer: new THREE.Vector2(), pDown: {x:0,y:0}, dragObj: null, pressTimer: null, isLongPress: false, downTime: 0,
+            raycaster: new THREE.Raycaster(), pointer: new THREE.Vector2(), pDown: {x:0,y:0}, dragObj: null, pressTimer: null, isLongPress: false,
 
             init: () => {
                 const c = document.getElementById('canvas-container'); const cv = document.getElementById('cad-canvas');
                 window.ThreeEngine.scene = new THREE.Scene(); window.ThreeEngine.scene.add(new THREE.AmbientLight(0xffffff, 0.6));
                 const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.7); hemiLight.position.set(0, 200, 0); window.ThreeEngine.scene.add(hemiLight);
                 const dl = new THREE.DirectionalLight(0xffffff, 0.8); dl.position.set(15, 25, 15); dl.castShadow = true; dl.shadow.mapSize.width = 2048; dl.shadow.mapSize.height = 2048; window.ThreeEngine.scene.add(dl);
-                const dl2 = new THREE.DirectionalLight(0xddeeff, 0.4); dl2.position.set(-15, 10, -10); window.ThreeEngine.scene.add(dl2);
                 
                 window.ThreeEngine.camera = new THREE.PerspectiveCamera(45, c.clientWidth / c.clientHeight, 0.1, 1000); window.ThreeEngine.camera.position.set(4, 3, 6);
-                window.ThreeEngine.renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, preserveDrawingBuffer: true }); window.ThreeEngine.renderer.setSize(c.clientWidth, c.clientHeight); window.ThreeEngine.renderer.shadowMap.enabled = true; window.ThreeEngine.renderer.shadowMap.type = THREE.PCFSoftShadowMap; window.ThreeEngine.renderer.outputEncoding = THREE.sRGBEncoding;
+                window.ThreeEngine.renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, preserveDrawingBuffer: true }); window.ThreeEngine.renderer.setSize(c.clientWidth, c.clientHeight); window.ThreeEngine.renderer.shadowMap.enabled = true; window.ThreeEngine.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
                 
                 window.ThreeEngine.controls = new THREE.OrbitControls(window.ThreeEngine.camera, cv); window.ThreeEngine.controls.enableDamping = true; window.ThreeEngine.controls.target.set(0, 0.5, 0);
                 
-                const grid = new THREE.GridHelper(40, 40, 0x888888, 0xdddddd); grid.material.opacity = 0.5; grid.material.transparent = true; window.ThreeEngine.scene.add(grid);
+                const grid = new THREE.GridHelper(40, 40, 0x888888, 0xdddddd); grid.material.opacity = 0.3; grid.material.transparent = true; window.ThreeEngine.scene.add(grid);
                 window.ThreeEngine.plane = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.MeshBasicMaterial({visible:false})); window.ThreeEngine.plane.rotation.x = -Math.PI/2; window.ThreeEngine.scene.add(window.ThreeEngine.plane);
                 window.ThreeEngine.rootNode = new THREE.Group(); window.ThreeEngine.scene.add(window.ThreeEngine.rootNode);
                 
@@ -746,26 +592,23 @@
             },
 
             onDown: (e) => {
-                const pos = window.ThreeEngine.getPtr(e); window.ThreeEngine.pDown = pos; window.ThreeEngine.isDown = true; window.ThreeEngine.isLongPress = false; window.ThreeEngine.downTime = Date.now();
+                const pos = window.ThreeEngine.getPtr(e); window.ThreeEngine.pDown = pos; window.ThreeEngine.isDown = true; window.ThreeEngine.isLongPress = false;
                 window.ThreeEngine.raycaster.setFromCamera(window.ThreeEngine.pointer, window.ThreeEngine.camera);
                 
-                if (window.AppState.arActive && window.AppState.modoInteracao === 'projeto') { window.ThreeEngine.controls.enabled = false; const hits = window.ThreeEngine.raycaster.intersectObject(window.ThreeEngine.plane); if (hits[0]) { window.ThreeEngine.dragObj = { type: 'root', offset: hits[0].point.sub(window.ThreeEngine.rootNode.position) }; } return; }
-
                 const hits = window.ThreeEngine.raycaster.intersectObjects(window.ThreeEngine.rootNode.children, true);
                 if (hits.length > 0) {
                     let target = hits[0].object;
-                    // Se clicou na linha da aresta, pegar o Mesh pai
                     if(target.type === 'LineSegments' && target.parent) target = target.parent;
 
                     let obj = target; while (obj && !obj.userData.isRootModule && obj.parent) obj = obj.parent;
                     
                     if (obj && obj.userData.isRootModule) {
                         window.App.modules.select(obj.userData.id);
-                        if (window.AppState.tool === 'move' || (window.AppState.arActive && window.AppState.modoInteracao === 'peca')) { window.ThreeEngine.controls.enabled = false; const pHit = window.ThreeEngine.raycaster.intersectObject(window.ThreeEngine.plane); if (pHit[0]) { window.ThreeEngine.dragObj = { obj: obj, offset: pHit[0].point.sub(obj.position) }; } }
+                        if (window.AppState.tool === 'move') { window.ThreeEngine.controls.enabled = false; const pHit = window.ThreeEngine.raycaster.intersectObject(window.ThreeEngine.plane); if (pHit[0]) { window.ThreeEngine.dragObj = { obj: obj, offset: pHit[0].point.sub(obj.position) }; } }
                         
                         if (window.AppState.tool !== 'remove_part') {
                             let cX = e.clientX; let cY = e.clientY; if (cX === undefined && e.touches && e.touches.length > 0) { cX = e.touches[0].clientX; cY = e.touches[0].clientY; }
-                            const ind = document.getElementById('longPressIndicator'); ind.style.display = 'block'; ind.style.left = (cX - 40) + 'px'; ind.style.top = (cY - 40) + 'px';
+                            const ind = document.getElementById('longPressIndicator'); ind.style.display = 'block'; ind.style.left = (cX - 30) + 'px'; ind.style.top = (cY - 30) + 'px';
                             window.ThreeEngine.pressTimer = setTimeout(() => { ind.style.display = 'none'; if (window.ThreeEngine.isDown && !window.ThreeEngine.dragObj && window.AppState.tool !== 'remove_part') { window.ThreeEngine.isLongPress = true; window.App.ui.openLiveEditor(obj.userData.id); } }, 500);
                         }
                     }
@@ -777,15 +620,13 @@
                 let cX = e.clientX; let cY = e.clientY; if (cX === undefined && e.touches && e.touches.length > 0) { cX = e.touches[0].clientX; cY = e.touches[0].clientY; }
                 if (Math.hypot(cX - window.ThreeEngine.pDown.x, cY - window.ThreeEngine.pDown.y) > 15) { clearTimeout(window.ThreeEngine.pressTimer); window.ThreeEngine.isLongPress = false; document.getElementById('longPressIndicator').style.display = 'none'; }
                 
-                if (window.ThreeEngine.dragObj && (window.AppState.tool === 'move' || window.AppState.arActive)) {
+                if (window.ThreeEngine.dragObj && window.AppState.tool === 'move') {
                     window.ThreeEngine.getPtr(e); window.ThreeEngine.raycaster.setFromCamera(window.ThreeEngine.pointer, window.ThreeEngine.camera); const hits = window.ThreeEngine.raycaster.intersectObject(window.ThreeEngine.plane);
                     if (hits[0]) {
                         const newPos = hits[0].point.sub(window.ThreeEngine.dragObj.offset);
-                        if (window.ThreeEngine.dragObj.type === 'root') { window.ThreeEngine.rootNode.position.x = newPos.x; window.ThreeEngine.rootNode.position.z = newPos.z; } else { 
-                            window.ThreeEngine.dragObj.obj.position.x = newPos.x; window.ThreeEngine.dragObj.obj.position.z = newPos.z; 
-                            const mod = window.AppState.modules.find(m => m.id === window.ThreeEngine.dragObj.obj.userData.id); 
-                            if (mod) { mod.posX = newPos.x * 1000; mod.posZ = newPos.z * 1000; window.App.ui.syncToStateNoRebuild(); } 
-                        }
+                        window.ThreeEngine.dragObj.obj.position.x = newPos.x; window.ThreeEngine.dragObj.obj.position.z = newPos.z; 
+                        const mod = window.AppState.modules.find(m => m.id === window.ThreeEngine.dragObj.obj.userData.id); 
+                        if (mod) { mod.posX = newPos.x * 1000; mod.posZ = newPos.z * 1000; window.App.ui.syncToStateNoRebuild(); } 
                     }
                 }
             },
@@ -796,9 +637,6 @@
 
                 let cX = e.clientX; let cY = e.clientY; if (cX === undefined && e.changedTouches && e.changedTouches.length > 0) { cX = e.changedTouches[0].clientX; cY = e.changedTouches[0].clientY; }
 
-                // ==========================================
-                // FERRAMENTA CIRÚRGICA: REMOVER PEÇA
-                // ==========================================
                 if (window.AppState.tool === 'remove_part') {
                     if (Math.hypot(cX - window.ThreeEngine.pDown.x, cY - window.ThreeEngine.pDown.y) < 15) {
                         window.ThreeEngine.raycaster.setFromCamera(window.ThreeEngine.pointer, window.ThreeEngine.camera);
@@ -806,7 +644,6 @@
                         if (hits.length > 0) {
                             let target = hits[0].object;
                             if(target.type === 'LineSegments' && target.parent) target = target.parent;
-                            
                             let modGroup = target; while(modGroup && !modGroup.userData.isRootModule) modGroup = modGroup.parent;
                             if (modGroup && target.userData && target.userData.partKey) {
                                 const mod = window.AppState.modules.find(m => m.id === modGroup.userData.id);
@@ -815,13 +652,12 @@
                                     if (!mod.removedParts.includes(target.userData.partKey)) {
                                         mod.removedParts.push(target.userData.partKey);
                                         window.App.modules.refreshAll();
-                                        window.App.ui.toast(`Peça removida: ${target.userData.partKey}`, "warning");
+                                        window.App.ui.toast(`Destruído: ${target.userData.partKey}`, "warning");
                                     }
                                 }
                             }
                         }
-                    }
-                    return;
+                    } return;
                 }
 
                 if (window.AppState.tool === 'add_comp') {
@@ -830,7 +666,7 @@
                         if (hits.length > 0) {
                             const hitPoint = hits[0].point;
                             window.App.modules.add('porta_avulsa', { posX: hitPoint.x * 1000, posY: hitPoint.y * 1000, posZ: hitPoint.z * 1000 });
-                            window.App.ui.toast("Componente inserido no clique!", "success");
+                            window.App.ui.toast("Porta Inserida!");
                         }
                     } return;
                 }
@@ -839,7 +675,6 @@
                     if (Math.hypot(cX - window.ThreeEngine.pDown.x, cY - window.ThreeEngine.pDown.y) < 15) {
                         window.ThreeEngine.raycaster.setFromCamera(window.ThreeEngine.pointer, window.ThreeEngine.camera); const hits = window.ThreeEngine.raycaster.intersectObjects(window.ThreeEngine.rootNode.children, true); let anim = null;
                         for (let h of hits) { let curr = h.object; while (curr) { if (curr.userData && curr.userData.isAnimatable) { anim = curr; break; } curr = curr.parent; } if (anim) break; }
-                        
                         if (anim) {
                             anim.userData.isOpen = !anim.userData.isOpen; const mod = window.AppState.modules.find(m => m.id === anim.userData.modId); if (mod) mod.compStates[anim.userData.compKey] = anim.userData.isOpen;
                             window.AppState.animacoesAtivas = window.AppState.animacoesAtivas.filter(a => a.obj !== anim); window.AppState.animacoesAtivas.push({ obj: anim, type: anim.userData.type, target: anim.userData.isOpen });
@@ -851,10 +686,9 @@
             animate: () => {
                 requestAnimationFrame(window.ThreeEngine.animate);
                 for (let i = window.AppState.animacoesAtivas.length - 1; i >= 0; i--) {
-                    const a = window.AppState.animacoesAtivas[i]; const obj = a.obj; const speed = 0.12; 
+                    const a = window.AppState.animacoesAtivas[i]; const obj = a.obj; const speed = 0.15; 
                     if (a.type === 'door_hinge') { const side = obj.userData.hinge === 'left' ? -1 : 1; const zD = obj.userData.zDir || 1; const targetAngle = a.target ? (Math.PI / 1.6 * side * zD) : 0; obj.rotation.y += (targetAngle - obj.rotation.y) * speed; if (Math.abs(obj.rotation.y - targetAngle) < 0.01) { obj.rotation.y = targetAngle; window.AppState.animacoesAtivas.splice(i, 1); } } 
                     else if (a.type === 'door_flap') { const zD = obj.userData.zDir || 1; const targetAngle = a.target ? (-Math.PI / 2.2 * zD) : 0; obj.rotation.x += (targetAngle - obj.rotation.x) * speed; if (Math.abs(obj.rotation.x - targetAngle) < 0.01) { obj.rotation.x = targetAngle; window.AppState.animacoesAtivas.splice(i, 1); } } 
-                    else if (a.type === 'door_slide') { const targetPos = a.target ? (obj.userData.baseX + obj.userData.travelX) : obj.userData.baseX; obj.position.x += (targetPos - obj.position.x) * speed; if (Math.abs(obj.position.x - targetPos) < 0.001) { obj.position.x = targetPos; window.AppState.animacoesAtivas.splice(i, 1); } } 
                     else if (a.type === 'drawer') { const zD = obj.userData.zDir || 1; const targetPos = a.target ? (obj.userData.baseZ + obj.userData.depth * 0.8 * zD) : obj.userData.baseZ; obj.position.z += (targetPos - obj.position.z) * speed; if (Math.abs(obj.position.z - targetPos) < 0.001) { obj.position.z = targetPos; window.AppState.animacoesAtivas.splice(i, 1); } }
                 }
                 window.ThreeEngine.controls.update(); window.ThreeEngine.renderer.render(window.ThreeEngine.scene, window.ThreeEngine.camera);
@@ -868,7 +702,7 @@
             },
 
             // =========================================================================
-            // CORE DE ENGENHARIA 3D (CSG COMERCIAL + CAIXARIA OCA COM FOLGAS + REMOÇÃO)
+            // REBUILD: CONSTRUÇÃO GEOMÉTRICA SÊNIOR
             // =========================================================================
             rebuildScene: () => {
                 window.AppState.animacoesAtivas = []; window.AppState.cutParts = []; 
@@ -892,31 +726,17 @@
                     const matTecido = new THREE.MeshStandardMaterial(window.MatDefs['tecido_linho']);
                     const selMat = new THREE.MeshStandardMaterial({...baseDef, emissive: 0x333333 });
                     
-                    const edgeMat = new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.2 }); 
-                    edgeMat.raycast = () => {}; 
+                    const edgeMat = new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.15 }); 
                     
                     const activeMat = (window.AppState.selectedModule === mod.id) ? selMat : matCorpo;
                     const activeMatFront = (window.AppState.selectedModule === mod.id) ? selMat : matFrente;
 
-                    const getMat = (partKey, defaultMat) => {
-                        if(mod.materiaisCustomizados?.estrutura?.[partKey]) {
-                            const isSelected = (window.AppState.selectedModule === mod.id);
-                            const bDef = window.MatDefs[mod.materiaisCustomizados.estrutura[partKey]];
-                            if(!bDef) return defaultMat;
-                            const mat = new THREE.MeshStandardMaterial(bDef);
-                            if(isSelected) mat.emissive.setHex(0x333333);
-                            return mat;
-                        } return defaultMat;
-                    };
-                    
-                    const matTeto = getMat('teto', mod.tampoVidro ? (mod.tipo==='balcao_curvo'||mod.tipo==='mesa_redonda_ripada'?matTampoPedra:matVidro) : activeMat); 
-                    const matBase = getMat('base', activeMat); const matEsq = getMat('lateralEsq', activeMat); const matDir = getMat('lateralDir', activeMat); const matFundo = getMat('fundo', activeMat);
+                    const matTeto = mod.tampoVidro ? (mod.tipo==='balcao_curvo'||mod.tipo==='mesa_redonda_ripada'?matTampoPedra:matVidro) : activeMat; 
 
                     const criarGeo = (geo, px, py, pz, cMat, partKey) => { 
                         if (partKey && mod.removedParts.includes(partKey)) return null;
                         const m = new THREE.Mesh(geo, cMat); m.position.set(px, py, pz); m.castShadow = m.receiveShadow = true; 
                         if(partKey) m.userData.partKey = partKey;
-                        // Não colocar wireframe em curvas para manter a suavidade Sênior
                         if(mod.tipo !== 'balcao_curvo' && mod.tipo !== 'sofa_curvo' && mod.tipo !== 'sofa' && mod.tipo !== 'puff' && mod.tipo !== 'mesa_redonda_ripada') {
                             m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), edgeMat)); 
                         }
@@ -925,283 +745,199 @@
                     
                     const criarBloco = (gw, gh, gd, px, py, pz, cMat, partKey, cutLabel = "Estrutura") => { 
                         if (partKey && mod.removedParts.includes(partKey)) return null;
-                        if (cMat !== matVidro && mod.tipo !== 'sofa' && mod.tipo !== 'cadeira' && mod.tipo !== 'puff' && mod.tipo !== 'balcao_curvo' && mod.tipo !== 'sofa_curvo') {
+                        if (cMat !== matVidro && !['sofa', 'cadeira', 'puff', 'balcao_curvo', 'sofa_curvo', 'mesa_redonda_ripada'].includes(mod.tipo) && mod.formato !== 'redondo') {
                             let pw = gw, ph = gh, pd = gd;
                             if (Math.abs(pw - esp) < 0.001) { window.AppState.cutParts.push({w: Math.round(ph*1000), h: Math.round(pd*1000), label: cutLabel}); }
                             else if (Math.abs(ph - esp) < 0.001) { window.AppState.cutParts.push({w: Math.round(pw*1000), h: Math.round(pd*1000), label: cutLabel}); }
                             else if (Math.abs(pd - esp) < 0.001) { window.AppState.cutParts.push({w: Math.round(pw*1000), h: Math.round(ph*1000), label: cutLabel}); }
-                            else if (gd <= 0.006) { window.AppState.cutParts.push({w: Math.round(pw*1000), h: Math.round(ph*1000), label: "Fundo"}); }
                         }
                         return criarGeo(new THREE.BoxGeometry(gw, gh, gd), px, py, pz, cMat, partKey);
                     };
 
-                    const drawInteractiveFronte = (gParent, isDrawer, wF, hF, dF, px, py, pz, cMat, abertura, isLeft, zDir, travelX, compKey) => {
+                    const drawFronte = (gParent, isDrawer, wF, hF, dF, px, py, pz, cMat, abertura, isLeft, zDir, compKey) => {
                         if (mod.removedParts.includes(compKey)) return;
-                        const grp = new THREE.Group(); const type = isDrawer ? 'drawer' : (abertura === 'correr' ? 'door_slide' : (abertura === 'basculante' ? 'door_flap' : 'door_hinge'));
+                        const grp = new THREE.Group(); const type = isDrawer ? 'drawer' : (abertura === 'basculante' ? 'door_flap' : 'door_hinge');
                         const isOpen = mod.compStates[compKey] || false; 
-                        grp.userData = { isAnimatable: true, type: type, isOpen: isOpen, modId: mod.id, compKey: compKey, zDir: zDir, depth: dF, baseZ: pz, travelX: travelX, baseX: px, hinge: isLeft ? 'left' : 'right', partKey: compKey };
+                        grp.userData = { isAnimatable: true, type: type, isOpen: isOpen, modId: mod.id, compKey: compKey, zDir: zDir, depth: dF, baseZ: pz, hinge: isLeft ? 'left' : 'right', partKey: compKey };
                         
                         const pM = new THREE.Mesh(new THREE.BoxGeometry(wF - folga, hF - folga, esp), cMat); 
                         pM.castShadow = true; pM.userData.partKey = compKey;
                         pM.add(new THREE.LineSegments(new THREE.EdgesGeometry(pM.geometry), edgeMat)); 
                         
                         if (isDrawer) { grp.position.set(px, py, isOpen ? (pz + dF * 0.8 * zDir) : pz); grp.add(pM); } 
-                        else {
-                            if (abertura === 'correr') { grp.position.set(isOpen ? px + travelX : px, py, pz); grp.add(pM); } 
-                            else if (abertura === 'basculante') { grp.position.set(px, py + hF/2, pz); pM.position.y = -hF/2; if (isOpen) grp.rotation.x = -Math.PI / 2.2 * zDir; grp.add(pM); } 
-                            else { 
-                                grp.position.set(px + (isLeft ? -wF/2 : wF/2), py, pz); pM.position.x = isLeft ? wF/2 : -wF/2; 
-                                const pux = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.15, 0.02), new THREE.MeshStandardMaterial({color:0x888, metalness:1})); pux.position.set(isLeft ? wF/2 - 0.04 : -wF/2 + 0.04, 0, 0.015 * zDir); pM.add(pux); 
-                                if (isOpen) grp.rotation.y = (Math.PI / 1.6 * (isLeft ? -1 : 1) * zDir); grp.add(pM); 
-                            }
+                        else if (abertura === 'basculante') { grp.position.set(px, py + hF/2, pz); pM.position.y = -hF/2; if (isOpen) grp.rotation.x = -Math.PI / 2.2 * zDir; grp.add(pM); } 
+                        else { 
+                            grp.position.set(px + (isLeft ? -wF/2 : wF/2), py, pz); pM.position.x = isLeft ? wF/2 : -wF/2; 
+                            const pux = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.15, 0.02), new THREE.MeshStandardMaterial({color:0x888})); pux.position.set(isLeft ? wF/2 - 0.04 : -wF/2 + 0.04, 0, 0.015 * zDir); pM.add(pux); 
+                            if (isOpen) grp.rotation.y = (Math.PI / 1.6 * (isLeft ? -1 : 1) * zDir); grp.add(pM); 
                         } gParent.add(grp);
-                        window.AppState.cutParts.push({w: Math.round(wF*1000), h: Math.round(hF*1000), label: isDrawer ? 'Frente Gaveta' : 'Porta'});
+                        window.AppState.cutParts.push({w: Math.round(wF*1000), h: Math.round(hF*1000), label: isDrawer ? 'Gaveta' : 'Porta'});
                     };
 
-                    const fillStorageArea = (boxW, boxH, boxD, boxX, boxY, boxZ, portas, gavetas, layout, abertura, dobrLado, zDir, parentGroup) => {
+                    const fillStorageArea = (boxW, boxH, boxD, boxX, boxY, boxZ, portas, gavetas, layout, zDir) => {
                         let startY = boxY - boxH/2, startX = boxX - boxW/2; let hP = boxH, hG = boxH, wP = boxW, wG = boxW; let syP = startY, syG = startY, sxP = startX, sxG = startX;
-                        const fixedW = mod.compW > 0 ? (mod.compW/1000) : 0; const fixedH = mod.compH > 0 ? (mod.compH/1000) : 0;
-
                         if (gavetas > 0 && portas > 0) {
                             if (layout === 'top_drawers') { hG = boxH*0.25; hP = boxH*0.75; syP = startY; syG = startY + hP; } 
                             else if (layout === 'bottom_drawers') { hG = boxH*0.25; hP = boxH*0.75; syG = startY; syP = startY + hG; } 
                             else if (layout === 'left_drawers') { wG = boxW*0.35; wP = boxW*0.65; sxG = startX; sxP = startX + wG; } 
                             else if (layout === 'right_drawers') { wP = boxW*0.65; wG = boxW*0.35; sxP = startX; sxG = startX + wP; }
                         }
-
                         if (gavetas > 0 && layout !== 'apenas_portas') {
-                            let currentY = syG;
-                            for (let i = 0; i < gavetas; i++) { 
-                                const gavKey = `gaveta_${i}`; const cG_W = mod.medidasCustomizadas?.[gavKey]?.w ? (mod.medidasCustomizadas[gavKey].w/1000) : (fixedW || wG); const cG_H = mod.medidasCustomizadas?.[gavKey]?.h ? (mod.medidasCustomizadas[gavKey].h/1000) : (fixedH || (hG / gavetas));
-                                const matGaveta = mod.materiaisCustomizados?.frentes?.[gavKey] ? new THREE.MeshStandardMaterial(window.MatDefs[mod.materiaisCustomizados.frentes[gavKey]]) : activeMatFront;
-                                drawInteractiveFronte(parentGroup, true, cG_W, cG_H, boxD, sxG + cG_W/2, currentY + cG_H/2, boxZ, matGaveta, '', false, zDir, 0, gavKey); currentY += cG_H;
-                            }
+                            let cY = syG;
+                            for (let i=0; i<gavetas; i++) { const cG_H = hG/gavetas; drawFronte(g, true, wG, cG_H, boxD, sxG + wG/2, cY + cG_H/2, boxZ, activeMatFront, '', false, zDir, `gaveta_${i}`); cY += cG_H; }
                         }
-
                         if (portas > 0 && layout !== 'apenas_gavetas') {
-                            let currentX = sxP;
-                            for (let i = 0; i < portas; i++) {
-                                const portKey = `porta_${i}`; const cP_W = mod.medidasCustomizadas?.[portKey]?.w ? (mod.medidasCustomizadas[portKey].w/1000) : (fixedW || (wP / portas)); const cP_H = mod.medidasCustomizadas?.[portKey]?.h ? (mod.medidasCustomizadas[portKey].h/1000) : (fixedH || hP);
-                                let isLeft = (i % 2 === 0); if (portas === 1) isLeft = (dobrLado === 'esq'); let tX = (i % 2 === 0) ? cP_W * 0.95 : -cP_W * 0.95; let doorZReal = boxZ + (abertura === 'correr' ? ((i % 2 === 0 ? 0.01 : 0.035) * zDir) : 0); 
-                                const matPorta = mod.materiaisCustomizados?.frentes?.[portKey] ? new THREE.MeshStandardMaterial(window.MatDefs[mod.materiaisCustomizados.frentes[portKey]]) : activeMatFront;
-                                drawInteractiveFronte(parentGroup, false, cP_W, cP_H, boxD, currentX + cP_W/2, syP + cP_H/2, doorZReal, matPorta, abertura, isLeft, zDir, tX, portKey); currentX += cP_W;
-                            }
+                            let cX = sxP;
+                            for (let i=0; i<portas; i++) { const cP_W = wP/portas; drawFronte(g, false, cP_W, hP, boxD, cX + cP_W/2, syP + hP/2, boxZ, activeMatFront, mod.abertura, (i%2===0), zDir, `porta_${i}`); cX += cP_W; }
                         }
                     };
 
-                    // =========================================================================
-                    // CSG MÓDULO CURVO, SOFÁ ORGÂNICO E MESA REDONDA RIPADA (REFS NAS FOTOS)
-                    // =========================================================================
+                    // ==========================================
+                    // CONSTRUTORES ESPECÍFICOS DE ALTO NÍVEL
+                    // ==========================================
                     if (mod.tipo === 'mesa_redonda_ripada') {
-                        // Base cilíndrica menor
                         const baseR = w / 4; 
-                        criarGeo(new THREE.CylinderGeometry(baseR, baseR, h - 0.03, 32), 0, (h-0.03)/2, 0, matCorpo, "base_cilindrica");
-                        
-                        // Ripado 360 em volta da base (Matemática pura)
+                        criarGeo(new THREE.CylinderGeometry(baseR, baseR, h - 0.03, 32), 0, (h-0.03)/2, 0, activeMat, "base_cilindrica");
                         if (!mod.removedParts.includes("ripado_360")) {
                             const ripG = new THREE.Group(); ripG.userData.partKey = "ripado_360";
                             const numRipas = Math.floor((2 * Math.PI * baseR) / 0.035);
                             for(let i=0; i<numRipas; i++) {
                                 const angle = (i / numRipas) * Math.PI * 2;
-                                const rx = Math.cos(angle) * (baseR + 0.01);
-                                const rz = Math.sin(angle) * (baseR + 0.01);
-                                const ripa = new THREE.Mesh(new THREE.BoxGeometry(0.015, h-0.03, 0.02), matFrente);
-                                ripa.position.set(rx, (h-0.03)/2, rz);
-                                ripa.rotation.y = -angle;
-                                ripG.add(ripa);
-                            }
-                            g.add(ripG);
-                            window.AppState.cutParts.push({w: Math.round((h-0.03)*1000), h: Math.round(0.035*1000), label: `Ripas 360 (${numRipas}x)`});
+                                const rx = Math.cos(angle) * (baseR + 0.01); const rz = Math.sin(angle) * (baseR + 0.01);
+                                const ripa = new THREE.Mesh(new THREE.BoxGeometry(0.015, h-0.03, 0.02), activeMatFront);
+                                ripa.position.set(rx, (h-0.03)/2, rz); ripa.rotation.y = -angle; ripG.add(ripa);
+                            } g.add(ripG);
                         }
-                        // Tampo maior (Pedra ou Madeira)
                         criarGeo(new THREE.CylinderGeometry(w/2, w/2, 0.03, 64), 0, h - 0.015, 0, matTeto, "tampo_cilindrico");
                     }
                     else if (mod.tipo === 'sofa_curvo') {
-                        // Sofá Curvo (Path Sweeping como no Balcão)
-                        const path = new THREE.CurvePath();
-                        path.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(-w/2, 0, d/2), new THREE.Vector3(0, 0, -d/4), new THREE.Vector3(w/2, 0, d/2)));
-                        const smoothPath = new THREE.CatmullRomCurve3(path.getPoints(50));
+                        // Construção do Sofá com Vector3 explícito para prevenir erros isVector2 do Three.js
+                        const p1 = new THREE.Vector3(-w/2, 0, d/2); const p2 = new THREE.Vector3(0, 0, -d/4); const p3 = new THREE.Vector3(w/2, 0, d/2);
+                        const path = new THREE.QuadraticBezierCurve3(p1, p2, p3);
+                        const smoothPath = new THREE.CatmullRomCurve3(path.getPoints(30));
                         
-                        const createSofaExtrusion = (shape, yPos, lbl, pKey) => {
+                        const createSofa = (shape, yPos, pKey) => {
                             if (mod.removedParts.includes(pKey)) return;
-                            const geo = new THREE.ExtrudeGeometry(shape, { extrudePath: smoothPath, steps: 80, bevelEnabled: true, bevelSegments: 3, bevelSize: 0.02, bevelThickness: 0.02 });
-                            const m = new THREE.Mesh(geo, matTecido); m.position.set(0, yPos, 0); m.castShadow = true; m.receiveShadow = true; 
-                            m.userData.partKey = pKey; g.add(m);
+                            const geo = new THREE.ExtrudeGeometry(shape, { extrudePath: smoothPath, steps: 60, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02 });
+                            const m = new THREE.Mesh(geo, matTecido); m.position.set(0, yPos, 0); m.castShadow = true; m.userData.partKey = pKey; g.add(m);
                         };
-
-                        // Assento
-                        const hAssento = h * 0.4;
-                        const assentoShape = new THREE.Shape(); assentoShape.moveTo(-d/3, 0); assentoShape.lineTo(d/3, 0); assentoShape.lineTo(d/3, hAssento); assentoShape.lineTo(-d/3, hAssento); assentoShape.lineTo(-d/3, 0);
-                        createSofaExtrusion(assentoShape, 0, "Assento Curvo", "assento_curvo");
-
-                        // Encosto (Vai até altura total, mais fino e atrás)
-                        const dEncosto = d * 0.2;
-                        const encostoShape = new THREE.Shape(); encostoShape.moveTo(-d/3, hAssento); encostoShape.lineTo(-d/3 + dEncosto, hAssento); encostoShape.lineTo(-d/3 + dEncosto, h); encostoShape.lineTo(-d/3, h); encostoShape.lineTo(-d/3, hAssento);
-                        createSofaExtrusion(encostoShape, 0, "Encosto Curvo", "encosto_curvo");
+                        const hAss = h * 0.4; const dEnc = d * 0.2;
+                        const sAss = new THREE.Shape(); sAss.moveTo(-d/3, 0); sAss.lineTo(d/3, 0); sAss.lineTo(d/3, hAss); sAss.lineTo(-d/3, hAss); sAss.lineTo(-d/3, 0);
+                        const sEnc = new THREE.Shape(); sEnc.moveTo(-d/3, hAss); sEnc.lineTo(-d/3 + dEnc, hAss); sEnc.lineTo(-d/3 + dEnc, h); sEnc.lineTo(-d/3, h); sEnc.lineTo(-d/3, hAss);
+                        createSofa(sAss, 0, "assento_curvo"); createSofa(sEnc, 0, "encosto_curvo");
                         
-                        // Ripado Vertical nas costas do sofá (Conforme Foto 1/4)
                         if (mod.ripadoFrontal && !mod.removedParts.includes("ripado_sofa")) {
-                            const points = smoothPath.getPoints(80);
-                            for (let i = 0; i < points.length; i++) {
-                                const pt = points[i]; 
-                                const tangent = smoothPath.getTangent(i / (points.length - 1), new THREE.Vector3()); 
-                                const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize(); // Normal apontando para fora da curva
-                                const rPx = pt.x - normal.x * (d/3 + 0.01); const rPz = pt.z - normal.z * (d/3 + 0.01); const angle = Math.atan2(tangent.x, tangent.z);
-                                const ripaGeo = new THREE.BoxGeometry(0.015, h, 0.02);
-                                const m = new THREE.Mesh(ripaGeo, activeMatFront); m.position.set(rPx, h/2, rPz); m.rotation.y = angle; m.userData.partKey = "ripado_sofa"; g.add(m);
+                            const pts = smoothPath.getPoints(60);
+                            for (let i=0; i<pts.length; i++) {
+                                const pt = pts[i]; const tan = smoothPath.getTangent(i/(pts.length-1), new THREE.Vector3()); const norm = new THREE.Vector3(-tan.z, 0, tan.x).normalize();
+                                const m = new THREE.Mesh(new THREE.BoxGeometry(0.015, h, 0.02), activeMatFront);
+                                m.position.set(pt.x - norm.x * (d/3 + 0.01), h/2, pt.z - norm.z * (d/3 + 0.01)); m.rotation.y = Math.atan2(tan.x, tan.z); m.userData.partKey = "ripado_sofa"; g.add(m);
                             }
                         }
                     }
                     else if (mod.tipo === 'painel_ripado_iluminado') {
-                        // Painel Reto Ripado (Parede da Foto 3)
-                        criarBloco(w, h, 0.03, 0, h/2, -d/2 + 0.015, matFundo, "fundo_painel", "Fundo do Painel");
-                        
+                        criarBloco(w, h, 0.03, 0, h/2, -d/2 + 0.015, activeMat, "fundo_painel", "Fundo Painel");
                         if (!mod.removedParts.includes("ripado_painel")) {
                             const ripG = new THREE.Group(); ripG.userData.partKey = "ripado_painel";
                             const numRipas = Math.floor(w / 0.04);
                             for(let i=0; i<numRipas; i++) {
-                                const rPx = -w/2 + 0.02 + (i * 0.04);
                                 const ripa = new THREE.Mesh(new THREE.BoxGeometry(0.02, h, 0.02), activeMatFront);
-                                ripa.position.set(rPx, h/2, -d/2 + 0.04);
-                                ripG.add(ripa);
-                            }
-                            g.add(ripG);
-                            window.AppState.cutParts.push({w: Math.round(h*1000), h: Math.round(0.04*1000), label: `Ripas Painel (${numRipas}x)`});
+                                ripa.position.set(-w/2 + 0.02 + (i * 0.04), h/2, -d/2 + 0.04); ripG.add(ripa);
+                            } g.add(ripG);
                         }
-                        
-                        // Fita LED atrás do painel
                         const ledMat = new THREE.MeshStandardMaterial({ color: 0xffddaa, emissive: 0xffddaa, emissiveIntensity: 2 });
                         criarGeo(new THREE.BoxGeometry(w-0.05, h-0.05, 0.01), 0, h/2, -d/2 - 0.01, ledMat, "led_painel");
                     }
                     else if (mod.tipo === 'balcao_curvo') {
                         const L1_len = w * 0.4; const L2_len = w * 0.3; 
-                        const path = new THREE.CurvePath();
-                        path.add(new THREE.LineCurve3(new THREE.Vector3(-L1_len, 0, 0), new THREE.Vector3(0, 0, 0)));
-                        path.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(rBase, 0, 0), new THREE.Vector3(rBase, 0, rBase)));
-                        path.add(new THREE.LineCurve3(new THREE.Vector3(rBase, 0, rBase), new THREE.Vector3(rBase, 0, rBase + L2_len)));
+                        const p1 = new THREE.Vector3(-L1_len, 0, 0); const p2 = new THREE.Vector3(0, 0, 0);
+                        const p3 = new THREE.Vector3(rBase, 0, 0); const p4 = new THREE.Vector3(rBase, 0, rBase);
+                        const p5 = new THREE.Vector3(rBase, 0, rBase + L2_len);
+                        
+                        const curvePts = [p1, p2];
+                        const bez = new THREE.QuadraticBezierCurve3(p2, p3, p4); curvePts.push(...bez.getPoints(20));
+                        curvePts.push(p5);
+                        
+                        // Vector3 unificado previne erro
+                        const smoothPath = new THREE.CatmullRomCurve3(curvePts);
 
-                        const pathPoints = path.getPoints(80);
-                        const smoothPath = new THREE.CatmullRomCurve3(pathPoints);
-
-                        const createExtrusion = (shape, material, yPos, lbl, pKey) => {
+                        const createExt = (shape, material, yPos, pKey) => {
                             if (mod.removedParts.includes(pKey)) return;
-                            const geo = new THREE.ExtrudeGeometry(shape, { extrudePath: smoothPath, steps: 80, bevelEnabled: false });
-                            const m = new THREE.Mesh(geo, material); m.position.set(0, yPos, 0); m.castShadow = true; m.receiveShadow = true; 
-                            m.userData.partKey = pKey; g.add(m);
-                            const compTotal = L1_len + L2_len + ((Math.PI * rBase) / 2);
-                            window.AppState.cutParts.push({w: Math.round(compTotal*1000), h: Math.round(100*1000), label: lbl});
+                            const geo = new THREE.ExtrudeGeometry(shape, { extrudePath: smoothPath, steps: 60, bevelEnabled: false });
+                            const m = new THREE.Mesh(geo, material); m.position.set(0, yPos, 0); m.castShadow = true; m.userData.partKey = pKey; g.add(m);
                         };
 
-                        const rodapeShape = new THREE.Shape(); rodapeShape.moveTo(-d/2 + 0.15, 0); rodapeShape.lineTo(d/2 - 0.05, 0); rodapeShape.lineTo(d/2 - 0.05, 0.1); rodapeShape.lineTo(-d/2 + 0.15, 0.1); rodapeShape.lineTo(-d/2 + 0.15, 0);
-                        createExtrusion(rodapeShape, matRodape, 0, "Rodapé Curvo", "rodape_curvo");
+                        const sRod = new THREE.Shape(); sRod.moveTo(-d/2 + 0.15, 0); sRod.lineTo(d/2 - 0.05, 0); sRod.lineTo(d/2 - 0.05, 0.1); sRod.lineTo(-d/2 + 0.15, 0.1); sRod.lineTo(-d/2 + 0.15, 0);
+                        createExt(sRod, matRodape, 0, "rodape_curvo");
 
-                        const corpoShape = new THREE.Shape(); corpoShape.moveTo(-d/2, 0); corpoShape.lineTo(d/2, 0); corpoShape.lineTo(d/2, h - 0.1); corpoShape.lineTo(-d/2, h - 0.1); corpoShape.lineTo(-d/2, 0);
-                        createExtrusion(corpoShape, activeMat, 0.1, "Corpo Curvo", "corpo_curvo");
+                        const sCorp = new THREE.Shape(); sCorp.moveTo(-d/2, 0); sCorp.lineTo(d/2, 0); sCorp.lineTo(d/2, h - 0.1); sCorp.lineTo(-d/2, h - 0.1); sCorp.lineTo(-d/2, 0);
+                        createExt(sCorp, activeMat, 0.1, "corpo_curvo");
 
-                        const tampoShape = new THREE.Shape(); const bFront = mod.tampoVidro ? 0.03 : 0.01;
-                        tampoShape.moveTo(-d/2 - 0.01, 0); tampoShape.lineTo(d/2 + bFront, 0); tampoShape.lineTo(d/2 + bFront, 0.036); tampoShape.lineTo(-d/2 - 0.01, 0.036); tampoShape.lineTo(-d/2 - 0.01, 0);
-                        createExtrusion(tampoShape, matTeto, h - 0.1, "Tampo Curvo", "tampo_curvo");
+                        const sTampo = new THREE.Shape(); const bF = mod.tampoVidro ? 0.03 : 0.01;
+                        sTampo.moveTo(-d/2 - 0.01, 0); sTampo.lineTo(d/2 + bF, 0); sTampo.lineTo(d/2 + bF, 0.036); sTampo.lineTo(-d/2 - 0.01, 0.036); sTampo.lineTo(-d/2 - 0.01, 0);
+                        createExt(sTampo, matTeto, h - 0.1, "tampo_curvo");
 
                         if (mod.ripadoFrontal && !mod.removedParts.includes("ripado_frontal")) {
-                            const points = smoothPath.getPoints(100);
-                            for (let i = 0; i < points.length; i++) {
-                                const pt = points[i]; 
-                                const tangent = smoothPath.getTangent(i / (points.length - 1), new THREE.Vector3()); 
-                                const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
-                                const rPx = pt.x + normal.x * (d/2 + 0.01); const rPz = pt.z + normal.z * (d/2 + 0.01); const angle = Math.atan2(tangent.x, tangent.z);
-                                const ripaGeo = new THREE.BoxGeometry(0.02, h - 0.1, 0.015);
-                                const m = new THREE.Mesh(ripaGeo, activeMatFront); m.position.set(rPx, 0.1 + (h-0.1)/2, rPz); m.rotation.y = angle; m.userData.partKey = "ripado_frontal"; g.add(m);
+                            const pts = smoothPath.getPoints(80);
+                            for (let i = 0; i < pts.length; i++) {
+                                const pt = pts[i]; const tan = smoothPath.getTangent(i/(pts.length-1), new THREE.Vector3()); const norm = new THREE.Vector3(-tan.z, 0, tan.x).normalize();
+                                const m = new THREE.Mesh(new THREE.BoxGeometry(0.02, h - 0.1, 0.015), activeMatFront);
+                                m.position.set(pt.x + norm.x * (d/2 + 0.01), 0.1 + (h-0.1)/2, pt.z + norm.z * (d/2 + 0.01)); m.rotation.y = Math.atan2(tan.x, tan.z); m.userData.partKey = "ripado_frontal"; g.add(m);
                             }
                         }
                     } 
-                    else if (mod.tipo === 'expositor') {
-                        criarBloco(esp, h, d, -w/2+esp/2, h/2, 0, matEsq, "lateralEsq", "Lateral Esq");
-                        criarBloco(esp, h, d, w/2-esp/2, h/2, 0, matDir, "lateralDir", "Lateral Dir");
-                        criarBloco(w-esp*2, h, esp, 0, h/2, -d/2+esp/2, matFundo, "fundo", "Fundo");
-                        
-                        const epIn = (h-esp*2) / (mod.prateleirasExternas + 1); 
-                        for(let i=1; i<=mod.prateleirasExternas; i++) {
-                            const yPos = esp + epIn*i;
-                            const prat = criarBloco(w-esp*2, esp, d-0.05, 0, yPos, 0, matCorpo, `prateleira_inc_${i}`, "Prateleira Inclinada");
-                            if(prat) prat.rotation.x = Math.PI / 15;
-                            criarBloco(w-esp*2, 0.04, esp, 0, yPos - 0.02, d/2 - 0.03, matCorpo, `aparador_${i}`, "Aparador");
-                        }
-                    } 
-                    else if (mod.tipo === 'nicho_iluminado') {
-                        criarBloco(w, esp, d, 0, esp/2, 0, matBase, "base", "Base"); criarBloco(w, esp, d, 0, h-esp/2, 0, matTeto, "teto", "Teto"); criarBloco(esp, h-esp*2, d, -w/2+esp/2, h/2, 0, matEsq, "lateralEsq", "Lat"); criarBloco(esp, h-esp*2, d, w/2-esp/2, h/2, 0, matDir, "lateralDir", "Lat"); criarBloco(w-esp*2, h-esp*2, esp, 0, h/2, -d/2+esp/2, matFundo, "fundo", "Fundo");
-                        const ledMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 2 });
-                        criarGeo(new THREE.BoxGeometry(w-esp*2, 0.01, 0.02), 0, h-esp-0.005, d/2 - 0.05, ledMat, "led_teto");
-                        criarGeo(new THREE.BoxGeometry(0.01, h-esp*2, 0.02), -w/2+esp+0.005, h/2, d/2 - 0.05, ledMat, "led_esq");
-                        criarGeo(new THREE.BoxGeometry(0.01, h-esp*2, 0.02), w/2-esp-0.005, h/2, d/2 - 0.05, ledMat, "led_dir");
-                    } 
                     else if (mod.tipo === 'sofa' || mod.tipo === 'puff') {
-                         if (mod.tipo === 'puff') {
-                             criarGeo(new THREE.BoxGeometry(w, h, d), 0, h/2, 0, matTecido, "corpo_puff");
-                         } else {
-                             const hAssento = h * 0.4; const dEncosto = d * 0.2; const wBraco = w * 0.15;
-                             criarGeo(new THREE.BoxGeometry(w, hAssento, d), 0, hAssento/2, 0, matTecido, "assento_sofa");
-                             criarGeo(new THREE.BoxGeometry(w, h - hAssento, dEncosto), 0, hAssento + (h-hAssento)/2, -d/2 + dEncosto/2, matTecido, "encosto_sofa");
-                             criarGeo(new THREE.BoxGeometry(wBraco, hAssento * 1.5, d), -w/2 + wBraco/2, (hAssento*1.5)/2, 0, matTecido, "braco_esq_sofa");
-                             criarGeo(new THREE.BoxGeometry(wBraco, hAssento * 1.5, d), w/2 - wBraco/2, (hAssento*1.5)/2, 0, matTecido, "braco_dir_sofa");
-                         }
+                        if (mod.tipo === 'puff') { criarBloco(w, h, d, 0, h/2, 0, matTecido, "corpo_puff"); } 
+                        else {
+                            const hA = h * 0.4; const dE = d * 0.2; const wB = w * 0.15;
+                            criarBloco(w, hA, d, 0, hA/2, 0, matTecido, "assento");
+                            criarBloco(w, h - hA, dE, 0, hA + (h-hA)/2, -d/2 + dE/2, matTecido, "encosto");
+                            criarBloco(wB, hA * 1.5, d, -w/2 + wB/2, (hA*1.5)/2, 0, matTecido, "braco_esq");
+                            criarBloco(wB, hA * 1.5, d, w/2 - wB/2, (hA*1.5)/2, 0, matTecido, "braco_dir");
+                        }
                     }
                     else {
-                        // =========================================================================
-                        // LÓGICA MESTRE DE CAIXARIA PADRÃO
-                        // =========================================================================
-                        const isBalcao = (mod.tipo === 'balcao'); 
-                        const prEx = mod.prateleirasExternas > 0 ? 0.20 : 0; 
-                        const chassiD = d - prEx; 
+                        // CAIXARIA PADRÃO OCA COM POSSIBILIDADE DE REMOVER QUALQUER PARTE
+                        const chD = d - (mod.prateleirasExternas > 0 ? 0.20 : 0); 
+                        let fTZ = chD / 2; let fAZ = -chD / 2; let dT = 1; let dA = -1;
+
+                        if (mod.frentesInternas) { fTZ = -chD / 2; fAZ = chD / 2; dT = -1; dA = 1; }
+                        if (mod.tipo === 'balcao') { fTZ = -fTZ; fAZ = -fAZ; dT = -dT; dA = -dA; }
+
+                        const zC = (fTZ + fAZ) / 2;
                         
-                        let faceTrabalhoZ = chassiD / 2; let faceAtendimentoZ = -chassiD / 2; let dirTrabalho = 1; let dirAtendimento = -1;
-
-                        if (mod.frentesInternas) { faceTrabalhoZ = -chassiD / 2; faceAtendimentoZ = chassiD / 2; dirTrabalho = -1; dirAtendimento = 1; }
-                        if (isBalcao) { faceTrabalhoZ = -faceTrabalhoZ; faceAtendimentoZ = -faceAtendimentoZ; dirTrabalho = -dirTrabalho; dirAtendimento = -dirAtendimento; }
-
-                        const zCentro = (faceTrabalhoZ + faceAtendimentoZ) / 2;
-                        
-                        criarBloco(w, esp, chassiD, 0, esp/2, zCentro, matBase, "base", "Base"); 
-                        criarBloco(w, esp, chassiD, 0, h-esp/2, zCentro, matTeto, "teto", "Tampo"); 
-                        criarBloco(esp, h-esp*2, chassiD, -w/2+esp/2, h/2, zCentro, matEsq, "lateralEsq", "Lat Esq"); 
-                        criarBloco(esp, h-esp*2, chassiD, w/2-esp/2, h/2, zCentro, matDir, "lateralDir", "Lat Dir"); 
-
-                        criarBloco(w-esp*2, h-esp*2, 0.006, 0, h/2, faceAtendimentoZ - (0.003 * dirAtendimento), matFundo, "fundo", "Fundo 6mm");
+                        criarBloco(w, esp, chD, 0, esp/2, zC, activeMat, "base", "Base"); 
+                        criarBloco(w, esp, chD, 0, h-esp/2, zC, matTeto, "teto", "Tampo"); 
+                        criarBloco(esp, h-esp*2, chD, -w/2+esp/2, h/2, zC, activeMat, "lateralEsq", "Lat Esq"); 
+                        criarBloco(esp, h-esp*2, chD, w/2-esp/2, h/2, zC, activeMat, "lateralDir", "Lat Dir"); 
+                        criarBloco(w-esp*2, h-esp*2, 0.006, 0, h/2, fAZ - (0.003 * dA), activeMat, "fundo", "Fundo");
                         
                         if (mod.prateleiras > 0) { 
                             const epIn = (h-esp*2) / (mod.prateleiras + 1); 
-                            for (let i=1; i<=mod.prateleiras; i++) { criarBloco(w-esp*2, esp, chassiD-0.02, 0, esp+epIn*i, zCentro, activeMat, `prat_int_${i}`, "Prat Interna"); }
+                            for (let i=1; i<=mod.prateleiras; i++) { criarBloco(w-esp*2, esp, chD-0.02, 0, esp+epIn*i, zC, activeMat, `prat_int_${i}`, "Prat Int"); }
                         }
                         
-                        if (prEx > 0 || mod.ripadoFrontal) { 
-                            criarBloco(w-esp*2, h-esp*2, esp, 0, h/2, faceAtendimentoZ + (esp/2 * dirAtendimento), activeMatFront, "fundo_ancoragem", "Fundo Ancoragem"); 
-                            
+                        if (mod.prateleirasExternas > 0 || mod.ripadoFrontal) { 
+                            criarBloco(w-esp*2, h-esp*2, esp, 0, h/2, fAZ + (esp/2 * dA), activeMatFront, "fundo_anc", "Painel"); 
                             if (mod.ripadoFrontal && !mod.removedParts.includes("ripado_frontal")) {
                                 const bw = w-esp*2; const qty = Math.floor(bw / 0.035); 
                                 for (let r = 0; r < qty; r++) { 
-                                    const rPx = 0 - bw/2 + r*0.035 + 0.017;
-                                    criarGeo(new THREE.BoxGeometry(0.02, h-esp*2, esp), rPx, h/2, faceAtendimentoZ + (esp * dirAtendimento), activeMatFront, "ripado_frontal");
-                                    window.AppState.cutParts.push({w: Math.round((h-esp*2)*1000), h: Math.round(0.035*1000), label: 'Ripa Frontal'});
+                                    criarGeo(new THREE.BoxGeometry(0.02, h-esp*2, esp), -bw/2 + r*0.035 + 0.017, h/2, fAZ + (esp * dA), activeMatFront, "ripado_frontal");
                                 }
                             }
-                            
-                            if (prEx > 0) { 
+                            if (mod.prateleirasExternas > 0) { 
                                 const epEx = (h-esp*2) / (mod.prateleirasExternas + 1); 
-                                for(let i=1; i<=mod.prateleirasExternas; i++) { criarBloco(w-esp*2, esp, prEx, 0, esp+epEx*i, faceAtendimentoZ + (prEx/2 * dirAtendimento), activeMat, `prat_ext_${i}`, "Prat Externa"); }
+                                for(let i=1; i<=mod.prateleirasExternas; i++) { criarBloco(w-esp*2, esp, 0.20, 0, esp+epEx*i, fAZ + (0.10 * dA), activeMat, `prat_ext_${i}`, "Prat Ext"); }
                             } 
                         }
 
-                        if ((mod.formato === 'L_esq' || mod.formato === 'L_dir') && rL > d) { 
-                            const isE = mod.formato === 'L_esq'; const wL = chassiD, lenL = rL - d; const pxL = isE ? -w/2+wL/2 : w/2-wL/2; const pzL = faceTrabalhoZ + (lenL/2 * dirTrabalho); 
-                            criarBloco(wL, esp, lenL, pxL, esp/2, pzL, matBase, "base_L", "Base L"); criarBloco(wL, esp, lenL, pxL, h-esp/2, pzL, matTeto, "teto_L", "Tampo L"); criarBloco(wL, h-esp*2, esp, pxL, h/2, pzL + (lenL/2 * dirTrabalho) - (esp/2 * dirTrabalho), matFundo, "fundo_L", "Ponta L"); 
-                            const ladoParedeX = pxL + (isE ? -wL/2 + esp/2 : wL/2 - esp/2); const ladoDentroX = pxL + (isE ? wL/2 - esp/2 : -wL/2 + esp/2); let painelX = mod.frentesInternas ? ladoParedeX : ladoDentroX; if (isBalcao) { painelX = mod.frentesInternas ? ladoDentroX : ladoParedeX; }
-                            criarBloco(esp, h-esp*2, lenL, painelX, h/2, pzL, isE ? matEsq : matDir, "lateral_L", "Lat L"); 
-
-                            const returnGroup = new THREE.Group(); returnGroup.position.set(pxL, h/2, pzL); returnGroup.rotation.y = isE ? -Math.PI/2 : Math.PI/2; 
-                            fillStorageArea(lenL-esp*2, h-esp*2, chassiD, 0, 0, (wL/2 * -dirTrabalho), mod.portas, mod.gavetas, mod.layoutInterno, mod.abertura, mod.dobradicaLado, dirTrabalho, returnGroup); 
-                            g.add(returnGroup); 
+                        if ((mod.formato === 'L_esq' || mod.formato === 'L_dir') && rBase > d) { 
+                            const isE = mod.formato === 'L_esq'; const wL = chD, lenL = rBase - d; const pxL = isE ? -w/2+wL/2 : w/2-wL/2; const pzL = fTZ + (lenL/2 * dT); 
+                            criarBloco(wL, esp, lenL, pxL, esp/2, pzL, activeMat, "base_L", "Base L"); criarBloco(wL, esp, lenL, pxL, h-esp/2, pzL, matTeto, "teto_L", "Tampo L"); criarBloco(wL, h-esp*2, esp, pxL, h/2, pzL + (lenL/2 * dT) - (esp/2 * dT), activeMat, "fundo_L", "Ponta L"); 
+                            criarBloco(esp, h-esp*2, lenL, pxL + (isE ? -wL/2 + esp/2 : wL/2 - esp/2), h/2, pzL, activeMat, "lateral_L", "Lat L"); 
                         }
                         
-                        fillStorageArea(w-esp*2, h-esp*2, chassiD, 0, h/2, faceTrabalhoZ, mod.portas, mod.gavetas, mod.layoutInterno, mod.abertura, mod.dobradicaLado, dirTrabalho, g);
+                        fillStorageArea(w-esp*2, h-esp*2, chD, 0, h/2, fTZ, mod.portas, mod.gavetas, mod.layoutInterno, dT);
                     }
 
                     const fx = mod.posX === 0 ? (autoX + w/2) : mod.posX / 1000;
@@ -1216,442 +952,102 @@
 
         window.App = {
             init: () => {
-                window.App.config.load(); 
-                window.ThreeEngine.init();
-                // Inicializando a FÁBRICA AMBULANTE
-                window.App.modules.add('balcao_curvo', { nome: "Recepção Nova Romana Curva", largura: 1500, altura: 1100, profundidade: 600, raioCurva: 800, material: 'amadeirado_padrao', tampoVidro: true, ripadoFrontal: true });
-                window.App.ui.toast("Motor AutoCAD Sênior Inicializado.", "success");
+                window.App.config.load(); window.ThreeEngine.init();
+                window.App.modules.add('balcao_curvo', { nome: "Balcão Orgânico Sênior", largura: 1500, altura: 1100, profundidade: 600, raioCurva: 800, material: 'amadeirado_padrao', tampoVidro: true, ripadoFrontal: true });
             },
             modules: {
                 add: (tipo, overrides = {}) => {
                     const id = Date.now().toString();
-                    const mod = { 
-                        id, tipo, nome: window.OracleEngine.rules[tipo]?.label || "Móvel Universal", 
-                        largura: 800, altura: 800, profundidade: 500, raioCurva: 600, material: 'amadeirado_padrao', abertura: 'giro', formato: 'reto', 
-                        portas: 2, gavetas: 0, prateleiras: 1, prateleirasExternas: 0, layoutInterno: 'apenas_portas', dobradicaLado: 'esq', 
-                        ripadoFrontal: false, tampoVidro: false, compW: 0, compH: 0, compStates: {}, 
-                        frentesInternas: false, materiaisCustomizados: { frentes: {}, estrutura: {} }, medidasCustomizadas: {}, 
-                        posX: 0, posY: 0, posZ: 0, rotY: 0, removedParts: [], ...overrides 
-                    };
-                    window.OracleEngine.validateAndFix(mod); 
-                    window.AppState.modules.push(mod); 
-                    window.App.modules.select(id); 
-                    window.App.modules.refreshAll();
+                    const mod = { id, tipo, nome: window.OracleEngine.rules[tipo]?.label || "Móvel Universal", largura: 800, altura: 800, profundidade: 500, raioCurva: 600, material: 'amadeirado_padrao', abertura: 'giro', formato: 'reto', portas: 2, gavetas: 0, prateleiras: 1, prateleirasExternas: 0, layoutInterno: 'apenas_portas', dobradicaLado: 'esq', ripadoFrontal: false, tampoVidro: false, compW: 0, compH: 0, compStates: {}, frentesInternas: false, materiaisCustomizados: { frentes: {}, estrutura: {} }, medidasCustomizadas: {}, posX: 0, posY: 0, posZ: 0, rotY: 0, removedParts: [], ...overrides };
+                    window.OracleEngine.validateAndFix(mod); window.AppState.modules.push(mod); window.App.modules.select(id); window.App.modules.refreshAll();
                 },
-                addGeneric: () => { 
-                    window.App.ui.fecharHUDs(); 
-                    window.App.modules.add('armario'); 
-                },
-                select: (id) => { 
-                    window.AppState.selectedModule = id; 
-                    window.ThreeEngine.highlightSelection(id); 
-                    window.App.ui.renderList(); 
-                    if (id && document.getElementById('floatingEditor').classList.contains('active')) { 
-                        window.App.ui.openLiveEditor(id); 
-                    } 
-                },
-                removeCurrent: () => { 
-                    let idToRem = window.AppState.selectedModule; 
-                    if (!idToRem) { const el = document.getElementById('eId'); if(el) idToRem = el.value; } 
-                    if (!idToRem) return window.App.ui.toast("Nenhum módulo selecionado.", "error"); 
-                    window.AppState.modules = window.AppState.modules.filter(m => m.id !== idToRem); 
-                    window.App.modules.select(null); 
-                    window.App.ui.fecharEditor(); 
-                    window.App.modules.refreshAll(); 
-                    window.App.ui.toast("Módulo excluído.", "success"); 
-                },
-                restorePartsCurrent: () => {
-                    let idToRem = window.AppState.selectedModule; 
-                    if (!idToRem) { const el = document.getElementById('eId'); if(el) idToRem = el.value; } 
-                    const mod = window.AppState.modules.find(m => m.id === idToRem);
-                    if (mod) {
-                        mod.removedParts = [];
-                        window.App.modules.refreshAll();
-                        window.App.ui.toast("Peças removidas restauradas!", "success");
-                    }
-                },
-                refreshAll: () => { 
-                    window.ThreeEngine.rebuildScene(); 
-                    window.BOMEngine.update(); 
-                    window.App.ui.renderList(); 
-                },
-                exportarProjeto: () => { 
-                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.AppState.modules, null, 2)); 
-                    const downloadAnchorNode = document.createElement('a'); 
-                    downloadAnchorNode.setAttribute("href", dataStr); 
-                    downloadAnchorNode.setAttribute("download", "projeto_marcenaria_senior.json"); 
-                    document.body.appendChild(downloadAnchorNode); 
-                    downloadAnchorNode.click(); 
-                    downloadAnchorNode.remove(); 
-                    window.App.ui.toast("Projeto exportado em JSON!", "success"); 
-                }
+                addGeneric: () => { window.App.ui.fecharHUDs(); window.App.modules.add('armario'); },
+                select: (id) => { window.AppState.selectedModule = id; window.ThreeEngine.highlightSelection(id); window.App.ui.renderList(); if (id && document.getElementById('floatingEditor').classList.contains('active')) { window.App.ui.openLiveEditor(id); } },
+                removeCurrent: () => { let idToRem = window.AppState.selectedModule; if (!idToRem) { const el = document.getElementById('eId'); if(el) idToRem = el.value; } if (!idToRem) return window.App.ui.toast("Nenhum módulo selecionado.", "error"); window.AppState.modules = window.AppState.modules.filter(m => m.id !== idToRem); window.App.modules.select(null); window.App.ui.fecharEditor(); window.App.modules.refreshAll(); window.App.ui.toast("Módulo excluído.", "success"); },
+                restorePartsCurrent: () => { let idToRem = window.AppState.selectedModule; if (!idToRem) { const el = document.getElementById('eId'); if(el) idToRem = el.value; } const mod = window.AppState.modules.find(m => m.id === idToRem); if (mod) { mod.removedParts = []; window.App.modules.refreshAll(); window.App.ui.toast("Peças restauradas!", "success"); } },
+                refreshAll: () => { window.ThreeEngine.rebuildScene(); window.BOMEngine.update(); window.App.ui.renderList(); },
+                exportarProjeto: () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.AppState.modules, null, 2)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "projeto_senior.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
             },
             ui: {
-                abrirHUD: (id) => { 
-                    document.querySelectorAll('.bottom-sheet').forEach(s => s.classList.remove('active')); 
-                    document.getElementById(id).classList.add('active'); 
-                },
-                fecharHUDs: () => { 
-                    document.querySelectorAll('.bottom-sheet').forEach(s => s.classList.remove('active')); 
-                },
-                fecharEditor: () => { 
-                    document.getElementById('floatingEditor').classList.remove('active'); 
-                },
-                toggleModal: (id) => { 
-                    const m = document.getElementById(id); 
-                    m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; 
-                },
-                toast: (msg, type = 'info') => { 
-                    const t = document.getElementById('toast'); 
-                    document.getElementById('toastMessage').innerText = msg; 
-                    t.className = `show ${type}`; 
-                    setTimeout(() => t.className = '', 3500); 
-                },
-                showLoader: (msg) => { 
-                    document.getElementById('statusText').innerText = msg; 
-                    document.getElementById('statusOverlay').style.display = 'flex'; 
-                },
-                hideLoader: () => { 
-                    document.getElementById('statusOverlay').style.display = 'none'; 
-                },
-                renderList: () => { 
-                    const c = document.getElementById('listaModulosContainer'); 
-                    if (!c) return; 
-                    c.innerHTML = ''; 
-                    window.AppState.modules.forEach(m => { 
-                        const d = document.createElement('div'); 
-                        d.className = `module-card ${window.AppState.selectedModule===m.id?'selected':''}`; 
-                        d.onclick = () => { window.App.modules.select(m.id); window.App.ui.fecharHUDs(); window.App.ui.openLiveEditor(m.id); }; 
-                        d.innerHTML = `<h4>${m.nome}</h4><p>${m.largura}x${m.altura}x${m.profundidade}mm - Mat: ${window.MatDefs[m.material]?.label}</p>`; 
-                        c.appendChild(d); 
-                    }); 
-                },
+                abrirHUD: (id) => { document.querySelectorAll('.bottom-sheet').forEach(s => s.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active')); event.currentTarget.classList.add('active'); document.getElementById(id).classList.add('active'); },
+                fecharHUDs: () => { document.querySelectorAll('.bottom-sheet').forEach(s => s.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active')); },
+                fecharEditor: () => { document.getElementById('floatingEditor').classList.remove('active'); },
+                toggleModal: (id) => { const m = document.getElementById(id); m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; },
+                toast: (msg, type = 'info') => { const t = document.getElementById('toast'); document.getElementById('toastMessage').innerText = msg; t.className = `show ${type}`; setTimeout(() => t.className = '', 3500); },
+                showLoader: (msg) => { document.getElementById('statusText').innerText = msg; document.getElementById('statusOverlay').style.display = 'flex'; },
+                hideLoader: () => { document.getElementById('statusOverlay').style.display = 'none'; },
+                renderList: () => { const c = document.getElementById('listaModulosContainer'); if (!c) return; c.innerHTML = ''; window.AppState.modules.forEach(m => { const d = document.createElement('div'); d.className = `module-card ${window.AppState.selectedModule===m.id?'selected':''}`; d.onclick = () => { window.App.modules.select(m.id); window.App.ui.fecharHUDs(); window.App.ui.openLiveEditor(m.id); }; d.innerHTML = `<h4>${m.nome}</h4><p>${m.largura}x${m.altura}x${m.profundidade}mm</p>`; c.appendChild(d); }); },
                 openLiveEditor: (id) => {
-                    const m = window.AppState.modules.find(x => x.id === id); 
-                    if (!m) return; 
-                    
-                    const elId = document.getElementById('eId'); 
-                    if (elId) elId.value = m.id;
-                    
+                    const m = window.AppState.modules.find(x => x.id === id); if (!m) return;
+                    document.getElementById('eId').value = m.id;
                     const props = ['tipo','formato','layoutInterno','dobradicaLado','material','abertura','largura','altura','profundidade','retornoL','portas','gavetas','prateleiras','prateleirasExternas','compW','compH','posX','posY','posZ','rotY'];
                     const keys = ['eT','eFormato','eLayoutInt','eDobradica','eMat','eA','eL','eAl','eP','eRetL','ePo','eG','ePr','ePratExt','eCompW','eCompH','ePx','ePy','ePz','eRy'];
+                    keys.forEach((k, i) => { const el = document.getElementById(k); if (el) el.value = m[props[i]] !== undefined ? m[props[i]] : (['eT','eFormato','eLayoutInt','eDobradica','eMat','eA'].includes(k) ? '' : 0); });
                     
-                    keys.forEach((k, i) => { 
-                        const el = document.getElementById(k); 
-                        if (el) el.value = m[props[i]] !== undefined ? m[props[i]] : (['eT','eFormato','eLayoutInt','eDobradica','eMat','eA'].includes(k) ? '' : 0); 
-                    });
+                    const elRipado = document.getElementById('eRipado'); if (elRipado) elRipado.checked = m.ripadoFrontal;
+                    const elVidro = document.getElementById('eVidro'); if (elVidro) elVidro.checked = m.tampoVidro;
+                    const elFrentes = document.getElementById('eFrentesInternas'); if (elFrentes) elFrentes.checked = m.frentesInternas;
                     
-                    const chkR = document.getElementById('eRipado'); if (chkR) chkR.checked = m.ripadoFrontal; 
-                    const chkV = document.getElementById('eVidro'); if (chkV) chkV.checked = m.tampoVidro; 
-                    const chkInternas = document.getElementById('eFrentesInternas'); if (chkInternas) chkInternas.checked = m.frentesInternas;
-                    
-                    const custContainer = document.getElementById('customFrentesContainer');
-                    if (custContainer) {
-                        custContainer.innerHTML = ''; 
-                        let html = '';
-                        const addField = (key, label) => {
-                            const w = m.medidasCustomizadas?.[key]?.w || ''; 
-                            const h = m.medidasCustomizadas?.[key]?.h || ''; 
-                            const mat = m.materiaisCustomizados?.frentes?.[key] || '';
-                            
-                            let matOpts = `<option value="">-- Cor Padrão --</option>`; 
-                            Object.keys(window.MatDefs).forEach(k => { 
-                                matOpts += `<option value="${k}" ${mat===k?'selected':''}>${window.MatDefs[k].label}</option>`; 
-                            });
-                            
-                            html += `<div style="margin-bottom:10px; padding:10px; background:#fff; border:1px solid #ccc; border-radius:4px;"><div style="font-weight:900; font-size:0.8rem; margin-bottom:8px; text-transform:uppercase; color:var(--primary-dark);">${label}</div><div style="display:flex; gap:10px; margin-bottom:8px;"><input type="number" id="custW_${key}" placeholder="Largura (mm)" value="${w}" style="flex:1; padding:8px; font-size:0.8rem; border:1px solid #ccc; border-radius:3px;" onchange="window.App.ui.syncCustom('${key}')"><input type="number" id="custH_${key}" placeholder="Altura (mm)" value="${h}" style="flex:1; padding:8px; font-size:0.8rem; border:1px solid #ccc; border-radius:3px;" onchange="window.App.ui.syncCustom('${key}')"></div><select id="custM_${key}" style="width:100%; padding:8px; font-size:0.8rem; border:1px solid #ccc; border-radius:3px;" onchange="window.App.ui.syncCustom('${key}')">${matOpts}</select></div>`;
-                        };
-                        
-                        for (let i = 0; i < m.gavetas; i++) addField(`gaveta_${i}`, `Gaveta ${i+1}`); 
-                        for (let i = 0; i < m.portas; i++) addField(`porta_${i}`, `Porta ${i+1}`);
-                        if (m.layoutInterno === 'ilha_dupla') { 
-                            for (let i = 0; i < m.portas; i++) addField(`porta_tras_${i}`, `Porta Traseira ${i+1}`); 
-                        }
-                        
-                        html += `<div style="font-weight:900; font-size:0.85rem; color:var(--secondary-wood); margin:15px 0 10px 0; border-top: 2px dashed #ccc; padding-top:15px;">CORES DA CAIXARIA</div>`;
-                        const parts = ['teto', 'base', 'lateralEsq', 'lateralDir', 'fundo']; 
-                        const partLabels = ['Teto / Tampo', 'Base / Chão', 'Lateral Esquerda', 'Lateral Direita', 'Fundo (Costas)'];
-                        
-                        parts.forEach((p, idx) => {
-                            const pMat = m.materiaisCustomizados?.estrutura?.[p] || ''; 
-                            let popts = `<option value="">-- Cor Padrão --</option>`; 
-                            Object.keys(window.MatDefs).forEach(k => popts += `<option value="${k}" ${pMat===k?'selected':''}>${window.MatDefs[k].label}</option>`);
-                            html += `<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;"><span style="font-size:0.8rem; font-weight:700;">${partLabels[idx]}</span><select id="custE_${p}" style="width:160px; padding:6px; font-size:0.75rem; border:1px solid #ccc; border-radius:3px;" onchange="window.App.ui.syncCustomStruct('${p}')">${popts}</select></div>`;
-                        }); 
-                        
-                        custContainer.innerHTML = html;
-                    } 
                     document.getElementById('floatingEditor').classList.add('active');
                 },
-                syncCustom: (key) => {
-                    const elId = document.getElementById('eId'); 
-                    if (!elId) return; 
-                    const m = window.AppState.modules.find(x => x.id === elId.value); 
-                    if (!m) return;
-                    
-                    if (!m.medidasCustomizadas) m.medidasCustomizadas = {}; 
-                    if (!m.materiaisCustomizados) m.materiaisCustomizados = { frentes:{}, estrutura:{} };
-                    
-                    const w = parseFloat(document.getElementById(`custW_${key}`).value) || 0; 
-                    const h = parseFloat(document.getElementById(`custH_${key}`).value) || 0; 
-                    const mat = document.getElementById(`custM_${key}`).value;
-                    
-                    if (w > 0 || h > 0) m.medidasCustomizadas[key] = { w, h }; 
-                    else delete m.medidasCustomizadas[key];
-                    
-                    if (mat) m.materiaisCustomizados.frentes[key] = mat; 
-                    else delete m.materiaisCustomizados.frentes[key]; 
-                    
-                    window.App.ui.syncToState(); 
-                },
-                syncCustomStruct: (part) => {
-                    const elId = document.getElementById('eId'); 
-                    if (!elId) return; 
-                    const m = window.AppState.modules.find(x => x.id === elId.value); 
-                    if (!m) return;
-                    
-                    if (!m.materiaisCustomizados) m.materiaisCustomizados = { frentes:{}, estrutura:{} }; 
-                    const mat = document.getElementById(`custE_${part}`).value;
-                    
-                    if (mat) m.materiaisCustomizados.estrutura[part] = mat; 
-                    else delete m.materiaisCustomizados.estrutura[part]; 
-                    
-                    window.App.modules.refreshAll();
-                },
                 syncToState: () => {
-                    const elId = document.getElementById('eId'); 
-                    if (!elId) return; 
-                    const m = window.AppState.modules.find(x => x.id === elId.value); 
-                    if (!m) return;
-                    
+                    const elId = document.getElementById('eId'); if (!elId) return; const m = window.AppState.modules.find(x => x.id === elId.value); if (!m) return;
                     const props = ['tipo','formato','layoutInterno','dobradicaLado','material','abertura','largura','altura','profundidade','retornoL','portas','gavetas','prateleiras','prateleirasExternas','compW','compH','posX','posY','posZ','rotY'];
                     const keys = ['eT','eFormato','eLayoutInt','eDobradica','eMat','eA','eL','eAl','eP','eRetL','ePo','eG','ePr','ePratExt','eCompW','eCompH','ePx','ePy','ePz','eRy'];
+                    keys.forEach((k, i) => { const el = document.getElementById(k); if (el) m[props[i]] = ['eT','eFormato','eLayoutInt','eDobradica','eMat','eA'].includes(k) ? el.value : parseFloat(el.value)||0; });
                     
-                    keys.forEach((k, i) => { 
-                        const el = document.getElementById(k); 
-                        if (el) m[props[i]] = ['eT','eFormato','eLayoutInt','eDobradica','eMat','eA'].includes(k) ? el.value : parseFloat(el.value)||0; 
-                    });
+                    const elRipado = document.getElementById('eRipado'); m.ripadoFrontal = elRipado ? elRipado.checked : false;
+                    const elVidro = document.getElementById('eVidro'); m.tampoVidro = elVidro ? elVidro.checked : false;
+                    const elFrentes = document.getElementById('eFrentesInternas'); m.frentesInternas = elFrentes ? elFrentes.checked : false;
                     
-                    const chkR = document.getElementById('eRipado'); if (chkR) m.ripadoFrontal = chkR.checked; 
-                    const chkV = document.getElementById('eVidro'); if (chkV) m.tampoVidro = chkV.checked; 
-                    const chkInternas = document.getElementById('eFrentesInternas'); if (chkInternas) m.frentesInternas = chkInternas.checked;
-                    
-                    window.OracleEngine.validateAndFix(m); 
-                    window.App.modules.refreshAll(); 
-                    window.App.ui.openLiveEditor(m.id);
+                    window.OracleEngine.validateAndFix(m); window.App.modules.refreshAll();
                 },
-                syncToStateNoRebuild: () => { 
-                    const elId = document.getElementById('eId'); 
-                    if (!elId) return; 
-                    const m = window.AppState.modules.find(x => x.id === elId.value); 
-                    if (!m) return; 
-                    const pxEl = document.getElementById('ePx'); 
-                    if (pxEl) pxEl.value = m.posX; 
-                    const pzEl = document.getElementById('ePz'); 
-                    if (pzEl) pzEl.value = m.posZ; 
-                    const pyEl = document.getElementById('ePy'); 
-                    if (pyEl) pyEl.value = m.posY; 
-                    const ryEl = document.getElementById('eRy'); 
-                    if (ryEl) ryEl.value = m.rotY; 
-                }
+                syncToStateNoRebuild: () => { const m = window.AppState.modules.find(x => x.id === document.getElementById('eId').value); if (m) { document.getElementById('ePx').value = m.posX; document.getElementById('ePz').value = m.posZ; document.getElementById('ePy').value = m.posY; document.getElementById('eRy').value = m.rotY; } }
             },
             ar: {
-                setModoCamera: (m) => { 
-                    window.AppState.tool = m; 
-                    document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active')); 
-                    event.currentTarget.classList.add('active'); 
-                    if(m === 'remove_part') window.App.ui.toast("Clique na peça do móvel 3D para destruí-la.", "warning");
-                },
-                setModoInteracao: (m) => { 
-                    window.AppState.modoInteracao = m; 
-                    document.getElementById('sw-peca').className = `switch-btn ${m==='peca'?'active':''}`; 
-                    document.getElementById('sw-projeto').className = `switch-btn ${m==='projeto'?'active':''}`; 
-                },
-                toggleAR: () => { 
-                    window.AppState.arActive = !window.AppState.arActive; 
-                    const container = document.getElementById('canvas-container'); 
-                    const txt = document.getElementById('arBtnText'); 
-                    if (window.AppState.arActive) { 
-                        if (window.AppState.imagemFundoURL) { 
-                            container.style.backgroundImage = `url(${window.AppState.imagemFundoURL})`; 
-                            container.style.backgroundSize = 'cover'; 
-                            container.style.backgroundPosition = 'center'; 
-                            container.style.backgroundRepeat = 'no-repeat'; 
-                        } else { 
-                            container.style.background = 'transparent'; 
-                        } 
-                        if (txt) txt.innerText = 'Desativar Fundo Real'; 
-                    } else { 
-                        container.style.background = 'radial-gradient(circle, #ffffff 0%, #cbd5e1 100%)'; 
-                        container.style.backgroundImage = 'none'; 
-                        if (txt) txt.innerText = 'Ativar Fundo Real Fotográfico'; 
-                    } 
-                },
-                applyTransform: () => { 
-                    const s = parseFloat(document.getElementById('camScale').value); 
-                    window.ThreeEngine.rootNode.scale.set(s, s, s); 
-                    window.ThreeEngine.rootNode.rotation.x = parseFloat(document.getElementById('camRotX').value); 
-                    window.ThreeEngine.rootNode.rotation.y = parseFloat(document.getElementById('camRotY').value); 
-                },
-                resetAR: () => { 
-                    window.ThreeEngine.rootNode.rotation.set(0,0,0); 
-                    window.ThreeEngine.rootNode.position.set(0,0,0); 
-                    window.ThreeEngine.rootNode.scale.set(1,1,1); 
-                    document.getElementById('camScale').value = 1; 
-                    document.getElementById('camRotX').value = 0; 
-                    document.getElementById('camRotY').value = 0; 
-                },
-                enterPrintMode: () => { 
-                    window.App.ui.fecharHUDs(); 
-                    window.App.ui.fecharEditor(); 
-                    ['mainHeader','mainSignature','mainControls','toolModeContainer'].forEach(id => document.getElementById(id).classList.add('hide-for-print')); 
-                    document.getElementById('btnExitPrint').style.display='block'; 
-                    window.ThreeEngine.controls.enabled = false; 
-                },
-                exitPrintMode: () => { 
-                    ['mainHeader','mainSignature','mainControls','toolModeContainer'].forEach(id => document.getElementById(id).classList.remove('hide-for-print')); 
-                    document.getElementById('btnExitPrint').style.display='none'; 
-                    window.ThreeEngine.controls.enabled = true; 
-                }
+                setModoCamera: (m, btn) => { window.AppState.tool = m; document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); if(m === 'remove_part') window.App.ui.toast("Borracha: Clique na peça para destruí-la.", "warning"); },
+                setModoInteracao: (m) => { window.AppState.modoInteracao = m; document.getElementById('sw-peca').className = `switch-btn ${m==='peca'?'active':''}`; document.getElementById('sw-projeto').className = `switch-btn ${m==='projeto'?'active':''}`; },
+                toggleAR: () => { window.AppState.arActive = !window.AppState.arActive; const c = document.getElementById('canvas-container'); if (window.AppState.arActive) { if (window.AppState.imagemFundoURL) { c.style.backgroundImage = `url(${window.AppState.imagemFundoURL})`; c.style.backgroundSize = 'cover'; c.style.backgroundPosition = 'center'; } else { c.style.background = 'transparent'; } } else { c.style.background = 'radial-gradient(circle, #FFFFFF 0%, #DCE2E8 100%)'; c.style.backgroundImage = 'none'; } },
+                applyTransform: () => { const s = parseFloat(document.getElementById('camScale').value); window.ThreeEngine.rootNode.scale.set(s, s, s); window.ThreeEngine.rootNode.rotation.x = parseFloat(document.getElementById('camRotX').value); window.ThreeEngine.rootNode.rotation.y = parseFloat(document.getElementById('camRotY').value); },
+                resetAR: () => { window.ThreeEngine.rootNode.rotation.set(0,0,0); window.ThreeEngine.rootNode.position.set(0,0,0); window.ThreeEngine.rootNode.scale.set(1,1,1); document.getElementById('camScale').value = 1; document.getElementById('camRotX').value = 0; document.getElementById('camRotY').value = 0; },
+                enterPrintMode: () => { window.App.ui.fecharHUDs(); window.App.ui.fecharEditor(); ['mainHeader','mainSignature','mainControls','toolModeContainer', 'desktopNav', '.bottom-nav', '.floating-buttons'].forEach(s => { const el = document.querySelector(s) || document.getElementById(s); if(el) el.style.display='none'; }); document.getElementById('btnExitPrint').style.display='block'; window.ThreeEngine.controls.enabled = false; },
+                exitPrintMode: () => { ['mainHeader','mainSignature','mainControls','toolModeContainer', 'desktopNav', '.bottom-nav', '.floating-buttons'].forEach(s => { const el = document.querySelector(s) || document.getElementById(s); if(el) el.style.display=''; }); document.getElementById('btnExitPrint').style.display='none'; window.ThreeEngine.controls.enabled = true; }
             },
-            bom: { 
-                updateParams: () => { window.BOMEngine.updateParams(); } 
-            },
+            bom: { updateParams: () => { window.BOMEngine.updateParams(); } },
             ai: {
                 toggleRecording: async () => { 
-                    if (!window.AppState.apiKeys.groq) { 
-                        window.App.ui.toggleModal('modalSettings'); 
-                        return window.App.ui.toast("Configure a chave da API Groq."); 
-                    } 
+                    if (!window.AppState.apiKeys.groq) { window.App.ui.toggleModal('modalSettings'); return window.App.ui.toast("Configure a chave da API Groq.", "warning"); } 
                     const btn = document.getElementById('btnRecord'); 
-                    if (window.AppState.mediaRecorder && window.AppState.mediaRecorder.state !== "inactive") { 
-                        window.AppState.mediaRecorder.stop(); 
-                        btn.classList.remove('recording'); 
-                        btn.innerHTML = "<i class='fas fa-microphone'></i> Gravar Voz"; 
-                    } else { 
-                        try { 
-                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true }); 
-                            window.AppState.mediaRecorder = new MediaRecorder(stream); 
-                            window.AppState.mediaRecorder.ondataavailable = e => window.AppState.audioChunks.push(e.data); 
-                            window.AppState.mediaRecorder.onstop = () => window.App.ai.processAudioBlob(new Blob(window.AppState.audioChunks, { type: 'audio/webm' })); 
-                            window.AppState.audioChunks = []; 
-                            window.AppState.mediaRecorder.start(); 
-                            btn.classList.add('recording'); 
-                            btn.innerHTML = "<i class='fas fa-stop'></i> Escutando..."; 
-                        } catch(e) { 
-                            window.App.ui.toast("Permissão de Microfone negada."); 
-                        } 
-                    } 
-                },
-                uploadAudio: (input) => { 
-                    if(input.files[0]) window.App.ai.processAudioBlob(input.files[0]); 
-                },
-                processAudioBlob: async (blob) => { 
-                    window.App.ui.showLoader("Transcrevendo com Whisper..."); 
-                    const fd = new FormData(); 
-                    fd.append("file", new File([blob], "audio.webm")); 
-                    fd.append("model", "whisper-large-v3"); 
-                    try { 
-                        const res = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", { method: "POST", headers: { "Authorization": `Bearer ${window.AppState.apiKeys.groq}` }, body: fd }); 
-                        const data = await res.json(); 
-                        if (data.text) { 
-                            window.AppState.transcricaoAtual = data.text; 
-                            document.getElementById('transcriptionText').innerText = `"${data.text}"`; 
-                            window.App.ui.toast("Áudio interpretado com sucesso."); 
-                        } 
-                    } catch(e) { 
-                        window.App.ui.toast("Erro na API Whisper."); 
-                    } finally { 
-                        window.App.ui.hideLoader(); 
-                    } 
+                    if (window.AppState.mediaRecorder && window.AppState.mediaRecorder.state !== "inactive") { window.AppState.mediaRecorder.stop(); btn.innerHTML = "<i class='fas fa-microphone'></i> Falar"; } 
+                    else { try { const stream = await navigator.mediaDevices.getUserMedia({ audio: true }); window.AppState.mediaRecorder = new MediaRecorder(stream); window.AppState.mediaRecorder.ondataavailable = e => window.AppState.audioChunks.push(e.data); window.AppState.mediaRecorder.onstop = () => window.App.ai.processAudioBlob(new Blob(window.AppState.audioChunks, { type: 'audio/webm' })); window.AppState.audioChunks = []; window.AppState.mediaRecorder.start(); btn.innerHTML = "<i class='fas fa-stop'></i> Gravando..."; } catch(e) { window.App.ui.toast("Permissão de Microfone negada."); } } 
                 },
                 processPhoto: (input) => { 
-                    if (input.files && input.files[0]) { 
-                        const f = input.files[0]; 
-                        window.AppState.imagemFundoURL = URL.createObjectURL(f); 
-                        document.getElementById('imagePreview').src = window.AppState.imagemFundoURL; 
-                        document.getElementById('imgPreviewContainer').style.display = 'block'; 
-                        const r = new FileReader(); 
-                        r.onload = () => { 
-                            window.AppState.imagemFundoBase64 = r.result.split(',')[1]; 
-                            window.App.ui.toast("Imagem carregada para Visão."); 
-                        }; 
-                        r.readAsDataURL(f); 
-                    } 
+                    if (input.files && input.files[0]) { const f = input.files[0]; window.AppState.imagemFundoURL = URL.createObjectURL(f); document.getElementById('imagePreview').src = window.AppState.imagemFundoURL; document.getElementById('imgPreviewContainer').style.display = 'block'; const r = new FileReader(); r.onload = () => { window.AppState.imagemFundoBase64 = r.result.split(',')[1]; window.App.ui.toast("Imagem carregada para Visão."); }; r.readAsDataURL(f); } 
                 },
                 generateWithOracle: async () => { 
-                    const txt = document.getElementById('textoAdicional').value.trim(); 
-                    const key = window.AppState.apiKeys.gemini; 
-                    
-                    if (!key) { 
-                        window.App.ui.toggleModal('modalSettings'); 
-                        return window.App.ui.toast("Insira a chave Gemini 2.5 Flash!"); 
-                    } 
-                    if (!window.AppState.imagemFundoBase64 && !window.AppState.transcricaoAtual && !txt) {
-                        return window.App.ui.toast("Forneça foto, texto ou áudio.");
-                    }
-                    
-                    window.App.ui.showLoader("Oráculo Arquitetônico Analisando..."); 
+                    const txt = document.getElementById('textoAdicional').value.trim(); const key = window.AppState.apiKeys.gemini; 
+                    if (!key) { window.App.ui.toggleModal('modalSettings'); return window.App.ui.toast("Insira a chave Gemini 2.5 Flash!"); } 
+                    window.App.ui.showLoader("Oráculo Sênior Analisando..."); 
                     try { 
-                        const prompt = `Você é o Arquiteto e Engenheiro de Marcenaria Comercial Sênior. Gere a estrutura 3D. TIPOS: balcao_curvo, mesa_redonda_ripada, sofa_curvo, painel_ripado_iluminado, expositor, nicho_iluminado, armario, balcao, guarda_roupa, mesa, painel_tv, porta_avulsa, gaveta_avulsa, painel_fixo, sofa, puff. 
-                        Atenção: A chave "removedParts" recebe um array de strings com as peças a remover (ex: ["fundo", "porta_0", "teto"]).
-                        VOZ/TEXTO: "${window.AppState.transcricaoAtual} ${txt}" 
-                        RETORNE JSON EX: {"modulos": [{"tipo": "balcao_curvo", "largura": 1800, "altura": 1100, "profundidade": 600, "raioCurva": 800, "material": "amadeirado_padrao", "ripadoFrontal": true, "tampoVidro": true, "removedParts": []}]}`; 
+                        const prompt = `Gere a estrutura 3D. TIPOS: balcao_curvo, mesa_redonda_ripada, sofa_curvo, painel_ripado_iluminado, expositor, nicho_iluminado, armario, balcao, guarda_roupa, mesa, painel_tv, porta_avulsa, gaveta_avulsa, painel_fixo, sofa, puff. IMPORTANTE: removedParts é um array com as partes a não desenhar (ex: ["fundo"]). Retorne apenas o JSON. Ex: {"modulos": [{"tipo": "balcao_curvo", "largura": 1800, "altura": 1100, "profundidade": 600, "raioCurva": 800, "material": "amadeirado_padrao", "ripadoFrontal": true, "tampoVidro": true, "removedParts": []}]} VOZ/TEXTO: "${window.AppState.transcricaoAtual} ${txt}"`; 
+                        const parts = [{ text: prompt }]; if (window.AppState.imagemFundoBase64) parts.push({ inlineData: { mimeType: "image/jpeg", data: window.AppState.imagemFundoBase64 } });
+                        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts }] }) }); 
+                        const data = await res.json(); if (data.error) throw new Error(data.error.message); 
                         
-                        const parts = [{ text: prompt }]; 
-                        if (window.AppState.imagemFundoBase64) {
-                            parts.push({ inlineData: { mimeType: "image/jpeg", data: window.AppState.imagemFundoBase64 } });
-                        }
-                        
-                        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, { 
-                            method: 'POST', 
-                            headers: { 'Content-Type': 'application/json' }, 
-                            body: JSON.stringify({ contents: [{ parts }] }) 
-                        }); 
-                        
-                        const data = await res.json(); 
-                        if (data.error) throw new Error(data.error.message); 
-                        
-                        // REGEX ROBUSCO PARA EXTRAIR O JSON MESMO SE A IA ESCREVER TEXTO EM VOLTA
+                        // EXTRAÇÃO ROBRESTA (100% BLINDADA CONTRA BUGS DE MARKDOWN DA IA)
                         const rawText = data.candidates[0].content.parts[0].text;
                         const match = rawText.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
-                        if (!match) throw new Error("JSON não encontrado na resposta do oráculo.");
+                        if (!match) throw new Error("JSON não encontrado.");
                         
                         const json = JSON.parse(match[0]); 
-                        
-                        if (json.modulos && json.modulos.length > 0) { 
-                            window.AppState.modules = [];
-                            json.modulos.forEach(m => window.App.modules.add(m.tipo || 'armario', m)); 
-                            window.App.ui.fecharHUDs(); 
-                            window.App.ui.toast("Arquitetura Comercial Gerada!"); 
-                        } 
-                    } catch(e) { 
-                        window.App.ui.toast("Erro no processamento da IA: " + e.message, "error"); 
-                    } finally { 
-                        window.App.ui.hideLoader(); 
-                    } 
+                        if (json.modulos && json.modulos.length > 0) { window.AppState.modules = []; json.modulos.forEach(m => window.App.modules.add(m.tipo || 'armario', m)); window.App.ui.fecharHUDs(); window.App.ui.toast("Arquitetura Comercial Gerada!"); } 
+                    } catch(e) { window.App.ui.toast("Erro IA: " + e.message, "error"); } finally { window.App.ui.hideLoader(); } 
                 }
             }
         };
 
-        window.App.config = { 
-            save: () => { 
-                localStorage.setItem('ak_gemini_cad', window.AppState.apiKeys.gemini); 
-                localStorage.setItem('ak_groq_cad', window.AppState.apiKeys.groq); 
-                window.App.ui.toggleModal('modalSettings');
-            }, 
-            load: () => { 
-                const eG = document.getElementById('api-gemini'); 
-                if (eG) eG.value = window.AppState.apiKeys.gemini; 
-                const eQ = document.getElementById('api-groq'); 
-                if (eQ) eQ.value = window.AppState.apiKeys.groq; 
-            } 
-        };
-
-        window.addEventListener('DOMContentLoaded', () => { 
-            window.App.config.load(); 
-            window.App.init(); 
-        });
+        window.App.config = { save: () => { localStorage.setItem('ak_gemini_cad', window.AppState.apiKeys.gemini); localStorage.setItem('ak_groq_cad', window.AppState.apiKeys.groq); window.App.ui.toggleModal('modalSettings'); }, load: () => { const eG = document.getElementById('api-gemini'); if (eG) eG.value = window.AppState.apiKeys.gemini; const eQ = document.getElementById('api-groq'); if (eQ) eQ.value = window.AppState.apiKeys.groq; } };
+        window.addEventListener('DOMContentLoaded', () => { window.App.config.load(); window.App.init(); });
     </script>
 </body>
 </html>
