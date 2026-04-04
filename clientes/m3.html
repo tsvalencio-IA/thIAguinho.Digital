@@ -14,18 +14,18 @@
     <style>
         :root {
             /* Paleta thIAguinho Soluções Sênior */
-            --primary-dark: #2C241B;     
+            --primary-dark: #1A1A1A;     
             --secondary-wood: #5C4033;   
             --accent-gold: #DDA15E;      
-            --light-cream: #FDFCF9;      
-            --soft-beige: #FBF8F4;       
-            --earth-green: #4CAF50;      
-            --text-color: #222222;       
-            --border-soft: #C6B6A5;      
+            --light-cream: #F5F5F5;      
+            --soft-beige: #EAEAEA;       
+            --earth-green: #2E7D32;      
+            --text-color: #111111;       
+            --border-soft: #CCCCCC;      
             --warning-red: #D32F2F;      
-            --success-green: #2E7D32;
-            --ai-blue: #1565C0;
-            --shadow-subtle: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --success-green: #1B5E20;
+            --ai-blue: #0D47A1;
+            --shadow-subtle: 0 8px 30px rgba(0, 0, 0, 0.08);
             --shadow-heavy: 0 15px 50px rgba(0, 0, 0, 0.4);
             --border-radius-lg: 24px;
             --border-radius-md: 16px;
@@ -35,124 +35,118 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--light-cream); color: var(--text-color); overflow: hidden; width: 100vw; height: 100vh; display: flex; flex-direction: column; }
 
-        .app-header { background-color: var(--primary-dark); color: var(--light-cream); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .app-header.hide-for-print { transform: translateY(-120%); }
-        .app-header h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 0.5px; margin: 0; display: flex; align-items: center; gap: 10px; }
+        .app-header { background-color: var(--primary-dark); color: #FFF; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-bottom: 3px solid var(--accent-gold); }
+        .app-header h1 { font-size: 1.3rem; font-weight: 900; letter-spacing: 0.5px; margin: 0; display: flex; align-items: center; gap: 12px; text-transform: uppercase; }
         .app-header h1 span.brand { color: var(--accent-gold); }
-        .icon-btn { background: none; border: none; color: var(--accent-gold); font-size: 1.6rem; cursor: pointer; transition: transform 0.3s ease; }
+        .icon-btn { background: none; border: none; color: var(--accent-gold); font-size: 1.8rem; cursor: pointer; transition: transform 0.3s ease; }
         .icon-btn:hover { transform: rotate(90deg) scale(1.1); }
 
-        .footer-signature { position: absolute; top: 80px; left: 20px; font-size: 0.7rem; color: rgba(0,0,0,0.5); font-weight: 800; pointer-events: none; z-index: 40; text-transform: uppercase; letter-spacing: 1.5px; transition: opacity 0.4s; }
-        .footer-signature.hide-for-print { opacity: 0; }
+        .footer-signature { position: absolute; top: 90px; left: 25px; font-size: 0.75rem; color: rgba(0,0,0,0.6); font-weight: 900; pointer-events: none; z-index: 40; text-transform: uppercase; letter-spacing: 2px; }
 
-        .top-tools { position: absolute; top: 85px; right: 25px; display: flex; gap: 10px; z-index: 50; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s; flex-wrap: wrap; justify-content: flex-end; max-width: 80vw; }
-        .top-tools.hide-for-print { transform: translateY(-150px); opacity: 0; pointer-events: none; }
-        .tool-btn { background: rgba(255,255,255,0.95); border: 2px solid var(--border-soft); color: var(--primary-dark); padding: 10px 14px; border-radius: var(--border-radius-md); font-weight: 800; font-family: 'Montserrat'; cursor: pointer; box-shadow: var(--shadow-subtle); display: flex; align-items: center; gap: 6px; transition: all 0.3s ease; font-size: 0.85rem; }
-        .tool-btn:hover { border-color: var(--accent-gold); }
-        .tool-btn.active { background: var(--ai-blue); color: white; border-color: var(--ai-blue); box-shadow: 0 6px 20px rgba(21, 101, 192, 0.4); }
+        .top-tools { position: absolute; top: 90px; right: 25px; display: flex; gap: 10px; z-index: 50; flex-wrap: wrap; justify-content: flex-end; max-width: 80vw; }
+        .tool-btn { background: rgba(255,255,255,0.95); border: 2px solid var(--border-soft); color: var(--primary-dark); padding: 12px 18px; border-radius: var(--border-radius-md); font-weight: 800; font-family: 'Montserrat'; cursor: pointer; box-shadow: var(--shadow-subtle); display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; font-size: 0.9rem; text-transform: uppercase; }
+        .tool-btn:hover { border-color: var(--accent-gold); transform: translateY(-2px); }
+        .tool-btn.active { background: var(--ai-blue); color: white; border-color: var(--ai-blue); box-shadow: 0 8px 25px rgba(13, 71, 161, 0.4); }
+        .tool-btn.eraser.active { background: var(--warning-red); border-color: var(--warning-red); box-shadow: 0 8px 25px rgba(211, 47, 47, 0.4); }
 
-        #canvas-container { flex: 1; position: relative; width: 100%; height: 100%; background: radial-gradient(circle, #ffffff 0%, #cbd5e1 100%); transition: background 0.5s ease; touch-action: none; }
+        #canvas-container { flex: 1; position: relative; width: 100%; height: 100%; background: radial-gradient(circle, #f0f4f8 0%, #cfd9df 100%); touch-action: none; }
         canvas { display: block; width: 100% !important; height: 100% !important; outline: none; touch-action: none; }
 
-        .floating-controls { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; z-index: 50; background: rgba(255, 255, 255, 0.98); padding: 12px 25px; border-radius: 50px; box-shadow: var(--shadow-subtle); backdrop-filter: blur(12px); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s; border: 1px solid rgba(255,255,255,0.8); }
-        .floating-controls.hide-for-print { transform: translate(-50%, 150px); opacity: 0; pointer-events: none; }
-        .fab-btn { background: transparent; border: none; color: var(--primary-dark); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.2s ease; min-width: 75px; gap: 6px; }
-        .fab-btn i { font-size: 1.6rem; color: var(--secondary-wood); transition: transform 0.2s ease; }
-        .fab-btn span { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .floating-controls { position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 50; background: rgba(255, 255, 255, 0.95); padding: 15px 30px; border-radius: 50px; box-shadow: var(--shadow-heavy); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); }
+        .fab-btn { background: transparent; border: none; color: var(--primary-dark); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.2s ease; min-width: 80px; gap: 8px; }
+        .fab-btn i { font-size: 1.8rem; color: var(--secondary-wood); transition: transform 0.2s ease; }
+        .fab-btn span { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
         .fab-btn.primary i { color: var(--ai-blue); }
         .fab-btn.success i { color: var(--earth-green); }
-        .fab-btn:hover i { transform: translateY(-3px); }
-        .fab-btn:active i { transform: scale(0.85); }
+        .fab-btn:hover i { transform: translateY(-4px); color: var(--accent-gold); }
+        .fab-btn:active i { transform: scale(0.9); }
 
-        .floating-buttons { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 1000; }
-        .floating-button { background-color: var(--secondary-wood); color: white; padding: 12px 20px; border-radius: 30px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); font-size: 1em; font-weight: 500; transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; border: none; cursor: pointer; }
-        .floating-button.mascote { background-color: #FFC107; color: var(--primary-dark); font-weight: 800; text-transform: uppercase; }
-        .floating-button.mascote:hover { background-color: #e0a800; transform: scale(1.05); }
+        .floating-buttons { position: fixed; bottom: 35px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 1000; }
+        .floating-button { background-color: var(--secondary-wood); color: white; padding: 15px 25px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); font-size: 1.05em; font-weight: 700; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 12px; border: none; cursor: pointer; font-family: 'Montserrat'; text-transform: uppercase; }
+        .floating-button.mascote { background-color: #FFC107; color: var(--primary-dark); font-weight: 900; letter-spacing: 1px; border: 2px solid #FFA000; }
+        .floating-button.mascote:hover { background-color: #FFA000; transform: scale(1.05); box-shadow: 0 6px 20px rgba(255, 193, 7, 0.5); }
 
-        #btnExitPrint { position: fixed; top: 25px; right: 25px; background: var(--warning-red); color: white; border: none; border-radius: 40px; padding: 15px 30px; font-weight: 900; font-size: 0.9rem; font-family: 'Montserrat'; z-index: 9999; display: none; cursor: pointer; box-shadow: 0 8px 25px rgba(211, 47, 47, 0.5); text-transform: uppercase; letter-spacing: 1px; transition: transform 0.2s; }
-        #btnExitPrint:active { transform: scale(0.95); }
-
-        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 85vh; background-color: var(--soft-beige); border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0; box-shadow: var(--shadow-heavy); z-index: 200; transition: bottom 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.15); display: flex; flex-direction: column; }
+        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 85vh; background-color: var(--soft-beige); border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0; box-shadow: var(--shadow-heavy); z-index: 200; transition: bottom 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; }
         .bottom-sheet.active { bottom: 0; }
-        .sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 25px 30px; border-bottom: 2px solid var(--border-soft); background-color: var(--light-cream); border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0; }
-        .sheet-header h3 { color: var(--primary-dark); margin: 0; font-size: 1.2rem; font-weight: 900; display: flex; align-items: center; gap: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .close-btn { background: #E0E0E0; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-weight: bold; color: var(--text-color); display: flex; justify-content: center; align-items: center; transition: all 0.3s ease; font-size: 1.4rem; }
+        .sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 25px 30px; border-bottom: 2px solid var(--border-soft); background-color: #FFF; border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0; }
+        .sheet-header h3 { color: var(--primary-dark); margin: 0; font-size: 1.3rem; font-weight: 900; display: flex; align-items: center; gap: 12px; text-transform: uppercase; }
+        .close-btn { background: #EEE; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-weight: bold; color: var(--warning-red); display: flex; justify-content: center; align-items: center; transition: all 0.3s ease; font-size: 1.5rem; }
         .close-btn:hover { background: var(--warning-red); color: white; transform: rotate(90deg); }
         .sheet-body { padding: 30px; overflow-y: auto; flex: 1; scrollbar-width: none; }
         .sheet-body::-webkit-scrollbar { display: none; }
 
-        .floating-editor { position: fixed; bottom: -100%; right: 0; width: 100%; max-height: 50vh; background: rgba(253, 252, 249, 0.99); box-shadow: var(--shadow-heavy); z-index: 300; transition: all 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.15); overflow-y: auto; padding: 20px; border-top: 8px solid var(--ai-blue); border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0; }
+        .floating-editor { position: fixed; bottom: -100%; right: 0; width: 100%; max-height: 50vh; background: #FFF; box-shadow: var(--shadow-heavy); z-index: 300; transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); overflow-y: auto; padding: 25px; border-top: 8px solid var(--ai-blue); border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0; }
         .floating-editor.active { bottom: 0; }
 
         @media(min-width: 1024px) {
-            .floating-editor { top: 90px; bottom: 30px; right: 30px; width: 600px; max-height: calc(100vh - 120px); border-radius: var(--border-radius-lg); transform: translateX(120%); opacity: 0; border: 1px solid var(--border-soft); }
+            .floating-editor { top: 100px; bottom: 30px; right: 30px; width: 650px; max-height: calc(100vh - 130px); border-radius: var(--border-radius-lg); transform: translateX(120%); opacity: 0; border: 1px solid var(--border-soft); }
             .floating-editor.active { transform: translateX(0); opacity: 1; bottom: auto; }
-            .bottom-sheet { width: 500px; left: 30px; bottom: 120px; border-radius: var(--border-radius-lg); max-height: 75vh; border: 1px solid var(--border-soft); }
+            .bottom-sheet { width: 550px; left: 30px; bottom: 130px; border-radius: var(--border-radius-lg); max-height: 75vh; border: 1px solid var(--border-soft); }
         }
 
         .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; font-size: 0.8rem; font-weight: 900; margin-bottom: 8px; color: var(--secondary-wood); text-transform: uppercase; letter-spacing: 1px; }
-        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 12px; border: 2px solid var(--border-soft); border-radius: var(--border-radius-sm); font-family: inherit; font-size: 0.95rem; background: #fff; color: var(--text-color); font-weight: 600; transition: border-color 0.3s, box-shadow 0.3s; }
-        .input-group input:focus, .input-group select:focus, .input-group textarea:focus { border-color: var(--ai-blue); outline: none; box-shadow: 0 0 0 4px rgba(21, 101, 192, 0.15); }
-        .input-group textarea { resize: vertical; min-height: 100px; }
+        .input-group label { display: block; font-size: 0.85rem; font-weight: 900; margin-bottom: 8px; color: var(--primary-dark); text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 14px; border: 2px solid var(--border-soft); border-radius: var(--border-radius-sm); font-family: inherit; font-size: 1rem; background: #FAFAFA; color: var(--text-color); font-weight: 600; transition: all 0.3s; }
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus { border-color: var(--ai-blue); background: #FFF; outline: none; box-shadow: 0 0 0 4px rgba(13, 71, 161, 0.1); }
+        .input-group textarea { resize: vertical; min-height: 120px; }
 
-        .checkbox-group { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; font-size: 0.9rem; font-weight: 700; color: var(--primary-dark); cursor: pointer; padding: 10px; background: #fff; border: 2px solid var(--border-soft); border-radius: var(--border-radius-sm); transition: all 0.3s ease; }
-        .checkbox-group:hover { border-color: var(--accent-gold); background-color: #FFFDF5; }
-        .checkbox-group input { width: 22px; height: 22px; accent-color: var(--accent-gold); cursor: pointer; margin: 0; }
+        .checkbox-group { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; font-size: 0.95rem; font-weight: 700; color: var(--primary-dark); cursor: pointer; padding: 12px; background: #FFF; border: 2px solid var(--border-soft); border-radius: var(--border-radius-sm); transition: all 0.3s ease; }
+        .checkbox-group:hover { border-color: var(--ai-blue); background-color: #F0F4F8; }
+        .checkbox-group input { width: 24px; height: 24px; accent-color: var(--ai-blue); cursor: pointer; margin: 0; }
 
-        .btn-block { display: flex; width: 100%; padding: 18px; justify-content: center; align-items: center; border: none; border-radius: var(--border-radius-sm); font-weight: 800; font-size: 1rem; cursor: pointer; margin-bottom: 15px; gap: 12px; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 1px; background-color: #e0e0e0; color: var(--primary-dark); }
-        .btn-block.action-btn { background-color: var(--accent-gold); color: #fff; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); }
-        .btn-block.success { background-color: var(--earth-green); color: #fff; box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4); }
-        .btn-block.primary { background-color: var(--ai-blue); color: #fff; box-shadow: 0 4px 15px rgba(21, 101, 192, 0.4); }
-        .btn-block.danger { background-color: var(--warning-red); color: #fff; box-shadow: 0 4px 15px rgba(211, 47, 47, 0.4); }
+        .btn-block { display: flex; width: 100%; padding: 18px; justify-content: center; align-items: center; border: none; border-radius: var(--border-radius-sm); font-weight: 900; font-size: 1.05rem; cursor: pointer; margin-bottom: 15px; gap: 12px; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 1px; background-color: #E0E0E0; color: var(--primary-dark); }
+        .btn-block.action-btn { background-color: var(--accent-gold); color: #FFF; box-shadow: 0 6px 20px rgba(221, 161, 94, 0.4); }
+        .btn-block.success { background-color: var(--earth-green); color: #FFF; box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4); }
+        .btn-block.primary { background-color: var(--ai-blue); color: #FFF; box-shadow: 0 6px 20px rgba(13, 71, 161, 0.4); }
+        .btn-block.danger { background-color: var(--warning-red); color: #FFF; box-shadow: 0 6px 20px rgba(198, 40, 40, 0.4); }
         .btn-block.recording { background-color: var(--warning-red); color: #fff; animation: pulseRecord 1.5s infinite; }
-        .btn-block:hover { filter: brightness(1.05); }
-        .btn-block:active { transform: scale(0.97); }
+        .btn-block:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn-block:active { transform: scale(0.98); }
 
         @keyframes pulseRecord { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7); } 50% { transform: scale(1.02); box-shadow: 0 0 0 15px rgba(211, 47, 47, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); } }
 
         .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .grid-3-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .grid-4-col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
 
-        .module-card { background: #fff; border-left: 8px solid var(--accent-gold); padding: 20px; margin-bottom: 20px; border-radius: var(--border-radius-md); box-shadow: 0 5px 20px rgba(0,0,0,0.06); cursor: pointer; position: relative; border-right: 1px solid #eee; border-top: 1px solid #eee; border-bottom: 1px solid #eee; transition: all 0.3s ease; }
-        .module-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .module-card { background: #FFF; border-left: 8px solid var(--accent-gold); padding: 20px; margin-bottom: 20px; border-radius: var(--border-radius-md); box-shadow: var(--shadow-subtle); cursor: pointer; border-right: 1px solid #EEE; border-top: 1px solid #EEE; border-bottom: 1px solid #EEE; transition: all 0.3s ease; }
+        .module-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-heavy); }
         .module-card.selected { border-left-color: var(--ai-blue); background: #E3F2FD; }
-        .module-card h4 { margin-bottom: 8px; color: var(--primary-dark); font-size: 1.05rem; text-transform: uppercase; font-weight: 800; }
-        .module-card p { font-size: 0.9rem; color: #555; margin-bottom: 12px; font-weight: 600; }
+        .module-card h4 { margin-bottom: 8px; color: var(--primary-dark); font-size: 1.1rem; text-transform: uppercase; font-weight: 900; }
+        .module-card p { font-size: 0.95rem; color: #555; margin-bottom: 12px; font-weight: 600; }
 
-        .price-summary { margin-top: 30px; padding: 35px 20px; background-color: #fff; border: 3px dashed var(--accent-gold); border-radius: var(--border-radius-lg); text-align: center; box-shadow: inset 0 2px 15px rgba(0,0,0,0.03); }
-        .price-summary h4 { color: var(--primary-dark); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase; font-weight: 900; }
-        .price-summary p { font-size: 3rem; font-weight: 900; color: var(--earth-green); letter-spacing: -1.5px; margin: 15px 0; }
+        .price-summary { margin-top: 30px; padding: 35px 20px; background-color: #FFF; border: 3px dashed var(--accent-gold); border-radius: var(--border-radius-lg); text-align: center; }
+        .price-summary h4 { color: var(--primary-dark); font-size: 1.3rem; margin-bottom: 10px; text-transform: uppercase; font-weight: 900; }
+        .price-summary p { font-size: 3.5rem; font-weight: 900; color: var(--earth-green); letter-spacing: -1px; margin: 15px 0; }
 
-        .bom-detail { font-size: 0.9rem; color: #444; text-transform: uppercase; font-weight: 800; display: flex; justify-content: space-between; border-top: 1px solid #E0E0E0; padding-top: 15px; margin-top: 10px; }
-        .bom-hardware-list { font-size: 0.8rem; color: var(--ai-blue); font-weight: 600; text-align: right; margin-top: 5px; text-transform: none; }
+        .bom-detail { font-size: 0.95rem; color: #333; text-transform: uppercase; font-weight: 800; display: flex; justify-content: space-between; border-top: 1px solid #DDD; padding-top: 15px; margin-top: 10px; }
+        .bom-hardware-list { font-size: 0.85rem; color: var(--ai-blue); font-weight: 700; text-align: right; margin-top: 5px; text-transform: none; }
 
-        .switch-container { display: flex; background: #E0E0E0; border-radius: var(--border-radius-sm); padding: 5px; margin-bottom: 25px; }
-        .switch-btn { flex: 1; padding: 14px; text-align: center; font-size: 0.9rem; font-weight: 800; border-radius: 6px; cursor: pointer; transition: all 0.3s; color: #555; text-transform: uppercase; }
-        .switch-btn.active { background: var(--ai-blue); color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .switch-container { display: flex; background: #E0E0E0; border-radius: var(--border-radius-sm); padding: 6px; margin-bottom: 25px; }
+        .switch-btn { flex: 1; padding: 15px; text-align: center; font-size: 0.95rem; font-weight: 800; border-radius: 6px; cursor: pointer; transition: all 0.3s; color: #555; text-transform: uppercase; }
+        .switch-btn.active { background: var(--ai-blue); color: white; box-shadow: var(--shadow-subtle); }
 
         #longPressIndicator { position: fixed; width: 80px; height: 80px; border: 8px solid var(--ai-blue); border-radius: 50%; border-top-color: transparent; animation: spinLoad 0.6s cubic-bezier(0.5, 0, 0.5, 1) infinite; display: none; z-index: 1000; pointer-events: none; }
         #imgPreviewContainer { margin-top: 20px; text-align: center; display: none; background: #fff; border-radius: var(--border-radius-md); padding: 15px; border: 2px dashed var(--border-soft); }
-        #imgPreviewContainer img { max-width: 100%; max-height: 200px; border-radius: var(--border-radius-sm); object-fit: contain; }
+        #imgPreviewContainer img { max-width: 100%; max-height: 250px; border-radius: var(--border-radius-sm); object-fit: contain; }
 
-        .modal-overlay, .status-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(8px); }
-        .modal-content { background: var(--light-cream); padding: 40px; border-radius: var(--border-radius-lg); width: 90%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+        .modal-overlay, .status-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(10px); }
+        .modal-content { background: #FFF; padding: 40px; border-radius: var(--border-radius-lg); width: 90%; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
 
         .loader { border: 8px solid rgba(255,255,255,0.1); border-top: 8px solid var(--accent-gold); border-radius: 50%; width: 80px; height: 80px; animation: spinLoad 1s linear infinite; margin-bottom: 30px; }
-        .status-overlay p { color: white; font-weight: 800; font-size: 1.4rem; text-align: center; letter-spacing: 1px; text-transform: uppercase; }
+        .status-overlay p { color: white; font-weight: 900; font-size: 1.5rem; text-align: center; letter-spacing: 1px; text-transform: uppercase; }
 
-        #toast { visibility: hidden; min-width: 320px; background-color: var(--primary-dark); color: #fff; text-align: center; border-radius: 40px; padding: 20px 30px; position: fixed; z-index: 3000; left: 50%; bottom: 140px; transform: translateX(-50%); font-size: 1.05rem; box-shadow: 0px 15px 40px rgba(0,0,0,0.6); font-weight: 800; border: 2px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        #toast { visibility: hidden; min-width: 350px; background-color: var(--primary-dark); color: #fff; text-align: center; border-radius: 40px; padding: 20px 30px; position: fixed; z-index: 3000; left: 50%; bottom: 140px; transform: translateX(-50%); font-size: 1.1rem; box-shadow: 0px 20px 50px rgba(0,0,0,0.6); font-weight: 800; border: 2px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; gap: 12px; }
         #toast.show { visibility: visible; animation: fadeinToast 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), fadeoutToast 0.4s 4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        #toast.success { border-color: var(--success-green); background-color: #1B5E20; }
+        #toast.success { border-color: var(--success-green); background-color: var(--success-green); }
         #toast.error { background-color: var(--warning-red); border-color: #FFCDD2; }
+        #toast.warning { background-color: #FF9800; border-color: #FFE082; color: #111; }
 
         @keyframes fadeinToast { from {bottom: 100px; opacity: 0;} to {bottom: 140px; opacity: 1;} }
         @keyframes fadeoutToast { from {bottom: 140px; opacity: 1;} to {bottom: 100px; opacity: 0;} }
         @keyframes spinLoad { to { transform: rotate(360deg); } }
 
         .cut-board { background: #d7ccc8; border: 2px solid #5d4037; position: relative; margin-bottom: 20px; border-radius: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        .cut-part { position: absolute; background: rgba(255,255,255,0.7); border: 1px solid #3e2723; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; overflow: hidden; color: #3e2723; text-align: center; }
+        .cut-part { position: absolute; background: rgba(255,255,255,0.8); border: 1px solid #3e2723; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; overflow: hidden; color: #3e2723; text-align: center; }
     </style>
 </head>
 <body>
@@ -166,13 +160,16 @@
 
     <div class="top-tools" id="toolModeContainer">
         <button class="tool-btn active" id="btnOrbit" onclick="window.App.ar.setModoCamera('orbit')">
-            <i class="fas fa-hand-pointer"></i> Tocar & Abrir (Interação Física)
+            <i class="fas fa-hand-pointer"></i> Interagir (Tocar/Abrir)
         </button>
         <button class="tool-btn" id="btnMove" onclick="window.App.ar.setModoCamera('move')">
-            <i class="fas fa-arrows-alt"></i> Arrastar Peça Livremente
+            <i class="fas fa-arrows-alt"></i> Mover Móvel
         </button>
         <button class="tool-btn" id="btnAddComp" onclick="window.App.ar.setModoCamera('add_comp')">
-            <i class="fas fa-plus"></i> Inserir no Clique
+            <i class="fas fa-plus"></i> Inserir Porta (Clique)
+        </button>
+        <button class="tool-btn" id="btnRemovePart" onclick="window.App.ar.setModoCamera('remove_part')" style="color: var(--warning-red); border-color: var(--warning-red);">
+            <i class="fas fa-eraser"></i> Destruir Peça (Borracha)
         </button>
     </div>
 
@@ -219,7 +216,7 @@
             <p id="transcriptionText" style="font-size:0.9rem; color:var(--success-green); font-weight:800; text-align:center; margin:15px 0;"></p>
             <div class="input-group">
                 <label>Instruções Complexas (Prompt Livre)</label>
-                <textarea id="textoAdicional" placeholder="Ex: Crie um balcão comercial curvo estilo Nova Romana com nichos expostos..."></textarea>
+                <textarea id="textoAdicional" placeholder="Ex: Crie um balcão curvo com ripado iluminado, um sofá curvo orgânico e uma mesa redonda ripada..."></textarea>
             </div>
             <div class="input-group">
                 <input type="file" id="fotoCliente" accept="image/*" style="display:none;" onchange="window.App.ai.processPhoto(this)">
@@ -241,7 +238,7 @@
         </div>
         <div class="sheet-body">
             <p style="font-size: 0.9rem; color: #555; margin-bottom:20px; text-align:center; font-weight:700;">
-                <i class="fas fa-info-circle"></i> Pressione e segure o dedo sobre a peça no 3D para editar a engenharia.
+                <i class="fas fa-info-circle"></i> Pressione e segure o dedo sobre a peça no 3D para editar a engenharia. Use a ferramenta <i class="fas fa-eraser" style="color:red"></i> para destruir peças (fundo, teto, etc).
             </p>
             <div id="listaModulosContainer"></div>
             <button class="btn-block primary" style="margin-top:20px;" onclick="window.App.modules.addGeneric()">
@@ -333,6 +330,9 @@
             <div class="input-group">
                 <label>Categoria Tipológica (Comercial / Sênior)</label>
                 <select id="eT" onchange="window.App.ui.syncToState()">
+                    <option value="mesa_redonda_ripada">Mesa Redonda Ripada (Ref)</option>
+                    <option value="sofa_curvo">Sofá Curvo Orgânico (Ref)</option>
+                    <option value="painel_ripado_iluminado">Painel Ripado Iluminado (Ref)</option>
                     <option value="balcao_curvo">Balcão Comercial Curvo</option>
                     <option value="expositor">Expositor Inclinado Comercial</option>
                     <option value="nicho_iluminado">Nicho com Iluminação LED</option>
@@ -344,6 +344,8 @@
                     <option value="porta_avulsa">Porta Avulsa (Solo)</option>
                     <option value="gaveta_avulsa">Gaveta Avulsa (Solo)</option>
                     <option value="painel_fixo">Painel Fixo (Madeira)</option>
+                    <option value="sofa">Sofá Reto / Poltrona</option>
+                    <option value="puff">Puff</option>
                 </select>
             </div>
             <div class="input-group">
@@ -370,7 +372,7 @@
             <div class="input-group">
                 <label>Material Físico / Cor Global</label>
                 <select id="eMat" onchange="window.App.ui.syncToState()">
-                    <option value="amadeirado_padrao">MDF Amadeirado Padrão</option><option value="louro_freijo">MDF Louro Freijó</option><option value="carvalho_hanover">MDF Carvalho Hanover</option><option value="nogueira_cadiz">MDF Nogueira Cádiz</option><option value="mdf_branco_diamante">MDF Branco Diamante (Brilho)</option><option value="mdf_preto_tx">MDF Preto TX / Mármore</option><option value="mdf_grafite">MDF Grafite</option><option value="mdf_azul_petroleo">MDF Azul Petróleo</option><option value="mdf_verde_savia">MDF Verde Sálvia</option>
+                    <option value="amadeirado_padrao">MDF Amadeirado Padrão</option><option value="louro_freijo">MDF Louro Freijó</option><option value="carvalho_hanover">MDF Carvalho Hanover</option><option value="nogueira_cadiz">MDF Nogueira Cádiz</option><option value="mdf_branco_diamante">MDF Branco Diamante (Brilho)</option><option value="mdf_preto_tx">MDF Preto TX / Mármore</option><option value="mdf_grafite">MDF Grafite</option><option value="mdf_azul_petroleo">MDF Azul Petróleo</option><option value="mdf_verde_savia">MDF Verde Sálvia</option><option value="tecido_linho">Tecido Linho (Sofás/Puffs)</option>
                 </select>
             </div>
             <div class="input-group">
@@ -384,7 +386,7 @@
         <div class="input-group">
             <label>Opcionais Estruturais e de Luxo</label>
             <div style="display:flex; gap:25px; flex-wrap:wrap;">
-                <label class="checkbox-group"><input type="checkbox" id="eRipado" onchange="window.App.ui.syncToState()"> Ripado Externo</label>
+                <label class="checkbox-group"><input type="checkbox" id="eRipado" onchange="window.App.ui.syncToState()"> Ripado Externo / Lateral</label>
                 <label class="checkbox-group"><input type="checkbox" id="eVidro" onchange="window.App.ui.syncToState()"> Tampo Vidro / Pedra</label>
                 <label class="checkbox-group"><input type="checkbox" id="eCantosArredondados" onchange="window.App.ui.syncToState()"> Quinas Arredondadas</label>
                 <label class="checkbox-group"><input type="checkbox" id="eFrentesInternas" onchange="window.App.ui.syncToState()"> Inverter Lado (Frentes Internas)</label>
@@ -435,9 +437,14 @@
             </div>
         </div>
         
-        <button class="btn-block danger" style="margin-top: 30px; padding: 20px; font-size:1.1rem;" onclick="window.App.modules.removeCurrent()">
-            <i class="fas fa-trash-alt"></i> Eliminar Definitivamente o Módulo
-        </button>
+        <div style="display:flex; gap: 15px;">
+            <button class="btn-block warning" style="margin-top: 30px; padding: 20px; font-size:1.1rem; background-color: #FF9800; color: #111;" onclick="window.App.modules.restorePartsCurrent()">
+                <i class="fas fa-hammer"></i> Restaurar Peças Removidas
+            </button>
+            <button class="btn-block danger" style="margin-top: 30px; padding: 20px; font-size:1.1rem;" onclick="window.App.modules.removeCurrent()">
+                <i class="fas fa-trash-alt"></i> Excluir Todo o Módulo
+            </button>
+        </div>
     </div>
 
     <div class="floating-buttons">
@@ -465,7 +472,7 @@
          * ESTADO GLOBAL E CATÁLOGO DE MATERIAIS EXPANDIDO
          */
         window.MatDefs = {
-            'amadeirado_padrao': { color: 0x8B5A2B, roughness: 0.8, metalness: 0.1, label: "Amadeirado Padrão", mult: 1.0 },
+            'amadeirado_padrao': { color: 0x8B5A2B, roughness: 0.8, metalness: 0.1, label: "Amadeirado Padrão (Freijó)", mult: 1.0 },
             'louro_freijo': { color: 0x9E7A5A, roughness: 0.8, metalness: 0.1, label: "MDF Louro Freijó", mult: 1.3 },
             'carvalho_hanover': { color: 0x8A6343, roughness: 0.8, metalness: 0.1, label: "MDF Carvalho Hanover", mult: 1.3 },
             'nogueira_cadiz': { color: 0x5C4033, roughness: 0.9, metalness: 0.1, label: "MDF Nogueira Cádiz", mult: 1.3 },
@@ -479,7 +486,8 @@
             'mdf_verde_savia': { color: 0x556B2F, roughness: 0.7, metalness: 0.1, label: "MDF Verde Sálvia", mult: 1.4 },
             'misto': { color: 0xFAFAFA, frontColor: 0x8B5A2B, roughness: 0.6, metalness: 0.1, label: "Misto", mult: 1.1 },
             'vidro_incolor': { color: 0x88CCFF, roughness: 0.0, metalness: 0.9, transparent: true, opacity: 0.25, label: "Vidro Incolor", mult: 2.5 },
-            'rodapé_escuro': { color: 0x222222, roughness: 0.9, metalness: 0.0, label: "Fórmica Preta (Rodapé)" }
+            'rodapé_escuro': { color: 0x222222, roughness: 0.9, metalness: 0.0, label: "Fórmica Preta (Rodapé)" },
+            'tecido_linho': { color: 0xBDB7AB, roughness: 0.9, metalness: 0.0, label: "Tecido Linho Cru (Sofá/Puff)", mult: 2.0 }
         };
 
         window.AppState = {
@@ -506,6 +514,9 @@
 
         window.OracleEngine = {
             rules: { 
+                mesa_redonda_ripada: { label: 'Mesa Redonda Ripada' },
+                sofa_curvo: { label: 'Sofá Curvo Orgânico' },
+                painel_ripado_iluminado: { label: 'Painel Ripado Iluminado' },
                 balcao_curvo: { label: 'Balcão Comercial Curvo' },
                 expositor: { label: 'Expositor Comercial' },
                 nicho_iluminado: { label: 'Nicho c/ LED' },
@@ -515,7 +526,9 @@
                 mesa: { label: 'Mesa' }, 
                 painel_tv: { label: 'Painel TV' }, 
                 porta_avulsa: { label: 'Porta Solo' }, 
-                gaveta_avulsa: { label: 'Gaveta Solo' }
+                gaveta_avulsa: { label: 'Gaveta Solo' },
+                sofa: { label: 'Sofá Reto/Poltrona' },
+                puff: { label: 'Puff' }
             },
             validateAndFix: (mod) => {
                 if (!window.AppState.modoOraculo) return; 
@@ -544,6 +557,12 @@
 
                 if (mod.tipo === 'balcao_curvo') {
                     let a = (Math.PI * w * h) + (w * d * 2); areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, null); laborMult = 2.5;
+                } else if (mod.tipo === 'sofa_curvo') {
+                    let a = w * h * d * 2; areaChassiGlobal += a; totalCostOfModuleMaterials += a * 300; laborMult = 2.5; // Estofado curvo premium
+                } else if (mod.tipo === 'mesa_redonda_ripada') {
+                    let a = (Math.PI * Math.pow(w/2, 2)) * 2 + (Math.PI * w/2 * h); areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, null); laborMult = 2.0;
+                } else if (mod.tipo === 'painel_ripado_iluminado') {
+                    let a = (w * h) * 1.5; areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, null); hwCusto += 120.0; laborMult = 1.5;
                 } else if (mod.tipo === 'expositor') {
                     let a = (h * d * 2) + (w * d * (mod.prateleirasExternas + 2)); areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, null); laborMult = 1.3;
                 } else if (mod.tipo === 'nicho_iluminado') {
@@ -553,6 +572,9 @@
                     if (mod.abertura === 'correr') { qtdTrilhos += 1; hwCusto += 45.0; } else if (mod.abertura === 'basculante') { qtdPistoes += 1; hwCusto += 35.0; } else { let dP = h > 1.5 ? 4 : 2; qtdDobradicas += dP; hwCusto += dP * 7.5; } 
                 } else if (mod.tipo === 'gaveta_avulsa') { 
                     let a = (w * 0.3 + d * 0.3 * 2 + w * d); areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, mod.materiaisCustomizados?.frentes?.['gaveta_avulsa_0']); qtdCorredicas += 1; hwCusto += 25.0; 
+                } else if (mod.tipo === 'sofa' || mod.tipo === 'puff') {
+                    let a = w * h * d; areaChassiGlobal += a; totalCostOfModuleMaterials += a * 250; 
+                    laborMult = 2.0;
                 } else {
                     let aLat = (h * d * 2); areaChassiGlobal += aLat; totalCostOfModuleMaterials += calcCustoPeca(aLat/2, mod.materiaisCustomizados?.estrutura?.['lateralEsq']) + calcCustoPeca(aLat/2, mod.materiaisCustomizados?.estrutura?.['lateralDir']);
                     let aTetoBase = (w * d * 2); areaChassiGlobal += aTetoBase; totalCostOfModuleMaterials += calcCustoPeca(aTetoBase/2, mod.materiaisCustomizados?.estrutura?.['teto']) + calcCustoPeca(aTetoBase/2, mod.materiaisCustomizados?.estrutura?.['base']);
@@ -573,8 +595,10 @@
                     }
                 }
 
-                if (mod.ripadoFrontal) { let a = (w * h) * 1.5; areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, null); laborMult += 0.3; }
-                if (mod.tampoVidro) { hwCusto += (w * d) * 150; }
+                if (mod.ripadoFrontal && mod.tipo !== 'mesa_redonda_ripada' && mod.tipo !== 'painel_ripado_iluminado') { 
+                    let a = (w * h) * 1.5; areaChassiGlobal += a; totalCostOfModuleMaterials += calcCustoPeca(a, null); laborMult += 0.3; 
+                }
+                if (mod.tampoVidro || mod.tampoPedra) { hwCusto += (w * d) * 150; }
 
                 return { area: areaChassiGlobal * 1.15, hardwareCost: hwCusto, laborMult: laborMult, customMatCostTotal: totalCostOfModuleMaterials * 1.15, counts: { dobradicas: qtdDobradicas, corredicas: qtdCorredicas, trilhos: qtdTrilhos, pistoes: qtdPistoes } }; 
             },
@@ -696,9 +720,10 @@
 
             init: () => {
                 const c = document.getElementById('canvas-container'); const cv = document.getElementById('cad-canvas');
-                window.ThreeEngine.scene = new THREE.Scene(); window.ThreeEngine.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+                window.ThreeEngine.scene = new THREE.Scene(); window.ThreeEngine.scene.add(new THREE.AmbientLight(0xffffff, 0.6));
                 const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.7); hemiLight.position.set(0, 200, 0); window.ThreeEngine.scene.add(hemiLight);
                 const dl = new THREE.DirectionalLight(0xffffff, 0.8); dl.position.set(15, 25, 15); dl.castShadow = true; dl.shadow.mapSize.width = 2048; dl.shadow.mapSize.height = 2048; window.ThreeEngine.scene.add(dl);
+                const dl2 = new THREE.DirectionalLight(0xddeeff, 0.4); dl2.position.set(-15, 10, -10); window.ThreeEngine.scene.add(dl2);
                 
                 window.ThreeEngine.camera = new THREE.PerspectiveCamera(45, c.clientWidth / c.clientHeight, 0.1, 1000); window.ThreeEngine.camera.position.set(4, 3, 6);
                 window.ThreeEngine.renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, preserveDrawingBuffer: true }); window.ThreeEngine.renderer.setSize(c.clientWidth, c.clientHeight); window.ThreeEngine.renderer.shadowMap.enabled = true; window.ThreeEngine.renderer.shadowMap.type = THREE.PCFSoftShadowMap; window.ThreeEngine.renderer.outputEncoding = THREE.sRGBEncoding;
@@ -728,15 +753,21 @@
 
                 const hits = window.ThreeEngine.raycaster.intersectObjects(window.ThreeEngine.rootNode.children, true);
                 if (hits.length > 0) {
-                    let obj = hits[0].object; while (obj && !obj.userData.isRootModule && obj.parent) obj = obj.parent;
+                    let target = hits[0].object;
+                    // Se clicou na linha da aresta, pegar o Mesh pai
+                    if(target.type === 'LineSegments' && target.parent) target = target.parent;
+
+                    let obj = target; while (obj && !obj.userData.isRootModule && obj.parent) obj = obj.parent;
+                    
                     if (obj && obj.userData.isRootModule) {
                         window.App.modules.select(obj.userData.id);
                         if (window.AppState.tool === 'move' || (window.AppState.arActive && window.AppState.modoInteracao === 'peca')) { window.ThreeEngine.controls.enabled = false; const pHit = window.ThreeEngine.raycaster.intersectObject(window.ThreeEngine.plane); if (pHit[0]) { window.ThreeEngine.dragObj = { obj: obj, offset: pHit[0].point.sub(obj.position) }; } }
                         
-                        let cX = e.clientX; let cY = e.clientY; if (cX === undefined && e.touches && e.touches.length > 0) { cX = e.touches[0].clientX; cY = e.touches[0].clientY; }
-                        const ind = document.getElementById('longPressIndicator'); ind.style.display = 'block'; ind.style.left = (cX - 40) + 'px'; ind.style.top = (cY - 40) + 'px';
-                        
-                        window.ThreeEngine.pressTimer = setTimeout(() => { ind.style.display = 'none'; if (window.ThreeEngine.isDown && !window.ThreeEngine.dragObj) { window.ThreeEngine.isLongPress = true; window.App.ui.openLiveEditor(obj.userData.id); } }, 500);
+                        if (window.AppState.tool !== 'remove_part') {
+                            let cX = e.clientX; let cY = e.clientY; if (cX === undefined && e.touches && e.touches.length > 0) { cX = e.touches[0].clientX; cY = e.touches[0].clientY; }
+                            const ind = document.getElementById('longPressIndicator'); ind.style.display = 'block'; ind.style.left = (cX - 40) + 'px'; ind.style.top = (cY - 40) + 'px';
+                            window.ThreeEngine.pressTimer = setTimeout(() => { ind.style.display = 'none'; if (window.ThreeEngine.isDown && !window.ThreeEngine.dragObj && window.AppState.tool !== 'remove_part') { window.ThreeEngine.isLongPress = true; window.App.ui.openLiveEditor(obj.userData.id); } }, 500);
+                        }
                     }
                 } else { window.App.modules.select(null); }
             },
@@ -765,13 +796,41 @@
 
                 let cX = e.clientX; let cY = e.clientY; if (cX === undefined && e.changedTouches && e.changedTouches.length > 0) { cX = e.changedTouches[0].clientX; cY = e.changedTouches[0].clientY; }
 
+                // ==========================================
+                // FERRAMENTA CIRÚRGICA: REMOVER PEÇA
+                // ==========================================
+                if (window.AppState.tool === 'remove_part') {
+                    if (Math.hypot(cX - window.ThreeEngine.pDown.x, cY - window.ThreeEngine.pDown.y) < 15) {
+                        window.ThreeEngine.raycaster.setFromCamera(window.ThreeEngine.pointer, window.ThreeEngine.camera);
+                        const hits = window.ThreeEngine.raycaster.intersectObjects(window.ThreeEngine.rootNode.children, true);
+                        if (hits.length > 0) {
+                            let target = hits[0].object;
+                            if(target.type === 'LineSegments' && target.parent) target = target.parent;
+                            
+                            let modGroup = target; while(modGroup && !modGroup.userData.isRootModule) modGroup = modGroup.parent;
+                            if (modGroup && target.userData && target.userData.partKey) {
+                                const mod = window.AppState.modules.find(m => m.id === modGroup.userData.id);
+                                if (mod) {
+                                    if (!mod.removedParts) mod.removedParts = [];
+                                    if (!mod.removedParts.includes(target.userData.partKey)) {
+                                        mod.removedParts.push(target.userData.partKey);
+                                        window.App.modules.refreshAll();
+                                        window.App.ui.toast(`Peça removida: ${target.userData.partKey}`, "warning");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return;
+                }
+
                 if (window.AppState.tool === 'add_comp') {
                     if (Math.hypot(cX - window.ThreeEngine.pDown.x, cY - window.ThreeEngine.pDown.y) < 15) {
                         window.ThreeEngine.raycaster.setFromCamera(window.ThreeEngine.pointer, window.ThreeEngine.camera); const hits = window.ThreeEngine.raycaster.intersectObjects(window.ThreeEngine.rootNode.children, true);
                         if (hits.length > 0) {
-                            const hitPoint = hits[0].point; const novoId = Date.now().toString();
-                            const mod = { id: novoId, tipo: 'porta_avulsa', nome: "Porta Inserida Livre", largura: 500, altura: 500, profundidade: 20, material: 'amadeirado_padrao', abertura: 'giro', formato: 'reto', portas: 0, gavetas: 0, prateleiras: 0, prateleirasExternas: 0, layoutInterno: 'apenas_portas', dobradicaLado: 'esq', ripadoFrontal: false, tampoVidro: false, compW: 0, compH: 0, compStates: {}, frentesInternas: false, materiaisCustomizados: { frentes: {}, estrutura: {} }, medidasCustomizadas: {}, posX: hitPoint.x * 1000, posY: hitPoint.y * 1000, posZ: hitPoint.z * 1000, rotY: 0 };
-                            window.AppState.modules.push(mod); window.App.modules.select(novoId); window.App.modules.refreshAll(); window.App.ui.toast("Componente inserido no clique!", "success");
+                            const hitPoint = hits[0].point;
+                            window.App.modules.add('porta_avulsa', { posX: hitPoint.x * 1000, posY: hitPoint.y * 1000, posZ: hitPoint.z * 1000 });
+                            window.App.ui.toast("Componente inserido no clique!", "success");
                         }
                     } return;
                 }
@@ -809,7 +868,7 @@
             },
 
             // =========================================================================
-            // CORE DE ENGENHARIA 3D (CSG COMERCIAL + CAIXARIA OCA COM FOLGAS)
+            // CORE DE ENGENHARIA 3D (CSG COMERCIAL + CAIXARIA OCA COM FOLGAS + REMOÇÃO)
             // =========================================================================
             rebuildScene: () => {
                 window.AppState.animacoesAtivas = []; window.AppState.cutParts = []; 
@@ -818,10 +877,11 @@
                 
                 window.AppState.modules.forEach(mod => {
                     const g = new THREE.Group(); g.userData = { id: mod.id, isRootModule: true };
+                    if (!mod.removedParts) mod.removedParts = [];
                     
                     const w = mod.largura / 1000; const h = mod.altura / 1000; const d = mod.profundidade / 1000;
                     const rBase = (mod.raioCurva || mod.retornoL || 800) / 1000; 
-                    const esp = 0.018; const folga = 0.003; // Folga realista de 3mm
+                    const esp = 0.018; const folga = 0.003; 
                     
                     const baseDef = window.MatDefs[mod.material] || window.MatDefs['amadeirado_padrao'];
                     const matCorpo = new THREE.MeshStandardMaterial(baseDef);
@@ -829,6 +889,7 @@
                     const matVidro = new THREE.MeshStandardMaterial(window.MatDefs['vidro_incolor']);
                     const matTampoPedra = new THREE.MeshStandardMaterial(window.MatDefs['mdf_preto_tx']);
                     const matRodape = new THREE.MeshStandardMaterial(window.MatDefs['rodapé_escuro']);
+                    const matTecido = new THREE.MeshStandardMaterial(window.MatDefs['tecido_linho']);
                     const selMat = new THREE.MeshStandardMaterial({...baseDef, emissive: 0x333333 });
                     
                     const edgeMat = new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.2 }); 
@@ -848,34 +909,41 @@
                         } return defaultMat;
                     };
                     
-                    const matTeto = getMat('teto', mod.tampoVidro ? (mod.tipo==='balcao_curvo'?matTampoPedra:matVidro) : activeMat); 
+                    const matTeto = getMat('teto', mod.tampoVidro ? (mod.tipo==='balcao_curvo'||mod.tipo==='mesa_redonda_ripada'?matTampoPedra:matVidro) : activeMat); 
                     const matBase = getMat('base', activeMat); const matEsq = getMat('lateralEsq', activeMat); const matDir = getMat('lateralDir', activeMat); const matFundo = getMat('fundo', activeMat);
 
-                    const criarGeo = (geo, px, py, pz, cMat = activeMat) => { 
+                    const criarGeo = (geo, px, py, pz, cMat, partKey) => { 
+                        if (partKey && mod.removedParts.includes(partKey)) return null;
                         const m = new THREE.Mesh(geo, cMat); m.position.set(px, py, pz); m.castShadow = m.receiveShadow = true; 
-                        if(mod.tipo !== 'balcao_curvo') m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), edgeMat)); 
+                        if(partKey) m.userData.partKey = partKey;
+                        // Não colocar wireframe em curvas para manter a suavidade Sênior
+                        if(mod.tipo !== 'balcao_curvo' && mod.tipo !== 'sofa_curvo' && mod.tipo !== 'sofa' && mod.tipo !== 'puff' && mod.tipo !== 'mesa_redonda_ripada') {
+                            m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), edgeMat)); 
+                        }
                         g.add(m); return m; 
                     };
                     
-                    const criarBloco = (gw, gh, gd, px, py, pz, cMat, cutLabel = "Estrutura") => { 
-                        if (cMat !== matVidro && mod.tipo !== 'sofa' && mod.tipo !== 'cadeira' && mod.tipo !== 'puff' && mod.tipo !== 'balcao_curvo') {
+                    const criarBloco = (gw, gh, gd, px, py, pz, cMat, partKey, cutLabel = "Estrutura") => { 
+                        if (partKey && mod.removedParts.includes(partKey)) return null;
+                        if (cMat !== matVidro && mod.tipo !== 'sofa' && mod.tipo !== 'cadeira' && mod.tipo !== 'puff' && mod.tipo !== 'balcao_curvo' && mod.tipo !== 'sofa_curvo') {
                             let pw = gw, ph = gh, pd = gd;
                             if (Math.abs(pw - esp) < 0.001) { window.AppState.cutParts.push({w: Math.round(ph*1000), h: Math.round(pd*1000), label: cutLabel}); }
                             else if (Math.abs(ph - esp) < 0.001) { window.AppState.cutParts.push({w: Math.round(pw*1000), h: Math.round(pd*1000), label: cutLabel}); }
                             else if (Math.abs(pd - esp) < 0.001) { window.AppState.cutParts.push({w: Math.round(pw*1000), h: Math.round(ph*1000), label: cutLabel}); }
                             else if (gd <= 0.006) { window.AppState.cutParts.push({w: Math.round(pw*1000), h: Math.round(ph*1000), label: "Fundo"}); }
                         }
-                        return criarGeo(new THREE.BoxGeometry(gw, gh, gd), px, py, pz, cMat);
+                        return criarGeo(new THREE.BoxGeometry(gw, gh, gd), px, py, pz, cMat, partKey);
                     };
 
                     const drawInteractiveFronte = (gParent, isDrawer, wF, hF, dF, px, py, pz, cMat, abertura, isLeft, zDir, travelX, compKey) => {
+                        if (mod.removedParts.includes(compKey)) return;
                         const grp = new THREE.Group(); const type = isDrawer ? 'drawer' : (abertura === 'correr' ? 'door_slide' : (abertura === 'basculante' ? 'door_flap' : 'door_hinge'));
                         const isOpen = mod.compStates[compKey] || false; 
-                        grp.userData = { isAnimatable: true, type: type, isOpen: isOpen, modId: mod.id, compKey: compKey, zDir: zDir, depth: dF, baseZ: pz, travelX: travelX, baseX: px, hinge: isLeft ? 'left' : 'right' };
+                        grp.userData = { isAnimatable: true, type: type, isOpen: isOpen, modId: mod.id, compKey: compKey, zDir: zDir, depth: dF, baseZ: pz, travelX: travelX, baseX: px, hinge: isLeft ? 'left' : 'right', partKey: compKey };
                         
-                        // Frentes com recuo realista de folga (gap)
                         const pM = new THREE.Mesh(new THREE.BoxGeometry(wF - folga, hF - folga, esp), cMat); 
-                        pM.castShadow = true; pM.add(new THREE.LineSegments(new THREE.EdgesGeometry(pM.geometry), edgeMat)); 
+                        pM.castShadow = true; pM.userData.partKey = compKey;
+                        pM.add(new THREE.LineSegments(new THREE.EdgesGeometry(pM.geometry), edgeMat)); 
                         
                         if (isDrawer) { grp.position.set(px, py, isOpen ? (pz + dF * 0.8 * zDir) : pz); grp.add(pM); } 
                         else {
@@ -922,38 +990,119 @@
                     };
 
                     // =========================================================================
-                    // CSG MÓDULO CURVO (BALCÃO COMERCIAL) E NOVAS FORMAS
+                    // CSG MÓDULO CURVO, SOFÁ ORGÂNICO E MESA REDONDA RIPADA (REFS NAS FOTOS)
                     // =========================================================================
-                    if (mod.tipo === 'balcao_curvo') {
+                    if (mod.tipo === 'mesa_redonda_ripada') {
+                        // Base cilíndrica menor
+                        const baseR = w / 4; 
+                        criarGeo(new THREE.CylinderGeometry(baseR, baseR, h - 0.03, 32), 0, (h-0.03)/2, 0, matCorpo, "base_cilindrica");
+                        
+                        // Ripado 360 em volta da base (Matemática pura)
+                        if (!mod.removedParts.includes("ripado_360")) {
+                            const ripG = new THREE.Group(); ripG.userData.partKey = "ripado_360";
+                            const numRipas = Math.floor((2 * Math.PI * baseR) / 0.035);
+                            for(let i=0; i<numRipas; i++) {
+                                const angle = (i / numRipas) * Math.PI * 2;
+                                const rx = Math.cos(angle) * (baseR + 0.01);
+                                const rz = Math.sin(angle) * (baseR + 0.01);
+                                const ripa = new THREE.Mesh(new THREE.BoxGeometry(0.015, h-0.03, 0.02), matFrente);
+                                ripa.position.set(rx, (h-0.03)/2, rz);
+                                ripa.rotation.y = -angle;
+                                ripG.add(ripa);
+                            }
+                            g.add(ripG);
+                            window.AppState.cutParts.push({w: Math.round((h-0.03)*1000), h: Math.round(0.035*1000), label: `Ripas 360 (${numRipas}x)`});
+                        }
+                        // Tampo maior (Pedra ou Madeira)
+                        criarGeo(new THREE.CylinderGeometry(w/2, w/2, 0.03, 64), 0, h - 0.015, 0, matTeto, "tampo_cilindrico");
+                    }
+                    else if (mod.tipo === 'sofa_curvo') {
+                        // Sofá Curvo (Path Sweeping como no Balcão)
+                        const path = new THREE.CurvePath();
+                        path.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(-w/2, 0, d/2), new THREE.Vector3(0, 0, -d/4), new THREE.Vector3(w/2, 0, d/2)));
+                        const smoothPath = new THREE.CatmullRomCurve3(path.getPoints(50));
+                        
+                        const createSofaExtrusion = (shape, yPos, lbl, pKey) => {
+                            if (mod.removedParts.includes(pKey)) return;
+                            const geo = new THREE.ExtrudeGeometry(shape, { extrudePath: smoothPath, steps: 80, bevelEnabled: true, bevelSegments: 3, bevelSize: 0.02, bevelThickness: 0.02 });
+                            const m = new THREE.Mesh(geo, matTecido); m.position.set(0, yPos, 0); m.castShadow = true; m.receiveShadow = true; 
+                            m.userData.partKey = pKey; g.add(m);
+                        };
+
+                        // Assento
+                        const hAssento = h * 0.4;
+                        const assentoShape = new THREE.Shape(); assentoShape.moveTo(-d/3, 0); assentoShape.lineTo(d/3, 0); assentoShape.lineTo(d/3, hAssento); assentoShape.lineTo(-d/3, hAssento); assentoShape.lineTo(-d/3, 0);
+                        createSofaExtrusion(assentoShape, 0, "Assento Curvo", "assento_curvo");
+
+                        // Encosto (Vai até altura total, mais fino e atrás)
+                        const dEncosto = d * 0.2;
+                        const encostoShape = new THREE.Shape(); encostoShape.moveTo(-d/3, hAssento); encostoShape.lineTo(-d/3 + dEncosto, hAssento); encostoShape.lineTo(-d/3 + dEncosto, h); encostoShape.lineTo(-d/3, h); encostoShape.lineTo(-d/3, hAssento);
+                        createSofaExtrusion(encostoShape, 0, "Encosto Curvo", "encosto_curvo");
+                        
+                        // Ripado Vertical nas costas do sofá (Conforme Foto 1/4)
+                        if (mod.ripadoFrontal && !mod.removedParts.includes("ripado_sofa")) {
+                            const points = smoothPath.getPoints(80);
+                            for (let i = 0; i < points.length; i++) {
+                                const pt = points[i]; 
+                                const tangent = smoothPath.getTangent(i / (points.length - 1), new THREE.Vector3()); 
+                                const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize(); // Normal apontando para fora da curva
+                                const rPx = pt.x - normal.x * (d/3 + 0.01); const rPz = pt.z - normal.z * (d/3 + 0.01); const angle = Math.atan2(tangent.x, tangent.z);
+                                const ripaGeo = new THREE.BoxGeometry(0.015, h, 0.02);
+                                const m = new THREE.Mesh(ripaGeo, activeMatFront); m.position.set(rPx, h/2, rPz); m.rotation.y = angle; m.userData.partKey = "ripado_sofa"; g.add(m);
+                            }
+                        }
+                    }
+                    else if (mod.tipo === 'painel_ripado_iluminado') {
+                        // Painel Reto Ripado (Parede da Foto 3)
+                        criarBloco(w, h, 0.03, 0, h/2, -d/2 + 0.015, matFundo, "fundo_painel", "Fundo do Painel");
+                        
+                        if (!mod.removedParts.includes("ripado_painel")) {
+                            const ripG = new THREE.Group(); ripG.userData.partKey = "ripado_painel";
+                            const numRipas = Math.floor(w / 0.04);
+                            for(let i=0; i<numRipas; i++) {
+                                const rPx = -w/2 + 0.02 + (i * 0.04);
+                                const ripa = new THREE.Mesh(new THREE.BoxGeometry(0.02, h, 0.02), activeMatFront);
+                                ripa.position.set(rPx, h/2, -d/2 + 0.04);
+                                ripG.add(ripa);
+                            }
+                            g.add(ripG);
+                            window.AppState.cutParts.push({w: Math.round(h*1000), h: Math.round(0.04*1000), label: `Ripas Painel (${numRipas}x)`});
+                        }
+                        
+                        // Fita LED atrás do painel
+                        const ledMat = new THREE.MeshStandardMaterial({ color: 0xffddaa, emissive: 0xffddaa, emissiveIntensity: 2 });
+                        criarGeo(new THREE.BoxGeometry(w-0.05, h-0.05, 0.01), 0, h/2, -d/2 - 0.01, ledMat, "led_painel");
+                    }
+                    else if (mod.tipo === 'balcao_curvo') {
                         const L1_len = w * 0.4; const L2_len = w * 0.3; 
                         const path = new THREE.CurvePath();
                         path.add(new THREE.LineCurve3(new THREE.Vector3(-L1_len, 0, 0), new THREE.Vector3(0, 0, 0)));
                         path.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(rBase, 0, 0), new THREE.Vector3(rBase, 0, rBase)));
                         path.add(new THREE.LineCurve3(new THREE.Vector3(rBase, 0, rBase), new THREE.Vector3(rBase, 0, rBase + L2_len)));
 
-                        // NOVO: Converte para CatmullRomCurve3 para corrigir erro de Frenet Frames (isVector2) no Three.js
                         const pathPoints = path.getPoints(80);
                         const smoothPath = new THREE.CatmullRomCurve3(pathPoints);
 
-                        const createExtrusion = (shape, material, yPos, lbl) => {
+                        const createExtrusion = (shape, material, yPos, lbl, pKey) => {
+                            if (mod.removedParts.includes(pKey)) return;
                             const geo = new THREE.ExtrudeGeometry(shape, { extrudePath: smoothPath, steps: 80, bevelEnabled: false });
-                            const m = new THREE.Mesh(geo, material); m.position.set(0, yPos, 0); m.castShadow = true; m.receiveShadow = true; g.add(m);
-                            // Calculo rudimentar para jogar o painel curvo pro plano de corte (unwrapped)
+                            const m = new THREE.Mesh(geo, material); m.position.set(0, yPos, 0); m.castShadow = true; m.receiveShadow = true; 
+                            m.userData.partKey = pKey; g.add(m);
                             const compTotal = L1_len + L2_len + ((Math.PI * rBase) / 2);
                             window.AppState.cutParts.push({w: Math.round(compTotal*1000), h: Math.round(100*1000), label: lbl});
                         };
 
                         const rodapeShape = new THREE.Shape(); rodapeShape.moveTo(-d/2 + 0.15, 0); rodapeShape.lineTo(d/2 - 0.05, 0); rodapeShape.lineTo(d/2 - 0.05, 0.1); rodapeShape.lineTo(-d/2 + 0.15, 0.1); rodapeShape.lineTo(-d/2 + 0.15, 0);
-                        createExtrusion(rodapeShape, matRodape, 0, "Rodapé Curvo");
+                        createExtrusion(rodapeShape, matRodape, 0, "Rodapé Curvo", "rodape_curvo");
 
                         const corpoShape = new THREE.Shape(); corpoShape.moveTo(-d/2, 0); corpoShape.lineTo(d/2, 0); corpoShape.lineTo(d/2, h - 0.1); corpoShape.lineTo(-d/2, h - 0.1); corpoShape.lineTo(-d/2, 0);
-                        createExtrusion(corpoShape, activeMat, 0.1, "Corpo Curvo");
+                        createExtrusion(corpoShape, activeMat, 0.1, "Corpo Curvo", "corpo_curvo");
 
                         const tampoShape = new THREE.Shape(); const bFront = mod.tampoVidro ? 0.03 : 0.01;
                         tampoShape.moveTo(-d/2 - 0.01, 0); tampoShape.lineTo(d/2 + bFront, 0); tampoShape.lineTo(d/2 + bFront, 0.036); tampoShape.lineTo(-d/2 - 0.01, 0.036); tampoShape.lineTo(-d/2 - 0.01, 0);
-                        createExtrusion(tampoShape, matTeto, h - 0.1, "Tampo Curvo");
+                        createExtrusion(tampoShape, matTeto, h - 0.1, "Tampo Curvo", "tampo_curvo");
 
-                        if (mod.ripadoFrontal) {
+                        if (mod.ripadoFrontal && !mod.removedParts.includes("ripado_frontal")) {
                             const points = smoothPath.getPoints(100);
                             for (let i = 0; i < points.length; i++) {
                                 const pt = points[i]; 
@@ -961,35 +1110,44 @@
                                 const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
                                 const rPx = pt.x + normal.x * (d/2 + 0.01); const rPz = pt.z + normal.z * (d/2 + 0.01); const angle = Math.atan2(tangent.x, tangent.z);
                                 const ripaGeo = new THREE.BoxGeometry(0.02, h - 0.1, 0.015);
-                                const m = new THREE.Mesh(ripaGeo, activeMatFront); m.position.set(rPx, 0.1 + (h-0.1)/2, rPz); m.rotation.y = angle; g.add(m);
+                                const m = new THREE.Mesh(ripaGeo, activeMatFront); m.position.set(rPx, 0.1 + (h-0.1)/2, rPz); m.rotation.y = angle; m.userData.partKey = "ripado_frontal"; g.add(m);
                             }
                         }
                     } 
                     else if (mod.tipo === 'expositor') {
-                        criarBloco(esp, h, d, -w/2+esp/2, h/2, 0, matEsq, "Lateral Esq");
-                        criarBloco(esp, h, d, w/2-esp/2, h/2, 0, matDir, "Lateral Dir");
-                        criarBloco(w-esp*2, h, esp, 0, h/2, -d/2+esp/2, matFundo, "Fundo");
+                        criarBloco(esp, h, d, -w/2+esp/2, h/2, 0, matEsq, "lateralEsq", "Lateral Esq");
+                        criarBloco(esp, h, d, w/2-esp/2, h/2, 0, matDir, "lateralDir", "Lateral Dir");
+                        criarBloco(w-esp*2, h, esp, 0, h/2, -d/2+esp/2, matFundo, "fundo", "Fundo");
                         
                         const epIn = (h-esp*2) / (mod.prateleirasExternas + 1); 
                         for(let i=1; i<=mod.prateleirasExternas; i++) {
                             const yPos = esp + epIn*i;
-                            const prat = criarBloco(w-esp*2, esp, d-0.05, 0, yPos, 0, matCorpo, "Prateleira Inclinada");
-                            prat.rotation.x = Math.PI / 15; // Inclinado
-                            criarBloco(w-esp*2, 0.04, esp, 0, yPos - 0.02, d/2 - 0.03, matCorpo, "Aparador");
-                            const ledMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffee, emissiveIntensity: 1.5 });
-                            criarGeo(new THREE.BoxGeometry(w-esp*2, 0.01, 0.01), 0, yPos - 0.01, -d/2 + 0.05, ledMat);
+                            const prat = criarBloco(w-esp*2, esp, d-0.05, 0, yPos, 0, matCorpo, `prateleira_inc_${i}`, "Prateleira Inclinada");
+                            if(prat) prat.rotation.x = Math.PI / 15;
+                            criarBloco(w-esp*2, 0.04, esp, 0, yPos - 0.02, d/2 - 0.03, matCorpo, `aparador_${i}`, "Aparador");
                         }
                     } 
                     else if (mod.tipo === 'nicho_iluminado') {
-                        criarBloco(w, esp, d, 0, esp/2, 0, matBase, "Base"); criarBloco(w, esp, d, 0, h-esp/2, 0, matTeto, "Teto"); criarBloco(esp, h-esp*2, d, -w/2+esp/2, h/2, 0, matEsq, "Lat"); criarBloco(esp, h-esp*2, d, w/2-esp/2, h/2, 0, matDir, "Lat"); criarBloco(w-esp*2, h-esp*2, esp, 0, h/2, -d/2+esp/2, matFundo, "Fundo");
+                        criarBloco(w, esp, d, 0, esp/2, 0, matBase, "base", "Base"); criarBloco(w, esp, d, 0, h-esp/2, 0, matTeto, "teto", "Teto"); criarBloco(esp, h-esp*2, d, -w/2+esp/2, h/2, 0, matEsq, "lateralEsq", "Lat"); criarBloco(esp, h-esp*2, d, w/2-esp/2, h/2, 0, matDir, "lateralDir", "Lat"); criarBloco(w-esp*2, h-esp*2, esp, 0, h/2, -d/2+esp/2, matFundo, "fundo", "Fundo");
                         const ledMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 2 });
-                        criarGeo(new THREE.BoxGeometry(w-esp*2, 0.01, 0.02), 0, h-esp-0.005, d/2 - 0.05, ledMat);
-                        criarGeo(new THREE.BoxGeometry(0.01, h-esp*2, 0.02), -w/2+esp+0.005, h/2, d/2 - 0.05, ledMat);
-                        criarGeo(new THREE.BoxGeometry(0.01, h-esp*2, 0.02), w/2-esp-0.005, h/2, d/2 - 0.05, ledMat);
+                        criarGeo(new THREE.BoxGeometry(w-esp*2, 0.01, 0.02), 0, h-esp-0.005, d/2 - 0.05, ledMat, "led_teto");
+                        criarGeo(new THREE.BoxGeometry(0.01, h-esp*2, 0.02), -w/2+esp+0.005, h/2, d/2 - 0.05, ledMat, "led_esq");
+                        criarGeo(new THREE.BoxGeometry(0.01, h-esp*2, 0.02), w/2-esp-0.005, h/2, d/2 - 0.05, ledMat, "led_dir");
                     } 
+                    else if (mod.tipo === 'sofa' || mod.tipo === 'puff') {
+                         if (mod.tipo === 'puff') {
+                             criarGeo(new THREE.BoxGeometry(w, h, d), 0, h/2, 0, matTecido, "corpo_puff");
+                         } else {
+                             const hAssento = h * 0.4; const dEncosto = d * 0.2; const wBraco = w * 0.15;
+                             criarGeo(new THREE.BoxGeometry(w, hAssento, d), 0, hAssento/2, 0, matTecido, "assento_sofa");
+                             criarGeo(new THREE.BoxGeometry(w, h - hAssento, dEncosto), 0, hAssento + (h-hAssento)/2, -d/2 + dEncosto/2, matTecido, "encosto_sofa");
+                             criarGeo(new THREE.BoxGeometry(wBraco, hAssento * 1.5, d), -w/2 + wBraco/2, (hAssento*1.5)/2, 0, matTecido, "braco_esq_sofa");
+                             criarGeo(new THREE.BoxGeometry(wBraco, hAssento * 1.5, d), w/2 - wBraco/2, (hAssento*1.5)/2, 0, matTecido, "braco_dir_sofa");
+                         }
+                    }
                     else {
                         // =========================================================================
-                        // LÓGICA MESTRE DE CAIXARIA PADRÃO (TOTALMENTE OCA E ESTRUTURAL COM FUGAS)
+                        // LÓGICA MESTRE DE CAIXARIA PADRÃO
                         // =========================================================================
                         const isBalcao = (mod.tipo === 'balcao'); 
                         const prEx = mod.prateleirasExternas > 0 ? 0.20 : 0; 
@@ -1002,53 +1160,47 @@
 
                         const zCentro = (faceTrabalhoZ + faceAtendimentoZ) / 2;
                         
-                        // Esqueleto
-                        criarBloco(w, esp, chassiD, 0, esp/2, zCentro, matBase, "Base"); 
-                        criarBloco(w, esp, chassiD, 0, h-esp/2, zCentro, matTeto, "Tampo"); 
-                        criarBloco(esp, h-esp*2, chassiD, -w/2+esp/2, h/2, zCentro, matEsq, "Lat Esq"); 
-                        criarBloco(esp, h-esp*2, chassiD, w/2-esp/2, h/2, zCentro, matDir, "Lat Dir"); 
+                        criarBloco(w, esp, chassiD, 0, esp/2, zCentro, matBase, "base", "Base"); 
+                        criarBloco(w, esp, chassiD, 0, h-esp/2, zCentro, matTeto, "teto", "Tampo"); 
+                        criarBloco(esp, h-esp*2, chassiD, -w/2+esp/2, h/2, zCentro, matEsq, "lateralEsq", "Lat Esq"); 
+                        criarBloco(esp, h-esp*2, chassiD, w/2-esp/2, h/2, zCentro, matDir, "lateralDir", "Lat Dir"); 
 
-                        // Fundo de 6mm isolando o ambiente
-                        criarBloco(w-esp*2, h-esp*2, 0.006, 0, h/2, faceAtendimentoZ - (0.003 * dirAtendimento), matFundo, "Fundo 6mm");
+                        criarBloco(w-esp*2, h-esp*2, 0.006, 0, h/2, faceAtendimentoZ - (0.003 * dirAtendimento), matFundo, "fundo", "Fundo 6mm");
                         
-                        // Prateleiras internas (Área Trabalho)
                         if (mod.prateleiras > 0) { 
                             const epIn = (h-esp*2) / (mod.prateleiras + 1); 
-                            for (let i=1; i<=mod.prateleiras; i++) { criarBloco(w-esp*2, esp, chassiD-0.02, 0, esp+epIn*i, zCentro, activeMat, "Prat Interna"); }
+                            for (let i=1; i<=mod.prateleiras; i++) { criarBloco(w-esp*2, esp, chassiD-0.02, 0, esp+epIn*i, zCentro, activeMat, `prat_int_${i}`, "Prat Interna"); }
                         }
                         
-                        // Ripado ou Prateleiras (Área Cliente)
                         if (prEx > 0 || mod.ripadoFrontal) { 
-                            criarBloco(w-esp*2, h-esp*2, esp, 0, h/2, faceAtendimentoZ + (esp/2 * dirAtendimento), activeMatFront, "Fundo Ancoragem"); 
+                            criarBloco(w-esp*2, h-esp*2, esp, 0, h/2, faceAtendimentoZ + (esp/2 * dirAtendimento), activeMatFront, "fundo_ancoragem", "Fundo Ancoragem"); 
                             
-                            if (mod.ripadoFrontal) {
+                            if (mod.ripadoFrontal && !mod.removedParts.includes("ripado_frontal")) {
                                 const bw = w-esp*2; const qty = Math.floor(bw / 0.035); 
                                 for (let r = 0; r < qty; r++) { 
                                     const rPx = 0 - bw/2 + r*0.035 + 0.017;
-                                    criarGeo(new THREE.BoxGeometry(0.02, h-esp*2, esp), rPx, h/2, faceAtendimentoZ + (esp * dirAtendimento), activeMatFront);
+                                    criarGeo(new THREE.BoxGeometry(0.02, h-esp*2, esp), rPx, h/2, faceAtendimentoZ + (esp * dirAtendimento), activeMatFront, "ripado_frontal");
                                     window.AppState.cutParts.push({w: Math.round((h-esp*2)*1000), h: Math.round(0.035*1000), label: 'Ripa Frontal'});
                                 }
                             }
                             
                             if (prEx > 0) { 
                                 const epEx = (h-esp*2) / (mod.prateleirasExternas + 1); 
-                                for(let i=1; i<=mod.prateleirasExternas; i++) { criarBloco(w-esp*2, esp, prEx, 0, esp+epEx*i, faceAtendimentoZ + (prEx/2 * dirAtendimento), activeMat, "Prat Externa"); }
+                                for(let i=1; i<=mod.prateleirasExternas; i++) { criarBloco(w-esp*2, esp, prEx, 0, esp+epEx*i, faceAtendimentoZ + (prEx/2 * dirAtendimento), activeMat, `prat_ext_${i}`, "Prat Externa"); }
                             } 
                         }
 
-                        // Módulo em L
                         if ((mod.formato === 'L_esq' || mod.formato === 'L_dir') && rL > d) { 
                             const isE = mod.formato === 'L_esq'; const wL = chassiD, lenL = rL - d; const pxL = isE ? -w/2+wL/2 : w/2-wL/2; const pzL = faceTrabalhoZ + (lenL/2 * dirTrabalho); 
-                            criarBloco(wL, esp, lenL, pxL, esp/2, pzL, matBase, "Base L"); criarBloco(wL, esp, lenL, pxL, h-esp/2, pzL, matTeto, "Tampo L"); criarBloco(wL, h-esp*2, esp, pxL, h/2, pzL + (lenL/2 * dirTrabalho) - (esp/2 * dirTrabalho), matFundo, "Ponta L"); 
+                            criarBloco(wL, esp, lenL, pxL, esp/2, pzL, matBase, "base_L", "Base L"); criarBloco(wL, esp, lenL, pxL, h-esp/2, pzL, matTeto, "teto_L", "Tampo L"); criarBloco(wL, h-esp*2, esp, pxL, h/2, pzL + (lenL/2 * dirTrabalho) - (esp/2 * dirTrabalho), matFundo, "fundo_L", "Ponta L"); 
                             const ladoParedeX = pxL + (isE ? -wL/2 + esp/2 : wL/2 - esp/2); const ladoDentroX = pxL + (isE ? wL/2 - esp/2 : -wL/2 + esp/2); let painelX = mod.frentesInternas ? ladoParedeX : ladoDentroX; if (isBalcao) { painelX = mod.frentesInternas ? ladoDentroX : ladoParedeX; }
-                            criarBloco(esp, h-esp*2, lenL, painelX, h/2, pzL, isE ? matEsq : matDir, "Lat L"); 
+                            criarBloco(esp, h-esp*2, lenL, painelX, h/2, pzL, isE ? matEsq : matDir, "lateral_L", "Lat L"); 
 
                             const returnGroup = new THREE.Group(); returnGroup.position.set(pxL, h/2, pzL); returnGroup.rotation.y = isE ? -Math.PI/2 : Math.PI/2; 
                             fillStorageArea(lenL-esp*2, h-esp*2, chassiD, 0, 0, (wL/2 * -dirTrabalho), mod.portas, mod.gavetas, mod.layoutInterno, mod.abertura, mod.dobradicaLado, dirTrabalho, returnGroup); 
                             g.add(returnGroup); 
                         }
                         
-                        // Portas e Gavetas (Área Trabalho)
                         fillStorageArea(w-esp*2, h-esp*2, chassiD, 0, h/2, faceTrabalhoZ, mod.portas, mod.gavetas, mod.layoutInterno, mod.abertura, mod.dobradicaLado, dirTrabalho, g);
                     }
 
@@ -1079,7 +1231,7 @@
                         portas: 2, gavetas: 0, prateleiras: 1, prateleirasExternas: 0, layoutInterno: 'apenas_portas', dobradicaLado: 'esq', 
                         ripadoFrontal: false, tampoVidro: false, compW: 0, compH: 0, compStates: {}, 
                         frentesInternas: false, materiaisCustomizados: { frentes: {}, estrutura: {} }, medidasCustomizadas: {}, 
-                        posX: 0, posY: 0, posZ: 0, rotY: 0, ...overrides 
+                        posX: 0, posY: 0, posZ: 0, rotY: 0, removedParts: [], ...overrides 
                     };
                     window.OracleEngine.validateAndFix(mod); 
                     window.AppState.modules.push(mod); 
@@ -1106,7 +1258,17 @@
                     window.App.modules.select(null); 
                     window.App.ui.fecharEditor(); 
                     window.App.modules.refreshAll(); 
-                    window.App.ui.toast("Módulo removido.", "success"); 
+                    window.App.ui.toast("Módulo excluído.", "success"); 
+                },
+                restorePartsCurrent: () => {
+                    let idToRem = window.AppState.selectedModule; 
+                    if (!idToRem) { const el = document.getElementById('eId'); if(el) idToRem = el.value; } 
+                    const mod = window.AppState.modules.find(m => m.id === idToRem);
+                    if (mod) {
+                        mod.removedParts = [];
+                        window.App.modules.refreshAll();
+                        window.App.ui.toast("Peças removidas restauradas!", "success");
+                    }
                 },
                 refreshAll: () => { 
                     window.ThreeEngine.rebuildScene(); 
@@ -1287,15 +1449,18 @@
                     if (pxEl) pxEl.value = m.posX; 
                     const pzEl = document.getElementById('ePz'); 
                     if (pzEl) pzEl.value = m.posZ; 
+                    const pyEl = document.getElementById('ePy'); 
+                    if (pyEl) pyEl.value = m.posY; 
+                    const ryEl = document.getElementById('eRy'); 
+                    if (ryEl) ryEl.value = m.rotY; 
                 }
             },
             ar: {
                 setModoCamera: (m) => { 
                     window.AppState.tool = m; 
-                    document.getElementById('btnOrbit').className = `tool-btn ${m==='orbit'?'active':''}`; 
-                    document.getElementById('btnMove').className = `tool-btn ${m==='move'?'active':''}`; 
-                    const btnAdd = document.getElementById('btnAddComp'); 
-                    if (btnAdd) btnAdd.className = `tool-btn ${m==='add_comp'?'active':''}`; 
+                    document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active')); 
+                    event.currentTarget.classList.add('active'); 
+                    if(m === 'remove_part') window.App.ui.toast("Clique na peça do móvel 3D para destruí-la.", "warning");
                 },
                 setModoInteracao: (m) => { 
                     window.AppState.modoInteracao = m; 
@@ -1428,7 +1593,10 @@
                     
                     window.App.ui.showLoader("Oráculo Arquitetônico Analisando..."); 
                     try { 
-                        const prompt = `Você é o Arquiteto e Engenheiro de Marcenaria Comercial Sênior. Gere a estrutura 3D. NÃO RESUMA. TIPOS: balcao_curvo, expositor, nicho_iluminado, armario, balcao, guarda_roupa, mesa, painel_tv, rack, cadeira, sofa, puff, nicho. LAYOUTS INTERNOS: top_drawers, bottom_drawers, left_drawers, right_drawers, gavetas_internas, apenas_portas, apenas_gavetas, ilha_dupla. FORMATOS: reto, L_esq, L_dir, canto_obliquo, canto_curvo, redondo, triangular, dobravel. VOZ/TEXTO: "${window.AppState.transcricaoAtual} ${txt}" RETORNE JSON EX: {"modulos": [{"tipo": "balcao_curvo", "largura": 1800, "altura": 1100, "profundidade": 600, "raioCurva": 800, "material": "amadeirado_padrao", "ripadoFrontal": true, "tampoVidro": true}]}`; 
+                        const prompt = `Você é o Arquiteto e Engenheiro de Marcenaria Comercial Sênior. Gere a estrutura 3D. TIPOS: balcao_curvo, mesa_redonda_ripada, sofa_curvo, painel_ripado_iluminado, expositor, nicho_iluminado, armario, balcao, guarda_roupa, mesa, painel_tv, porta_avulsa, gaveta_avulsa, painel_fixo, sofa, puff. 
+                        Atenção: A chave "removedParts" recebe um array de strings com as peças a remover (ex: ["fundo", "porta_0", "teto"]).
+                        VOZ/TEXTO: "${window.AppState.transcricaoAtual} ${txt}" 
+                        RETORNE JSON EX: {"modulos": [{"tipo": "balcao_curvo", "largura": 1800, "altura": 1100, "profundidade": 600, "raioCurva": 800, "material": "amadeirado_padrao", "ripadoFrontal": true, "tampoVidro": true, "removedParts": []}]}`; 
                         
                         const parts = [{ text: prompt }]; 
                         if (window.AppState.imagemFundoBase64) {
@@ -1444,8 +1612,12 @@
                         const data = await res.json(); 
                         if (data.error) throw new Error(data.error.message); 
                         
-                        const jsonStr = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim(); 
-                        const json = JSON.parse(jsonStr); 
+                        // REGEX ROBUSCO PARA EXTRAIR O JSON MESMO SE A IA ESCREVER TEXTO EM VOLTA
+                        const rawText = data.candidates[0].content.parts[0].text;
+                        const match = rawText.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+                        if (!match) throw new Error("JSON não encontrado na resposta do oráculo.");
+                        
+                        const json = JSON.parse(match[0]); 
                         
                         if (json.modulos && json.modulos.length > 0) { 
                             window.AppState.modules = [];
@@ -1454,7 +1626,7 @@
                             window.App.ui.toast("Arquitetura Comercial Gerada!"); 
                         } 
                     } catch(e) { 
-                        window.App.ui.toast("Erro no processamento da IA: " + e.message); 
+                        window.App.ui.toast("Erro no processamento da IA: " + e.message, "error"); 
                     } finally { 
                         window.App.ui.hideLoader(); 
                     } 
