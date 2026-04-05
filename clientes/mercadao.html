@@ -220,6 +220,7 @@
         </div>
     </div>
 
+    <!-- ESTÚDIO AR MELHORADO: CAIXA DA SALA E LIMITES DE FOTOGRAFIA -->
     <div id="perspectiveHUD" class="bottom-sheet">
         <div class="sheet-header">
             <h3><i class="fas fa-camera"></i> Estúdio de Posicionamento AR</h3>
@@ -621,7 +622,7 @@
                 document.getElementById('bom-price').innerText = fmt(cTotal + profit); document.getElementById('bom-area').innerText = tArea.toFixed(2) + ' m²'; document.getElementById('bom-mat').innerText = fmt(totalMatsCost + tHWFix + tHWDyn); document.getElementById('bom-mobra').innerText = fmt(tLaborDyn); document.getElementById('bom-profit').innerText = fmt(profit); document.getElementById('bom-hw-cost').innerText = fmt(tHWDyn);
                 let hwListStr = []; if (cDob > 0) hwListStr.push(`${cDob}x Dobradiças`); if (cCor > 0) hwListStr.push(`${cCor}x Corrediças`); if (cTril > 0) hwListStr.push(`${cTril}x Trilhos`); if (cPist > 0) hwListStr.push(`${cPist}x Pistões`); document.getElementById('bom-hw-list').innerText = hwListStr.length > 0 ? hwListStr.join(' | ') : "Nenhuma ferragem identificada.";
             },
-            updateParams: () => { window.AppState.costs.mdf = parseFloat(document.getElementById('cost-mdf').value) || 85.00; window.AppState.costs.labor = parseFloat(document.getElementById('cost-labor').value) || 80.00; window.AppState.costs.hardware = parseFloat(document.getElementById('cost-hardware').value) || 0.00; window.AppState.costs.margin = parseFloat(document.getElementById('cost-margin').value) || 40; window.BOMEngine.update(); }
+            updateParams: () => { window.AppState.costs.mdf = parseFloat(document.getElementById('cost-mdf').value) || 85.00; window.AppState.costs.labor = parseFloat(document.getElementById('cost-labor').value) || 80.00; window.AppState.costs.hardware = parseFloat(document.getElementById('cost-hardware').value) || 0.00; window.AppState.costs.margin = parseFloat(document.getElementById('cost-margin').value) || 40; window.BOMEngine.update(); window.App.storage.save(); }
         };
 
         // ==========================================================================
@@ -694,15 +695,16 @@
                     let w = mod.largura || 1000; let d = mod.profundidade || 500;
                     if (mod.tipo === 'parede_otica' || mod.nome.includes('Expositor') || mod.tipo === 'armario') {
                         let goRight = mod.nome.includes('Dir'); let goLeft = mod.nome.includes('Esq');
-                        if (goLeft || (!goRight && zEsq <= zDir)) {
-                            mod.posX = -(roomWidth / 2) + (d / 2); mod.posZ = -(roomDepth / 2) + zEsq + (w / 2) + 500; mod.rotY = 0; zEsq += w + 200; 
+                        if (!goRight && !goLeft) { if (zEsq <= zDir) goLeft = true; else goRight = true; }
+                        if (goLeft) {
+                            mod.posX = -(roomWidth / 2) + (d / 2); mod.posZ = -(roomDepth / 2) + zEsq + (w / 2) + 500; mod.rotY = 90; zEsq += w + 100; 
                         } else {
-                            mod.posX = (roomWidth / 2) - (d / 2); mod.posZ = -(roomDepth / 2) + zDir + (w / 2) + 500; mod.rotY = 180; zDir += w + 200;
+                            mod.posX = (roomWidth / 2) - (d / 2); mod.posZ = -(roomDepth / 2) + zDir + (w / 2) + 500; mod.rotY = -90; zDir += w + 100;
                         }
                     } else if (mod.tipo.includes('centro') || mod.nome.includes('Pórtico') || mod.nome.includes('Mesa') || mod.nome.includes('Totem') || mod.tipo.includes('chillibeans')) {
                          mod.posX = 0; 
-                         if(mod.tipo === 'totem_iluminado_otica') { mod.posZ = (roomDepth / 2) - 1000; } 
-                         else { mod.posZ = -(roomDepth / 2) + zCentro + (d / 2) + 2000; zCentro += d + 1500; }
+                         if(mod.tipo === 'totem_iluminado_otica') { mod.posZ = (roomDepth / 2) - 1000; mod.rotY = 0; } 
+                         else { mod.posZ = -(roomDepth / 2) + zCentro + (d / 2) + 2000; zCentro += d + 1500; mod.rotY = 0; }
                     } else if (mod.tipo === 'balcao' || mod.nome.includes('Caixa') || mod.tipo === 'balcao_mercadao') { mod.posX = 0; mod.posZ = -(roomDepth / 2) + 1000; mod.rotY = 0; }
                     else { mod.posX = 0; mod.posZ = 0; mod.rotY = 0; }
                     placed.push(mod);
@@ -724,17 +726,18 @@
                 const c = document.getElementById('canvas-container'); const cv = document.getElementById('cad-canvas');
                 window.ThreeEngine.scene = new THREE.Scene();
                 
-                // Iluminação Ajustada para Cores Fortes
+                // Iluminação Ajustada para Cores Vivas
                 window.ThreeEngine.scene.add(new THREE.AmbientLight(0xffffff, 0.7)); 
-                const dl = new THREE.DirectionalLight(0xffffff, 0.6); dl.position.set(10, 20, 10); dl.castShadow = true; 
+                const dl = new THREE.DirectionalLight(0xffffff, 0.8); dl.position.set(10, 20, 10); dl.castShadow = true; 
                 dl.shadow.mapSize.width = 2048; dl.shadow.mapSize.height = 2048; dl.shadow.bias = -0.001;
                 window.ThreeEngine.scene.add(dl);
                 const dl2 = new THREE.DirectionalLight(0xffffff, 0.3); dl2.position.set(-10, 10, -10); window.ThreeEngine.scene.add(dl2);
                 
                 window.ThreeEngine.camera = new THREE.PerspectiveCamera(45, c.clientWidth / c.clientHeight, 0.1, 1000); window.ThreeEngine.camera.position.set(4, 4, 6);
                 
-                // Renderer PBR - LinearToneMapping para preservar as cores da marca!
+                // Renderer PBR - LinearToneMapping para não lavar as cores
                 window.ThreeEngine.renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, preserveDrawingBuffer: true, powerPreference: "high-performance" }); 
+                window.ThreeEngine.renderer.setClearColor(0x000000, 0); 
                 window.ThreeEngine.renderer.setSize(c.clientWidth, c.clientHeight); window.ThreeEngine.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
                 window.ThreeEngine.renderer.shadowMap.enabled = true; window.ThreeEngine.renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
                 window.ThreeEngine.renderer.outputEncoding = THREE.sRGBEncoding; window.ThreeEngine.renderer.toneMapping = THREE.LinearToneMapping;
@@ -743,23 +746,25 @@
                 const pmremGenerator = new THREE.PMREMGenerator( window.ThreeEngine.renderer );
                 window.ThreeEngine.scene.environment = pmremGenerator.fromScene( new THREE.RoomEnvironment(), 0.04 ).texture;
 
-                // Efeito Bloom Ajustado
+                // Efeito Bloom
                 const renderScene = new THREE.RenderPass( window.ThreeEngine.scene, window.ThreeEngine.camera );
                 const bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( c.clientWidth, c.clientHeight ), 1.2, 0.4, 0.85 );
-                bloomPass.threshold = 1.0; bloomPass.strength = 0.6; bloomPass.radius = 0.3;
+                bloomPass.threshold = 1.2; bloomPass.strength = 1.0; bloomPass.radius = 0.3;
                 window.ThreeEngine.composer = new THREE.EffectComposer( window.ThreeEngine.renderer );
                 window.ThreeEngine.composer.addPass( renderScene ); window.ThreeEngine.composer.addPass( bloomPass );
 
                 window.ThreeEngine.controls = new THREE.OrbitControls(window.ThreeEngine.camera, cv); window.ThreeEngine.controls.enableDamping = true; window.ThreeEngine.controls.target.set(0, 0.5, 0);
                 window.ThreeEngine.rootNode = new THREE.Group(); window.ThreeEngine.scene.add(window.ThreeEngine.rootNode);
-                window.ThreeEngine.dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0); // Para arrastar a sala
+                window.ThreeEngine.dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
                 
                 cv.addEventListener('pointerdown', window.ThreeEngine.onPtrDown, { capture: true }); 
                 cv.addEventListener('pointermove', window.ThreeEngine.onPtrMove, { capture: true }); 
                 cv.addEventListener('pointerup', window.ThreeEngine.onPtrUp, { capture: true });
 
-                cv.addEventListener('touchstart', function(e) { e.preventDefault(); }, { passive: false }); 
-                cv.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false }); 
+                const stopTouch = (e) => { if (window.ThreeEngine.dragObj) e.stopImmediatePropagation(); };
+                cv.addEventListener('touchstart', stopTouch, { capture: true, passive: false }); 
+                cv.addEventListener('touchmove', stopTouch, { capture: true, passive: false }); 
+                cv.addEventListener('touchend', stopTouch, { capture: true, passive: false });
 
                 window.addEventListener('resize', () => { window.ThreeEngine.camera.aspect = c.clientWidth / c.clientHeight; window.ThreeEngine.camera.updateProjectionMatrix(); window.ThreeEngine.renderer.setSize(c.clientWidth, c.clientHeight); if(window.ThreeEngine.composer) window.ThreeEngine.composer.setSize(c.clientWidth, c.clientHeight); });
                 window.ThreeEngine.animate();
@@ -776,10 +781,13 @@
                 window.ThreeEngine.raycaster.setFromCamera(window.ThreeEngine.pointer, window.ThreeEngine.camera);
                 
                 if (window.AppState.arActive && window.AppState.modoInteracao === 'projeto') { 
-                    window.ThreeEngine.controls.enabled = false; 
                     window.ThreeEngine.dragPlane.constant = -window.ThreeEngine.rootNode.position.y;
                     const hitPoint = new THREE.Vector3(); window.ThreeEngine.raycaster.ray.intersectPlane(window.ThreeEngine.dragPlane, hitPoint);
-                    if (hitPoint) { window.ThreeEngine.dragObj = { type: 'root', offset: hitPoint.clone().sub(window.ThreeEngine.rootNode.position) }; } return; 
+                    if (hitPoint) { 
+                        window.ThreeEngine.controls.enabled = false; 
+                        window.ThreeEngine.dragObj = { type: 'root', offset: hitPoint.clone().sub(window.ThreeEngine.rootNode.position) }; 
+                    } 
+                    return; 
                 }
 
                 const hits = window.ThreeEngine.raycaster.intersectObjects(window.ThreeEngine.rootNode.children, true);
@@ -815,7 +823,7 @@
                     
                     if (window.ThreeEngine.dragObj.type === 'root') { 
                         const hitPoint = new THREE.Vector3(); window.ThreeEngine.raycaster.ray.intersectPlane(window.ThreeEngine.dragPlane, hitPoint);
-                        if(hitPoint) { const newPos = hitPoint.clone().sub(window.ThreeEngine.dragObj.offset); window.ThreeEngine.rootNode.position.x = newPos.x; window.ThreeEngine.rootNode.position.z = newPos.z; }
+                        if(hitPoint) { const newPos = hitPoint.clone().sub(window.ThreeEngine.dragObj.offset); window.ThreeEngine.rootNode.position.x = newPos.x; window.ThreeEngine.rootNode.position.z = newPos.z; window.App.storage.save(); }
                     } else { 
                         const modData = window.AppState.modules.find(m => m.id === window.ThreeEngine.dragObj.obj.userData.id); 
                         if (modData) {
@@ -823,17 +831,16 @@
                             if(hitPointMat) {
                                 let tX = hitPointMat.x - window.ThreeEngine.dragObj.offset.x; 
                                 let tZ = hitPointMat.z - window.ThreeEngine.dragObj.offset.z; 
-                                let tY = (modData.posY || 0) / 1000; // Preserva a altura Y definida pelo utilizador!
-                                let rY = modData.rotY || 0; // Preserva a rotação definida pelo utilizador!
+                                let tY = (modData.posY !== undefined) ? modData.posY / 1000 : 0; 
+                                let rY = modData.rotY || 0; 
 
                                 const rW2 = window.AppState.roomWidth / 2000; const rD2 = window.AppState.roomDepth / 2000;
                                 const halfW = (modData.largura || 1000) / 2000; const halfD = (modData.profundidade || 500) / 2000;
-                                const snapDist = 0.4; // Colisão acontece apenas a 40cm da parede
-                                let snapped = false;
+                                const snapDist = 0.4; let snapped = false;
 
                                 if (Math.abs((tZ - halfD) - (-rD2)) < snapDist) { tZ = -rD2 + halfD; rY = 0; snapped = true; }
-                                else if (Math.abs((tX - halfW) - (-rW2)) < snapDist) { tX = -rW2 + halfW; rY = -90; snapped = true; }
-                                else if (Math.abs((tX + halfW) - (rW2)) < snapDist) { tX = rW2 - halfW; rY = 90; snapped = true; }
+                                else if (Math.abs((tX - halfW) - (-rW2)) < snapDist) { tX = -rW2 + halfW; rY = -90; snapped = true; } 
+                                else if (Math.abs((tX + halfW) - (rW2)) < snapDist) { tX = rW2 - halfW; rY = 90; snapped = true; } 
 
                                 window.ThreeEngine.dragObj.obj.position.set(tX, tY, tZ); 
                                 if(snapped) { window.ThreeEngine.dragObj.obj.rotation.y = THREE.MathUtils.degToRad(rY); modData.rotY = rY; }
@@ -852,6 +859,8 @@
                 clearTimeout(window.ThreeEngine.pressTimer); document.getElementById('longPressIndicator').style.display = 'none';
                 if (window.ThreeEngine.dragObj) { window.ThreeEngine.dragObj = null; return; } 
                 if (window.ThreeEngine.isLongPress) { window.ThreeEngine.isLongPress = false; return; } 
+                
+                window.App.storage.save();
 
                 let cX = e.clientX; let cY = e.clientY; if (cX === undefined && e.changedTouches && e.changedTouches.length > 0) { cX = e.changedTouches[0].clientX; cY = e.changedTouches[0].clientY; }
 
@@ -886,7 +895,7 @@
                     if (Math.hypot(cX - window.ThreeEngine.pDown.x, cY - window.ThreeEngine.pDown.y) < 15) {
                         window.ThreeEngine.raycaster.setFromCamera(window.ThreeEngine.pointer, window.ThreeEngine.camera); const hits = window.ThreeEngine.raycaster.intersectObjects(window.ThreeEngine.rootNode.children, true); let anim = null;
                         for (let h of hits) { let curr = h.object; if(curr.userData.type && curr.userData.type.includes('wall')) continue; if (curr.type === 'LineSegments' && curr.parent) curr = curr.parent; while (curr) { if (curr.userData && curr.userData.isAnimatable) { anim = curr; break; } curr = curr.parent; } if (anim) break; }
-                        if (anim) { anim.userData.isOpen = !anim.userData.isOpen; const mod = window.AppState.modules.find(m => m.id === anim.userData.modId); if (mod) mod.compStates[anim.userData.compKey] = anim.userData.isOpen; window.AppState.animacoesAtivas = window.AppState.animacoesAtivas.filter(a => a.obj !== anim); window.AppState.animacoesAtivas.push({ obj: anim, type: anim.userData.type, target: anim.userData.isOpen }); }
+                        if (anim) { anim.userData.isOpen = !anim.userData.isOpen; const mod = window.AppState.modules.find(m => m.id === anim.userData.modId); if (mod) mod.compStates[anim.userData.compKey] = anim.userData.isOpen; window.AppState.animacoesAtivas = window.AppState.animacoesAtivas.filter(a => a.obj !== anim); window.AppState.animacoesAtivas.push({ obj: anim, type: anim.userData.type, target: anim.userData.isOpen }); window.App.storage.save(); }
                     }
                 }
             },
@@ -911,7 +920,7 @@
                 window.AppState.animacoesAtivas = []; window.AppState.cutParts = []; 
                 
                 const rW = window.AppState.roomWidth / 1000; const rD = window.AppState.roomDepth / 1000; const rH = 3;
-                const cMat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }); // Invisível mas colide
+                const cMat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }); // Fica 100% invisível mas colide
                 
                 window.ThreeEngine.floorCollider = new THREE.Mesh(new THREE.PlaneGeometry(rW*3, rD*3), cMat); window.ThreeEngine.floorCollider.rotation.x = -Math.PI/2; window.ThreeEngine.floorCollider.userData.type = 'floor'; window.ThreeEngine.rootNode.add(window.ThreeEngine.floorCollider);
                 window.ThreeEngine.wallBackCollider = new THREE.Mesh(new THREE.PlaneGeometry(rW, rH), cMat); window.ThreeEngine.wallBackCollider.position.set(0, rH/2, -rD/2); window.ThreeEngine.wallBackCollider.userData.type = 'wallBack'; window.ThreeEngine.rootNode.add(window.ThreeEngine.wallBackCollider);
@@ -951,8 +960,7 @@
                     const matLed = getMatReal('led');
                     const matEspelho = getMatReal('espelho');
                     
-                    // SOLUÇÃO Z-FIGHTING EXATA: polygonOffset empurra as linhas suavemente para trás e não piscam
-                    const edgeMat = new THREE.LineBasicMaterial({ color: 0x222222, transparent: true, opacity: 0.15, depthTest: true, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 }); edgeMat.raycast = () => {}; 
+                    const edgeMat = new THREE.LineBasicMaterial({ color: 0x222222, transparent: true, opacity: 0.15, depthTest: true, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }); edgeMat.raycast = () => {}; 
                     const selMat = new THREE.MeshStandardMaterial({...matCorpo, emissive: 0x333333 });
                     const activeMat = (window.AppState.selectedModule === mod.id) ? selMat : matCorpo;
                     const activeMatFront = (window.AppState.selectedModule === mod.id) ? selMat : matFrente;
@@ -1169,9 +1177,8 @@
                         fillStorageArea(w-esp*2, h-esp*2, chassiD, 0, h/2, faceTrabalhoZ, mod.portas, mod.gavetas, mod.layoutInterno, mod.abertura, mod.dobradicaLado, dirTrabalho, g);
                     }
 
-                    // APLICAÇÃO DE POSIÇÃO E ROTAÇÃO LIVRE (O Utilizador decide!)
                     const fx = (mod.posX !== undefined) ? mod.posX / 1000 : 0;
-                    const fY = (mod.posY !== undefined) ? mod.posY / 1000 : 0; // Altura na parede
+                    const fY = (mod.posY !== undefined) ? mod.posY / 1000 : 0; 
                     const fZ = (mod.posZ !== undefined) ? mod.posZ / 1000 : 0;
                     
                     g.position.set(fx, fY, fZ);
@@ -1183,32 +1190,77 @@
         };
 
         // ==========================================================================
-        // 8. APP CONTROLLER E GESTOR DE FOTOS UNIFICADO
+        // 8. APP CONTROLLER E GESTOR DE SISTEMA
         // ==========================================================================
         window.App = {
-            init: () => { window.App.config.load(); window.ThreeEngine.init(); window.App.modules.add('parede_otica', { nome: "Expositor Mercadão", largura: 2000, altura: 2400, profundidade: 450, portas: 0, gavetas: 3, layoutInterno: "apenas_gavetas", material: 'mdf_branco_diamante', posY: 0 }); window.App.ui.toast("Fábrica 3D Realista Iniciada! Cores do Mercadão e Movimento Livre.", "success"); },
+            storage: {
+                save: () => {
+                    const data = {
+                        modules: window.AppState.modules,
+                        roomW: window.AppState.roomWidth,
+                        roomD: window.AppState.roomDepth,
+                        bgImage: window.AppState.imagemFundoURL
+                    };
+                    try { localStorage.setItem('mercadao_save', JSON.stringify(data)); } 
+                    catch(e) { console.warn("Imagem demasiado grande para localStorage."); data.bgImage = null; localStorage.setItem('mercadao_save', JSON.stringify(data)); }
+                },
+                load: () => {
+                    const saved = localStorage.getItem('mercadao_save');
+                    if (saved) {
+                        const data = JSON.parse(saved);
+                        if (data.modules) window.AppState.modules = data.modules;
+                        if (data.roomW) { window.AppState.roomWidth = data.roomW; document.getElementById('roomW').value = data.roomW; }
+                        if (data.roomD) { window.AppState.roomDepth = data.roomD; document.getElementById('roomD').value = data.roomD; }
+                        if (data.bgImage) {
+                            window.AppState.imagemFundoURL = data.bgImage;
+                            window.AppState.imagemFundoBase64 = data.bgImage.split(',')[1];
+                            const imgPreview = document.getElementById('imagePreview');
+                            if(imgPreview) { imgPreview.src = data.bgImage; document.getElementById('imgPreviewContainer').style.display = 'block'; }
+                        }
+                    }
+                }
+            },
             
-            // FUNÇÃO GLOBAL DE FOTOS: Sincroniza HUD de IA e HUD de AR para a mesma foto!
+            init: () => { 
+                window.App.config.load(); 
+                window.ThreeEngine.init(); 
+                window.App.storage.load();
+                
+                if(window.AppState.modules.length === 0) {
+                    window.App.modules.add('parede_otica', { nome: "Expositor Mercadão", largura: 2000, altura: 2400, profundidade: 450, portas: 0, gavetas: 3, layoutInterno: "apenas_gavetas", material: 'mdf_branco_diamante', posY: 0 }); 
+                } else {
+                    window.ThreeEngine.rebuildScene();
+                    window.App.ui.renderList();
+                }
+                window.App.ui.toast("Fábrica 3D Realista Iniciada! Projeto Recuperado.", "success"); 
+            },
+            
+            // FUNÇÃO GLOBAL DE FOTOS
             processGlobalPhoto: (input) => { 
                 if (input.files && input.files[0]) { 
                     const f = input.files[0]; 
-                    window.AppState.imagemFundoURL = URL.createObjectURL(f); 
-                    
-                    // Mostra na aba da IA
-                    const imgPreview = document.getElementById('imagePreview'); if(imgPreview) imgPreview.src = window.AppState.imagemFundoURL; 
-                    const previewContainer = document.getElementById('imgPreviewContainer'); if(previewContainer) previewContainer.style.display = 'block'; 
-                    
-                    // Coloca no fundo 3D se o AR estiver ligado
-                    if (window.AppState.arActive) {
-                        const container = document.getElementById('canvas-container'); 
-                        container.style.backgroundImage = `url(${window.AppState.imagemFundoURL})`; 
-                        container.style.backgroundSize = 'cover'; container.style.backgroundPosition = 'center'; 
-                        document.getElementById('arBtnText').innerText = 'Desativar Fundo Real'; 
-                        window.ThreeEngine.rebuildScene(); window.App.ui.fecharHUDs();
-                    }
-
-                    const r = new FileReader(); r.onload = () => { window.AppState.imagemFundoBase64 = r.result.split(',')[1]; }; r.readAsDataURL(f);
-                    window.App.ui.toast("Foto Carregada com Sucesso!", "success"); 
+                    const r = new FileReader(); 
+                    r.onload = () => { 
+                        const base64Data = r.result;
+                        window.AppState.imagemFundoURL = base64Data; 
+                        window.AppState.imagemFundoBase64 = base64Data.split(',')[1]; 
+                        
+                        const imgPreview = document.getElementById('imagePreview'); 
+                        if(imgPreview) imgPreview.src = window.AppState.imagemFundoURL; 
+                        const previewContainer = document.getElementById('imgPreviewContainer'); 
+                        if(previewContainer) previewContainer.style.display = 'block'; 
+                        
+                        if (window.AppState.arActive) {
+                            const container = document.getElementById('canvas-container'); 
+                            container.style.backgroundImage = `url(${window.AppState.imagemFundoURL})`; 
+                            container.style.backgroundSize = 'cover'; container.style.backgroundPosition = 'center'; 
+                            document.getElementById('arBtnText').innerText = 'Desativar Fundo Real'; 
+                            window.ThreeEngine.rebuildScene(); window.App.ui.fecharHUDs();
+                        }
+                        window.App.storage.save();
+                        window.App.ui.toast("Foto Carregada e Guardada!", "success"); 
+                    }; 
+                    r.readAsDataURL(f);
                 } 
             },
 
@@ -1240,24 +1292,24 @@
                         custContainer.innerHTML = html;
                     } document.getElementById('floatingEditor').classList.add('active');
                 },
-                syncCustom: (key) => { const elId = document.getElementById('eId'); if (!elId) return; const m = window.AppState.modules.find(x => x.id === elId.value); if (!m) return; if (!m.medidasCustomizadas) m.medidasCustomizadas = {}; if (!m.materiaisCustomizados) m.materiaisCustomizados = { frentes:{}, estrutura:{} }; const w = parseFloat(document.getElementById(`custW_${key}`).value) || 0; const h = parseFloat(document.getElementById(`custH_${key}`).value) || 0; const mat = document.getElementById(`custM_${key}`).value; if (w > 0 || h > 0) m.medidasCustomizadas[key] = { w, h }; else delete m.medidasCustomizadas[key]; if (mat) m.materiaisCustomizados.frentes[key] = mat; else delete m.materiaisCustomizados.frentes[key]; window.App.modules.refreshAll(); },
-                syncCustomStruct: (part) => { const elId = document.getElementById('eId'); if (!elId) return; const m = window.AppState.modules.find(x => x.id === elId.value); if (!m) return; if (!m.materiaisCustomizados) m.materiaisCustomizados = { frentes:{}, estrutura:{} }; const mat = document.getElementById(`custE_${part}`).value; if (mat) m.materiaisCustomizados.estrutura[part] = mat; else delete m.materiaisCustomizados.estrutura[part]; window.App.modules.refreshAll(); },
+                syncCustom: (key) => { const elId = document.getElementById('eId'); if (!elId) return; const m = window.AppState.modules.find(x => x.id === elId.value); if (!m) return; if (!m.medidasCustomizadas) m.medidasCustomizadas = {}; if (!m.materiaisCustomizados) m.materiaisCustomizados = { frentes:{}, estrutura:{} }; const w = parseFloat(document.getElementById(`custW_${key}`).value) || 0; const h = parseFloat(document.getElementById(`custH_${key}`).value) || 0; const mat = document.getElementById(`custM_${key}`).value; if (w > 0 || h > 0) m.medidasCustomizadas[key] = { w, h }; else delete m.medidasCustomizadas[key]; if (mat) m.materiaisCustomizados.frentes[key] = mat; else delete m.materiaisCustomizados.frentes[key]; window.App.modules.refreshAll(); window.App.storage.save(); },
+                syncCustomStruct: (part) => { const elId = document.getElementById('eId'); if (!elId) return; const m = window.AppState.modules.find(x => x.id === elId.value); if (!m) return; if (!m.materiaisCustomizados) m.materiaisCustomizados = { frentes:{}, estrutura:{} }; const mat = document.getElementById(`custE_${part}`).value; if (mat) m.materiaisCustomizados.estrutura[part] = mat; else delete m.materiaisCustomizados.estrutura[part]; window.App.modules.refreshAll(); window.App.storage.save(); },
                 syncToState: () => {
                     const elId = document.getElementById('eId'); if (!elId) return; const m = window.AppState.modules.find(x => x.id === elId.value); if (!m) return;
                     const props = ['tipo','formato','layoutInterno','dobradicaLado','material','abertura','largura','altura','profundidade','retornoL','portas','gavetas','prateleiras','prateleirasExternas','compW','compH','posX','posY','posZ','rotY'];
                     const keys = ['eT','eFormato','eLayoutInt','eDobradica','eMat','eA','eL','eAl','eP','eRetL','ePo','eG','ePr','ePratExt','eCompW','eCompH','ePx','ePy','ePz','eRy'];
                     keys.forEach((k, i) => { const el = document.getElementById(k); if (el) m[props[i]] = ['eT','eFormato','eLayoutInt','eDobradica','eMat','eA'].includes(k) ? el.value : parseFloat(el.value)||0; });
                     const chkR = document.getElementById('eRipado'); if(chkR) m.ripadoFrontal = chkR.checked; const chkV = document.getElementById('eVidro'); if(chkV) m.tampoVidro = chkV.checked; const chkInternas = document.getElementById('eFrentesInternas'); if(chkInternas) m.frentesInternas = chkInternas.checked;
-                    window.OracleEngine.validateAndFix(m); window.App.modules.refreshAll(); window.App.ui.openLiveEditor(m.id);
+                    window.OracleEngine.validateAndFix(m); window.App.modules.refreshAll(); window.App.ui.openLiveEditor(m.id); window.App.storage.save();
                 },
-                syncToStateNoRebuild: () => { const elId = document.getElementById('eId'); if (!elId) return; const m = window.AppState.modules.find(x => x.id === elId.value); if (!m) return; const pxEl = document.getElementById('ePx'); if (pxEl) pxEl.value = m.posX; const pzEl = document.getElementById('ePz'); if (pzEl) pzEl.value = m.posZ; const ryEl = document.getElementById('eRy'); if(ryEl) ryEl.value = m.rotY; const pyEl = document.getElementById('ePy'); if(pyEl) pyEl.value = m.posY; }
+                syncToStateNoRebuild: () => { const elId = document.getElementById('eId'); if (!elId) return; const m = window.AppState.modules.find(x => x.id === elId.value); if (!m) return; const pxEl = document.getElementById('ePx'); if (pxEl) pxEl.value = m.posX; const pzEl = document.getElementById('ePz'); if (pzEl) pzEl.value = m.posZ; const ryEl = document.getElementById('eRy'); if(ryEl) ryEl.value = m.rotY; const pyEl = document.getElementById('ePy'); if(pyEl) pyEl.value = m.posY; window.App.storage.save(); }
             },
             api: { saveKeys: () => { window.AppState.apiKeys.gemini = document.getElementById('api-gemini').value.trim(); window.AppState.apiKeys.groq = document.getElementById('api-groq').value.trim(); window.App.config.save(); window.App.ui.toggleModal('modalSettings'); window.App.ui.toast("Chaves salvas!", "success"); } },
             modules: {
-                add: (tipo, overrides = {}) => { const id = Date.now().toString() + Math.floor(Math.random()*1000); const mod = { id, tipo, nome: window.OracleEngine.rules[tipo]?.label || "Móvel Universal", largura: 1000, altura: 800, profundidade: 500, material: 'mdf_branco_diamante', abertura: 'giro', formato: 'reto', portas: 2, gavetas: 0, prateleiras: 1, prateleirasExternas: 0, layoutInterno: 'apenas_portas', dobradicaLado: 'esq', ripadoFrontal: false, tampoVidro: false, compW: 0, compH: 0, compStates: {}, frentesInternas: false, materiaisCustomizados: { frentes: {}, estrutura: {} }, medidasCustomizadas: {}, posX: 0, posY: 0, posZ: 0, rotY: 0, removedParts: [], ...overrides }; window.OracleEngine.validateAndFix(mod); window.AppState.modules.push(mod); window.App.modules.select(id); window.App.modules.refreshAll(); },
+                add: (tipo, overrides = {}) => { const id = Date.now().toString() + Math.floor(Math.random()*1000); const mod = { id, tipo, nome: window.OracleEngine.rules[tipo]?.label || "Móvel Universal", largura: 1000, altura: 800, profundidade: 500, material: 'mdf_branco_diamante', abertura: 'giro', formato: 'reto', portas: 2, gavetas: 0, prateleiras: 1, prateleirasExternas: 0, layoutInterno: 'apenas_portas', dobradicaLado: 'esq', ripadoFrontal: false, tampoVidro: false, compW: 0, compH: 0, compStates: {}, frentesInternas: false, materiaisCustomizados: { frentes: {}, estrutura: {} }, medidasCustomizadas: {}, posX: 0, posY: 0, posZ: 0, rotY: 0, removedParts: [], ...overrides }; window.OracleEngine.validateAndFix(mod); window.AppState.modules.push(mod); window.App.modules.select(id); window.App.modules.refreshAll(); window.App.storage.save(); },
                 addGeneric: () => { window.App.ui.fecharHUDs(); window.App.modules.add('armario'); },
                 select: (id) => { window.AppState.selectedModule = id; window.ThreeEngine.highlightSelection(id); window.App.ui.renderList(); if (id && document.getElementById('floatingEditor').classList.contains('active')) { window.App.ui.openLiveEditor(id); } },
-                removeCurrent: () => { let idToRem = window.AppState.selectedModule; if (!idToRem) { const el = document.getElementById('eId'); if(el) idToRem = el.value; } if (!idToRem) return window.App.ui.toast("Nenhum módulo selecionado.", "error"); window.AppState.modules = window.AppState.modules.filter(m => m.id !== idToRem); window.App.modules.select(null); window.App.ui.fecharEditor(); window.App.modules.refreshAll(); window.App.ui.toast("Módulo removido.", "success"); },
+                removeCurrent: () => { let idToRem = window.AppState.selectedModule; if (!idToRem) { const el = document.getElementById('eId'); if(el) idToRem = el.value; } if (!idToRem) return window.App.ui.toast("Nenhum módulo selecionado.", "error"); window.AppState.modules = window.AppState.modules.filter(m => m.id !== idToRem); window.App.modules.select(null); window.App.ui.fecharEditor(); window.App.modules.refreshAll(); window.App.ui.toast("Módulo removido.", "success"); window.App.storage.save(); },
                 refreshAll: () => { window.ThreeEngine.rebuildScene(); window.BOMEngine.update(); window.App.ui.renderList(); },
                 exportarProjeto: () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.AppState.modules, null, 2)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "projeto_marcenaria.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); window.App.ui.toast("Projeto exportado em JSON!", "success"); },
                 gerarPlanoCorte: () => { window.CutPlanEngine.generate(); document.getElementById('cutPlanContainer').style.display = 'block'; window.App.ui.toast("Plano de Corte (Nesting) Gerado!"); }
@@ -1265,7 +1317,7 @@
             ar: {
                 setModoCamera: (m) => { window.AppState.tool = m; document.getElementById('btnOrbit').className = `tool-btn ${m==='orbit'?'active':''}`; document.getElementById('btnMove').className = `tool-btn ${m==='move'?'active':''}`; const btnAdd = document.getElementById('btnAddComp'); if (btnAdd) btnAdd.className = `tool-btn ${m==='add_comp'?'active':''}`; const btnRm = document.getElementById('btnRemComp'); if(btnRm) btnRm.className = `tool-btn eraser ${m==='remove_part'?'active':''}`; },
                 setModoInteracao: (m) => { window.AppState.modoInteracao = m; document.getElementById('sw-peca').className = `switch-btn ${m==='peca'?'active':''}`; document.getElementById('sw-projeto').className = `switch-btn ${m==='projeto'?'active':''}`; },
-                syncRoomBounds: () => { window.AppState.roomWidth = parseFloat(document.getElementById('roomW').value) || 4500; window.AppState.roomDepth = parseFloat(document.getElementById('roomD').value) || 8000; window.ThreeEngine.rebuildScene(); },
+                syncRoomBounds: () => { window.AppState.roomWidth = parseFloat(document.getElementById('roomW').value) || 4500; window.AppState.roomDepth = parseFloat(document.getElementById('roomD').value) || 8000; window.ThreeEngine.rebuildScene(); window.App.storage.save(); },
                 toggleAR: () => { 
                     window.AppState.arActive = !window.AppState.arActive; const container = document.getElementById('canvas-container'); const txt = document.getElementById('arBtnText'); 
                     if (window.AppState.arActive) { 
@@ -1327,6 +1379,7 @@
 
                         if (interceptado) {
                             window.AppState.modules = []; modsIntercept.forEach(m => window.App.modules.add(m.tipo, m)); window.App.ui.fecharHUDs(); window.App.ui.hideLoader();
+                            window.App.storage.save();
                             return window.App.ui.toast("Loja do Mercadão Renderizada! Ajuste no Estúdio AR.");
                         }
 
@@ -1335,7 +1388,6 @@
                         if(!window.AppState.imagemFundoBase64 && !window.AppState.transcricaoAtual && !txt) { window.App.ui.hideLoader(); return window.App.ui.toast("Forneça foto, texto ou áudio."); }
                         
                         try { 
-                            // PROMPT CORRIGIDO PARA FORÇAR O MERCADÃO
                             const prompt = `Você é o Arquiteto Oficial da franquia Mercadão dos Óculos.
 Gere a estrutura 3D da loja baseada na imagem e no pedido.
 REGRA ABSOLUTA: Use APENAS as peças e materiais oficiais da marca.
@@ -1355,6 +1407,7 @@ RETORNE APENAS JSON LIMPO, EX: {"modulos": [{"tipo": "parede_otica", "nome": "Ex
                                 const modsFisicos = window.LayoutEngine.calculate(window.AppState.roomWidth, window.AppState.roomDepth, json.modulos);
                                 modsFisicos.forEach(m => window.App.modules.add(m.tipo || 'parede_otica', m)); 
                                 window.App.ui.fecharHUDs(); window.App.ui.toast("Projeto IA Realista Gerado!"); 
+                                window.App.storage.save();
                             } 
                         } catch(e) { window.App.ui.toast("Erro no processamento da IA."); } finally { window.App.ui.hideLoader(); } 
                     }, 500);
