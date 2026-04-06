@@ -220,7 +220,6 @@
         </div>
     </div>
 
-    <!-- ESTÚDIO AR MELHORADO: CAIXA DA SALA E LIMITES DE FOTOGRAFIA -->
     <div id="perspectiveHUD" class="bottom-sheet">
         <div class="sheet-header">
             <h3><i class="fas fa-camera"></i> Estúdio de Posicionamento AR</h3>
@@ -519,6 +518,28 @@
             },
             validateAndFix: (mod) => {
                 if(!window.AppState.modoOraculo) return; let fixes = [];
+                // BLINDAGEM DO MERCADÃO DOS ÓCULOS
+                const prompt = document.getElementById('textoAdicional').value.toLowerCase();
+                const isMercadao = prompt.includes('mercad') || prompt.includes('oculo') || prompt.includes('otica');
+                if (isMercadao) {
+                    if (mod.tipo === 'armario' || mod.tipo === 'guarda_roupa' || mod.tipo === 'rack') {
+                        fixes.push({k:'tipo', v:'parede_otica', msg:'Forçado para Expositor Mercadão'});
+                        fixes.push({k:'material', v:'mdf_branco_diamante', msg:''});
+                        fixes.push({k:'gavetas', v:3, msg:''});
+                    }
+                    if (mod.tipo === 'balcao') {
+                        fixes.push({k:'tipo', v:'balcao_mercadao', msg:'Forçado para Balcão Caixa Mercadão'});
+                        fixes.push({k:'material', v:'mdf_vermelho_mercadao', msg:''});
+                    }
+                    if (mod.tipo === 'mesa' || mod.tipo === 'mesa_redonda') {
+                        fixes.push({k:'tipo', v:'mesa_atendimento_mercadao', msg:'Forçado para Mesa Mercadão'});
+                        fixes.push({k:'material', v:'mdf_azul_mercadao', msg:''});
+                    }
+                    if (mod.tipo === 'cadeira') {
+                        fixes.push({k:'material', v:'mdf_branco_diamante', msg:''});
+                    }
+                }
+
                 if(mod.tipo === 'mesa' && mod.altura > 1100 && mod.formato !== 'dobravel') fixes.push({k:'altura', v:750, msg:'Mesa ajustada (750mm)'});
                 if(mod.tipo === 'painel_tv' && mod.profundidade > 300) fixes.push({k:'profundidade', v:100, msg:'Painel afinado (100mm)'});
                 if(mod.tipo === 'rack' && mod.altura > 800) fixes.push({k:'altura', v:500, msg:'Rack rebaixado (<800mm)'});
@@ -539,7 +560,7 @@
                     if (totalW_Portas > mod.largura) fixes.push({k:'medidasCustomizadas', v:{}, msg:'Soma excede o vão. Resetado.'});
                     if (exceededHeight) fixes.push({k:'medidasCustomizadas', v:{}, msg:'Peça maior que a caixaria. Resetado.'});
                 }
-                fixes.forEach(f => { mod[f.k] = f.v; window.App.ui.toast(`Oráculo: ${f.msg}`); });
+                fixes.forEach(f => { mod[f.k] = f.v; if(f.msg) window.App.ui.toast(`Oráculo: ${f.msg}`); });
             }
         };
 
@@ -726,16 +747,16 @@
                 const c = document.getElementById('canvas-container'); const cv = document.getElementById('cad-canvas');
                 window.ThreeEngine.scene = new THREE.Scene();
                 
-                // Iluminação Ajustada para Cores Vivas
+                // Iluminação Ajustada para Cores Fortes
                 window.ThreeEngine.scene.add(new THREE.AmbientLight(0xffffff, 0.7)); 
-                const dl = new THREE.DirectionalLight(0xffffff, 0.8); dl.position.set(10, 20, 10); dl.castShadow = true; 
+                const dl = new THREE.DirectionalLight(0xffffff, 0.6); dl.position.set(10, 20, 10); dl.castShadow = true; 
                 dl.shadow.mapSize.width = 2048; dl.shadow.mapSize.height = 2048; dl.shadow.bias = -0.001;
                 window.ThreeEngine.scene.add(dl);
                 const dl2 = new THREE.DirectionalLight(0xffffff, 0.3); dl2.position.set(-10, 10, -10); window.ThreeEngine.scene.add(dl2);
                 
                 window.ThreeEngine.camera = new THREE.PerspectiveCamera(45, c.clientWidth / c.clientHeight, 0.1, 1000); window.ThreeEngine.camera.position.set(4, 4, 6);
                 
-                // Renderer PBR - LinearToneMapping para não lavar as cores
+                // Renderer PBR - LinearToneMapping para não lavar as cores, exposição neutra
                 window.ThreeEngine.renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, preserveDrawingBuffer: true, powerPreference: "high-performance" }); 
                 window.ThreeEngine.renderer.setClearColor(0x000000, 0); 
                 window.ThreeEngine.renderer.setSize(c.clientWidth, c.clientHeight); window.ThreeEngine.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -746,10 +767,10 @@
                 const pmremGenerator = new THREE.PMREMGenerator( window.ThreeEngine.renderer );
                 window.ThreeEngine.scene.environment = pmremGenerator.fromScene( new THREE.RoomEnvironment(), 0.04 ).texture;
 
-                // Efeito Bloom
+                // Efeito Bloom Ajustado
                 const renderScene = new THREE.RenderPass( window.ThreeEngine.scene, window.ThreeEngine.camera );
                 const bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( c.clientWidth, c.clientHeight ), 1.2, 0.4, 0.85 );
-                bloomPass.threshold = 1.2; bloomPass.strength = 1.0; bloomPass.radius = 0.3;
+                bloomPass.threshold = 1.0; bloomPass.strength = 0.6; bloomPass.radius = 0.3;
                 window.ThreeEngine.composer = new THREE.EffectComposer( window.ThreeEngine.renderer );
                 window.ThreeEngine.composer.addPass( renderScene ); window.ThreeEngine.composer.addPass( bloomPass );
 
@@ -757,14 +778,9 @@
                 window.ThreeEngine.rootNode = new THREE.Group(); window.ThreeEngine.scene.add(window.ThreeEngine.rootNode);
                 window.ThreeEngine.dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
                 
-                cv.addEventListener('pointerdown', window.ThreeEngine.onPtrDown, { capture: true }); 
-                cv.addEventListener('pointermove', window.ThreeEngine.onPtrMove, { capture: true }); 
-                cv.addEventListener('pointerup', window.ThreeEngine.onPtrUp, { capture: true });
-
-                const stopTouch = (e) => { if (window.ThreeEngine.dragObj) e.stopImmediatePropagation(); };
-                cv.addEventListener('touchstart', stopTouch, { capture: true, passive: false }); 
-                cv.addEventListener('touchmove', stopTouch, { capture: true, passive: false }); 
-                cv.addEventListener('touchend', stopTouch, { capture: true, passive: false });
+                cv.addEventListener('pointerdown', window.ThreeEngine.onPtrDown); 
+                cv.addEventListener('pointermove', window.ThreeEngine.onPtrMove); 
+                cv.addEventListener('pointerup', window.ThreeEngine.onPtrUp);
 
                 window.addEventListener('resize', () => { window.ThreeEngine.camera.aspect = c.clientWidth / c.clientHeight; window.ThreeEngine.camera.updateProjectionMatrix(); window.ThreeEngine.renderer.setSize(c.clientWidth, c.clientHeight); if(window.ThreeEngine.composer) window.ThreeEngine.composer.setSize(c.clientWidth, c.clientHeight); });
                 window.ThreeEngine.animate();
@@ -781,13 +797,10 @@
                 window.ThreeEngine.raycaster.setFromCamera(window.ThreeEngine.pointer, window.ThreeEngine.camera);
                 
                 if (window.AppState.arActive && window.AppState.modoInteracao === 'projeto') { 
+                    window.ThreeEngine.controls.enabled = false; 
                     window.ThreeEngine.dragPlane.constant = -window.ThreeEngine.rootNode.position.y;
                     const hitPoint = new THREE.Vector3(); window.ThreeEngine.raycaster.ray.intersectPlane(window.ThreeEngine.dragPlane, hitPoint);
-                    if (hitPoint) { 
-                        window.ThreeEngine.controls.enabled = false; 
-                        window.ThreeEngine.dragObj = { type: 'root', offset: hitPoint.clone().sub(window.ThreeEngine.rootNode.position) }; 
-                    } 
-                    return; 
+                    if (hitPoint) { window.ThreeEngine.dragObj = { type: 'root', offset: hitPoint.clone().sub(window.ThreeEngine.rootNode.position) }; } return; 
                 }
 
                 const hits = window.ThreeEngine.raycaster.intersectObjects(window.ThreeEngine.rootNode.children, true);
@@ -831,8 +844,8 @@
                             if(hitPointMat) {
                                 let tX = hitPointMat.x - window.ThreeEngine.dragObj.offset.x; 
                                 let tZ = hitPointMat.z - window.ThreeEngine.dragObj.offset.z; 
-                                let tY = (modData.posY !== undefined) ? modData.posY / 1000 : 0; 
-                                let rY = modData.rotY || 0; 
+                                let tY = (modData.posY !== undefined) ? modData.posY / 1000 : 0; // Preserva a altura Y definida pelo utilizador!
+                                let rY = modData.rotY || 0; // Preserva a rotação definida pelo utilizador!
 
                                 const rW2 = window.AppState.roomWidth / 2000; const rD2 = window.AppState.roomDepth / 2000;
                                 const halfW = (modData.largura || 1000) / 2000; const halfD = (modData.profundidade || 500) / 2000;
@@ -960,6 +973,7 @@
                     const matLed = getMatReal('led');
                     const matEspelho = getMatReal('espelho');
                     
+                    // SOLUÇÃO Z-FIGHTING EXATA: polygonOffset empurra as linhas suavemente para trás e não piscam
                     const edgeMat = new THREE.LineBasicMaterial({ color: 0x222222, transparent: true, opacity: 0.15, depthTest: true, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }); edgeMat.raycast = () => {}; 
                     const selMat = new THREE.MeshStandardMaterial({...matCorpo, emissive: 0x333333 });
                     const activeMat = (window.AppState.selectedModule === mod.id) ? selMat : matCorpo;
@@ -1047,7 +1061,7 @@
                     };
 
                     // ==============================================================
-                    // MÓDULOS DE ALTA QUALIDADE DO MERCADÃO E SHOPPING
+                    // MÓDULOS DE ALTA QUALIDADE DO MERCADÃO (COM ÓCULOS EM TODOS)
                     // ==============================================================
                     if (mod.tipo === 'expositor_oculos_inclinado') {
                         const baseH = h * 0.65; criarBloco(w, baseH, d, 0, baseH/2, 0, matBase, "base_otica_inf");
@@ -1292,8 +1306,8 @@
                         custContainer.innerHTML = html;
                     } document.getElementById('floatingEditor').classList.add('active');
                 },
-                syncCustom: (key) => { const elId = document.getElementById('eId'); if (!elId) return; const m = window.AppState.modules.find(x => x.id === elId.value); if (!m) return; if (!m.medidasCustomizadas) m.medidasCustomizadas = {}; if (!m.materiaisCustomizados) m.materiaisCustomizados = { frentes:{}, estrutura:{} }; const w = parseFloat(document.getElementById(`custW_${key}`).value) || 0; const h = parseFloat(document.getElementById(`custH_${key}`).value) || 0; const mat = document.getElementById(`custM_${key}`).value; if (w > 0 || h > 0) m.medidasCustomizadas[key] = { w, h }; else delete m.medidasCustomizadas[key]; if (mat) m.materiaisCustomizados.frentes[key] = mat; else delete m.materiaisCustomizados.frentes[key]; window.App.modules.refreshAll(); window.App.storage.save(); },
-                syncCustomStruct: (part) => { const elId = document.getElementById('eId'); if (!elId) return; const m = window.AppState.modules.find(x => x.id === elId.value); if (!m) return; if (!m.materiaisCustomizados) m.materiaisCustomizados = { frentes:{}, estrutura:{} }; const mat = document.getElementById(`custE_${part}`).value; if (mat) m.materiaisCustomizados.estrutura[part] = mat; else delete m.materiaisCustomizados.estrutura[part]; window.App.modules.refreshAll(); window.App.storage.save(); },
+                syncCustom: (key) => { const elId = document.getElementById('eId'); if (!elId) return; const m = window.AppState.modules.find(x => x.id === elId.value); if (!m) return; if (!m.medidasCustomizadas) m.medidasCustomizadas = {}; if (!m.materiaisCustomizados) m.materiaisCustomizados = { frentes:{}, estrutura:{} }; const w = parseFloat(document.getElementById(`custW_${key}`).value) || 0; const h = parseFloat(document.getElementById(`custH_${key}`).value) || 0; const mat = document.getElementById(`custM_${key}`).value; if (w > 0 || h > 0) m.medidasCustomizadas[key] = { w, h }; else delete m.medidasCustomizadas[key]; if (mat) m.materiaisCustomizados.frentes[key] = mat; else delete m.materiaisCustomizados.frentes[key]; window.App.modules.refreshAll(); },
+                syncCustomStruct: (part) => { const elId = document.getElementById('eId'); if (!elId) return; const m = window.AppState.modules.find(x => x.id === elId.value); if (!m) return; if (!m.materiaisCustomizados) m.materiaisCustomizados = { frentes:{}, estrutura:{} }; const mat = document.getElementById(`custE_${part}`).value; if (mat) m.materiaisCustomizados.estrutura[part] = mat; else delete m.materiaisCustomizados.estrutura[part]; window.App.modules.refreshAll(); },
                 syncToState: () => {
                     const elId = document.getElementById('eId'); if (!elId) return; const m = window.AppState.modules.find(x => x.id === elId.value); if (!m) return;
                     const props = ['tipo','formato','layoutInterno','dobradicaLado','material','abertura','largura','altura','profundidade','retornoL','portas','gavetas','prateleiras','prateleirasExternas','compW','compH','posX','posY','posZ','rotY'];
