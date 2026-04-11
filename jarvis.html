@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>t.h.I.A.g.u.i.n.h.o | Sistema Central (RTDB)</title>
+    
+    <!-- Tailwind CSS & Ícones -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Three.js (Motor Gráfico 3D) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        :root { --jarvis-cyan: #00f0ff; --jarvis-blue: #0051ff; --bg-color: #02050a; }
+        body { font-family: 'Rajdhani', sans-serif; background-color: var(--bg-color); color: var(--jarvis-cyan); overflow: hidden; margin: 0; }
+        .tech-font { font-family: 'Share Tech Mono', monospace; }
+        
+        #arc-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; opacity: 0.85; pointer-events: none; }
+        
+        .holo-panel {
+            background: rgba(0, 20, 40, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 240, 255, 0.2); box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.05), 0 0 15px rgba(0, 240, 255, 0.1);
+        }
+
+        body::after {
+            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2; background-size: 100% 2px, 3px 100%; pointer-events: none;
+        }
+
+        .chat-area { height: calc(100vh - 200px); overflow-y: auto; scroll-behavior: smooth; z-index: 10; position: relative; }
+        .chat-area::-webkit-scrollbar { width: 3px; }
+        .chat-area::-webkit-scrollbar-thumb { background: var(--jarvis-cyan); }
+
+        .msg { max-width: 90%; padding: 10px 15px; margin-bottom: 15px; font-size: 1.1rem; line-height: 1.4; animation: glitch-in 0.3s ease-out forwards; position: relative; }
+        .msg-user { background: rgba(0, 80, 255, 0.1); border-right: 2px solid var(--jarvis-blue); margin-left: auto; text-align: right; }
+        .msg-ai { background: rgba(0, 240, 255, 0.05); border-left: 2px solid var(--jarvis-cyan); margin-right: auto; }
+        .msg-sys { text-align: center; font-size: 0.8rem; color: #4a5568; letter-spacing: 2px; text-transform: uppercase; }
+
+        .modal { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 50; }
+        .modal.active { opacity: 1; pointer-events: auto; }
+
+        @keyframes glitch-in {
+            0% { opacity: 0; transform: translateX(-10px); clip-path: polygon(0 0, 100% 0, 100% 10%, 0 10%); }
+            50% { clip-path: polygon(0 40%, 100% 40%, 100% 60%, 0 60%); }
+            100% { opacity: 1; transform: translateX(0); clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+        }
+        .processing { animation: pulse-cyan 1s infinite; }
+        @keyframes pulse-cyan { 0% { box-shadow: 0 0 5px var(--jarvis-cyan); } 50% { box-shadow: 0 0 20px var(--jarvis-cyan); } 100% { box-shadow: 0 0 5px var(--jarvis-cyan); } }
+    </style>
+</head>
+<body>
+
+    <!-- Módulo Visual: Reator Arc -->
+    <div id="arc-container"></div>
+
+    <!-- Módulo Visual: Interface HUD -->
+    <div class="relative z-10 flex flex-col h-screen w-full max-w-5xl mx-auto p-3 md:p-6 pointer-events-none">
+        
+        <header class="flex justify-between items-start mb-2 pointer-events-auto">
+            <div>
+                <h1 class="text-3xl md:text-5xl tech-font font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-b from-cyan-300 to-blue-600 drop-shadow-[0_0_10px_rgba(0,240,255,0.8)]">
+                    t.h.I.A.g.u.i.n.h.o.
+                </h1>
+                <div class="flex items-center gap-2 mt-1">
+                    <div id="status-led" class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]"></div>
+                    <span id="status-text" class="tech-font text-[10px] md:text-xs tracking-widest text-slate-400 uppercase">MATRIZ RTDB OFFLINE</span>
+                </div>
+            </div>
+            <button onclick="UI.toggleSetup()" class="holo-panel text-cyan-400 hover:text-white hover:bg-cyan-900/30 p-2 md:p-3 rounded-none border-cyan-500/50 transition">
+                <i class="fas fa-server"></i>
+            </button>
+        </header>
+
+        <div class="flex gap-4 mb-4 pointer-events-auto tech-font text-xs uppercase tracking-widest border-b border-cyan-900/50 pb-2">
+            <button onclick="Jarvis.setMode('intel')" id="tab-intel" class="text-cyan-400 font-bold drop-shadow-[0_0_5px_#00f0ff] transition"><i class="fas fa-brain"></i> Intelecto Divino</button>
+            <button onclick="Jarvis.setMode('forge')" id="tab-forge" class="text-slate-600 hover:text-cyan-400 transition"><i class="fas fa-eye"></i> Forja de Imagens</button>
+        </div>
+
+        <div id="terminal" class="chat-area flex-1 flex flex-col pb-4 pointer-events-auto">
+            <div class="msg-sys mt-4">INICIALIZANDO... CONECTE O BANCO DE DADOS (RTDB).</div>
+        </div>
+
+        <div class="mt-2 flex flex-col md:flex-row gap-2 items-end pointer-events-auto shrink-0 holo-panel p-2">
+            <div class="flex-1 w-full flex items-center bg-black/40 border border-cyan-800/50 p-1">
+                <span class="tech-font text-cyan-500 pl-2">></span>
+                <textarea id="cmd-input" rows="1" class="w-full bg-transparent text-cyan-50 tech-font p-2 resize-none outline-none text-sm md:text-base placeholder-cyan-800" placeholder="Aguardando comando..." disabled></textarea>
+            </div>
+            <button id="btn-execute" onclick="Jarvis.executeCommand()" class="w-full md:w-16 h-12 md:h-auto bg-cyan-950 border border-cyan-500 text-cyan-400 hover:bg-cyan-900 hover:text-white transition flex items-center justify-center tech-font font-bold tracking-widest disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                EXE
+            </button>
+        </div>
+    </div>
+
+    <!-- Módulo Modal: Configuração do RTDB e Chaves -->
+    <div id="setup-modal" class="modal fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="holo-panel border-t-4 border-t-cyan-500 w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto pointer-events-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl tech-font text-cyan-400 tracking-widest">FIREBASE REALTIME DATABASE</h2>
+                <button onclick="UI.toggleSetup()" class="text-cyan-700 hover:text-cyan-400"><i class="fas fa-times text-2xl"></i></button>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="bg-black/50 p-4 border border-cyan-900/50">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2"><i class="fas fa-database text-cyan-600"></i> Conexão RTDB</h3>
+                    <input type="text" id="fb-url" class="w-full bg-transparent border-b border-cyan-800 text-xs text-cyan-300 tech-font outline-none focus:border-cyan-400 p-1 mb-2" placeholder="URL (ex: https://thiaguinho-40a14-default-rtdb.firebaseio.com)">
+                    <button onclick="DB.connect()" class="w-full bg-cyan-900/30 hover:bg-cyan-800/50 border border-cyan-700 text-cyan-400 py-2 text-xs tech-font tracking-widest transition">
+                        INICIALIZAR MATRIZ
+                    </button>
+                </div>
+
+                <div class="bg-black/50 p-4 border border-cyan-900/50">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2"><i class="fas fa-key text-yellow-600"></i> Obfuscação de Chave</h3>
+                    <p class="text-[10px] text-slate-500 mb-3 tech-font">A chave será fatiada e salva em 'jarvis_system/keys' no Realtime Database.</p>
+                    <input type="password" id="key-gemini" class="w-full bg-transparent border-b border-cyan-800 text-sm text-white outline-none focus:border-cyan-400 p-1 mb-4" placeholder="GEMINI API KEY">
+                    <button onclick="DB.saveKeys()" class="w-full bg-cyan-600 text-black font-bold py-2 text-xs tech-font tracking-widest hover:bg-cyan-500 transition shadow-[0_0_10px_#00f0ff]">
+                        FATIAR E SALVAR (RTDB)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MÓDULOS DE LÓGICA JAVASCRIPT (Arquitetura Vanilla JS Modular) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        // ==========================================
+        // MÓDULO 1: REATOR 3D
+        // ==========================================
+        const ArcReactor = {
+            scene: null, camera: null, renderer: null, rings: [], core: null,
+            targetSpeed: 0.005, currentSpeed: 0.005,
+            
+            init() {
+                const container = document.getElementById('arc-container');
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.camera.position.z = 20;
+
+                this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                container.appendChild(this.renderer.domElement);
+
+                this.scene.add(new THREE.AmbientLight(0x00f0ff, 0.2));
+                this.scene.add(new THREE.PointLight(0x00f0ff, 2, 50));
+
+                const createRing = (radius, tube, opacity, speedX, speedY) => {
+                    const mesh = new THREE.Mesh(new THREE.TorusGeometry(radius, tube, 16, 100), new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: opacity }));
+                    mesh.userData = { speedX, speedY };
+                    this.scene.add(mesh); this.rings.push(mesh);
+                };
+
+                createRing(6, 0.1, 0.3, 0.01, 0.005);
+                createRing(5.5, 0.05, 0.5, -0.005, 0.01);
+                createRing(4, 0.2, 0.1, 0.02, -0.01);
+
+                this.core = new THREE.Mesh(new THREE.SphereGeometry(2.5, 32, 32), new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.8 }));
+                this.scene.add(this.core);
+
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+                this.animate();
+            },
+
+            setPower(level) {
+                if(level === 'high') { this.targetSpeed = 0.05; this.core.material.opacity = 1; this.core.material.color.setHex(0x0051ff); } 
+                else { this.targetSpeed = 0.005; this.core.material.opacity = 0.6; this.core.material.color.setHex(0x00f0ff); }
+            },
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                this.currentSpeed += (this.targetSpeed - this.currentSpeed) * 0.1;
+                this.rings.forEach(ring => { ring.rotation.x += ring.userData.speedX + (this.currentSpeed * 0.5); ring.rotation.y += ring.userData.speedY + this.currentSpeed; });
+                const scale = 1 + Math.sin(Date.now() * 0.005) * 0.05; this.core.scale.set(scale, scale, scale);
+                this.renderer.render(this.scene, this.camera);
+            }
+        };
+
+        // ==========================================
+        // MÓDULO 2: FIREBASE REALTIME DATABASE (Data at Rest)
+        // ==========================================
+        window.DB = {
+            app: null, db: null, isReady: false, keyGemini: '',
+
+            split(key) {
+                if(!key) return null; const s = Math.ceil(key.length / 4);
+                return { p1: key.substr(0, s), p2: key.substr(s, s), p3: key.substr(s*2, s), p4: key.substr(s*3) };
+            },
+            join(obj) { return obj ? (obj.p1||'') + (obj.p2||'') + (obj.p3||'') + (obj.p4||'') : ''; },
+
+            async connect() {
+                const url = document.getElementById('fb-url').value.trim();
+                if(!url) { alert("Insira a URL do Database!"); return; }
+
+                try {
+                    this.app = initializeApp({ databaseURL: url, projectId: "thiaguinho-oracle" });
+                    this.db = getDatabase(this.app);
+                    localStorage.setItem('jarvis_rtdb_url', url);
+                    
+                    document.getElementById('status-led').className = "w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_#00f0ff]";
+                    document.getElementById('status-text').innerText = "SISTEMA ONLINE (RTDB)";
+                    document.getElementById('status-text').className = "tech-font text-[10px] md:text-xs tracking-widest text-cyan-400 uppercase";
+                    
+                    document.getElementById('cmd-input').disabled = false;
+                    document.getElementById('btn-execute').disabled = false;
+                    this.isReady = true;
+
+                    window.UI.logSys("Conectado ao Realtime Database. Lendo fragmentos neurais...");
+                    await this.loadKeys();
+
+                } catch(e) { alert("Erro ao conectar no RTDB: " + e.message); }
+            },
+
+            async saveKeys() {
+                if(!this.isReady) { alert("Conecte a matriz de dados primeiro."); return; }
+                const gem = document.getElementById('key-gemini').value.trim();
+                if(!gem) return;
+
+                try {
+                    await set(ref(this.db, 'jarvis_system/keys/gemini'), this.split(gem));
+                    alert("Chave fatiada e salva no RTDB!");
+                    document.getElementById('key-gemini').value = '';
+                    await this.loadKeys();
+                    window.UI.toggleSetup();
+                } catch(e) { 
+                    alert("Erro de Permissão. Verifique se atualizou as regras do Firebase para liberar a escrita em 'jarvis_system'."); 
+                }
+            },
+
+            async loadKeys() {
+                if(!this.isReady) return;
+                try {
+                    const snap = await get(ref(this.db, 'jarvis_system/keys/gemini'));
+                    if(snap.exists()) {
+                        this.keyGemini = this.join(snap.val());
+                        window.UI.logSys("Chave remontada na RAM. Sistema operacional, senhor.");
+                        Jarvis.speak("Sistemas online e aguardando.");
+                    } else {
+                        window.UI.logSys("Aviso: Nenhuma chave encontrada em 'jarvis_system/keys'. Insira no painel.");
+                    }
+                } catch(e) { window.UI.logSys("Erro ao ler banco de dados."); }
+            }
+        };
+
+        // ==========================================
+        // MÓDULO 3: J.A.R.V.I.S. CÉREBRO
+        // ==========================================
+        window.Jarvis = {
+            mode: 'intel', isWorking: false,
+
+            setMode(m) {
+                this.mode = m;
+                document.getElementById('tab-intel').className = m === 'intel' ? "text-cyan-400 font-bold drop-shadow-[0_0_5px_#00f0ff] transition" : "text-slate-600 hover:text-cyan-400 transition";
+                document.getElementById('tab-forge').className = m === 'forge' ? "text-cyan-400 font-bold drop-shadow-[0_0_5px_#00f0ff] transition" : "text-slate-600 hover:text-cyan-400 transition";
+                document.getElementById('cmd-input').placeholder = m === 'intel' ? "Comande a lógica e sistemas..." : "Descreva a imagem hiper-realista que deseja...";
+            },
+
+            async executeCommand() {
+                if(this.isWorking) return;
+                const input = document.getElementById('cmd-input');
+                const cmd = input.value.trim();
+                if(!cmd) return;
+
+                this.isWorking = true;
+                input.value = '';
+                document.getElementById('btn-execute').classList.add('processing');
+                ArcReactor.setPower('high');
+                
+                window.UI.addMsg('user', cmd);
+
+                try {
+                    if (this.mode === 'intel') await this.generateIntel(cmd);
+                    else if (this.mode === 'forge') await this.generateVisual(cmd);
+                } catch (e) {
+                    window.UI.logSys("FALHA CRÍTICA: " + e.message);
+                    this.speak("Senhor, encontrei um erro crítico.");
+                } finally {
+                    this.isWorking = false;
+                    document.getElementById('btn-execute').classList.remove('processing');
+                    ArcReactor.setPower('normal');
+                }
+            },
+
+            async generateIntel(cmd) {
+                const key = window.DB.keyGemini;
+                if(!key) throw new Error("Chave Mestra ausente.");
+
+                const sysPrompt = "Você é t.h.I.A.g.u.i.n.h.o, uma Inteligência Artificial avançada. Responda de forma impecável, direta e técnica. Trate o usuário por 'Senhor'. Forneça códigos estruturados em formato Markdown quando necessário.";
+
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: cmd }] }], systemInstruction: { parts: [{ text: sysPrompt }] } })
+                });
+                
+                const data = await res.json();
+                if(data.error) throw new Error(data.error.message);
+                
+                const reply = data.candidates[0].content.parts[0].text;
+                window.UI.addMsg('ai', reply);
+                this.speak(reply);
+            },
+
+            async generateVisual(cmd) {
+                window.UI.logSys("Acessando processamento distribuído. Forjando imagem 8K...");
+                
+                const promptFinal = encodeURIComponent(`Masterpiece, highly detailed, photorealistic, 8k resolution, ${cmd}`);
+                const seed = Math.floor(Math.random() * 999999);
+                const url = `https://pollinations.ai/p/${promptFinal}?width=1024&height=1024&seed=${seed}&model=flux`;
+
+                const imgHtml = `
+                    <div class="border border-cyan-800 p-2 bg-black/50">
+                        <div class="text-xs tech-font text-cyan-600 mb-2 uppercase tracking-widest">Renderização Concluída</div>
+                        <img src="${url}" class="w-full h-auto border border-cyan-500/50 opacity-90 hover:opacity-100 transition cursor-pointer" alt="Render" onload="window.UI.scrollDown()">
+                        <a href="${url}" target="_blank" download class="block mt-2 text-[10px] text-center bg-cyan-900/30 text-cyan-400 py-2 hover:bg-cyan-800">BAIXAR IMAGEM</a>
+                    </div>
+                `;
+                
+                window.UI.addMsg('ai', imgHtml, false);
+                this.speak("A imagem foi renderizada e enviada para o painel, senhor.");
+            },
+
+            speak(text) {
+                if (!window.speechSynthesis) return;
+                window.speechSynthesis.cancel();
+                // Limpeza segura usando Expressões Regulares Seguras (Sem quebrar o Markdown do chat)
+                let cleanText = text.replace(new RegExp('```[\\s\\S]*?```', 'g'), "Apresentando informações na tela, senhor.");
+                cleanText = cleanText.replace(new RegExp('[#*`_]', 'g'), '');
+                
+                const utt = new SpeechSynthesisUtterance(cleanText);
+                utt.lang = 'pt-BR'; utt.pitch = 0.3; utt.rate = 1.1;
+                window.speechSynthesis.speak(utt);
+            }
+        };
+
+        // ==========================================
+        // MÓDULO 4: UI E FORMATAÇÃO (BLINDADO)
+        // ==========================================
+        window.UI = {
+            toggleSetup() { document.getElementById('setup-modal').classList.toggle('active'); },
+            
+            logSys(text) {
+                const term = document.getElementById('terminal');
+                term.innerHTML += `<div class="msg-sys mt-2">${text}</div>`;
+                this.scrollDown();
+            },
+
+            formatHolo(text) {
+                // TÉCNICA DE BLINDAGEM: Usar new RegExp() em vez de barras // literais
+                // Isso impede que os formatadores de Markdown quebrem o código JS gerado.
+                const regexBloco = new RegExp('```(.*?)\\n([\\s\\S]*?)```', 'g');
+                const regexNegrito = new RegExp('\\*\\*(.*?)\\*\\*', 'g');
+                const regexQuebra = new RegExp('\\n', 'g');
+
+                let formatted = text;
+                
+                // Transforma Blocos de Código Markdown em HTML estlizado
+                formatted = formatted.replace(regexBloco, '<div class="bg-black/80 border-l-2 border-cyan-500 p-3 my-2 font-mono text-[10px] md:text-xs overflow-x-auto text-cyan-300 shadow-inner"><code>$2</code></div>');
+                
+                // Transforma Texto em Negrito **texto** em tag <strong>
+                formatted = formatted.replace(regexNegrito, '<strong class="text-white drop-shadow-[0_0_2px_#fff]">$1</strong>');
+                
+                // Transforma quebras de linha em <br>
+                formatted = formatted.replace(regexQuebra, '<br>');
+                
+                return formatted;
+            },
+
+            addMsg(type, content, format = true) {
+                const term = document.getElementById('terminal');
+                const div = document.createElement('div');
+                div.className = `msg msg-${type}`;
+                
+                if(type === 'user') {
+                    div.innerHTML = `<span class="tech-font text-[10px] text-blue-500 mb-1 block">>> SENHOR</span>${content}`;
+                } else if(type === 'ai') {
+                    const finalContent = format ? this.formatHolo(content) : content;
+                    div.innerHTML = `<span class="tech-font text-[10px] text-cyan-500 mb-1 block">>> t.h.I.A.g.u.i.n.h.o.</span>${finalContent}`;
+                }
+                
+                term.appendChild(div);
+                this.scrollDown();
+            },
+            
+            scrollDown() {
+                const term = document.getElementById('terminal');
+                term.scrollTop = term.scrollHeight;
+            }
+        };
+
+        // INICIALIZAÇÃO
+        window.onload = () => {
+            ArcReactor.init();
+            const savedUrl = localStorage.getItem('jarvis_rtdb_url');
+            if(savedUrl) {
+                document.getElementById('fb-url').value = savedUrl;
+                window.DB.connect();
+            }
+
+            document.getElementById('cmd-input').addEventListener('keypress', (e) => {
+                if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); window.Jarvis.executeCommand(); }
+            });
+        };
+    </script>
+</body>
+</html>
