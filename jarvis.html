@@ -69,7 +69,7 @@
                     <h1 class="text-xl tech-font font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-emerald-400 leading-none">
                         t.h.I.A.g.u.i.n.h.o.
                     </h1>
-                    <span id="status-text" class="tech-font text-[9px] tracking-widest text-slate-400 uppercase block leading-none mt-1">RTDB OFFLINE</span>
+                    <span id="status-text" class="tech-font text-[9px] tracking-widest text-slate-400 uppercase block leading-none mt-1">SISTEMA OFFLINE</span>
                 </div>
             </div>
             <button onclick="UI.toggleSetup()" class="text-cyan-400 p-2 border border-cyan-800 rounded-lg bg-black/50 active:bg-cyan-900 transition shadow-[0_0_10px_rgba(0,240,255,0.2)]">
@@ -97,32 +97,33 @@
         </div>
     </div>
 
-    <!-- MODAL DE CONFIGURAÇÃO (RTDB E CHAVES OMNI) -->
+    <!-- MODAL DE CONFIGURAÇÃO ABSOLUTA (FIREBASE JSON + CHAVES OMNI) -->
     <div id="setup-modal" class="modal fixed inset-0 bg-black/95 backdrop-blur-lg flex items-center justify-center p-4">
         <div class="holo-panel rounded-2xl border-t-4 border-t-cyan-500 w-full max-w-md p-5 max-h-[90vh] overflow-y-auto pointer-events-auto">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg tech-font text-cyan-400 tracking-widest"><i class="fas fa-network-wired"></i> MATRIZ OMNI (RTDB)</h2>
+                <h2 class="text-lg tech-font text-cyan-400 tracking-widest"><i class="fas fa-network-wired"></i> MATRIZ DE CONFIGURAÇÃO</h2>
                 <button onclick="UI.toggleSetup()" class="text-slate-500 active:text-cyan-400 p-2"><i class="fas fa-times text-xl"></i></button>
             </div>
             
             <div class="space-y-4">
+                <!-- RESTAURAÇÃO DO JSON COMPLETO DO FIREBASE -->
                 <div class="bg-black/60 p-3 border border-cyan-900 rounded-lg">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">1. Conexão Firebase</label>
-                    <input type="url" id="fb-url" class="w-full bg-transparent border-b border-cyan-800 text-xs text-cyan-300 tech-font outline-none focus:border-cyan-400 p-1 mb-2" placeholder="URL do Realtime Database">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">1. Firebase Config (JSON Completo)</label>
+                    <textarea id="fb-config" rows="4" class="w-full bg-transparent border-b border-cyan-800 text-[10px] text-cyan-300 tech-font outline-none focus:border-cyan-400 p-1 mb-2" placeholder='{\n  "apiKey": "AIzaSy...",\n  "authDomain": "...",\n  "databaseURL": "...",\n  "projectId": "..."\n}'></textarea>
                     <button onclick="DB.connect()" class="w-full bg-cyan-900/50 border border-cyan-700 text-cyan-400 py-2 rounded text-[10px] tech-font tracking-widest active:bg-cyan-800">
-                        CONECTAR BANCO
+                        INICIALIZAR MATRIZ DE DADOS
                     </button>
                 </div>
 
                 <div class="bg-black/60 p-3 border border-cyan-900 rounded-lg space-y-3">
-                    <label class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest block border-b border-cyan-900 pb-1">2. Chaves (Fatiamento Seguro)</label>
+                    <label class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest block border-b border-cyan-900 pb-1">2. Chaves (Fatiamento OMNI Seguro)</label>
                     
                     <div>
                         <span class="text-[9px] text-emerald-400 tech-font">GEMINI API (Juiz Central)</span>
                         <input type="password" id="key-gemini" class="w-full bg-transparent border-b border-cyan-800 text-sm text-white outline-none focus:border-emerald-400 p-1" placeholder="AIzaSy...">
                     </div>
                     <div>
-                        <span class="text-[9px] text-orange-400 tech-font">GROQ API (Cérebro Rápido)</span>
+                        <span class="text-[9px] text-orange-400 tech-font">GROQ API (Cérebro Lógico)</span>
                         <input type="password" id="key-groq" class="w-full bg-transparent border-b border-cyan-800 text-sm text-white outline-none focus:border-orange-400 p-1" placeholder="gsk_...">
                     </div>
                     <div>
@@ -214,7 +215,6 @@
                 this.headGroup.rotation.y = Math.sin(Date.now() * 0.0005) * 0.15;
                 this.particles.rotation.y += 0.001;
 
-                // Lip Sync Simples e Eficiente
                 if(this.isSpeaking) {
                     if(Math.random() > 0.5) this.targetJaw = (Math.random() * 0.3) + 0.1;
                 } else {
@@ -226,7 +226,7 @@
         };
 
         // ==========================================
-        // MÓDULO 2: FIREBASE (RTDB) OBFUSCAÇÃO TRIPLA
+        // MÓDULO 2: FIREBASE E OBFUSCAÇÃO DE CHAVES
         // ==========================================
         window.DB = {
             app: null, db: null, isReady: false, 
@@ -239,13 +239,15 @@
             join(obj) { return obj ? (obj.p1||'') + (obj.p2||'') + (obj.p3||'') + (obj.p4||'') : ''; },
 
             async connect() {
-                const url = document.getElementById('fb-url').value.trim();
-                if(!url) return;
+                const configStr = document.getElementById('fb-config').value.trim();
+                if(!configStr) { alert("Insira o JSON Completo do Firebase!"); return; }
 
                 try {
-                    this.app = initializeApp({ databaseURL: url, projectId: "thiaguinho-oracle" });
+                    const configJSON = JSON.parse(configStr);
+                    this.app = initializeApp(configJSON);
                     this.db = getDatabase(this.app);
-                    localStorage.setItem('jarvis_rtdb_url', url);
+                    
+                    localStorage.setItem('jarvis_fb_config_full', configStr);
                     
                     const led = document.getElementById('status-led');
                     led.className = "w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]";
@@ -256,10 +258,10 @@
                     document.getElementById('btn-execute').disabled = false;
                     this.isReady = true;
 
-                    window.UI.logSys("Conectado ao RTDB. Carregando fragmentos neurais das 3 IAs...");
+                    window.UI.logSys("Conectado à Matriz de Dados. Carregando fragmentos neurais...");
                     await this.loadKeys();
 
-                } catch(e) { alert("Erro RTDB: " + e.message); }
+                } catch(e) { alert("Erro de parsing JSON ou conexão do Firebase: " + e.message); }
             },
 
             async saveKeys() {
@@ -276,12 +278,14 @@
                     if(or) { await set(ref(this.db, 'jarvis_system/keys/openrouter'), this.split(or)); salvouAlgo = true; }
                     
                     if(salvouAlgo) {
-                        alert("Chaves OMNI fatiadas e salvas no RTDB!");
+                        alert("Chaves OMNI fatiadas e salvas no RTDB com sucesso!");
                         document.getElementById('key-gemini').value = '';
                         document.getElementById('key-groq').value = '';
                         document.getElementById('key-openrouter').value = '';
                         await this.loadKeys();
                         window.UI.toggleSetup();
+                    } else {
+                        alert("Nenhuma chave preenchida para salvar.");
                     }
                 } catch(e) { alert("Erro de Permissão Firebase. Verifique suas regras no nó jarvis_system."); }
             },
@@ -296,8 +300,8 @@
                         if(data.groq) this.keys.groq = this.join(data.groq);
                         if(data.openrouter) this.keys.openrouter = this.join(data.openrouter);
                         
-                        window.UI.logSys("Mentes OMNI remontadas. Sistema Absoluto Operacional.");
-                        Jarvis.speak("Matriz OMNI conectada. Consenso de múltiplas inteligências ativo e pronto, senhor.");
+                        window.UI.logSys("Mentes OMNI (Gemini, Groq, OpenRouter) carregadas. Sistema operacional.");
+                        Jarvis.speak("Matriz OMNI conectada. Consenso de múltiplas inteligências pronto.");
                     } else {
                         window.UI.logSys("Aviso: Chaves ausentes no RTDB. Por favor, configure a Matriz OMNI.");
                     }
@@ -397,20 +401,17 @@
             async generateConsensus(cmd) {
                 window.UI.logSys("Iniciando varredura paralela nas IAs menores (Llama 3 & Mistral)...");
                 
-                // Roda as duas IAs ao mesmo tempo para ser rápido (Promise.all)
                 const drafts = await Promise.all([
                     window.MentesAPI.queryGroq(cmd),
                     window.MentesAPI.queryOpenRouter(cmd)
                 ]);
 
-                // Mostra os rascunhos na tela
                 window.UI.addMsg('draft', `<b>[DRAFT GROQ]:</b> ${drafts[0].substring(0, 150)}...`);
                 window.UI.addMsg('draft', `<b>[DRAFT OPENROUTER]:</b> ${drafts[1].substring(0, 150)}...`);
 
                 window.UI.logSys("Conflitos analisados. Acionando Juiz Central (Gemini) para Síntese Absoluta...");
-                window.Avatar3D.setStatus('consensus'); // Olhos verdes
+                window.Avatar3D.setStatus('consensus');
 
-                // Joga pro Juiz Final
                 const truth = await window.MentesAPI.queryGeminiJudge(cmd, drafts);
                 
                 window.UI.addMsg('truth', truth);
@@ -440,7 +441,7 @@
                 if (!window.speechSynthesis) return;
                 window.speechSynthesis.cancel();
                 
-                // Limpeza Segura usando Regex isoladas para não quebrar no chat
+                // Limpeza Regex Segura
                 const rxBlock = new RegExp('```[\\s\\S]*?```', 'g');
                 const rxMarks = new RegExp('[#*`_]', 'g');
                 
@@ -449,10 +450,9 @@
                 
                 const utt = new SpeechSynthesisUtterance(cleanText);
                 utt.lang = 'pt-BR'; 
-                utt.pitch = 0.2; // Bem robótico/grave
+                utt.pitch = 0.2; 
                 utt.rate = 1.15; 
 
-                // Gatilhos de Lip-Sync
                 utt.onstart = () => { window.Avatar3D.isSpeaking = true; };
                 utt.onend = () => { window.Avatar3D.isSpeaking = false; window.Avatar3D.targetJaw = 0; };
                 utt.onerror = () => { window.Avatar3D.isSpeaking = false; };
@@ -474,7 +474,7 @@
             },
 
             formatHolo(text) {
-                // Regex Isolados (Previne bugs na cópia do código)
+                // Regex Isolados
                 const rxCode = new RegExp('```(.*?)\\n([\\s\\S]*?)```', 'g');
                 const rxBold = new RegExp('\\*\\*(.*?)\\*\\*', 'g');
                 const rxNewLine = new RegExp('\\n', 'g');
@@ -515,9 +515,9 @@
         // INICIALIZAÇÃO E BOOT
         window.onload = () => {
             window.Avatar3D.init();
-            const savedUrl = localStorage.getItem('jarvis_rtdb_url');
-            if(savedUrl) {
-                document.getElementById('fb-url').value = savedUrl;
+            const savedConfig = localStorage.getItem('jarvis_fb_config_full');
+            if(savedConfig) {
+                document.getElementById('fb-config').value = savedConfig;
                 window.DB.connect();
             }
 
