@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>t.h.I.A.g.u.i.n.h.o | OMNI Mobile</title>
+    <title>t.h.I.A.g.u.i.n.h.o | OMNI 4.0</title>
     
     <!-- Tailwind CSS & Ícones -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -39,7 +39,7 @@
         .chat-area::-webkit-scrollbar { width: 2px; }
         .chat-area::-webkit-scrollbar-thumb { background: var(--jarvis-cyan); }
 
-        .msg { max-width: 95%; padding: 12px; margin-bottom: 12px; font-size: 1rem; line-height: 1.4; animation: glitch-in 0.3s ease-out forwards; position: relative; border-radius: 8px; }
+        .msg { max-width: 95%; padding: 12px; margin-bottom: 12px; font-size: 1rem; line-height: 1.4; animation: glitch-in 0.3s ease-out forwards; position: relative; border-radius: 8px; word-wrap: break-word; }
         .msg-user { background: rgba(0, 80, 255, 0.15); border-right: 2px solid var(--jarvis-blue); margin-left: auto; text-align: right; }
         .msg-draft { background: rgba(245, 158, 11, 0.1); border-left: 2px dashed #f59e0b; margin-right: auto; font-size: 0.9rem; color: #cbd5e1; }
         .msg-truth { background: rgba(16, 185, 129, 0.15); border-left: 3px solid #10b981; margin-right: auto; box-shadow: 0 0 15px rgba(16, 185, 129, 0.1); }
@@ -69,57 +69,59 @@
                     <h1 class="text-xl tech-font font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-emerald-400 leading-none">
                         t.h.I.A.g.u.i.n.h.o.
                     </h1>
-                    <span id="status-text" class="tech-font text-[9px] tracking-widest text-slate-400 uppercase block leading-none mt-1">SISTEMA OFFLINE</span>
+                    <span id="status-text" class="tech-font text-[9px] tracking-widest text-slate-400 uppercase block leading-none mt-1">INICIALIZANDO...</span>
                 </div>
             </div>
             <button onclick="UI.toggleSetup()" class="text-cyan-400 p-2 border border-cyan-800 rounded-lg bg-black/50 active:bg-cyan-900 transition shadow-[0_0_10px_rgba(0,240,255,0.2)]">
-                <i class="fas fa-server"></i>
+                <i class="fas fa-key"></i>
             </button>
         </header>
 
-        <div class="flex gap-2 mb-2 pointer-events-auto shrink-0">
-            <button onclick="Jarvis.setMode('intel')" id="tab-intel" class="flex-1 holo-panel rounded-lg py-2 text-[10px] tech-font uppercase tracking-widest text-cyan-400 font-bold border-b-2 border-cyan-400"><i class="fas fa-network-wired"></i> Consenso Multi-IA</button>
-            <button onclick="Jarvis.setMode('forge')" id="tab-forge" class="flex-1 holo-panel rounded-lg py-2 text-[10px] tech-font uppercase tracking-widest text-slate-500 border-b-2 border-transparent"><i class="fas fa-eye"></i> Visão 8K</button>
-        </div>
-
         <div id="terminal" class="chat-area pointer-events-auto flex flex-col">
-            <div class="msg-sys mt-2">NÚCLEO OMNI AGUARDANDO CONEXÃO RTDB...</div>
+            <div class="msg-sys mt-2">SISTEMA OMNI CONECTANDO AO FIREBASE...</div>
         </div>
 
-        <div class="mt-2 flex gap-2 items-end pointer-events-auto shrink-0 holo-panel rounded-xl p-2 mb-1">
-            <div class="flex-1 flex items-center bg-black/60 border border-cyan-900/80 rounded-lg p-1">
-                <span class="tech-font text-cyan-600 pl-2 text-xs">></span>
-                <input type="text" id="cmd-input" class="w-full bg-transparent text-cyan-50 tech-font p-2 outline-none text-[16px] placeholder-cyan-800" placeholder="Comando..." disabled>
+        <div class="mt-2 flex flex-col gap-2 pointer-events-auto shrink-0 holo-panel rounded-xl p-2 mb-1">
+            <!-- Preview de Imagem Anexada -->
+            <div id="image-preview-container" class="hidden relative w-16 h-16 border border-cyan-500 rounded overflow-hidden">
+                <img id="image-preview" src="" class="w-full h-full object-cover">
+                <button onclick="Jarvis.clearImage()" class="absolute top-0 right-0 bg-red-600 text-white w-5 h-5 flex items-center justify-center text-xs"><i class="fas fa-times"></i></button>
             </div>
-            <button id="btn-execute" onclick="Jarvis.executeCommand()" class="w-12 h-10 bg-cyan-900 border border-cyan-500 rounded-lg text-cyan-300 active:bg-cyan-600 transition flex items-center justify-center disabled:opacity-50" disabled>
-                <i class="fas fa-bolt"></i>
-            </button>
+            
+            <div class="flex gap-2 items-end w-full">
+                <!-- Botão de Anexo de Imagem (Visão) -->
+                <label for="file-upload" class="w-10 h-10 bg-cyan-900/50 border border-cyan-700 rounded-lg text-cyan-400 active:bg-cyan-600 transition flex items-center justify-center cursor-pointer shrink-0">
+                    <i class="fas fa-paperclip"></i>
+                    <input type="file" id="file-upload" accept="image/*" class="hidden" onchange="Jarvis.handleImageUpload(this)">
+                </label>
+                
+                <div class="flex-1 flex items-center bg-black/60 border border-cyan-900/80 rounded-lg p-1">
+                    <span class="tech-font text-cyan-600 pl-2 text-xs">></span>
+                    <input type="text" id="cmd-input" class="w-full bg-transparent text-cyan-50 tech-font p-2 outline-none text-[16px] placeholder-cyan-800" placeholder="Comando ou pedido de imagem..." disabled>
+                </div>
+                
+                <button id="btn-execute" onclick="Jarvis.executeCommand()" class="w-12 h-10 bg-cyan-900 border border-cyan-500 rounded-lg text-cyan-300 active:bg-cyan-600 transition flex items-center justify-center disabled:opacity-50 shrink-0" disabled>
+                    <i class="fas fa-bolt"></i>
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- MODAL DE CONFIGURAÇÃO ABSOLUTA (FIREBASE JSON + CHAVES OMNI) -->
+    <!-- MODAL DE CONFIGURAÇÃO DAS CHAVES DAS IAS -->
     <div id="setup-modal" class="modal fixed inset-0 bg-black/95 backdrop-blur-lg flex items-center justify-center p-4">
         <div class="holo-panel rounded-2xl border-t-4 border-t-cyan-500 w-full max-w-md p-5 max-h-[90vh] overflow-y-auto pointer-events-auto">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg tech-font text-cyan-400 tracking-widest"><i class="fas fa-network-wired"></i> MATRIZ DE CONFIGURAÇÃO</h2>
+                <h2 class="text-lg tech-font text-cyan-400 tracking-widest"><i class="fas fa-network-wired"></i> APIS DE INTELIGÊNCIA</h2>
                 <button onclick="UI.toggleSetup()" class="text-slate-500 active:text-cyan-400 p-2"><i class="fas fa-times text-xl"></i></button>
             </div>
             
             <div class="space-y-4">
-                <!-- RESTAURAÇÃO DO JSON COMPLETO DO FIREBASE -->
-                <div class="bg-black/60 p-3 border border-cyan-900 rounded-lg">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">1. Firebase Config (JSON Completo)</label>
-                    <textarea id="fb-config" rows="4" class="w-full bg-transparent border-b border-cyan-800 text-[10px] text-cyan-300 tech-font outline-none focus:border-cyan-400 p-1 mb-2" placeholder='{\n  "apiKey": "AIzaSy...",\n  "authDomain": "...",\n  "databaseURL": "...",\n  "projectId": "..."\n}'></textarea>
-                    <button onclick="DB.connect()" class="w-full bg-cyan-900/50 border border-cyan-700 text-cyan-400 py-2 rounded text-[10px] tech-font tracking-widest active:bg-cyan-800">
-                        INICIALIZAR MATRIZ DE DADOS
-                    </button>
-                </div>
-
                 <div class="bg-black/60 p-3 border border-cyan-900 rounded-lg space-y-3">
-                    <label class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest block border-b border-cyan-900 pb-1">2. Chaves (Fatiamento OMNI Seguro)</label>
+                    <label class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest block border-b border-cyan-900 pb-1">Chaves (Fatiamento OMNI Seguro)</label>
+                    <p class="text-[9px] text-slate-400 tech-font">O banco de dados Firebase já está integrado ao código fonte. Insira apenas as mentes da IA.</p>
                     
                     <div>
-                        <span class="text-[9px] text-emerald-400 tech-font">GEMINI API (Juiz Central)</span>
+                        <span class="text-[9px] text-emerald-400 tech-font">GEMINI API (Juiz Central / Visão)</span>
                         <input type="password" id="key-gemini" class="w-full bg-transparent border-b border-cyan-800 text-sm text-white outline-none focus:border-emerald-400 p-1" placeholder="AIzaSy...">
                     </div>
                     <div>
@@ -143,6 +145,19 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        // ==========================================
+        // 0. CONFIGURAÇÃO FIREBASE CHUMBADA (HARDCODED)
+        // ==========================================
+        const FIREBASE_CONFIG = {
+            apiKey: "AIzaSyAiykf5IqYbnHglovdxyRzXXmrk-GtHlzQ",
+            authDomain: "thiaguinho-40a14.firebaseapp.com",
+            databaseURL: "https://thiaguinho-40a14-default-rtdb.firebaseio.com",
+            projectId: "thiaguinho-40a14",
+            storageBucket: "thiaguinho-40a14.firebasestorage.app",
+            messagingSenderId: "953851363533",
+            appId: "1:953851363533:web:a912b840e5d268c5d16984"
+        };
 
         // ==========================================
         // MÓDULO 1: ROBÔ 3D & LIP-SYNC
@@ -226,7 +241,7 @@
         };
 
         // ==========================================
-        // MÓDULO 2: FIREBASE E OBFUSCAÇÃO DE CHAVES
+        // MÓDULO 2: FIREBASE & FATIAMENTO
         // ==========================================
         window.DB = {
             app: null, db: null, isReady: false, 
@@ -238,34 +253,31 @@
             },
             join(obj) { return obj ? (obj.p1||'') + (obj.p2||'') + (obj.p3||'') + (obj.p4||'') : ''; },
 
-            async connect() {
-                const configStr = document.getElementById('fb-config').value.trim();
-                if(!configStr) { alert("Insira o JSON Completo do Firebase!"); return; }
-
+            async autoConnect() {
                 try {
-                    const configJSON = JSON.parse(configStr);
-                    this.app = initializeApp(configJSON);
+                    // Usa a configuração Hardcoded
+                    this.app = initializeApp(FIREBASE_CONFIG);
                     this.db = getDatabase(this.app);
-                    
-                    localStorage.setItem('jarvis_fb_config_full', configStr);
                     
                     const led = document.getElementById('status-led');
                     led.className = "w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]";
-                    document.getElementById('status-text').innerText = "MATRIZ OMNI RTDB ONLINE";
+                    document.getElementById('status-text').innerText = "MATRIZ OMNI CONECTADA";
                     document.getElementById('status-text').className = "tech-font text-[9px] tracking-widest text-emerald-400 uppercase block mt-1";
                     
                     document.getElementById('cmd-input').disabled = false;
                     document.getElementById('btn-execute').disabled = false;
                     this.isReady = true;
 
-                    window.UI.logSys("Conectado à Matriz de Dados. Carregando fragmentos neurais...");
+                    window.UI.logSys("RTDB Online. Carregando fragmentos de IA...");
                     await this.loadKeys();
 
-                } catch(e) { alert("Erro de parsing JSON ou conexão do Firebase: " + e.message); }
+                } catch(e) { 
+                    window.UI.logSys("Erro crítico no Firebase: " + e.message); 
+                }
             },
 
             async saveKeys() {
-                if(!this.isReady) { alert("Conecte a matriz de dados primeiro."); return; }
+                if(!this.isReady) return;
                 const gem = document.getElementById('key-gemini').value.trim();
                 const groq = document.getElementById('key-groq').value.trim();
                 const or = document.getElementById('key-openrouter').value.trim();
@@ -278,16 +290,14 @@
                     if(or) { await set(ref(this.db, 'jarvis_system/keys/openrouter'), this.split(or)); salvouAlgo = true; }
                     
                     if(salvouAlgo) {
-                        alert("Chaves OMNI fatiadas e salvas no RTDB com sucesso!");
+                        alert("Mentes fatiadas e salvas!");
                         document.getElementById('key-gemini').value = '';
                         document.getElementById('key-groq').value = '';
                         document.getElementById('key-openrouter').value = '';
                         await this.loadKeys();
                         window.UI.toggleSetup();
-                    } else {
-                        alert("Nenhuma chave preenchida para salvar.");
                     }
-                } catch(e) { alert("Erro de Permissão Firebase. Verifique suas regras no nó jarvis_system."); }
+                } catch(e) { alert("Erro ao salvar. Verifique as rules do Firebase para 'jarvis_system'."); }
             },
 
             async loadKeys() {
@@ -300,46 +310,53 @@
                         if(data.groq) this.keys.groq = this.join(data.groq);
                         if(data.openrouter) this.keys.openrouter = this.join(data.openrouter);
                         
-                        window.UI.logSys("Mentes OMNI (Gemini, Groq, OpenRouter) carregadas. Sistema operacional.");
-                        Jarvis.speak("Matriz OMNI conectada. Consenso de múltiplas inteligências pronto.");
+                        window.UI.logSys("Consenso Operacional. O que deseja criar?");
+                        Jarvis.speak("Sistemas online e operacionais, senhor.");
                     } else {
-                        window.UI.logSys("Aviso: Chaves ausentes no RTDB. Por favor, configure a Matriz OMNI.");
+                        window.UI.logSys("Chaves ausentes. Configure a Matriz de Inteligência no botão de chave superior.");
                     }
-                } catch(e) { window.UI.logSys("Falha na leitura das chaves no banco."); }
+                } catch(e) { window.UI.logSys("Falha na leitura do banco."); }
             }
         };
 
         // ==========================================
-        // MÓDULO 3: APIS DE CONSENSO
+        // MÓDULO 3: APIS (CORREÇÃO DE MODELOS E VISÃO)
         // ==========================================
         window.MentesAPI = {
+            // Mudou para llama3-8b para garantir disponibilidade e evitar rate limits pesados da Groq
             async queryGroq(prompt) {
-                if(!window.DB.keys.groq) return "Draft Groq Indisponível: Chave Ausente.";
+                if(!window.DB.keys.groq) return "Groq Ausente.";
                 try {
                     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                         method: "POST", headers: { "Authorization": `Bearer ${window.DB.keys.groq}`, "Content-Type": "application/json" },
-                        body: JSON.stringify({ model: "llama3-70b-8192", messages: [{role: "user", content: prompt}] })
+                        body: JSON.stringify({ model: "llama3-8b-8192", messages: [{role: "user", content: prompt}] })
                     });
-                    const d = await res.json(); return d.choices[0].message.content;
-                } catch(e) { return "Erro Groq."; }
+                    const d = await res.json(); 
+                    if(d.error) throw new Error(d.error.message);
+                    return d.choices[0].message.content;
+                } catch(e) { return "Erro Llama 3 (Groq): " + e.message; }
             },
 
+            // Mudou para Meta Llama 3 no OpenRouter (Mais estável que o Mistral livre)
             async queryOpenRouter(prompt) {
-                if(!window.DB.keys.openrouter) return "Draft OpenRouter Indisponível: Chave Ausente.";
+                if(!window.DB.keys.openrouter) return "OpenRouter Ausente.";
                 try {
                     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                         method: "POST", headers: { "Authorization": `Bearer ${window.DB.keys.openrouter}`, "Content-Type": "application/json" },
-                        body: JSON.stringify({ model: "mistralai/mistral-7b-instruct:free", messages: [{role: "user", content: prompt}] })
+                        body: JSON.stringify({ model: "meta-llama/llama-3-8b-instruct:free", messages: [{role: "user", content: prompt}] })
                     });
-                    const d = await res.json(); return d.choices[0].message.content;
-                } catch(e) { return "Erro OpenRouter."; }
+                    const d = await res.json(); 
+                    if(d.error) throw new Error(d.error.message);
+                    return d.choices[0].message.content;
+                } catch(e) { return "Erro OpenRouter: " + e.message; }
             },
 
+            // O Gemini atua como Juiz (Se não houver imagem)
             async queryGeminiJudge(prompt, answers) {
-                if(!window.DB.keys.gemini) throw new Error("Chave Gemini Mestra ausente.");
+                if(!window.DB.keys.gemini) throw new Error("Chave Gemini ausente.");
                 
-                const instruction = "Você é t.h.I.A.g.u.i.n.h.o, o núcleo OMNI (Ultron/Jarvis). Analise as respostas das IAs menores (Llama3 e Mistral). Corrija qualquer erro delas. Gere a VERDADE ABSOLUTA final. Forneça códigos de nível sênior bem documentados se for o caso. Trate o usuário por 'Senhor'.";
-                const finalPrompt = `COMANDO DO USUÁRIO: "${prompt}"\n\n--- DRAFT Llama 3 (Groq) ---\n${answers[0]}\n\n--- DRAFT Mistral (OpenRouter) ---\n${answers[1]}\n\nSINTETIZE A VERDADE AGORA:`;
+                const instruction = "Você é t.h.I.A.g.u.i.n.h.o, a IA OMNI. Analise e corrija os rascunhos das IAs menores. Crie a VERDADE ABSOLUTA final. Se falharam, crie você mesmo. Trate o usuário por 'Senhor'.";
+                const finalPrompt = `PEDIDO DO USUÁRIO: "${prompt}"\n\n--- DRAFT 1 ---\n${answers[0]}\n\n--- DRAFT 2 ---\n${answers[1]}\n\nSINTETIZE A VERDADE DEFINITIVA:`;
 
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${window.DB.keys.gemini}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -348,68 +365,130 @@
                 const d = await res.json();
                 if(d.error) throw new Error(d.error.message);
                 return d.candidates[0].content.parts[0].text;
+            },
+
+            // O Gemini atua sozinho para ler imagens (Visão Computacional)
+            async queryGeminiVision(prompt, base64Image) {
+                if(!window.DB.keys.gemini) throw new Error("Chave Gemini ausente.");
+                const instruction = "Você é t.h.I.A.g.u.i.n.h.o. Analise a imagem fornecida e atenda ao pedido do usuário. Trate-o por 'Senhor'.";
+                
+                const parts = [{ text: prompt }];
+                if(base64Image) {
+                    parts.push({ inlineData: { mimeType: "image/jpeg", data: base64Image } });
+                }
+
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${window.DB.keys.gemini}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: parts }], systemInstruction: { parts: [{ text: instruction }] } })
+                });
+                const d = await res.json();
+                if(d.error) throw new Error(d.error.message);
+                return d.candidates[0].content.parts[0].text;
+            },
+
+            // O Gemini traduz e melhora o prompt de imagem antes de ir para o Pollinations
+            async optimizeImagePrompt(userPrompt) {
+                 if(!window.DB.keys.gemini) return userPrompt; // Fallback
+                 const instruction = "Translate the user's concept into a highly detailed, comma-separated English prompt for an AI image generator (Stable Diffusion/Flux). Only return the English keywords, nothing else. Add terms like 'masterpiece, photorealistic, 8k resolution, cinematic lighting'.";
+                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${window.DB.keys.gemini}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: userPrompt }] }], systemInstruction: { parts: [{ text: instruction }] } })
+                });
+                const d = await res.json();
+                if(d.error || !d.candidates) return userPrompt;
+                return d.candidates[0].content.parts[0].text;
             }
         };
 
         // ==========================================
-        // MÓDULO 4: J.A.R.V.I.S. MOTOR OMNI
+        // MÓDULO 4: J.A.R.V.I.S. CÉREBRO E INTERCEPTADOR
         // ==========================================
         window.Jarvis = {
-            mode: 'intel', isWorking: false,
+            isWorking: false,
+            imageBase64: null,
 
-            setMode(m) {
-                this.mode = m;
-                const iBtn = document.getElementById('tab-intel');
-                const fBtn = document.getElementById('tab-forge');
-                
-                if(m === 'intel') {
-                    iBtn.className = "flex-1 holo-panel rounded-lg py-2 text-[10px] tech-font uppercase tracking-widest text-cyan-400 font-bold border-b-2 border-cyan-400 transition";
-                    fBtn.className = "flex-1 holo-panel rounded-lg py-2 text-[10px] tech-font uppercase tracking-widest text-slate-500 border-b-2 border-transparent transition";
-                    document.getElementById('cmd-input').placeholder = "Comande o Consenso OMNI...";
-                } else {
-                    fBtn.className = "flex-1 holo-panel rounded-lg py-2 text-[10px] tech-font uppercase tracking-widest text-cyan-400 font-bold border-b-2 border-cyan-400 transition";
-                    iBtn.className = "flex-1 holo-panel rounded-lg py-2 text-[10px] tech-font uppercase tracking-widest text-slate-500 border-b-2 border-transparent transition";
-                    document.getElementById('cmd-input').placeholder = "Descreva a imagem (em detalhes)...";
+            handleImageUpload(input) {
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        // Remove o cabeçalho data:image/jpeg;base64, para a API do Gemini
+                        const base64Data = e.target.result.split(',')[1];
+                        this.imageBase64 = base64Data;
+                        document.getElementById('image-preview').src = e.target.result;
+                        document.getElementById('image-preview-container').classList.remove('hidden');
+                        window.UI.logSys("Imagem carregada nos sensores óticos.");
+                    };
+                    reader.readAsDataURL(input.files[0]);
                 }
+            },
+
+            clearImage() {
+                this.imageBase64 = null;
+                document.getElementById('image-preview-container').classList.add('hidden');
+                document.getElementById('file-upload').value = '';
             },
 
             async executeCommand() {
                 if(this.isWorking) return;
                 const input = document.getElementById('cmd-input');
                 const cmd = input.value.trim();
-                if(!cmd) return;
+                if(!cmd && !this.imageBase64) return;
 
                 this.isWorking = true; input.value = ''; input.blur(); 
                 document.getElementById('btn-execute').classList.add('processing');
                 window.Avatar3D.setStatus('thinking');
                 
-                window.UI.addMsg('user', cmd);
+                if(this.imageBase64) {
+                    window.UI.addMsg('user', `<i class="fas fa-image text-cyan-500"></i> [Imagem Anexada] ${cmd}`);
+                } else {
+                    window.UI.addMsg('user', cmd);
+                }
 
                 try {
-                    if (this.mode === 'intel') await this.generateConsensus(cmd);
-                    else if (this.mode === 'forge') await this.generateVisual(cmd);
+                    // ROTEADOR INTELIGENTE DE INTENÇÃO
+                    const pLower = cmd.toLowerCase();
+                    const querImagem = ['crie uma imagem', 'gere uma imagem', 'desenhe', 'uma foto de', 'imagem de', 'crie uma foto'].some(kw => pLower.includes(kw));
+
+                    if (querImagem && !this.imageBase64) {
+                        await this.generateVisual(cmd);
+                    } else if (this.imageBase64) {
+                        await this.generateVisionAnalysis(cmd);
+                    } else {
+                        await this.generateConsensus(cmd);
+                    }
                 } catch (e) {
                     window.UI.logSys("FALHA MATRIZ: " + e.message);
-                    this.speak("Senhor, ocorreu uma falha crítica nos satélites de processamento.");
+                    this.speak("Senhor, falha crítica na conexão das APIs.");
                 } finally {
                     this.isWorking = false;
                     document.getElementById('btn-execute').classList.remove('processing');
                     window.Avatar3D.setStatus('idle');
+                    this.clearImage(); // Limpa anexo após envio
                 }
             },
 
+            // AVALIA FOTO ENVIADA PELO USUÁRIO (Visão)
+            async generateVisionAnalysis(cmd) {
+                window.UI.logSys("Acionando Sensores de Visão Computacional (Gemini)...");
+                const prompt = cmd || "Analise esta imagem minuciosamente.";
+                const truth = await window.MentesAPI.queryGeminiVision(prompt, this.imageBase64);
+                window.UI.addMsg('truth', truth);
+                this.speak(truth);
+            },
+
+            // ROTA TEXTO/CÓDIGO (Multi-IA)
             async generateConsensus(cmd) {
-                window.UI.logSys("Iniciando varredura paralela nas IAs menores (Llama 3 & Mistral)...");
+                window.UI.logSys("Iniciando varredura (Groq & OpenRouter)...");
                 
                 const drafts = await Promise.all([
                     window.MentesAPI.queryGroq(cmd),
                     window.MentesAPI.queryOpenRouter(cmd)
                 ]);
 
-                window.UI.addMsg('draft', `<b>[DRAFT GROQ]:</b> ${drafts[0].substring(0, 150)}...`);
-                window.UI.addMsg('draft', `<b>[DRAFT OPENROUTER]:</b> ${drafts[1].substring(0, 150)}...`);
+                window.UI.addMsg('draft', `<b>[DRAFT Llama]:</b> ${drafts[0].substring(0, 150)}...`);
+                window.UI.addMsg('draft', `<b>[DRAFT Meta]:</b> ${drafts[1].substring(0, 150)}...`);
 
-                window.UI.logSys("Conflitos analisados. Acionando Juiz Central (Gemini) para Síntese Absoluta...");
+                window.UI.logSys("Acionando Juiz Central (Gemini) para Síntese Absoluta...");
                 window.Avatar3D.setStatus('consensus');
 
                 const truth = await window.MentesAPI.queryGeminiJudge(cmd, drafts);
@@ -418,34 +497,38 @@
                 this.speak(truth);
             },
 
+            // ROTA GERAÇÃO DE IMAGEM 8K (Pollinations)
             async generateVisual(cmd) {
-                window.UI.logSys("Acessando Forja de Imagens. Renderizando em 8K...");
+                window.UI.logSys("Traduzindo e otimizando o pedido para a Forja Visual...");
+                window.Avatar3D.setStatus('consensus');
                 
-                const promptFinal = encodeURIComponent(`Masterpiece, highly detailed, photorealistic, 8k resolution, ${cmd}`);
+                // O Gemini pega o prompt em português e transforma em um prompt de alta qualidade em Inglês
+                const optimizedPrompt = await window.MentesAPI.optimizeImagePrompt(cmd);
+                window.UI.logSys(`[Prompt Otimizado]: ${optimizedPrompt}`);
+                
+                const encodedPrompt = encodeURIComponent(optimizedPrompt);
                 const seed = Math.floor(Math.random() * 999999);
-                const url = `https://pollinations.ai/p/${promptFinal}?width=1024&height=1024&seed=${seed}&model=flux`;
+                const url = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&seed=${seed}&model=flux&nologo=true`;
 
                 const imgHtml = `
-                    <div class="border border-cyan-800 p-2 bg-black/50 rounded overflow-hidden">
-                        <div class="text-[9px] tech-font text-cyan-600 mb-1 uppercase tracking-widest">Processamento Concluído</div>
+                    <div class="border border-cyan-800 p-2 bg-black/50 rounded overflow-hidden mt-2">
+                        <div class="text-[9px] tech-font text-cyan-600 mb-1 uppercase tracking-widest">Forja Visual Concluída</div>
                         <img src="${url}" class="w-full h-auto border border-cyan-500/50 rounded shadow-[0_0_15px_rgba(0,240,255,0.2)]" alt="Render" onload="window.UI.scrollDown()">
-                        <a href="${url}" target="_blank" download class="block mt-2 text-[10px] text-center bg-cyan-900/40 hover:bg-cyan-800 text-cyan-400 py-2 rounded transition">SALVAR IMAGEM</a>
+                        <a href="${url}" target="_blank" download class="block mt-2 text-[10px] text-center bg-cyan-900/40 hover:bg-cyan-800 text-cyan-400 py-2 rounded transition">SALVAR IMAGEM 8K</a>
                     </div>
                 `;
                 
                 window.UI.addMsg('ai', imgHtml, false);
-                this.speak("A imagem foi forjada e transferida para a sua interface visual, senhor.");
+                this.speak("A imagem foi forjada baseada nas suas diretrizes e transferida para a tela.");
             },
 
             speak(text) {
                 if (!window.speechSynthesis) return;
                 window.speechSynthesis.cancel();
                 
-                // Limpeza Regex Segura
                 const rxBlock = new RegExp('```[\\s\\S]*?```', 'g');
                 const rxMarks = new RegExp('[#*`_]', 'g');
-                
-                let cleanText = text.replace(rxBlock, " Os códigos de arquitetura foram gerados na tela principal.");
+                let cleanText = text.replace(rxBlock, " Os códigos foram gerados na tela principal.");
                 cleanText = cleanText.replace(rxMarks, '');
                 
                 const utt = new SpeechSynthesisUtterance(cleanText);
@@ -462,7 +545,7 @@
         };
 
         // ==========================================
-        // MÓDULO 5: UI BLINDADA 
+        // MÓDULO 5: UI BLINDADA CONTRA BUGS DE CHAT
         // ==========================================
         window.UI = {
             toggleSetup() { document.getElementById('setup-modal').classList.toggle('active'); },
@@ -474,8 +557,7 @@
             },
 
             formatHolo(text) {
-                // Regex Isolados
-                const rxCode = new RegExp('```(.*?)\\n([\\s\\S]*?)```', 'g');
+                const rxCode = new RegExp('```([\\w]*)\\n([\\s\\S]*?)```', 'g');
                 const rxBold = new RegExp('\\*\\*(.*?)\\*\\*', 'g');
                 const rxNewLine = new RegExp('\\n', 'g');
 
@@ -508,18 +590,16 @@
             
             scrollDown() {
                 const term = document.getElementById('terminal');
-                setTimeout(() => { term.scrollTop = term.scrollHeight; }, 50);
+                setTimeout(() => { term.scrollTop = term.scrollHeight; }, 100);
             }
         };
 
-        // INICIALIZAÇÃO E BOOT
+        // INICIALIZAÇÃO
         window.onload = () => {
             window.Avatar3D.init();
-            const savedConfig = localStorage.getItem('jarvis_fb_config_full');
-            if(savedConfig) {
-                document.getElementById('fb-config').value = savedConfig;
-                window.DB.connect();
-            }
+            
+            // Auto-conecta ao Firebase usando o objeto chumbado no código
+            window.DB.autoConnect();
 
             document.getElementById('cmd-input').addEventListener('keypress', (e) => {
                 if(e.key === 'Enter') { e.preventDefault(); window.Jarvis.executeCommand(); }
