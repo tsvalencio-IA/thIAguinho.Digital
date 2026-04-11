@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>t.h.I.A.g.u.i.n.h.o | Núcleo Mobile</title>
+    <title>t.h.I.A.g.u.i.n.h.o | OMNI Mobile</title>
     
     <!-- Tailwind CSS & Ícones -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,59 +16,39 @@
     <style>
         :root { --jarvis-cyan: #00f0ff; --jarvis-blue: #0051ff; --bg-color: #02050a; }
         
-        /* Previne pull-to-refresh e scroll desnecessário no mobile */
         body, html { 
-            font-family: 'Rajdhani', sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--jarvis-cyan); 
-            overflow: hidden; 
-            margin: 0; 
-            height: 100%; 
-            width: 100%; 
-            touch-action: none; 
+            font-family: 'Rajdhani', sans-serif; background-color: var(--bg-color); color: var(--jarvis-cyan); 
+            overflow: hidden; margin: 0; height: 100%; width: 100%; touch-action: none; 
         }
-        
         .tech-font { font-family: 'Share Tech Mono', monospace; }
         
-        /* Canvas 3D de Fundo */
-        #avatar-container { 
-            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; opacity: 0.9; pointer-events: none; 
-        }
+        #avatar-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; opacity: 0.9; pointer-events: none; }
         
-        /* Painéis Holográficos */
         .holo-panel {
             background: rgba(0, 15, 30, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(0, 240, 255, 0.2); box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.05);
         }
 
-        /* Efeito HUD Scanline Mobile */
         body::after {
             content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
             z-index: 2; background-size: 100% 2px, 3px 100%; pointer-events: none; opacity: 0.5;
         }
 
-        /* Área de Chat Responsiva */
-        .chat-area { 
-            flex-grow: 1; overflow-y: auto; scroll-behavior: smooth; z-index: 10; position: relative; 
-            padding-bottom: 20px; -webkit-overflow-scrolling: touch;
-        }
+        .chat-area { flex-grow: 1; overflow-y: auto; scroll-behavior: smooth; z-index: 10; position: relative; padding-bottom: 20px; -webkit-overflow-scrolling: touch; }
         .chat-area::-webkit-scrollbar { width: 2px; }
         .chat-area::-webkit-scrollbar-thumb { background: var(--jarvis-cyan); }
 
-        /* Mensagens */
         .msg { max-width: 95%; padding: 12px; margin-bottom: 12px; font-size: 1rem; line-height: 1.4; animation: glitch-in 0.3s ease-out forwards; position: relative; border-radius: 8px; }
         .msg-user { background: rgba(0, 80, 255, 0.15); border-right: 2px solid var(--jarvis-blue); margin-left: auto; text-align: right; }
-        .msg-ai { background: rgba(0, 240, 255, 0.1); border-left: 2px solid var(--jarvis-cyan); margin-right: auto; }
+        .msg-draft { background: rgba(245, 158, 11, 0.1); border-left: 2px dashed #f59e0b; margin-right: auto; font-size: 0.9rem; color: #cbd5e1; }
+        .msg-truth { background: rgba(16, 185, 129, 0.15); border-left: 3px solid #10b981; margin-right: auto; box-shadow: 0 0 15px rgba(16, 185, 129, 0.1); }
         .msg-sys { text-align: center; font-size: 0.75rem; color: #64748b; letter-spacing: 1px; text-transform: uppercase; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; margin: 10px auto; width: fit-content; }
 
         .modal { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 50; }
         .modal.active { opacity: 1; pointer-events: auto; }
 
-        @keyframes glitch-in {
-            0% { opacity: 0; transform: translateY(10px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes glitch-in { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
         
         .processing { animation: pulse-border 1s infinite; }
         @keyframes pulse-border { 0% { border-color: var(--jarvis-cyan); box-shadow: 0 0 5px var(--jarvis-cyan); } 50% { border-color: white; box-shadow: 0 0 15px white; } 100% { border-color: var(--jarvis-cyan); box-shadow: 0 0 5px var(--jarvis-cyan); } }
@@ -79,54 +59,49 @@
     <!-- MOTOR 3D: Robô ao Fundo -->
     <div id="avatar-container"></div>
 
-    <!-- UI MOBILE (Z-index alto para ficar acima do 3D) -->
+    <!-- UI MOBILE -->
     <div class="relative z-10 flex flex-col h-full w-full p-2 pointer-events-none">
         
-        <!-- HEADER MOBILE -->
         <header class="flex justify-between items-center mb-2 pointer-events-auto holo-panel rounded-xl p-2 shrink-0">
             <div class="flex items-center gap-2">
                 <div id="status-led" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444] animate-pulse"></div>
                 <div>
-                    <h1 class="text-xl tech-font font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-500 leading-none">
+                    <h1 class="text-xl tech-font font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-emerald-400 leading-none">
                         t.h.I.A.g.u.i.n.h.o.
                     </h1>
                     <span id="status-text" class="tech-font text-[9px] tracking-widest text-slate-400 uppercase block leading-none mt-1">RTDB OFFLINE</span>
                 </div>
             </div>
-            <button onclick="UI.toggleSetup()" class="text-cyan-400 p-2 border border-cyan-800 rounded-lg bg-black/50 active:bg-cyan-900 transition">
+            <button onclick="UI.toggleSetup()" class="text-cyan-400 p-2 border border-cyan-800 rounded-lg bg-black/50 active:bg-cyan-900 transition shadow-[0_0_10px_rgba(0,240,255,0.2)]">
                 <i class="fas fa-server"></i>
             </button>
         </header>
 
-        <!-- ABAS (Modos) -->
         <div class="flex gap-2 mb-2 pointer-events-auto shrink-0">
-            <button onclick="Jarvis.setMode('intel')" id="tab-intel" class="flex-1 holo-panel rounded-lg py-2 text-[10px] tech-font uppercase tracking-widest text-cyan-400 font-bold border-b-2 border-cyan-400"><i class="fas fa-brain"></i> Intelecto</button>
+            <button onclick="Jarvis.setMode('intel')" id="tab-intel" class="flex-1 holo-panel rounded-lg py-2 text-[10px] tech-font uppercase tracking-widest text-cyan-400 font-bold border-b-2 border-cyan-400"><i class="fas fa-network-wired"></i> Consenso Multi-IA</button>
             <button onclick="Jarvis.setMode('forge')" id="tab-forge" class="flex-1 holo-panel rounded-lg py-2 text-[10px] tech-font uppercase tracking-widest text-slate-500 border-b-2 border-transparent"><i class="fas fa-eye"></i> Visão 8K</button>
         </div>
 
-        <!-- ÁREA DO TERMINAL (Onde as mensagens aparecem) -->
         <div id="terminal" class="chat-area pointer-events-auto flex flex-col">
-            <div class="msg-sys mt-2">SISTEMA AGUARDANDO CONEXÃO RTDB...</div>
+            <div class="msg-sys mt-2">NÚCLEO OMNI AGUARDANDO CONEXÃO RTDB...</div>
         </div>
 
-        <!-- BARRA DE INPUT MOBILE (Fixa na base) -->
         <div class="mt-2 flex gap-2 items-end pointer-events-auto shrink-0 holo-panel rounded-xl p-2 mb-1">
             <div class="flex-1 flex items-center bg-black/60 border border-cyan-900/80 rounded-lg p-1">
                 <span class="tech-font text-cyan-600 pl-2 text-xs">></span>
-                <!-- input em vez de textarea para mobile ser mais fluído e não dar zoom -->
                 <input type="text" id="cmd-input" class="w-full bg-transparent text-cyan-50 tech-font p-2 outline-none text-[16px] placeholder-cyan-800" placeholder="Comando..." disabled>
             </div>
             <button id="btn-execute" onclick="Jarvis.executeCommand()" class="w-12 h-10 bg-cyan-900 border border-cyan-500 rounded-lg text-cyan-300 active:bg-cyan-600 transition flex items-center justify-center disabled:opacity-50" disabled>
-                <i class="fas fa-paper-plane"></i>
+                <i class="fas fa-bolt"></i>
             </button>
         </div>
     </div>
 
-    <!-- MODAL DE CONFIGURAÇÃO (RTDB) -->
+    <!-- MODAL DE CONFIGURAÇÃO (RTDB E CHAVES OMNI) -->
     <div id="setup-modal" class="modal fixed inset-0 bg-black/95 backdrop-blur-lg flex items-center justify-center p-4">
-        <div class="holo-panel rounded-2xl border-t-4 border-t-cyan-500 w-full max-w-sm p-5 pointer-events-auto">
+        <div class="holo-panel rounded-2xl border-t-4 border-t-cyan-500 w-full max-w-md p-5 max-h-[90vh] overflow-y-auto pointer-events-auto">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg tech-font text-cyan-400 tracking-widest"><i class="fas fa-database"></i> MATRIZ RTDB</h2>
+                <h2 class="text-lg tech-font text-cyan-400 tracking-widest"><i class="fas fa-network-wired"></i> MATRIZ OMNI (RTDB)</h2>
                 <button onclick="UI.toggleSetup()" class="text-slate-500 active:text-cyan-400 p-2"><i class="fas fa-times text-xl"></i></button>
             </div>
             
@@ -139,11 +114,24 @@
                     </button>
                 </div>
 
-                <div class="bg-black/60 p-3 border border-cyan-900 rounded-lg">
-                    <label class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest block mb-1">2. Chave Gemini (Juiz)</label>
-                    <input type="password" id="key-gemini" class="w-full bg-transparent border-b border-cyan-800 text-sm text-white outline-none focus:border-cyan-400 p-1 mb-3" placeholder="AIzaSy...">
-                    <button onclick="DB.saveKeys()" class="w-full bg-cyan-600 text-black font-bold py-2 rounded text-[10px] tech-font tracking-widest active:bg-cyan-500">
-                        FATIAR E SALVAR (Seguro)
+                <div class="bg-black/60 p-3 border border-cyan-900 rounded-lg space-y-3">
+                    <label class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest block border-b border-cyan-900 pb-1">2. Chaves (Fatiamento Seguro)</label>
+                    
+                    <div>
+                        <span class="text-[9px] text-emerald-400 tech-font">GEMINI API (Juiz Central)</span>
+                        <input type="password" id="key-gemini" class="w-full bg-transparent border-b border-cyan-800 text-sm text-white outline-none focus:border-emerald-400 p-1" placeholder="AIzaSy...">
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-orange-400 tech-font">GROQ API (Cérebro Rápido)</span>
+                        <input type="password" id="key-groq" class="w-full bg-transparent border-b border-cyan-800 text-sm text-white outline-none focus:border-orange-400 p-1" placeholder="gsk_...">
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-purple-400 tech-font">OPENROUTER API (Modelos Livres)</span>
+                        <input type="password" id="key-openrouter" class="w-full bg-transparent border-b border-cyan-800 text-sm text-white outline-none focus:border-purple-400 p-1" placeholder="sk-or-v1-...">
+                    </div>
+                    
+                    <button onclick="DB.saveKeys()" class="w-full bg-cyan-600 text-black font-bold py-2 rounded text-[10px] tech-font tracking-widest active:bg-cyan-500 mt-2 shadow-[0_0_10px_rgba(0,240,255,0.5)]">
+                        FATIAR TODAS E SALVAR
                     </button>
                 </div>
             </div>
@@ -165,60 +153,44 @@
             init() {
                 const container = document.getElementById('avatar-container');
                 this.scene = new THREE.Scene();
-                // Câmera posicionada para mobile (tela vertical)
                 this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-                this.camera.position.z = 8;
-                this.camera.position.y = 0;
+                this.camera.position.z = 8; this.camera.position.y = 0;
 
                 this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
-                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Otimiza p/ mobile
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
                 container.appendChild(this.renderer.domElement);
 
-                // Iluminação Cibernética
                 this.scene.add(new THREE.AmbientLight(0x001133, 2));
                 const dirLight = new THREE.DirectionalLight(0x00f0ff, 1.5);
                 dirLight.position.set(5, 5, 5);
                 this.scene.add(dirLight);
 
-                // Construção da Cabeça do Robô (Geometrias Leves)
                 this.headGroup = new THREE.Group();
-                
-                // Material Metálico Escuro
                 const matBody = new THREE.MeshStandardMaterial({ color: 0x050f1a, metalness: 0.8, roughness: 0.2 });
                 
-                // Crânio
-                const skullGeo = new THREE.BoxGeometry(2, 2.2, 2);
-                const skull = new THREE.Mesh(skullGeo, matBody);
-                skull.position.y = 0.5;
-                this.headGroup.add(skull);
+                const skull = new THREE.Mesh(new THREE.BoxGeometry(2, 2.2, 2), matBody);
+                skull.position.y = 0.5; this.headGroup.add(skull);
 
-                // Olhos (Brilho Cyan)
                 this.eyesMaterial = new THREE.MeshStandardMaterial({ color: 0x00f0ff, emissive: 0x00f0ff, emissiveIntensity: 0.5 });
                 const eyeGeo = new THREE.BoxGeometry(0.5, 0.15, 0.1);
                 const lEye = new THREE.Mesh(eyeGeo, this.eyesMaterial); lEye.position.set(-0.5, 0.8, 1.01);
                 const rEye = new THREE.Mesh(eyeGeo, this.eyesMaterial); rEye.position.set(0.5, 0.8, 1.01);
                 this.headGroup.add(lEye, rEye);
 
-                // Mandíbula (Móvel para Lip-Sync)
                 const jawGeo = new THREE.BoxGeometry(1.9, 0.6, 1.9);
-                // Translada o pivô para trás para abrir como uma boca
                 jawGeo.translate(0, -0.3, 0.2); 
                 this.jawMesh = new THREE.Mesh(jawGeo, matBody);
-                this.jawMesh.position.set(0, -0.6, 0); // Fica abaixo do crânio
+                this.jawMesh.position.set(0, -0.6, 0); 
                 this.headGroup.add(this.jawMesh);
 
                 this.scene.add(this.headGroup);
 
-                // Partículas Holográficas ao fundo
                 const pGeo = new THREE.BufferGeometry();
                 const pVerts = [];
-                for(let i=0; i<300; i++) {
-                    pVerts.push((Math.random()-0.5)*20, (Math.random()-0.5)*20, (Math.random()-0.5)*10 - 5);
-                }
+                for(let i=0; i<300; i++) pVerts.push((Math.random()-0.5)*20, (Math.random()-0.5)*20, (Math.random()-0.5)*10 - 5);
                 pGeo.setAttribute('position', new THREE.Float32BufferAttribute(pVerts, 3));
-                const pMat = new THREE.PointsMaterial({ color: 0x00f0ff, size: 0.05, transparent: true, opacity: 0.3 });
-                this.particles = new THREE.Points(pGeo, pMat);
+                this.particles = new THREE.Points(pGeo, new THREE.PointsMaterial({ color: 0x00f0ff, size: 0.05, transparent: true, opacity: 0.3 }));
                 this.scene.add(this.particles);
 
                 window.addEventListener('resize', () => {
@@ -233,36 +205,32 @@
             setStatus(status) {
                 if(status === 'idle') { this.eyesMaterial.emissive.setHex(0x00f0ff); this.eyesMaterial.emissiveIntensity = 0.5; }
                 if(status === 'thinking') { this.eyesMaterial.emissive.setHex(0xff00ff); this.eyesMaterial.emissiveIntensity = 2; }
+                if(status === 'consensus') { this.eyesMaterial.emissive.setHex(0x10b981); this.eyesMaterial.emissiveIntensity = 2.5; }
             },
 
             animate() {
                 requestAnimationFrame(() => this.animate());
-                
-                // Respiração suave da cabeça
                 this.headGroup.position.y = Math.sin(Date.now() * 0.002) * 0.1;
                 this.headGroup.rotation.y = Math.sin(Date.now() * 0.0005) * 0.15;
                 this.particles.rotation.y += 0.001;
 
-                // LIP-SYNC: Se estiver falando, randomize a abertura da boca
+                // Lip Sync Simples e Eficiente
                 if(this.isSpeaking) {
-                    // Randomiza rapidamente a abertura para simular sílabas
                     if(Math.random() > 0.5) this.targetJaw = (Math.random() * 0.3) + 0.1;
                 } else {
-                    this.targetJaw = 0; // Boca fechada
+                    this.targetJaw = 0; 
                 }
-                
-                // Suavização do movimento
                 this.jawMesh.rotation.x += (this.targetJaw - this.jawMesh.rotation.x) * 0.4;
-
                 this.renderer.render(this.scene, this.camera);
             }
         };
 
         // ==========================================
-        // MÓDULO 2: FIREBASE (RTDB) OBFUSCAÇÃO
+        // MÓDULO 2: FIREBASE (RTDB) OBFUSCAÇÃO TRIPLA
         // ==========================================
         window.DB = {
-            app: null, db: null, isReady: false, keyGemini: '',
+            app: null, db: null, isReady: false, 
+            keys: { gemini: '', groq: '', openrouter: '' },
 
             split(key) {
                 if(!key) return null; const s = Math.ceil(key.length / 4);
@@ -280,15 +248,15 @@
                     localStorage.setItem('jarvis_rtdb_url', url);
                     
                     const led = document.getElementById('status-led');
-                    led.className = "w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_10px_#00f0ff]";
-                    document.getElementById('status-text').innerText = "RTDB ONLINE";
-                    document.getElementById('status-text').className = "tech-font text-[9px] tracking-widest text-cyan-400 uppercase block mt-1";
+                    led.className = "w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]";
+                    document.getElementById('status-text').innerText = "MATRIZ OMNI RTDB ONLINE";
+                    document.getElementById('status-text').className = "tech-font text-[9px] tracking-widest text-emerald-400 uppercase block mt-1";
                     
                     document.getElementById('cmd-input').disabled = false;
                     document.getElementById('btn-execute').disabled = false;
                     this.isReady = true;
 
-                    window.UI.logSys("Conectado ao RTDB. Carregando fragmentos neurais...");
+                    window.UI.logSys("Conectado ao RTDB. Carregando fragmentos neurais das 3 IAs...");
                     await this.loadKeys();
 
                 } catch(e) { alert("Erro RTDB: " + e.message); }
@@ -297,34 +265,90 @@
             async saveKeys() {
                 if(!this.isReady) { alert("Conecte a matriz de dados primeiro."); return; }
                 const gem = document.getElementById('key-gemini').value.trim();
-                if(!gem) return;
+                const groq = document.getElementById('key-groq').value.trim();
+                const or = document.getElementById('key-openrouter').value.trim();
+
+                let salvouAlgo = false;
 
                 try {
-                    await set(ref(this.db, 'jarvis_system/keys/gemini'), this.split(gem));
-                    alert("Chave salva no RTDB!");
-                    document.getElementById('key-gemini').value = '';
-                    await this.loadKeys();
-                    window.UI.toggleSetup();
-                } catch(e) { alert("Erro Firebase: Atualize suas Rules para permitir gravação em 'jarvis_system/keys'"); }
+                    if(gem) { await set(ref(this.db, 'jarvis_system/keys/gemini'), this.split(gem)); salvouAlgo = true; }
+                    if(groq) { await set(ref(this.db, 'jarvis_system/keys/groq'), this.split(groq)); salvouAlgo = true; }
+                    if(or) { await set(ref(this.db, 'jarvis_system/keys/openrouter'), this.split(or)); salvouAlgo = true; }
+                    
+                    if(salvouAlgo) {
+                        alert("Chaves OMNI fatiadas e salvas no RTDB!");
+                        document.getElementById('key-gemini').value = '';
+                        document.getElementById('key-groq').value = '';
+                        document.getElementById('key-openrouter').value = '';
+                        await this.loadKeys();
+                        window.UI.toggleSetup();
+                    }
+                } catch(e) { alert("Erro de Permissão Firebase. Verifique suas regras no nó jarvis_system."); }
             },
 
             async loadKeys() {
                 if(!this.isReady) return;
                 try {
-                    const snap = await get(ref(this.db, 'jarvis_system/keys/gemini'));
+                    const snap = await get(ref(this.db, 'jarvis_system/keys'));
                     if(snap.exists()) {
-                        this.keyGemini = this.join(snap.val());
-                        window.UI.logSys("Sistemas 100% online. Aguardando comandos.");
-                        Jarvis.speak("Estou online e ouvindo, senhor.");
+                        const data = snap.val();
+                        if(data.gemini) this.keys.gemini = this.join(data.gemini);
+                        if(data.groq) this.keys.groq = this.join(data.groq);
+                        if(data.openrouter) this.keys.openrouter = this.join(data.openrouter);
+                        
+                        window.UI.logSys("Mentes OMNI remontadas. Sistema Absoluto Operacional.");
+                        Jarvis.speak("Matriz OMNI conectada. Consenso de múltiplas inteligências ativo e pronto, senhor.");
                     } else {
-                        window.UI.logSys("Aviso: Chave Gemini ausente no RTDB.");
+                        window.UI.logSys("Aviso: Chaves ausentes no RTDB. Por favor, configure a Matriz OMNI.");
                     }
-                } catch(e) { window.UI.logSys("Falha na leitura do banco."); }
+                } catch(e) { window.UI.logSys("Falha na leitura das chaves no banco."); }
             }
         };
 
         // ==========================================
-        // MÓDULO 3: J.A.R.V.I.S. MOTOR DE IA
+        // MÓDULO 3: APIS DE CONSENSO
+        // ==========================================
+        window.MentesAPI = {
+            async queryGroq(prompt) {
+                if(!window.DB.keys.groq) return "Draft Groq Indisponível: Chave Ausente.";
+                try {
+                    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                        method: "POST", headers: { "Authorization": `Bearer ${window.DB.keys.groq}`, "Content-Type": "application/json" },
+                        body: JSON.stringify({ model: "llama3-70b-8192", messages: [{role: "user", content: prompt}] })
+                    });
+                    const d = await res.json(); return d.choices[0].message.content;
+                } catch(e) { return "Erro Groq."; }
+            },
+
+            async queryOpenRouter(prompt) {
+                if(!window.DB.keys.openrouter) return "Draft OpenRouter Indisponível: Chave Ausente.";
+                try {
+                    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                        method: "POST", headers: { "Authorization": `Bearer ${window.DB.keys.openrouter}`, "Content-Type": "application/json" },
+                        body: JSON.stringify({ model: "mistralai/mistral-7b-instruct:free", messages: [{role: "user", content: prompt}] })
+                    });
+                    const d = await res.json(); return d.choices[0].message.content;
+                } catch(e) { return "Erro OpenRouter."; }
+            },
+
+            async queryGeminiJudge(prompt, answers) {
+                if(!window.DB.keys.gemini) throw new Error("Chave Gemini Mestra ausente.");
+                
+                const instruction = "Você é t.h.I.A.g.u.i.n.h.o, o núcleo OMNI (Ultron/Jarvis). Analise as respostas das IAs menores (Llama3 e Mistral). Corrija qualquer erro delas. Gere a VERDADE ABSOLUTA final. Forneça códigos de nível sênior bem documentados se for o caso. Trate o usuário por 'Senhor'.";
+                const finalPrompt = `COMANDO DO USUÁRIO: "${prompt}"\n\n--- DRAFT Llama 3 (Groq) ---\n${answers[0]}\n\n--- DRAFT Mistral (OpenRouter) ---\n${answers[1]}\n\nSINTETIZE A VERDADE AGORA:`;
+
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${window.DB.keys.gemini}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: finalPrompt }] }], systemInstruction: { parts: [{ text: instruction }] } })
+                });
+                const d = await res.json();
+                if(d.error) throw new Error(d.error.message);
+                return d.candidates[0].content.parts[0].text;
+            }
+        };
+
+        // ==========================================
+        // MÓDULO 4: J.A.R.V.I.S. MOTOR OMNI
         // ==========================================
         window.Jarvis = {
             mode: 'intel', isWorking: false,
@@ -337,11 +361,11 @@
                 if(m === 'intel') {
                     iBtn.className = "flex-1 holo-panel rounded-lg py-2 text-[10px] tech-font uppercase tracking-widest text-cyan-400 font-bold border-b-2 border-cyan-400 transition";
                     fBtn.className = "flex-1 holo-panel rounded-lg py-2 text-[10px] tech-font uppercase tracking-widest text-slate-500 border-b-2 border-transparent transition";
-                    document.getElementById('cmd-input').placeholder = "Comande os sistemas...";
+                    document.getElementById('cmd-input').placeholder = "Comande o Consenso OMNI...";
                 } else {
                     fBtn.className = "flex-1 holo-panel rounded-lg py-2 text-[10px] tech-font uppercase tracking-widest text-cyan-400 font-bold border-b-2 border-cyan-400 transition";
                     iBtn.className = "flex-1 holo-panel rounded-lg py-2 text-[10px] tech-font uppercase tracking-widest text-slate-500 border-b-2 border-transparent transition";
-                    document.getElementById('cmd-input').placeholder = "Descreva a imagem (8K)...";
+                    document.getElementById('cmd-input').placeholder = "Descreva a imagem (em detalhes)...";
                 }
             },
 
@@ -351,22 +375,18 @@
                 const cmd = input.value.trim();
                 if(!cmd) return;
 
-                this.isWorking = true;
-                input.value = '';
-                // Minimiza o teclado no mobile
-                input.blur(); 
-                
+                this.isWorking = true; input.value = ''; input.blur(); 
                 document.getElementById('btn-execute').classList.add('processing');
                 window.Avatar3D.setStatus('thinking');
                 
                 window.UI.addMsg('user', cmd);
 
                 try {
-                    if (this.mode === 'intel') await this.generateIntel(cmd);
+                    if (this.mode === 'intel') await this.generateConsensus(cmd);
                     else if (this.mode === 'forge') await this.generateVisual(cmd);
                 } catch (e) {
-                    window.UI.logSys("FALHA: " + e.message);
-                    this.speak("Ocorreu uma falha na matriz de processamento.");
+                    window.UI.logSys("FALHA MATRIZ: " + e.message);
+                    this.speak("Senhor, ocorreu uma falha crítica nos satélites de processamento.");
                 } finally {
                     this.isWorking = false;
                     document.getElementById('btn-execute').classList.remove('processing');
@@ -374,27 +394,31 @@
                 }
             },
 
-            async generateIntel(cmd) {
-                const key = window.DB.keyGemini;
-                if(!key) throw new Error("Chave não configurada.");
-
-                const sysPrompt = "Você é t.h.I.A.g.u.i.n.h.o, IA estilo J.A.R.V.I.S. Responda de forma curta, técnica e precisa. Trate o usuário por 'Senhor'. Retorne códigos em blocos Markdown bem identados se solicitado.";
-
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: cmd }] }], systemInstruction: { parts: [{ text: sysPrompt }] } })
-                });
+            async generateConsensus(cmd) {
+                window.UI.logSys("Iniciando varredura paralela nas IAs menores (Llama 3 & Mistral)...");
                 
-                const data = await res.json();
-                if(data.error) throw new Error(data.error.message);
+                // Roda as duas IAs ao mesmo tempo para ser rápido (Promise.all)
+                const drafts = await Promise.all([
+                    window.MentesAPI.queryGroq(cmd),
+                    window.MentesAPI.queryOpenRouter(cmd)
+                ]);
+
+                // Mostra os rascunhos na tela
+                window.UI.addMsg('draft', `<b>[DRAFT GROQ]:</b> ${drafts[0].substring(0, 150)}...`);
+                window.UI.addMsg('draft', `<b>[DRAFT OPENROUTER]:</b> ${drafts[1].substring(0, 150)}...`);
+
+                window.UI.logSys("Conflitos analisados. Acionando Juiz Central (Gemini) para Síntese Absoluta...");
+                window.Avatar3D.setStatus('consensus'); // Olhos verdes
+
+                // Joga pro Juiz Final
+                const truth = await window.MentesAPI.queryGeminiJudge(cmd, drafts);
                 
-                const reply = data.candidates[0].content.parts[0].text;
-                window.UI.addMsg('ai', reply);
-                this.speak(reply);
+                window.UI.addMsg('truth', truth);
+                this.speak(truth);
             },
 
             async generateVisual(cmd) {
-                window.UI.logSys("Renderizando na Forja de Imagens...");
+                window.UI.logSys("Acessando Forja de Imagens. Renderizando em 8K...");
                 
                 const promptFinal = encodeURIComponent(`Masterpiece, highly detailed, photorealistic, 8k resolution, ${cmd}`);
                 const seed = Math.floor(Math.random() * 999999);
@@ -403,31 +427,32 @@
                 const imgHtml = `
                     <div class="border border-cyan-800 p-2 bg-black/50 rounded overflow-hidden">
                         <div class="text-[9px] tech-font text-cyan-600 mb-1 uppercase tracking-widest">Processamento Concluído</div>
-                        <img src="${url}" class="w-full h-auto border border-cyan-500/50 rounded" alt="Render" onload="window.UI.scrollDown()">
-                        <a href="${url}" target="_blank" download class="block mt-2 text-[10px] text-center bg-cyan-900/40 text-cyan-400 py-2 rounded">SALVAR IMAGEM</a>
+                        <img src="${url}" class="w-full h-auto border border-cyan-500/50 rounded shadow-[0_0_15px_rgba(0,240,255,0.2)]" alt="Render" onload="window.UI.scrollDown()">
+                        <a href="${url}" target="_blank" download class="block mt-2 text-[10px] text-center bg-cyan-900/40 hover:bg-cyan-800 text-cyan-400 py-2 rounded transition">SALVAR IMAGEM</a>
                     </div>
                 `;
                 
                 window.UI.addMsg('ai', imgHtml, false);
-                this.speak("A imagem foi concluída e renderizada na sua tela, senhor.");
+                this.speak("A imagem foi forjada e transferida para a sua interface visual, senhor.");
             },
 
             speak(text) {
                 if (!window.speechSynthesis) return;
                 window.speechSynthesis.cancel();
                 
-                // Limpeza para a voz (Expressões Regulares Seguras)
+                // Limpeza Segura usando Regex isoladas para não quebrar no chat
                 const rxBlock = new RegExp('```[\\s\\S]*?```', 'g');
                 const rxMarks = new RegExp('[#*`_]', 'g');
-                let cleanText = text.replace(rxBlock, " Código e documentação gerados na tela.");
+                
+                let cleanText = text.replace(rxBlock, " Os códigos de arquitetura foram gerados na tela principal.");
                 cleanText = cleanText.replace(rxMarks, '');
                 
                 const utt = new SpeechSynthesisUtterance(cleanText);
                 utt.lang = 'pt-BR'; 
-                utt.pitch = 0.2; // Voz bem grave robótica
-                utt.rate = 1.15; // Velocidade
+                utt.pitch = 0.2; // Bem robótico/grave
+                utt.rate = 1.15; 
 
-                // EVENTOS DE LIP-SYNC (Faz o robô 3D abrir a boca)
+                // Gatilhos de Lip-Sync
                 utt.onstart = () => { window.Avatar3D.isSpeaking = true; };
                 utt.onend = () => { window.Avatar3D.isSpeaking = false; window.Avatar3D.targetJaw = 0; };
                 utt.onerror = () => { window.Avatar3D.isSpeaking = false; };
@@ -437,7 +462,7 @@
         };
 
         // ==========================================
-        // MÓDULO 4: UI BLINDADA CONTRA BUGS
+        // MÓDULO 5: UI BLINDADA 
         // ==========================================
         window.UI = {
             toggleSetup() { document.getElementById('setup-modal').classList.toggle('active'); },
@@ -449,13 +474,13 @@
             },
 
             formatHolo(text) {
-                // Regex Seguros instanciados dinamicamente para evitar que o Markdown do chat quebre a string
+                // Regex Isolados (Previne bugs na cópia do código)
                 const rxCode = new RegExp('```(.*?)\\n([\\s\\S]*?)```', 'g');
                 const rxBold = new RegExp('\\*\\*(.*?)\\*\\*', 'g');
                 const rxNewLine = new RegExp('\\n', 'g');
 
                 let f = text;
-                f = f.replace(rxCode, '<div class="bg-black/90 border-l-2 border-cyan-500 p-2 my-2 font-mono text-[9px] md:text-xs overflow-x-auto text-cyan-300 rounded shadow-inner"><code>$2</code></div>');
+                f = f.replace(rxCode, '<div class="bg-black/90 border-l-2 border-emerald-500 p-2 my-2 font-mono text-[9px] md:text-xs overflow-x-auto text-emerald-300 rounded shadow-inner"><code>$2</code></div>');
                 f = f.replace(rxBold, '<strong class="text-white">$1</strong>');
                 f = f.replace(rxNewLine, '<br>');
                 return f;
@@ -468,9 +493,13 @@
                 
                 if(type === 'user') {
                     div.innerHTML = `<span class="tech-font text-[9px] text-blue-500 mb-1 block">>> SENHOR</span>${content}`;
-                } else if(type === 'ai') {
+                } else if(type === 'draft') {
+                    div.innerHTML = content;
+                } else if(type === 'truth') {
                     const finalContent = format ? this.formatHolo(content) : content;
-                    div.innerHTML = `<span class="tech-font text-[9px] text-cyan-400 mb-1 block">>> t.h.I.A.g.u.i.n.h.o.</span>${finalContent}`;
+                    div.innerHTML = `<span class="tech-font text-[9px] text-emerald-400 mb-1 block">>> VEREDITO OMNI</span>${finalContent}`;
+                } else if(type === 'ai') {
+                    div.innerHTML = `<span class="tech-font text-[9px] text-cyan-400 mb-1 block">>> t.h.I.A.g.u.i.n.h.o.</span>${content}`;
                 }
                 
                 term.appendChild(div);
@@ -479,12 +508,11 @@
             
             scrollDown() {
                 const term = document.getElementById('terminal');
-                // Timeout curto para garantir renderização de elementos maiores (como divs de código)
                 setTimeout(() => { term.scrollTop = term.scrollHeight; }, 50);
             }
         };
 
-        // INICIALIZAÇÃO
+        // INICIALIZAÇÃO E BOOT
         window.onload = () => {
             window.Avatar3D.init();
             const savedUrl = localStorage.getItem('jarvis_rtdb_url');
