@@ -53,19 +53,17 @@ export async function askGemini(msgUsuario) {
         const apiKey = await obterChaveDaApi();
         if (!apiKey) return "Aviso: Chave da API não configurada ou erro de permissão no Firebase.";
 
-        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        // CORREÇÃO: Utilizando 1.5-flash para suportar sua chave e a Voz Neural
+        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-        // LIMPEZA E FORMATAÇÃO DO HISTÓRICO PARA EVITAR ERRO 400
         let contents = [];
         
         // A API EXIGE que o histórico comece com 'user'.
-        // Injetamos um gatilho de início caso o histórico comece com a fala do robô.
         contents.push({ role: 'user', parts: [{ text: "Olá, gostaria de uma consultoria." }] });
 
         chatHistoryCliente.forEach(m => {
             const roleApi = (m.role === 'user' || m.role === 'admin') ? 'user' : 'model';
             
-            // Só adiciona se o papel for diferente do último (Alternância Obrigatória)
             if (contents.length === 0 || contents[contents.length - 1].role !== roleApi) {
                 contents.push({ role: roleApi, parts: [{ text: m.text }] });
             }
@@ -153,7 +151,7 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
 
                 if (!adminApiKey) throw new Error("Chave do Admin não encontrada.");
 
-                const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + adminApiKey;
+                const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + adminApiKey;
                 const payload = {
                     contents: [{ role: "user", parts: [{ text: textoParaFalar }] }],
                     generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } } } }
@@ -192,7 +190,8 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
 
         Comece sua resposta avisando o Thiago que o código está pronto e que o motor de Voz Neural do Gemini foi injetado com sucesso.`;
 
-        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        // CORREÇÃO: Utilizando 1.5-flash
+        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
         const contents = historicoSalvo.map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
         contents.push({ role: 'user', parts: [{ text: msgAdmin }] });
@@ -253,7 +252,8 @@ export async function analisarEGerarProcessoAIMP(contextoCaotico, nomeVideoAnexa
         
         Seja analítico, inteligente e mostre que a thIAguinho Soluções é capaz de estruturar negócios perfeitamente.`;
 
-        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        // CORREÇÃO: Utilizando 1.5-flash
+        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
         const res = await fetch(MODEL_URL, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
