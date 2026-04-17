@@ -55,8 +55,19 @@ export async function askGemini(msgUsuario) {
 
         const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
-        // Mapeando o array existente para respeitar a estrutura user/model alternada
-        const contents = chatHistoryCliente.map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
+        let contents = [];
+        
+        // BLINDAGEM DA API DO GOOGLE:
+        // A API recusa a conexão (Erro 400) se a conversa não começar com o 'user'.
+        // Como o bot é quem começa a falar no nosso UI, injetamos um 'Oi' oculto aqui.
+        if (chatHistoryCliente.length > 0 && chatHistoryCliente[0].role !== 'user') {
+            contents.push({ role: 'user', parts: [{ text: 'Iniciar atendimento.' }] });
+        }
+
+        // Mapeia o resto do histórico real
+        chatHistoryCliente.forEach(m => {
+            contents.push({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] });
+        });
 
         const res = await fetch(MODEL_URL, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -95,7 +106,10 @@ export async function askGemini(msgUsuario) {
             botReply = botReply.replace(/\[LEAD:.*?\]/gi, '').trim();
         }
         return botReply;
-    } catch(e) { return "Houve uma falha na conexão. Pode repetir a informação?"; }
+    } catch(e) { 
+        console.error("Falha detalhada de conexão:", e);
+        return "Houve uma falha na conexão. Pode repetir a informação?"; 
+    }
 }
 
 export function adicionarAoHistorico(role, texto) {
@@ -135,7 +149,7 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
 
                 const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + adminApiKey;
                 const payload = {
-                    contents: [{ parts: [{ text: textoParaFalar }] }],
+                    contents: [{ role: "user", parts: [{ text: textoParaFalar }] }],
                     generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } } } }
                 };
 
