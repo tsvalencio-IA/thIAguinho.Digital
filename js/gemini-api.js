@@ -4,8 +4,13 @@
 import { database, ref, push, set, get } from './firebase-config.js';
 
 let chatHistoryCliente = [];
-let chaveApiArmazenada = null; 
+let chaveApiArmazenada = null;
 let leadJaCapturado = false;
+
+// ============================================================
+// LOCK GLOBAL: impede múltiplas chamadas simultâneas à API
+// ============================================================
+let _geminiLocked = false;
 
 // =========================================================================
 // CÉREBRO 1: A CONSULTORA E ARQUITETA (ENTREVISTA PROFISSIONAL)
@@ -44,90 +49,220 @@ async function obterChaveDaApi() {
             chaveApiArmazenada = snapshot.val();
             return chaveApiArmazenada;
         }
-    } catch (e) { console.error("Erro ao resgatar chave no Firebase:", e); }
+    } catch (e) {
+        console.error('[JARVIS][Firebase] Erro ao resgatar chave da API:', e);
+    }
     return null;
 }
 
-export async function askGemini(msgUsuario) {
+// ============================================================
+// FUNÇÃO ÚNICA: sendMessageToGemini
+// Centraliza timeout (15s), retry (máx 2), logging detalhado
+// ============================================================
+async function sendMessageToGemini(modelUrl, requestBody, retryCount = 0) {
+    const MAX_RETRIES = 2;
+    const TIMEOUT_MS = 15000;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
     try {
-        const apiKey = await obterChaveDaApi();
-        if (!apiKey) return "Aviso: Chave da API não configurada ou erro de permissão no Firebase.";
+        console.log(`[JARVIS][API] Tentativa ${retryCount + 1} — URL: ${modelUrl.split('?')[0]}`);
+        console.log('[JARVIS][API] Request body (resumo):', JSON.stringify({
+            contentsLength: requestBody.contents?.length,
+            firstRole: requestBody.contents?.[0]?.role,
+            lastRole: requestBody.contents?.[requestBody.contents?.length - 1]?.role,
+            systemInstructionLen: requestBody.system_instruction?.parts?.[0]?.text?.length
+        }));
 
-        // CORREÇÃO: Utilizando 1.5-flash para suportar sua chave e a Voz Neural
-        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-        let contents = [];
-        
-        // A API EXIGE que o histórico comece com 'user'.
-        contents.push({ role: 'user', parts: [{ text: "Olá, gostaria de uma consultoria." }] });
-
-        chatHistoryCliente.forEach(m => {
-            const roleApi = (m.role === 'user' || m.role === 'admin') ? 'user' : 'model';
-            
-            if (contents.length === 0 || contents[contents.length - 1].role !== roleApi) {
-                contents.push({ role: roleApi, parts: [{ text: m.text }] });
-            }
-        });
-
-        const res = await fetch(MODEL_URL, {
-            method: 'POST', 
+        const res = await fetch(modelUrl, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                contents: contents, 
-                system_instruction: { parts: [{ text: systemPrompt }] } 
-            })
+            body: JSON.stringify(requestBody),
+            signal: controller.signal
         });
-        
+
+        clearTimeout(timeoutId);
+
         const data = await res.json();
-        if (data.error) throw new Error(data.error.message);
-        
-        let botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Desculpe, ocorreu um erro de processamento.";
-        
+
+        if (!res.ok || data.error) {
+            const errCode = data.error?.code || res.status;
+            const errMsg  = data.error?.message || `HTTP ${res.status}`;
+            console.error(`[JARVIS][API] Erro da API — ${errCode}: ${errMsg}`);
+            throw new Error(`${errCode}: ${errMsg}`);
+        }
+
+        console.log('[JARVIS][API] Resposta recebida com sucesso.');
+        return data;
+
+    } catch (e) {
+        clearTimeout(timeoutId);
+
+        if (e.name === 'AbortError') {
+            throw new Error('[Timeout] Requisição ultrapassou 15 segundos.');
+        }
+
+        console.warn(`[JARVIS][API] Falha na tentativa ${retryCount + 1}:`, e.message);
+
+        if (retryCount < MAX_RETRIES) {
+            const delay = (retryCount + 1) * 2000; // 2s, 4s
+            console.log(`[JARVIS][API] Retentando em ${delay / 1000}s...`);
+            await new Promise(r => setTimeout(r, delay));
+            return sendMessageToGemini(modelUrl, requestBody, retryCount + 1);
+        }
+
+        throw e;
+    }
+}
+
+// ============================================================
+// CONSTRUÇÃO SEGURA DO ARRAY DE CONTENTS
+// CORREÇÃO CRÍTICA: a API do Gemini exige:
+//   1. Começar com role 'user'
+//   2. Alternar estritamente user → model → user → model
+//   3. Terminar com role 'user' (mensagem atual)
+// ============================================================
+function buildContents(history) {
+    const contents = [];
+
+    for (const m of history) {
+        const roleApi = (m.role === 'user' || m.role === 'admin') ? 'user' : 'model';
+        const texto   = String(m.text || '').trim();
+        if (!texto) continue;
+
+        if (contents.length === 0 || contents[contents.length - 1].role !== roleApi) {
+            // Novo turno: cria entrada
+            contents.push({ role: roleApi, parts: [{ text: texto }] });
+        } else {
+            // Mesmo role consecutivo: mescla (evita erro da API)
+            contents[contents.length - 1].parts.push({ text: texto });
+        }
+    }
+
+    // CORREÇÃO: se o array começa com 'model' (saudação inicial do bot foi
+    // adicionada ao histórico antes de qualquer mensagem do usuário),
+    // insere uma âncora 'user' para satisfazer o requisito da API.
+    if (contents.length > 0 && contents[0].role === 'model') {
+        console.warn('[JARVIS][History] Histórico iniciava com "model" — inserindo âncora user.');
+        contents.unshift({ role: 'user', parts: [{ text: 'Olá' }] });
+    }
+
+    return contents;
+}
+
+// ============================================================
+// CÉREBRO 1 — askGemini: Conversa Principal
+// Lock + Debounce + Timeout + Retry + Sanitização
+// ============================================================
+export async function askGemini(msgUsuario) {
+
+    // DEBOUNCE / LOCK: bloqueia chamadas simultâneas
+    if (_geminiLocked) {
+        console.warn('[JARVIS] askGemini bloqueado — outra chamada em andamento.');
+        return 'Aguarde, ainda estou processando sua mensagem...';
+    }
+    _geminiLocked = true;
+
+    try {
+        // Sanitização do input
+        const msgSanitizada = String(msgUsuario || '')
+            .trim()
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .substring(0, 2000);
+
+        if (!msgSanitizada) {
+            return 'Por favor, envie uma mensagem para continuar.';
+        }
+
+        const apiKey = await obterChaveDaApi();
+        if (!apiKey) {
+            return 'Aviso: Chave da API não configurada ou erro de permissão no Firebase.';
+        }
+
+        // CORREÇÃO: gemini-2.5-flash para geração de texto (suporta contexto longo)
+        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+        // CORREÇÃO PRINCIPAL: constrói o histórico com alternância correta.
+        // NOTA: msgUsuario já foi adicionado ao chatHistoryCliente ANTES desta chamada
+        // (via adicionarAoHistorico em ar-logic.js), portanto está incluso no buildContents.
+        const contents = buildContents(chatHistoryCliente);
+
+        // Segurança adicional: se o array ficou vazio ou não termina em 'user',
+        // adiciona a mensagem atual explicitamente.
+        if (contents.length === 0) {
+            contents.push({ role: 'user', parts: [{ text: msgSanitizada }] });
+        } else if (contents[contents.length - 1].role !== 'user') {
+            contents.push({ role: 'user', parts: [{ text: msgSanitizada }] });
+        }
+
+        const requestBody = {
+            contents,
+            system_instruction: { parts: [{ text: systemPrompt }] }
+        };
+
+        const data = await sendMessageToGemini(MODEL_URL, requestBody);
+
+        let botReply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!botReply) {
+            console.error('[JARVIS][API] Resposta sem conteúdo de texto:', JSON.stringify(data));
+            return 'Desculpe, ocorreu um erro de processamento. Pode repetir?';
+        }
+
+        // CAPTURA DO LEAD (lógica original preservada integralmente)
         const regexLead = /\[LEAD:\s*NOME=([\s\S]*?)\|\s*EMPRESA=([\s\S]*?)\|\s*DORES=([\s\S]*?)\|\s*FACILITOIDE=([\s\S]*?)\|\s*WHATSAPP=([\s\S]*?)\]/i;
         const match = botReply.match(regexLead);
-        
+
         if (match) {
             if (!leadJaCapturado) {
                 const [, nome, empresa, dores, facilitoide, whatsapp] = match;
                 let wppLimpo = whatsapp.replace(/\D/g, '');
-                if (wppLimpo.startsWith('55') && wppLimpo.length > 11) wppLimpo = wppLimpo.substring(2); 
+                if (wppLimpo.startsWith('55') && wppLimpo.length > 11) wppLimpo = wppLimpo.substring(2);
 
                 const novoLeadRef = push(ref(database, 'projetos_capturados'));
-                set(novoLeadRef, {
-                    nome: nome.trim() || "Cliente Indefinido", 
-                    empresa: empresa.trim() || "Não informada",
-                    dores: dores.trim() || "Sem dor detalhada", 
-                    facilitoide: facilitoide.trim() || "Arquitetura pendente.", 
-                    whatsapp: wppLimpo, 
-                    data: new Date().toISOString(), 
-                    devChat: [],
-                    status: 'novo'
+                await set(novoLeadRef, {
+                    nome:        nome.trim()        || 'Cliente Indefinido',
+                    empresa:     empresa.trim()     || 'Não informada',
+                    dores:       dores.trim()       || 'Sem dor detalhada',
+                    facilitoide: facilitoide.trim() || 'Arquitetura pendente.',
+                    whatsapp:    wppLimpo,
+                    data:        new Date().toISOString(),
+                    devChat:     [],
+                    status:      'novo'
                 });
-                leadJaCapturado = true; 
+                leadJaCapturado = true;
+                console.log('[JARVIS][Lead] Lead capturado com sucesso!');
             }
             botReply = botReply.replace(regexLead, '').trim();
         } else if (leadJaCapturado) {
             botReply = botReply.replace(/\[LEAD:.*?\]/gi, '').trim();
         }
+
         return botReply;
-    } catch(e) { 
-        console.error("Falha detalhada de conexão:", e);
-        return "Houve uma falha na conexão. Pode repetir a informação?"; 
+
+    } catch (e) {
+        console.error('[JARVIS] Falha crítica em askGemini:', e.message);
+        return 'Houve uma falha na conexão. Pode repetir a informação?';
+    } finally {
+        // SEMPRE libera o lock, mesmo em caso de erro
+        _geminiLocked = false;
     }
 }
 
 export function adicionarAoHistorico(role, texto) {
-    chatHistoryCliente.push({ role: role, text: texto });
+    chatHistoryCliente.push({ role, text: texto });
 }
 
 // =========================================================================
 // CÉREBRO 2: O ENGENHEIRO SAAS (INJETOR DA VOZ NEURAL DO GEMINI)
 // =========================================================================
-export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, historicoSalvo = [], idProjetoAtivo = "padrao") {
+export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, historicoSalvo = [], idProjetoAtivo = 'padrao') {
     try {
         const apiKey = await obterChaveDaApi();
-        if (!apiKey) return "Configure a chave da API no Painel primeiro.";
+        if (!apiKey) return 'Configure a chave da API no Painel primeiro.';
 
+        // CORREÇÃO: template atualizado para gemini-2.5-flash (único que suporta AUDIO)
         const promptDesenvolvedor = `Você é um Engenheiro de Software Sênior construindo sistemas para a thIAguinho Soluções.
         Projeto atual: ${contextoProjeto}
         ID ÚNICO do Cliente: ${idProjetoAtivo}
@@ -151,7 +286,7 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
 
                 if (!adminApiKey) throw new Error("Chave do Admin não encontrada.");
 
-                const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + adminApiKey;
+                const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + adminApiKey;
                 const payload = {
                     contents: [{ role: "user", parts: [{ text: textoParaFalar }] }],
                     generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } } } }
@@ -159,6 +294,7 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
 
                 const res = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
                 const data = await res.json();
+                if (!res.ok || data.error) throw new Error(data.error?.message || "HTTP " + res.status);
                 const base64Audio = data.candidates[0].content.parts[0].inlineData.data;
 
                 const binaryString = window.atob(base64Audio);
@@ -175,7 +311,7 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
                 source.start();
 
             } catch(e) {
-                console.warn("Falha no Motor Gemini, ativando plano B local: ", e);
+                console.warn("Falha no Motor Gemini TTS, ativando plano B local: ", e.message);
                 const fallback = new SpeechSynthesisUtterance(textoParaFalar);
                 fallback.lang = 'pt-BR';
                 window.speechSynthesis.speak(fallback);
@@ -190,24 +326,43 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
 
         Comece sua resposta avisando o Thiago que o código está pronto e que o motor de Voz Neural do Gemini foi injetado com sucesso.`;
 
-        // CORREÇÃO: Utilizando 1.5-flash
-        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-        const contents = historicoSalvo.map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
-        contents.push({ role: 'user', parts: [{ text: msgAdmin }] });
+        // CORREÇÃO: buildContents aplicado ao histórico do dev também
+        const contents = [];
+        for (const m of historicoSalvo) {
+            const roleApi = m.role === 'user' ? 'user' : 'model';
+            const texto   = String(m.text || '').trim();
+            if (!texto) continue;
+            if (contents.length === 0 || contents[contents.length - 1].role !== roleApi) {
+                contents.push({ role: roleApi, parts: [{ text: texto }] });
+            } else {
+                contents[contents.length - 1].parts.push({ text: texto });
+            }
+        }
 
-        const res = await fetch(MODEL_URL, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: contents, system_instruction: { parts: [{ text: promptDesenvolvedor }] } })
+        // Garante começa com 'user'
+        if (contents.length > 0 && contents[0].role === 'model') {
+            contents.unshift({ role: 'user', parts: [{ text: 'Olá, preciso de ajuda.' }] });
+        }
+
+        // Adiciona a mensagem atual do admin
+        if (contents.length === 0 || contents[contents.length - 1].role !== 'user') {
+            contents.push({ role: 'user', parts: [{ text: msgAdmin }] });
+        } else {
+            contents[contents.length - 1].parts.push({ text: msgAdmin });
+        }
+
+        const data = await sendMessageToGemini(MODEL_URL, {
+            contents,
+            system_instruction: { parts: [{ text: promptDesenvolvedor }] }
         });
-        
-        const data = await res.json();
-        if (data.error) throw new Error(data.error.message);
-        
-        return data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro de processamento da IA.";
 
-    } catch(e) {
-        return "Erro de compilação da IA: " + e.message;
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Erro de processamento da IA.';
+
+    } catch (e) {
+        console.error('[JARVIS][Dev] Erro em conversarComDesenvolvedorIA:', e.message);
+        return 'Erro de compilação da IA: ' + e.message;
     }
 }
 
@@ -217,7 +372,7 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
 export async function analisarEGerarProcessoAIMP(contextoCaotico, nomeVideoAnexado = null) {
     try {
         const apiKey = await obterChaveDaApi();
-        if (!apiKey) throw new Error("Chave da API não encontrada.");
+        if (!apiKey) throw new Error('Chave da API não encontrada.');
 
         let intro = contextoCaotico;
         if (nomeVideoAnexado) {
@@ -252,26 +407,19 @@ export async function analisarEGerarProcessoAIMP(contextoCaotico, nomeVideoAnexa
         
         Seja analítico, inteligente e mostre que a thIAguinho Soluções é capaz de estruturar negócios perfeitamente.`;
 
-        // CORREÇÃO: Utilizando 1.5-flash
-        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-        const res = await fetch(MODEL_URL, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                contents: [{ role: 'user', parts: [{ text: intro }] }], 
-                system_instruction: { parts: [{ text: promptEngenheiroProcessos }] } 
-            })
+        const data = await sendMessageToGemini(MODEL_URL, {
+            contents: [{ role: 'user', parts: [{ text: intro }] }],
+            system_instruction: { parts: [{ text: promptEngenheiroProcessos }] }
         });
-        
-        const data = await res.json();
-        if (data.error) throw new Error(data.error.message);
-        
-        let htmlResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro de geração.";
-        
+
+        let htmlResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Erro de geração.';
         htmlResponse = htmlResponse.replace(/```html/g, '').replace(/```/g, '').trim();
         return htmlResponse;
 
-    } catch(e) {
-        throw new Error("Falha no Cérebro AIMP: " + e.message);
+    } catch (e) {
+        console.error('[JARVIS][AIMP] Erro:', e.message);
+        throw new Error('Falha no Cérebro AIMP: ' + e.message);
     }
 }
