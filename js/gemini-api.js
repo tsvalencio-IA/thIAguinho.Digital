@@ -44,29 +44,29 @@ async function obterChaveDaApi() {
             chaveApiArmazenada = snapshot.val();
             return chaveApiArmazenada;
         }
-    } catch (e) { console.error("Erro Firebase:", e); }
+    } catch (e) { console.error("Erro ao resgatar chave no Firebase:", e); }
     return null;
 }
 
 export async function askGemini(msgUsuario) {
     try {
         const apiKey = await obterChaveDaApi();
-        if (!apiKey) return "Aviso: Chave da API não configurada no painel.";
+        if (!apiKey) return "Aviso: Chave da API não configurada ou erro de permissão no Firebase.";
 
         const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
-        // CONSTRUÇÃO DO PAYLOAD COM BLINDAGEM DE ESTRUTURA
+        // LIMPEZA E FORMATAÇÃO DO HISTÓRICO PARA EVITAR ERRO 400
         let contents = [];
         
-        // REGRA 1: Começar sempre com 'user' para evitar erro 400.
-        // Injetamos um gatilho inicial caso o histórico comece com a IA.
-        contents.push({ role: 'user', parts: [{ text: "Olá! Gostaria de uma consultoria da thIAguinho Soluções." }] });
+        // A API EXIGE que o histórico comece com 'user'.
+        // Injetamos um gatilho de início caso o histórico comece com a fala do robô.
+        contents.push({ role: 'user', parts: [{ text: "Olá, gostaria de uma consultoria." }] });
 
         chatHistoryCliente.forEach(m => {
             const roleApi = (m.role === 'user' || m.role === 'admin') ? 'user' : 'model';
             
-            // REGRA 2: Alternância obrigatória. Não adiciona se o papel for igual ao anterior.
-            if (contents[contents.length - 1].role !== roleApi) {
+            // Só adiciona se o papel for diferente do último (Alternância Obrigatória)
+            if (contents.length === 0 || contents[contents.length - 1].role !== roleApi) {
                 contents.push({ role: roleApi, parts: [{ text: m.text }] });
             }
         });
@@ -76,7 +76,7 @@ export async function askGemini(msgUsuario) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 contents: contents, 
-                systemInstruction: { parts: [{ text: systemPrompt }] } 
+                system_instruction: { parts: [{ text: systemPrompt }] } 
             })
         });
         
@@ -113,7 +113,7 @@ export async function askGemini(msgUsuario) {
         }
         return botReply;
     } catch(e) { 
-        console.error("Erro técnico Gemini:", e);
+        console.error("Falha detalhada de conexão:", e);
         return "Houve uma falha na conexão. Pode repetir a informação?"; 
     }
 }
@@ -199,7 +199,7 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
 
         const res = await fetch(MODEL_URL, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: contents, systemInstruction: { parts: [{ text: promptDesenvolvedor }] } })
+            body: JSON.stringify({ contents: contents, system_instruction: { parts: [{ text: promptDesenvolvedor }] } })
         });
         
         const data = await res.json();
@@ -259,7 +259,7 @@ export async function analisarEGerarProcessoAIMP(contextoCaotico, nomeVideoAnexa
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 contents: [{ role: 'user', parts: [{ text: intro }] }], 
-                systemInstruction: { parts: [{ text: promptEngenheiroProcessos }] } 
+                system_instruction: { parts: [{ text: promptEngenheiroProcessos }] } 
             })
         });
         
