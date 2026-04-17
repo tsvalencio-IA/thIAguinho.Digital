@@ -72,9 +72,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const apiKey = snapKey.val();
                 const voiceName = snapVoice.exists() ? snapVoice.val() : "Aoede";
                 
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                // CORREÇÃO: Utilizando 1.5-flash (O único que suporta AUDIO para sua chave)
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
                 const payload = {
-                    contents: [{ role: "user", parts: [{ text: textoVoz }] }], // Obrigatório iniciar com user
+                    contents: [{ role: "user", parts: [{ text: textoVoz }] }], 
                     generationConfig: {
                         responseModalities: ["AUDIO"],
                         speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } } }
