@@ -53,25 +53,30 @@ export async function askGemini(msgUsuario) {
         const apiKey = await obterChaveDaApi();
         if (!apiKey) return "Aviso: Chave da API não configurada no painel.";
 
-        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
+        // CONSTRUÇÃO BLINDADA DO HISTÓRICO (Alternância de Roles e Início com User)
         let contents = [];
         
-        // BLINDAGEM DA API DO GOOGLE:
-        // A API recusa a conexão (Erro 400) se a conversa não começar com o 'user'.
-        // Como o bot é quem começa a falar no nosso UI, injetamos um 'Oi' oculto aqui.
-        if (chatHistoryCliente.length > 0 && chatHistoryCliente[0].role !== 'user') {
-            contents.push({ role: 'user', parts: [{ text: 'Iniciar atendimento.' }] });
-        }
-
-        // Mapeia o resto do histórico real
+        // A API exige que a conversa comece com 'user'. Injetamos um gatilho inicial.
+        contents.push({ role: 'user', parts: [{ text: "Olá, gostaria de iniciar a consultoria." }] });
+        
         chatHistoryCliente.forEach(m => {
-            contents.push({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] });
+            const roleApi = (m.role === 'user' || m.role === 'admin') ? 'user' : 'model';
+            
+            // Só adiciona ao payload se o role for diferente do último (evita erro 400 de repetição)
+            if (contents[contents.length - 1].role !== roleApi) {
+                contents.push({ role: roleApi, parts: [{ text: m.text }] });
+            }
         });
 
         const res = await fetch(MODEL_URL, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: contents, systemInstruction: { parts: [{ text: systemPrompt }] } })
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                contents: contents, 
+                system_instruction: { parts: [{ text: systemPrompt }] } 
+            })
         });
         
         const data = await res.json();
@@ -107,7 +112,7 @@ export async function askGemini(msgUsuario) {
         }
         return botReply;
     } catch(e) { 
-        console.error("Falha detalhada de conexão:", e);
+        console.error("Erro na Chamada Gemini:", e);
         return "Houve uma falha na conexão. Pode repetir a informação?"; 
     }
 }
@@ -147,7 +152,7 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
 
                 if (!adminApiKey) throw new Error("Chave do Admin não encontrada.");
 
-                const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + adminApiKey;
+                const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + adminApiKey;
                 const payload = {
                     contents: [{ role: "user", parts: [{ text: textoParaFalar }] }],
                     generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } } } }
@@ -186,14 +191,14 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
 
         Comece sua resposta avisando o Thiago que o código está pronto e que o motor de Voz Neural do Gemini foi injetado com sucesso.`;
 
-        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
         const contents = historicoSalvo.map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
         contents.push({ role: 'user', parts: [{ text: msgAdmin }] });
 
         const res = await fetch(MODEL_URL, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: contents, systemInstruction: { parts: [{ text: promptDesenvolvedor }] } })
+            body: JSON.stringify({ contents: contents, system_instruction: { parts: [{ text: promptDesenvolvedor }] } })
         });
         
         const data = await res.json();
@@ -247,13 +252,13 @@ export async function analisarEGerarProcessoAIMP(contextoCaotico, nomeVideoAnexa
         
         Seja analítico, inteligente e mostre que a thIAguinho Soluções é capaz de estruturar negócios perfeitamente.`;
 
-        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
         const res = await fetch(MODEL_URL, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 contents: [{ role: 'user', parts: [{ text: intro }] }], 
-                systemInstruction: { parts: [{ text: promptEngenheiroProcessos }] } 
+                system_instruction: { parts: [{ text: promptEngenheiroProcessos }] } 
             })
         });
         
@@ -262,7 +267,6 @@ export async function analisarEGerarProcessoAIMP(contextoCaotico, nomeVideoAnexa
         
         let htmlResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro de geração.";
         
-        // Remove markdown tags if the AI accidentally adds them
         htmlResponse = htmlResponse.replace(/```html/g, '').replace(/```/g, '').trim();
         return htmlResponse;
 
