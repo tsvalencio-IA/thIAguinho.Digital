@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
                 const payload = {
-                    contents: [{ parts: [{ text: textoVoz }] }],
+                    contents: [{ role: "user", parts: [{ text: textoVoz }] }], // Definindo explicitamente o role user aqui também
                     generationConfig: {
                         responseModalities: ["AUDIO"],
                         speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } } }
