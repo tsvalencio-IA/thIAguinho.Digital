@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (globalAudioCtx.state === 'suspended') {
             globalAudioCtx.resume();
         }
+        // Cria e toca um "som mudo" de 1 milissegundo. Isso força o celular a liberar o alto-falante para a nossa IA.
         const buffer = globalAudioCtx.createBuffer(1, 1, 22050);
         const source = globalAudioCtx.createBufferSource();
         source.buffer = buffer;
@@ -36,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     document.getElementById('btn-start').addEventListener('click', () => {
-        unlockAudio(); 
+        unlockAudio(); // Destranca no clique inicial
         
         startScreen.classList.add('hidden');
         uiLayer.classList.remove('hidden');
@@ -62,6 +63,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         let textoVoz = texto.replace(/\[OPCOES:.*?\]/i, '').replace(/\*\*/g, '');
         if(!textoVoz.trim()) return;
 
+        // BLINDAGEM CONTRA "MILHÕES/BILHÕES": Qualquer número com 5+ dígitos é fatiado com espaços para ser lido dígito por dígito.
         textoVoz = textoVoz.replace(/\d{5,}/g, match => match.split('').join(' '));
 
         try {
@@ -72,9 +74,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const apiKey = snapKey.val();
                 const voiceName = snapVoice.exists() ? snapVoice.val() : "Aoede";
                 
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
                 const payload = {
-                    contents: [{ role: "user", parts: [{ text: textoVoz }] }], // Role User obrigatório
+                    contents: [{ parts: [{ text: textoVoz }] }],
                     generationConfig: {
                         responseModalities: ["AUDIO"],
                         speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } } }
@@ -104,13 +106,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     audioAtual.buffer = audioBuffer;
                     audioAtual.connect(globalAudioCtx.destination);
                     audioAtual.start();
-                    return; 
+                    return; // Sucesso com a Voz do Gemini!
                 }
             }
         } catch (error) {
-            console.error("Falha Motor Gemini:", error);
+            console.error("Falha fatal no Motor Gemini, ativando plano B local: ", error);
         }
 
+        // Fallback: Apenas em último caso extremo de falta de internet
         const utterance = new SpeechSynthesisUtterance(textoVoz);
         utterance.lang = 'pt-BR';
         window.speechSynthesis.speak(utterance);
@@ -121,19 +124,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         const recognition = new SpeechRecognition();
         recognition.lang = 'pt-BR';
         btnMic.addEventListener('click', () => {
-            unlockAudio(); 
+            unlockAudio(); // Garante liberação
             if (isProcessing) return; 
             if (btnMic.classList.contains('listening')) { 
                 recognition.stop(); 
                 btnMic.classList.remove('listening'); 
+                userInput.placeholder = "Digite ou escolha uma opção..."; 
             } else { 
                 recognition.start(); 
                 btnMic.classList.add('listening'); 
+                userInput.placeholder = "Ouvindo..."; 
             }
         });
         recognition.onresult = (e) => {
             userInput.value = e.results[0][0].transcript;
             btnMic.classList.remove('listening');
+            userInput.placeholder = "Digite ou escolha uma opção..."; 
             enviarMensagemDigitada(); 
         };
     } else {
@@ -151,6 +157,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function processarEExibirMensagemBot(respostaCompleta) {
         const regexOpcoes = /\[OPCOES:\s*(.*?)\]/i;
         const match = respostaCompleta.match(regexOpcoes);
+        
         let textoLimpo = respostaCompleta.replace(regexOpcoes, '').trim();
         
         addMsgVisual('bot', textoLimpo);
@@ -176,12 +183,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             btn.className = 'btn-opcao';
             btn.innerText = opcaoText;
             btn.onclick = (event) => {
-                unlockAudio(); 
-                if(isProcessing) return;
+                unlockAudio(); // Garante liberação
+                if(isProcessing) { event.preventDefault(); return; }
                 isProcessing = true; 
                 container.style.opacity = '0.5';
                 container.style.pointerEvents = 'none'; 
-                enviarMensagemClicada(opcaoText);
+                setTimeout(() => { enviarMensagemClicada(opcaoText); }, 50); 
             };
             container.appendChild(btn);
         });
@@ -199,7 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function enviarMensagemDigitada() {
-        unlockAudio(); 
+        unlockAudio(); // Garante liberação
         if(isProcessing) return;
         const msg = userInput.value.trim();
         if (!msg) return;
@@ -222,7 +229,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const ind = document.createElement('div');
         ind.className = "text-xs text-slate-400 mt-1 mb-3 text-center font-bold";
         ind.id = "digitando"; 
-        ind.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Construindo arquitetura...";
+        ind.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Construindo a arquitetura técnica...";
         chatDisplay.appendChild(ind);
         chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
