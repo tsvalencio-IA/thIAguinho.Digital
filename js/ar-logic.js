@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     document.getElementById('btn-start').addEventListener('click', () => {
-        unlockAudio(); 
+        unlockAudio(); // Destranca no clique inicial
         
         startScreen.classList.add('hidden');
         uiLayer.classList.remove('hidden');
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
                 const payload = {
-                    contents: [{ role: "user", parts: [{ text: textoVoz }] }], // Role User exigido pela API
+                    contents: [{ role: "user", parts: [{ text: textoVoz }] }], // Obrigatório iniciar com user
                     generationConfig: {
                         responseModalities: ["AUDIO"],
                         speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } } }
