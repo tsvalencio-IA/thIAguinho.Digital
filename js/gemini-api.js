@@ -53,10 +53,9 @@ export async function askGemini(msgUsuario) {
         const apiKey = await obterChaveDaApi();
         if (!apiKey) return "Aviso: Chave da API não configurada no painel.";
 
-        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
-        // CORREÇÃO APLICADA AQUI: O ar-logic.js já insere a msg no histórico global.
-        // Mapeamos o array existente. A inserção duplicada foi removida.
+        // Mapeando o array existente para respeitar a estrutura user/model alternada
         const contents = chatHistoryCliente.map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
 
         const res = await fetch(MODEL_URL, {
@@ -134,7 +133,7 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
 
                 if (!adminApiKey) throw new Error("Chave do Admin não encontrada.");
 
-                const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + adminApiKey;
+                const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + adminApiKey;
                 const payload = {
                     contents: [{ parts: [{ text: textoParaFalar }] }],
                     generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } } } }
@@ -173,7 +172,7 @@ export async function conversarComDesenvolvedorIA(msgAdmin, contextoProjeto, his
 
         Comece sua resposta avisando o Thiago que o código está pronto e que o motor de Voz Neural do Gemini foi injetado com sucesso.`;
 
-        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
         const contents = historicoSalvo.map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
         contents.push({ role: 'user', parts: [{ text: msgAdmin }] });
@@ -234,7 +233,7 @@ export async function analisarEGerarProcessoAIMP(contextoCaotico, nomeVideoAnexa
         
         Seja analítico, inteligente e mostre que a thIAguinho Soluções é capaz de estruturar negócios perfeitamente.`;
 
-        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
         const res = await fetch(MODEL_URL, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
