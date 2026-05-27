@@ -2,33 +2,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Briefing — Gincana da Copa | Tênis One</title>
+  <title>Formulário — Gincana da Copa | Tênis One</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root {
-      --bg: #f3f7f4;
+      --bg: #f4f8f5;
       --card: #ffffff;
       --text: #102018;
-      --muted: #607268;
+      --muted: #66766d;
       --line: #dce7df;
-      --green: #096b3d;
+      --green: #08643a;
       --green-2: #0e8f56;
-      --blue: #153e90;
+      --blue: #143f91;
       --yellow: #f5c542;
+      --orange: #f28c28;
       --soft: #edf8f1;
       --soft-blue: #eef4ff;
       --danger: #fff1f1;
-      --radius: 20px;
-      --shadow: 0 14px 42px rgba(7, 45, 24, 0.10);
+      --radius: 22px;
+      --shadow: 0 16px 46px rgba(7, 45, 24, 0.11);
     }* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at 12% 0%, rgba(245,197,66,.35), transparent 24%),
-    radial-gradient(circle at 86% 4%, rgba(21,62,144,.16), transparent 28%),
+    radial-gradient(circle at 12% 0%, rgba(245,197,66,.36), transparent 24%),
+    radial-gradient(circle at 90% 4%, rgba(20,63,145,.16), transparent 30%),
     linear-gradient(180deg, #eaf7ee 0%, var(--bg) 42%);
   line-height: 1.45;
 }
@@ -38,22 +41,28 @@ header, main, footer {
   margin: 0 auto;
 }
 
-header { padding: 30px 0 16px; }
+header { padding: 28px 0 14px; }
 
-.hero, .card {
+.hero, .card, .side-card {
   background: rgba(255,255,255,.96);
   border: 1px solid var(--line);
-  border-radius: 26px;
+  border-radius: 28px;
   box-shadow: var(--shadow);
 }
 
-.hero { padding: 28px; overflow: hidden; position: relative; }
+.hero {
+  padding: 30px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(9,107,61,.16);
+}
+
 .hero::after {
   content: "⚽";
   position: absolute;
-  right: 24px;
-  top: 18px;
-  font-size: 82px;
+  right: 28px;
+  top: 22px;
+  font-size: 96px;
   opacity: .10;
   transform: rotate(-12deg);
 }
@@ -67,24 +76,41 @@ header { padding: 30px 0 16px; }
   background: #fff8db;
   color: #755600;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 900;
   margin-bottom: 14px;
+  border: 1px solid rgba(245,197,66,.45);
 }
 
 h1 {
   margin: 0 0 10px;
-  font-size: clamp(29px, 4vw, 48px);
+  max-width: 880px;
+  font-size: clamp(30px, 4vw, 50px);
   line-height: 1.04;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.045em;
   color: var(--green);
 }
 
 .subtitle {
   margin: 0;
-  max-width: 900px;
+  max-width: 870px;
   color: var(--muted);
-  font-size: 16px;
+  font-size: 17px;
 }
+
+.client-callout {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: center;
+  background: linear-gradient(135deg, #f7fff9, #fff8db);
+  border: 1px solid #d9eccf;
+  border-radius: 20px;
+  padding: 16px;
+}
+
+.client-callout strong { color: var(--green); }
+.client-callout p { margin: 0; color: var(--muted); font-size: 14px; }
 
 .toolbar {
   display: flex;
@@ -97,9 +123,10 @@ button {
   border: 0;
   border-radius: 14px;
   padding: 12px 15px;
-  font-weight: 800;
+  font-weight: 900;
   cursor: pointer;
   transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+  font-family: inherit;
 }
 button:hover { transform: translateY(-1px); }
 button:active { transform: translateY(0); opacity: .82; }
@@ -107,6 +134,7 @@ button:active { transform: translateY(0); opacity: .82; }
 .btn-primary { background: var(--green); color: white; box-shadow: 0 10px 20px rgba(9,107,61,.20); }
 .btn-blue { background: var(--blue); color: white; box-shadow: 0 10px 20px rgba(21,62,144,.17); }
 .btn-yellow { background: var(--yellow); color: #3f3100; }
+.btn-orange { background: var(--orange); color: white; }
 .btn-light { background: var(--soft); color: var(--green); border: 1px solid #cbe6d4; }
 .btn-outline { background: white; color: var(--text); border: 1px solid var(--line); }
 .btn-danger { background: var(--danger); color: #9b1c1c; }
@@ -120,7 +148,7 @@ button:active { transform: translateY(0); opacity: .82; }
   background: #ecfdf3;
   border: 1px solid #bfe8cd;
   color: #14532d;
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .progress-wrap {
@@ -129,39 +157,68 @@ button:active { transform: translateY(0); opacity: .82; }
   z-index: 10;
   margin: 0 calc((100vw - min(1180px, calc(100vw - 32px))) / -2);
   padding: 10px calc((100vw - min(1180px, calc(100vw - 32px))) / 2);
-  background: rgba(243,247,244,.88);
+  background: rgba(244,248,245,.92);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(220,231,223,.8);
+  border-bottom: 1px solid rgba(220,231,223,.88);
 }
 
-.progress-label { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; font-weight: 800; }
+.progress-label { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; font-weight: 900; }
 .progress-bar { height: 10px; border-radius: 999px; background: #dce8df; overflow: hidden; margin-top: 7px; }
 .progress-fill { height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, var(--green), var(--yellow), var(--blue)); transition: width .18s ease; }
 
 main { padding: 16px 0 38px; }
+
+.layout {
+  display: grid;
+  grid-template-columns: 270px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.side-card {
+  position: sticky;
+  top: 70px;
+  padding: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.side-card h3 { margin: 0 0 6px; font-size: 16px; color: var(--green); }
+.nav-link {
+  display: block;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 13.5px;
+  font-weight: 800;
+  padding: 9px 10px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+}
+.nav-link:hover { background: var(--soft); border-color: #cbe6d4; }
+
 form { display: grid; gap: 18px; }
-.card { padding: 24px; }
+.card { padding: 24px; scroll-margin-top: 86px; }
 
 .section-head { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 18px; }
 .number {
   flex: 0 0 auto;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   display: grid;
   place-items: center;
-  border-radius: 13px;
+  border-radius: 14px;
   background: #fff8db;
   color: #6d5200;
   font-weight: 900;
 }
-h2 { margin: 0; font-size: 22px; letter-spacing: -0.02em; }
+h2 { margin: 0; font-size: 23px; letter-spacing: -0.02em; }
 .section-desc { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
 
 .grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
 .full { grid-column: 1 / -1; }
 
-label, .field-label { display: grid; gap: 7px; font-size: 14px; font-weight: 800; }
+label, .field-label { display: grid; gap: 7px; font-size: 14px; font-weight: 900; }
 input, select, textarea {
   width: 100%;
   border: 1px solid var(--line);
@@ -175,7 +232,8 @@ input, select, textarea {
 textarea { min-height: 96px; resize: vertical; }
 input:focus, select:focus, textarea:focus { border-color: var(--green-2); box-shadow: 0 0 0 4px rgba(14,143,86,.10); }
 
-.hint { color: var(--muted); font-size: 12.5px; font-weight: 400; }
+.required::after { content: " *"; color: #b42318; }
+.hint { color: var(--muted); font-size: 12.5px; font-weight: 500; }
 .note, .suggestion {
   border-radius: 15px;
   padding: 13px 14px;
@@ -186,11 +244,14 @@ input:focus, select:focus, textarea:focus { border-color: var(--green-2); box-sh
 .suggestion { background: #fff8db; border: 1px solid #efd77b; color: #664c00; margin: 14px 0 0; }
 
 .checks { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
-.check { display: flex; gap: 9px; align-items: flex-start; padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: white; font-weight: 500; }
+.check { display: flex; gap: 9px; align-items: flex-start; padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: white; font-weight: 600; }
 .check input { width: auto; margin-top: 2px; accent-color: var(--green); }
 
 .mini-title { font-weight: 900; color: var(--green); margin: 10px 0 10px; }
 .divider { height: 1px; background: var(--line); margin: 18px 0; }
+
+.pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.pill { font-size: 12px; font-weight: 900; background: var(--soft); color: var(--green); padding: 7px 10px; border-radius: 999px; border: 1px solid #cbe6d4; }
 
 .levels {
   display: grid;
@@ -236,19 +297,37 @@ canvas#stickerCanvas {
 .sticker-actions { display: flex; gap: 6px; padding: 8px; }
 .sticker-actions button { flex: 1; }
 
+.summary-box {
+  display: grid;
+  gap: 10px;
+  background: linear-gradient(135deg, #f7fff9, #eef4ff);
+  border: 1px solid #d2e5da;
+  border-radius: 18px;
+  padding: 16px;
+  margin-top: 14px;
+}
+.summary-box strong { color: var(--green); }
+#missingList { margin: 0; padding-left: 18px; color: #7a271a; }
+
 footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
 
+@media (max-width: 980px) {
+  .layout { grid-template-columns: 1fr; }
+  .side-card { position: relative; top: auto; }
+}
+
 @media (max-width: 850px) {
-  .grid, .grid-3, .checks, .levels, .sticker-studio { grid-template-columns: 1fr; }
+  .grid, .grid-3, .checks, .levels, .sticker-studio, .client-callout { grid-template-columns: 1fr; }
   .hero, .card { padding: 20px; }
   .toolbar button { width: 100%; }
   .hero::after { display: none; }
 }
 
 @media print {
-  .toolbar, .progress-wrap, .sticker-actions { display: none !important; }
+  .toolbar, .progress-wrap, .side-card, .sticker-actions { display: none !important; }
   body { background: white; }
   .hero, .card { box-shadow: none; }
+  .layout { grid-template-columns: 1fr; }
 }
 
   </style>
@@ -256,405 +335,423 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
 <body>
   <header>
     <div class="hero">
-      <div class="badge">⚽ Briefing + gincana + figurinhas da Copa</div>
-      <h1>Briefing — Sistema de Competição de Vendas Tênis One</h1>
+      <div class="badge">⚽ Formulário oficial da gincana de vendas</div>
+      <h1>Saulo, preencha as informações da Gincana da Copa Tênis One</h1>
       <p class="subtitle">
-        Roteiro para entrevistar o Saulo e levantar todas as regras da gincana de vendas no período da Copa do Mundo: administradores, vendedores, produtos, pontuação, ranking, prêmios, telas, relatórios e álbum de figurinhas dos vendedores.
+        Responda este formulário com as regras da campanha, os participantes, os produtos, a pontuação, os prêmios e as telas que você imagina para o sistema. No final, clique em <strong>Gerar PDF</strong> e envie o arquivo para a thIAguinho Soluções.
       </p>
+      <div class="client-callout">
+        <div>
+          <strong>Importante:</strong>
+          <p>Não precisa responder perfeito. Quando não tiver certeza, marque “A confirmar” ou escreva sua dúvida no campo de observações.</p>
+        </div>
+        <span class="pill">Salva automaticamente neste navegador</span>
+      </div>
       <div class="toolbar">
-        <button type="button" class="btn-primary" onclick="generatePDF()">Gerar PDF do briefing</button>
-        <button type="button" class="btn-yellow" onclick="saveDraft()">Salvar local stage</button>
-        <button type="button" class="btn-light" onclick="loadDraft(true)">Carregar local stage</button>
+        <button type="button" class="btn-primary" onclick="generatePDF()">Gerar PDF para enviar</button>
+        <button type="button" class="btn-yellow" onclick="saveDraft(true)">Salvar agora</button>
+        <button type="button" class="btn-light" onclick="loadDraft(true)">Carregar salvo</button>
         <button type="button" class="btn-blue" onclick="window.print()">Imprimir / salvar PDF</button>
-        <button type="button" class="btn-outline" onclick="downloadJSON()">Exportar JSON</button>
-        <button type="button" class="btn-danger" onclick="clearAll()">Limpar tudo</button>
+        <button type="button" class="btn-outline" onclick="downloadJSON()">Baixar respostas em JSON</button>
+        <button type="button" class="btn-danger" onclick="clearAll()">Limpar formulário</button>
       </div>
       <div id="status" class="status"></div>
     </div>
   </header>  <main>
     <div class="progress-wrap">
       <div class="progress-label">
-        <span>Preenchimento do briefing</span>
+        <span>Preenchimento do formulário</span>
         <span id="progressText">0%</span>
       </div>
       <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
-    </div><form id="briefingForm">
-  <section class="card" data-title="1. Identificação">
-    <div class="section-head">
-      <div class="number">1</div>
-      <div>
-        <h2>Identificação do cliente e da loja</h2>
-        <p class="section-desc">Quem pediu, qual loja participa e quem aprova a regra final.</p>
-      </div>
-    </div>
-    <div class="grid">
-      <label>Nome do entrevistado
-        <input name="cliente_nome" value="Saulo" placeholder="Ex.: Saulo" />
-      </label>
-      <label>Cargo
-        <input name="cliente_cargo" value="Gerente da loja" placeholder="Ex.: Gerente da loja" />
-      </label>
-      <label>Franquia / empresa
-        <input name="empresa" value="Tênis One" placeholder="Ex.: Tênis One" />
-      </label>
-      <label>Unidade / shopping
-        <input name="unidade" placeholder="Ex.: Shopping, cidade, número da loja" />
-      </label>
-      <label>Data da entrevista
-        <input type="date" name="data_entrevista" />
-      </label>
-      <label>Responsável pelo briefing
-        <input name="responsavel_briefing" placeholder="Ex.: thIAguinho Soluções" />
-      </label>
-      <label class="full">Quem aprova mudanças de regra?
-        <input name="aprovador_regra" placeholder="Ex.: Saulo, franqueado, gerente regional, matriz" />
-        <span class="hint">Isso evita alteração de regra depois do sistema pronto.</span>
-      </label>
-    </div>
-  </section>
+    </div><div class="layout">
+  <aside class="side-card">
+    <h3>Ir para a seção</h3>
+    <a class="nav-link" href="#dados">1. Dados iniciais</a>
+    <a class="nav-link" href="#campanha">2. Campanha</a>
+    <a class="nav-link" href="#participantes">3. Participantes</a>
+    <a class="nav-link" href="#figurinhas">4. Figurinhas</a>
+    <a class="nav-link" href="#produtos">5. Produtos e pontos</a>
+    <a class="nav-link" href="#vendas">6. Lançamentos</a>
+    <a class="nav-link" href="#acessos">7. Acessos</a>
+    <a class="nav-link" href="#ranking">8. Ranking</a>
+    <a class="nav-link" href="#premios">9. Prêmios</a>
+    <a class="nav-link" href="#sistema">10. Sistema</a>
+    <a class="nav-link" href="#finalizacao">11. Finalização</a>
+  </aside>
 
-  <section class="card" data-title="2. Contexto e dor">
-    <div class="section-head">
-      <div class="number">2</div>
-      <div>
-        <h2>Contexto atual e dor real</h2>
-        <p class="section-desc">Antes de escolher ferramenta, entenda processo, gargalo e risco de confusão.</p>
-      </div>
-    </div>
-    <div class="note">O WhatsApp, a planilha ou o sistema não são o problema sozinhos. O problema geralmente é falta de esteira, dono da etapa, regra clara e visibilidade do ranking.</div>
-    <div class="grid">
-      <label class="full">Como as vendas são registradas hoje?
-        <textarea name="como_registra_vendas" placeholder="Sistema da franquia, planilha, ERP, maquininha, relatório diário, anotação manual..."></textarea>
-      </label>
-      <label class="full">Qual problema o Saulo quer resolver com essa gincana digital?
-        <textarea name="dor_principal" placeholder="Engajar vendedores, evitar conferência manual, dar transparência, reduzir erro, apurar vencedores..."></textarea>
-      </label>
-      <label class="full">O que pode gerar discussão entre vendedores?
-        <textarea name="pontos_confusao" placeholder="Venda lançada errada, troca, devolução, produto sem pontuação, vendedor contestando ranking..."></textarea>
-      </label>
-      <label class="full">Qual seria o resultado ideal ao final da Copa?
-        <textarea name="resultado_ideal" placeholder="Ranking confiável, vendedores motivados, premiação clara, relatório final, histórico da campanha..."></textarea>
-      </label>
-    </div>
-  </section>
-
-  <section class="card" data-title="3. Tema Copa do Mundo">
-    <div class="section-head">
-      <div class="number">3</div>
-      <div>
-        <h2>Tema Copa do Mundo e conceito da gincana</h2>
-        <p class="section-desc">Aqui a campanha deixa de ser só ranking e vira experiência para a equipe.</p>
-      </div>
-    </div>
-    <div class="grid-3">
-      <label>Nome da gincana
-        <input name="nome_gincana" placeholder="Ex.: Copa Tênis One de Vendas" />
-      </label>
-      <label>Data de início
-        <input type="date" name="data_inicio" />
-      </label>
-      <label>Data de término
-        <input type="date" name="data_fim" />
-      </label>
-    </div>
-    <div class="grid">
-      <label>Formato da competição
-        <select name="tipo_competicao">
-          <option value="">Selecione</option>
-          <option>Individual por vendedor</option>
-          <option>Por seleções/equipes internas</option>
-          <option>Individual + seleções/equipes</option>
-          <option>Por meta diária</option>
-          <option>Por rodadas da Copa</option>
-          <option>Modelo misto</option>
-        </select>
-      </label>
-      <label>Identidade visual desejada
-        <select name="identidade_visual">
-          <option value="">Selecione</option>
-          <option>Brasil / verde e amarelo</option>
-          <option>Copa do Mundo genérica</option>
-          <option>Álbum de figurinhas</option>
-          <option>Estádio / placar</option>
-          <option>Seleções por equipe</option>
-          <option>A confirmar</option>
-        </select>
-      </label>
-      <label class="full">Regras especiais em dias de jogos
-        <textarea name="regras_dias_jogos" placeholder="Ex.: pontuação dobrada em jogos do Brasil, bônus em dia de jogo, desafio relâmpago, venda de produto de futebol vale mais..."></textarea>
-      </label>
-      <label class="full">Slogan ou frase da campanha
-        <input name="slogan_campanha" placeholder="Ex.: Quem vende mais, levanta a taça!" />
-      </label>
-    </div>
-    <div class="suggestion">Sugestão: usar uma linguagem de Copa sem depender de marca oficial. Ex.: taça, estádio, seleção da loja, artilheiro de vendas, craque da rodada e álbum dos vendedores.</div>
-  </section>
-
-  <section class="card" data-title="4. Participantes e álbum de figurinhas">
-    <div class="section-head">
-      <div class="number">4</div>
-      <div>
-        <h2>Participantes e álbum de figurinhas</h2>
-        <p class="section-desc">Cadastre vendedores e gere figurinhas temáticas para engajar a equipe.</p>
-      </div>
-    </div>
-    <div class="grid-3">
-      <label>Quantidade de vendedores
-        <input type="number" min="0" name="qtd_vendedores" placeholder="Ex.: 8" />
-      </label>
-      <label>Terá vendedores temporários?
-        <select name="vendedor_temporario"><option value="">Selecione</option><option>Sim</option><option>Não</option><option>A confirmar</option></select>
-      </label>
-      <label>Terá equipes/seleções?
-        <select name="tera_equipes"><option value="">Selecione</option><option>Sim</option><option>Não</option><option>A confirmar</option></select>
-      </label>
-    </div>
-    <div class="grid">
-      <label class="full">Lista inicial de vendedores
-        <textarea name="lista_vendedores" placeholder="Nome, apelido, turno, equipe/seleção, telefone/e-mail, status ativo/inativo."></textarea>
-      </label>
-      <label class="full">Regras diferentes por vendedor
-        <textarea name="regra_vendedor_diferente" placeholder="Ex.: gerente não participa, temporário participa parcialmente, caixa também vende, vendedor de meio período..."></textarea>
-      </label>
-    </div>
-
-    <div class="divider"></div>
-    <div class="mini-title">Estúdio de figurinhas da Copa</div>
-    <div class="note">As fotos ficam salvas no navegador em localStorage após clicar em “Salvar local stage”. Evite fotos muito pesadas para não estourar o limite do navegador.</div>
-
-    <div class="sticker-studio">
-      <div class="grid">
-        <label>Foto do vendedor
-          <input type="file" id="stickerPhoto" accept="image/*" />
-        </label>
-        <label>Nome na figurinha
-          <input id="stickerName" placeholder="Ex.: João" />
-        </label>
-        <label>Apelido / título
-          <input id="stickerNickname" placeholder="Ex.: Artilheiro do Caixa" />
-        </label>
-        <label>Seleção / equipe
-          <input id="stickerTeam" placeholder="Ex.: Seleção Verde" />
-        </label>
-        <label>Posição na gincana
-          <select id="stickerPosition">
-            <option>Craque de vendas</option>
-            <option>Artilheiro</option>
-            <option>Capitão</option>
-            <option>Camisa 10</option>
-            <option>Defesa contra cancelamentos</option>
-            <option>Garçom dos combos</option>
-          </select>
-        </label>
-        <label>Frase da figurinha
-          <input id="stickerPhrase" placeholder="Ex.: Rumo à taça da Tênis One" />
-        </label>
-        <div class="full toolbar" style="margin-top:0">
-          <button type="button" class="btn-blue" onclick="previewSticker()">Pré-visualizar figurinha</button>
-          <button type="button" class="btn-primary" onclick="addStickerToAlbum()">Adicionar ao álbum</button>
+  <form id="briefingForm">
+    <section class="card" id="dados" data-title="1. Dados iniciais">
+      <div class="section-head">
+        <div class="number">1</div>
+        <div>
+          <h2>Dados iniciais</h2>
+          <p class="section-desc">Informe os dados principais da loja e da pessoa responsável pelas decisões.</p>
         </div>
       </div>
-      <div class="sticker-preview-wrap">
-        <canvas id="stickerCanvas" width="800" height="1000"></canvas>
-        <button type="button" class="btn-yellow" onclick="downloadCurrentSticker()">Baixar figurinha atual PNG</button>
+      <div class="grid">
+        <label><span class="required">Seu nome</span>
+          <input name="cliente_nome" value="Saulo" data-required="true" placeholder="Ex.: Saulo" />
+        </label>
+        <label><span class="required">Seu cargo</span>
+          <input name="cliente_cargo" value="Gerente da loja" data-required="true" placeholder="Ex.: Gerente da loja" />
+        </label>
+        <label><span class="required">Nome da franquia / empresa</span>
+          <input name="empresa" value="Tênis One" data-required="true" placeholder="Ex.: Tênis One" />
+        </label>
+        <label><span class="required">Unidade / shopping</span>
+          <input name="unidade" data-required="true" placeholder="Ex.: Shopping, cidade, número da loja" />
+        </label>
+        <label>Data do preenchimento
+          <input type="date" name="data_entrevista" />
+        </label>
+        <label>Quem mais decide sobre a campanha?
+          <input name="aprovador_regra" placeholder="Ex.: franqueado, gerente regional, matriz ou somente Saulo" />
+        </label>
+        <label class="full">Existe alguma regra da franquia que o sistema precisa respeitar?</label>
+        <textarea name="regras_franquia" placeholder="Ex.: regras de comissão, produtos que não podem entrar, aprovação da matriz, limite de desconto, padrão visual da marca..."></textarea>
       </div>
-    </div>
-    <div id="stickerGallery" class="gallery"></div>
-  </section>
+    </section>
 
-  <section class="card" data-title="5. Produtos e pontuação">
-    <div class="section-head"><div class="number">5</div><div><h2>Produtos, categorias e pontuação</h2><p class="section-desc">Mapeie quais itens contam, quanto valem e onde entram bônus de Copa.</p></div></div>
-    <div class="mini-title">Produtos elegíveis</div>
-    <div class="checks">
-      <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Tênis casual" /> Tênis casual</label>
-      <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Tênis de corrida" /> Tênis de corrida</label>
-      <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Tênis de treino/academia" /> Tênis treino/academia</label>
-      <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Chuteiras" /> Chuteiras</label>
-      <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Camisas de time/seleção" /> Camisas de time/seleção</label>
-      <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Bolas" /> Bolas</label>
-      <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Meias" /> Meias</label>
-      <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Mochilas/bolsas" /> Mochilas/bolsas</label>
-      <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Bonés/acessórios" /> Bonés/acessórios</label>
-      <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Todos os produtos da loja" /> Todos os produtos da loja</label>
-    </div>
-    <div class="grid" style="margin-top:14px">
-      <label>Modelo de pontuação
-        <select name="modelo_pontuacao"><option value="">Selecione</option><option>Ponto fixo por venda</option><option>Ponto por produto vendido</option><option>Ponto por valor vendido</option><option>Ponto por categoria</option><option>Ponto por margem/lucro</option><option>Ponto por meta batida</option><option>Modelo misto</option></select>
-      </label>
-      <label>Terá bônus/multiplicador?
-        <select name="usa_bonus"><option value="">Selecione</option><option>Sim</option><option>Não</option><option>A confirmar</option></select>
-      </label>
-      <label class="full">Tabela de pontuação desejada
+    <section class="card" id="campanha" data-title="2. Campanha da Copa">
+      <div class="section-head">
+        <div class="number">2</div>
+        <div>
+          <h2>Campanha da Copa</h2>
+          <p class="section-desc">Defina como a gincana vai acontecer durante o período da Copa.</p>
+        </div>
+      </div>
+      <div class="grid-3">
+        <label><span class="required">Nome da gincana</span>
+          <input name="nome_gincana" data-required="true" placeholder="Ex.: Copa Tênis One de Vendas" />
+        </label>
+        <label><span class="required">Data de início</span>
+          <input type="date" name="data_inicio" data-required="true" />
+        </label>
+        <label><span class="required">Data de término</span>
+          <input type="date" name="data_fim" data-required="true" />
+        </label>
+      </div>
+      <div class="grid">
+        <label><span class="required">Como será a disputa?</span>
+          <select name="tipo_competicao" data-required="true">
+            <option value="">Selecione</option>
+            <option>Individual por vendedor</option>
+            <option>Por equipes/seleções internas</option>
+            <option>Individual + equipes/seleções</option>
+            <option>Por metas diárias</option>
+            <option>Por rodadas da Copa</option>
+            <option>A confirmar</option>
+          </select>
+        </label>
+        <label>Estilo visual desejado
+          <select name="identidade_visual">
+            <option value="">Selecione</option>
+            <option>Brasil / verde e amarelo</option>
+            <option>Copa do Mundo genérica</option>
+            <option>Álbum de figurinhas</option>
+            <option>Estádio / placar</option>
+            <option>Seleções por equipe</option>
+            <option>A confirmar</option>
+          </select>
+        </label>
+        <label class="full">Qual é o objetivo principal da gincana?</label>
+        <textarea name="objetivo_campanha" placeholder="Ex.: aumentar vendas, motivar a equipe, vender produtos específicos, bater meta da loja, criar clima de Copa..."></textarea>
+        <label class="full">Terá regra especial em dias de jogos?</label>
+        <textarea name="regras_dias_jogos" placeholder="Ex.: pontos dobrados em jogos do Brasil, desafio relâmpago, bônus em horário específico, prêmio extra no dia do jogo..."></textarea>
+        <label class="full">Frase ou slogan da campanha</label>
+        <input name="slogan_campanha" placeholder="Ex.: Quem vende mais, levanta a taça!" />
+      </div>
+      <div class="suggestion">Sugestão: usar nomes internos como “Artilheiro de Vendas”, “Craque da Rodada”, “Camisa 10” e “Seleção Campeã” para deixar a campanha mais divertida.</div>
+    </section>
+
+    <section class="card" id="participantes" data-title="3. Participantes">
+      <div class="section-head">
+        <div class="number">3</div>
+        <div>
+          <h2>Participantes</h2>
+          <p class="section-desc">Informe quem vai participar e se haverá disputa individual, por equipe ou os dois.</p>
+        </div>
+      </div>
+      <div class="grid-3">
+        <label><span class="required">Quantidade de vendedores</span>
+          <input type="number" min="0" name="qtd_vendedores" data-required="true" placeholder="Ex.: 8" />
+        </label>
+        <label>Terá vendedores temporários?
+          <select name="vendedor_temporario"><option value="">Selecione</option><option>Sim</option><option>Não</option><option>A confirmar</option></select>
+        </label>
+        <label>Terá equipes/seleções?
+          <select name="tera_equipes"><option value="">Selecione</option><option>Sim</option><option>Não</option><option>A confirmar</option></select>
+        </label>
+      </div>
+      <div class="grid">
+        <label class="full">Lista dos vendedores participantes</label>
+        <textarea name="lista_vendedores" placeholder="Informe nome, apelido, turno e equipe/seleção, se já souber. Ex.: João — manhã — Seleção Verde."></textarea>
+        <label class="full">Algum colaborador terá regra diferente?</label>
+        <textarea name="regra_vendedor_diferente" placeholder="Ex.: gerente não participa, temporário participa parcialmente, caixa também vende, vendedor de meio período tem meta proporcional..."></textarea>
+        <label class="full">Como deseja dividir as equipes/seleções?</label>
+        <textarea name="divisao_equipes" placeholder="Ex.: por turno, sorteio, escolha do gerente, equipes fixas, países fictícios..."></textarea>
+      </div>
+    </section>
+
+    <section class="card" id="figurinhas" data-title="4. Figurinhas da Copa">
+      <div class="section-head">
+        <div class="number">4</div>
+        <div>
+          <h2>Figurinhas dos vendedores</h2>
+          <p class="section-desc">Envie fotos dos vendedores e crie figurinhas para usar na gincana.</p>
+        </div>
+      </div>
+      <div class="note">As figurinhas ficam salvas neste navegador após clicar em “Salvar agora”. Também é possível baixar cada figurinha em PNG.</div>
+      <div class="grid">
+        <label>Deseja usar figurinhas na campanha?
+          <select name="usar_figurinhas"><option value="">Selecione</option><option>Sim</option><option>Não</option><option>A confirmar</option></select>
+        </label>
+        <label>Onde as figurinhas serão usadas?</label>
+        <select name="uso_figurinhas"><option value="">Selecione</option><option>No sistema</option><option>No painel da loja</option><option>No grupo de WhatsApp</option><option>Impresso na loja</option><option>No sistema + divulgação</option><option>A confirmar</option></select>
+      </div>
+
+      <div class="divider"></div>
+      <div class="mini-title">Criar figurinha</div>
+      <div class="sticker-studio">
+        <div class="grid">
+          <label>Foto do vendedor
+            <input type="file" id="stickerPhoto" accept="image/*" />
+          </label>
+          <label>Nome na figurinha
+            <input id="stickerName" placeholder="Ex.: João" />
+          </label>
+          <label>Apelido / título
+            <input id="stickerNickname" placeholder="Ex.: Artilheiro do Caixa" />
+          </label>
+          <label>Equipe / seleção
+            <input id="stickerTeam" placeholder="Ex.: Seleção Verde" />
+          </label>
+          <label>Função na gincana
+            <select id="stickerPosition">
+              <option>Craque de vendas</option>
+              <option>Artilheiro</option>
+              <option>Capitão</option>
+              <option>Camisa 10</option>
+              <option>Defesa contra cancelamentos</option>
+              <option>Garçom dos combos</option>
+            </select>
+          </label>
+          <label>Frase da figurinha
+            <input id="stickerPhrase" placeholder="Ex.: Rumo à taça da Tênis One" />
+          </label>
+          <div class="full toolbar" style="margin-top:0">
+            <button type="button" class="btn-blue" onclick="previewSticker()">Pré-visualizar</button>
+            <button type="button" class="btn-primary" onclick="addStickerToAlbum()">Adicionar ao álbum</button>
+          </div>
+        </div>
+        <div class="sticker-preview-wrap">
+          <canvas id="stickerCanvas" width="800" height="1000"></canvas>
+          <button type="button" class="btn-yellow" onclick="downloadCurrentSticker()">Baixar figurinha atual</button>
+        </div>
+      </div>
+      <div id="stickerGallery" class="gallery"></div>
+    </section>
+
+    <section class="card" id="produtos" data-title="5. Produtos e pontuação">
+      <div class="section-head"><div class="number">5</div><div><h2>Produtos e pontuação</h2><p class="section-desc">Escolha o que conta na campanha e como os pontos serão calculados.</p></div></div>
+      <div class="mini-title">Quais produtos devem contar?</div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Tênis casual" /> Tênis casual</label>
+        <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Tênis de corrida" /> Tênis de corrida</label>
+        <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Tênis de treino/academia" /> Tênis treino/academia</label>
+        <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Chuteiras" /> Chuteiras</label>
+        <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Camisas de time/seleção" /> Camisas de time/seleção</label>
+        <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Bolas" /> Bolas</label>
+        <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Meias" /> Meias</label>
+        <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Mochilas/bolsas" /> Mochilas/bolsas</label>
+        <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Bonés/acessórios" /> Bonés/acessórios</label>
+        <label class="check"><input type="checkbox" name="produtos_elegiveis" value="Todos os produtos da loja" /> Todos os produtos da loja</label>
+      </div>
+      <div class="grid" style="margin-top:14px">
+        <label><span class="required">Como deseja calcular os pontos?</span>
+          <select name="modelo_pontuacao" data-required="true"><option value="">Selecione</option><option>Ponto fixo por venda</option><option>Ponto por produto vendido</option><option>Ponto por valor vendido</option><option>Ponto por categoria</option><option>Ponto por margem/lucro</option><option>Ponto por meta batida</option><option>Modelo misto</option><option>A confirmar</option></select>
+        </label>
+        <label>Terá bônus ou multiplicador?
+          <select name="usa_bonus"><option value="">Selecione</option><option>Sim</option><option>Não</option><option>A confirmar</option></select>
+        </label>
+        <label class="full">Informe a pontuação desejada</label>
         <textarea name="tabela_pontuacao" placeholder="Ex.: Tênis = 10 pts; Chuteira = 15 pts; Camisa de seleção = 8 pts; Combo tênis + meia = +5 pts; venda acima de R$ X = +Y pts."></textarea>
-      </label>
-      <label class="full">Bônus temáticos de Copa
+        <label class="full">Bônus temáticos da Copa</label>
         <textarea name="bonus_copa" placeholder="Ex.: Gol de placa = produto estratégico; Hat-trick = 3 vendas no dia; Camisa 10 = maior ticket médio; Jogo do Brasil = pontos dobrados..."></textarea>
-      </label>
-      <label class="full">Produtos que NÃO devem contar
-        <textarea name="produtos_excluidos" placeholder="Troca, vale-presente, produto com desconto específico, venda corporativa, item sem margem..."></textarea>
-      </label>
-    </div>
-    <div class="suggestion">Sugestão para MVP: categorias com pontos fixos + bônus manual aprovado pelo gerente. Regras complexas podem ficar para evolução.</div>
-  </section>
+        <label class="full">Quais produtos ou situações NÃO devem pontuar?</label>
+        <textarea name="produtos_excluidos" placeholder="Ex.: troca, vale-presente, produto com desconto específico, venda cancelada, venda corporativa, item sem margem..."></textarea>
+      </div>
+    </section>
 
-  <section class="card" data-title="6. Lançamento e validação">
-    <div class="section-head"><div class="number">6</div><div><h2>Lançamento de vendas e validação</h2><p class="section-desc">Venda lançada precisa ter responsável, comprovante e status para o ranking ser confiável.</p></div></div>
-    <div class="grid">
-      <label>Como as vendas serão lançadas?
-        <select name="forma_lancamento"><option value="">Selecione</option><option>Manual pelo gerente</option><option>Manual pelo vendedor</option><option>Vendedor lança e gerente aprova</option><option>Importação de planilha</option><option>Integração futura com sistema da loja</option><option>A confirmar</option></select>
-      </label>
-      <label>Precisa anexar comprovante?
-        <select name="precisa_comprovante"><option value="">Selecione</option><option>Sim, sempre</option><option>Somente acima de determinado valor</option><option>Não</option><option>A confirmar</option></select>
-      </label>
-      <label class="full">Dados obrigatórios da venda
-        <textarea name="dados_venda" placeholder="Vendedor, data, hora, produto, SKU, quantidade, valor, cupom fiscal, forma de pagamento, comprovante, observação..."></textarea>
-      </label>
-      <label class="full">Quem valida se a venda é verdadeira?</label>
-      <textarea name="validacao_venda" placeholder="Gerente confere no sistema da loja; subgerente valida; validação ao final do dia; aprovação automática futura..."></textarea>
-      <label class="full">Como tratar cancelamento, troca ou devolução?</label>
-      <textarea name="cancelamento_troca_devolucao" placeholder="Retirar pontos, deixar pendente, gerente desconta manualmente, prazo de contestação..."></textarea>
-    </div>
-  </section>
+    <section class="card" id="vendas" data-title="6. Lançamentos de vendas">
+      <div class="section-head"><div class="number">6</div><div><h2>Lançamentos de vendas</h2><p class="section-desc">Defina quem lança as vendas e como elas serão confirmadas.</p></div></div>
+      <div class="grid">
+        <label><span class="required">Quem vai lançar as vendas?</span>
+          <select name="forma_lancamento" data-required="true"><option value="">Selecione</option><option>Somente gerente</option><option>Gerente e subgerente</option><option>Cada vendedor lança sua venda</option><option>Vendedor lança e gerente aprova</option><option>Importação de planilha</option><option>Integração futura com sistema da loja</option><option>A confirmar</option></select>
+        </label>
+        <label>Precisa anexar comprovante?
+          <select name="precisa_comprovante"><option value="">Selecione</option><option>Sim, sempre</option><option>Somente acima de determinado valor</option><option>Não</option><option>A confirmar</option></select>
+        </label>
+        <label class="full">Quais informações precisam ser registradas em cada venda?</label>
+        <textarea name="dados_venda" placeholder="Ex.: vendedor, data, produto, SKU, quantidade, valor, cupom fiscal, forma de pagamento, comprovante, observação..."></textarea>
+        <label class="full">Quem confirma se a venda está correta?</label>
+        <textarea name="validacao_venda" placeholder="Ex.: gerente confere no sistema da loja, subgerente valida no fim do dia, aprovação automática futura..."></textarea>
+        <label class="full">Como tratar cancelamento, troca ou devolução?</label>
+        <textarea name="cancelamento_troca_devolucao" placeholder="Ex.: retirar pontos, deixar pendente, gerente desconta manualmente, prazo de contestação..."></textarea>
+      </div>
+    </section>
 
-  <section class="card" data-title="7. Administradores e permissões">
-    <div class="section-head"><div class="number">7</div><div><h2>Administradores e permissões</h2><p class="section-desc">Defina quem pode cadastrar, lançar, aprovar, corrigir e exportar.</p></div></div>
-    <div class="grid-3">
-      <label>Quantos administradores terão?
-        <input type="number" min="0" name="qtd_administradores" placeholder="Ex.: 1" />
-      </label>
-      <label>Quem poderá lançar produtos?
-        <input name="quem_lanca_produtos" placeholder="Ex.: somente gerente" />
-      </label>
-      <label>Quem poderá lançar vendas/pontos?
-        <input name="quem_lanca_vendas" placeholder="Ex.: gerente, subgerente, vendedor" />
-      </label>
-    </div>
-    <div class="mini-title">Permissões necessárias</div>
-    <div class="checks">
-      <label class="check"><input type="checkbox" name="permissoes" value="Cadastrar vendedores" /> Cadastrar vendedores</label>
-      <label class="check"><input type="checkbox" name="permissoes" value="Cadastrar produtos" /> Cadastrar produtos</label>
-      <label class="check"><input type="checkbox" name="permissoes" value="Cadastrar regras de pontuação" /> Cadastrar regras de pontuação</label>
-      <label class="check"><input type="checkbox" name="permissoes" value="Lançar venda" /> Lançar venda</label>
-      <label class="check"><input type="checkbox" name="permissoes" value="Aprovar venda" /> Aprovar venda</label>
-      <label class="check"><input type="checkbox" name="permissoes" value="Editar lançamento" /> Editar lançamento</label>
-      <label class="check"><input type="checkbox" name="permissoes" value="Excluir lançamento" /> Excluir lançamento</label>
-      <label class="check"><input type="checkbox" name="permissoes" value="Exportar relatório" /> Exportar relatório</label>
-      <label class="check"><input type="checkbox" name="permissoes" value="Ver ranking geral" /> Ver ranking geral</label>
-      <label class="check"><input type="checkbox" name="permissoes" value="Ver apenas próprio desempenho" /> Ver apenas próprio desempenho</label>
-    </div>
-    <div class="grid" style="margin-top:14px">
-      <label class="full">Observações de acesso
+    <section class="card" id="acessos" data-title="7. Acessos e permissões">
+      <div class="section-head"><div class="number">7</div><div><h2>Acessos e permissões</h2><p class="section-desc">Informe quem pode acessar, cadastrar, lançar, aprovar e consultar.</p></div></div>
+      <div class="grid-3">
+        <label><span class="required">Quantos administradores terão?</span>
+          <input type="number" min="0" name="qtd_administradores" data-required="true" placeholder="Ex.: 1" />
+        </label>
+        <label>Quem poderá cadastrar produtos?
+          <input name="quem_lanca_produtos" placeholder="Ex.: somente gerente" />
+        </label>
+        <label>Quem poderá lançar pontos/vendas?
+          <input name="quem_lanca_vendas" placeholder="Ex.: gerente, subgerente, vendedor" />
+        </label>
+      </div>
+      <div class="mini-title">O que cada acesso precisa permitir?</div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" name="permissoes" value="Cadastrar vendedores" /> Cadastrar vendedores</label>
+        <label class="check"><input type="checkbox" name="permissoes" value="Cadastrar produtos" /> Cadastrar produtos</label>
+        <label class="check"><input type="checkbox" name="permissoes" value="Cadastrar regras de pontuação" /> Cadastrar regras de pontuação</label>
+        <label class="check"><input type="checkbox" name="permissoes" value="Lançar venda" /> Lançar venda</label>
+        <label class="check"><input type="checkbox" name="permissoes" value="Aprovar venda" /> Aprovar venda</label>
+        <label class="check"><input type="checkbox" name="permissoes" value="Editar lançamento" /> Editar lançamento</label>
+        <label class="check"><input type="checkbox" name="permissoes" value="Excluir lançamento" /> Excluir lançamento</label>
+        <label class="check"><input type="checkbox" name="permissoes" value="Exportar relatório" /> Exportar relatório</label>
+        <label class="check"><input type="checkbox" name="permissoes" value="Ver ranking geral" /> Ver ranking geral</label>
+        <label class="check"><input type="checkbox" name="permissoes" value="Ver apenas próprio desempenho" /> Vendedor ver apenas próprio desempenho</label>
+      </div>
+      <div class="grid" style="margin-top:14px">
+        <label class="full">Alguma observação sobre acesso?</label>
         <textarea name="obs_permissoes" placeholder="Ex.: vendedor só visualiza ranking; gerente aprova; franqueado vê relatório final; matriz não acessa..."></textarea>
-      </label>
-    </div>
-    <div class="suggestion">Sugestão inicial: 3 perfis — Administrador, Gerente/Aprovador e Vendedor.</div>
-  </section>
+      </div>
+    </section>
 
-  <section class="card" data-title="8. Ranking e gamificação">
-    <div class="section-head"><div class="number">8</div><div><h2>Ranking, metas e gamificação</h2><p class="section-desc">Defina como a equipe verá o placar e quais conquistas aumentam engajamento.</p></div></div>
-    <div class="grid-3">
-      <label>Ranking será público?
-        <select name="ranking_publico"><option value="">Selecione</option><option>Todos veem tudo</option><option>Todos veem posição e pontos</option><option>Cada vendedor vê só seu desempenho</option><option>Somente gerente vê</option><option>A confirmar</option></select>
-      </label>
-      <label>Terá meta individual?
-        <select name="meta_individual"><option value="">Selecione</option><option>Sim</option><option>Não</option><option>A confirmar</option></select>
-      </label>
-      <label>Terá meta da loja/equipe?
-        <select name="meta_loja"><option value="">Selecione</option><option>Sim</option><option>Não</option><option>A confirmar</option></select>
-      </label>
-    </div>
-    <div class="mini-title">Recursos de gamificação</div>
-    <div class="checks">
-      <label class="check"><input type="checkbox" name="gamificacao" value="Artilheiro do dia" /> Artilheiro do dia</label>
-      <label class="check"><input type="checkbox" name="gamificacao" value="Craque da rodada" /> Craque da rodada</label>
-      <label class="check"><input type="checkbox" name="gamificacao" value="Camisa 10 da semana" /> Camisa 10 da semana</label>
-      <label class="check"><input type="checkbox" name="gamificacao" value="Hat-trick de vendas" /> Hat-trick de vendas</label>
-      <label class="check"><input type="checkbox" name="gamificacao" value="Desafio relâmpago" /> Desafio relâmpago</label>
-      <label class="check"><input type="checkbox" name="gamificacao" value="Álbum de figurinhas" /> Álbum de figurinhas</label>
-      <label class="check"><input type="checkbox" name="gamificacao" value="Painel de TV na loja" /> Painel de TV na loja</label>
-      <label class="check"><input type="checkbox" name="gamificacao" value="Ranking por seleções" /> Ranking por seleções</label>
-    </div>
-    <div class="grid" style="margin-top:14px">
-      <label class="full">Informações do painel/ranking</label>
-      <textarea name="info_painel_ranking" placeholder="Posição, nome, figurinha, equipe/seleção, pontos, vendas aprovadas, meta, produtos vendidos, evolução diária..."></textarea>
-      <label class="full">Critérios de desempate</label>
-      <textarea name="criterios_desempate" placeholder="Maior valor vendido, maior número de produtos estratégicos, menor cancelamento, maior ticket médio, primeiro a bater meta..."></textarea>
-    </div>
-  </section>
+    <section class="card" id="ranking" data-title="8. Ranking e gamificação">
+      <div class="section-head"><div class="number">8</div><div><h2>Ranking e gamificação</h2><p class="section-desc">Escolha como o placar será exibido para a equipe.</p></div></div>
+      <div class="grid-3">
+        <label><span class="required">Quem poderá ver o ranking?</span>
+          <select name="ranking_publico" data-required="true"><option value="">Selecione</option><option>Todos veem tudo</option><option>Todos veem posição e pontos</option><option>Cada vendedor vê só seu desempenho</option><option>Somente gerente vê</option><option>A confirmar</option></select>
+        </label>
+        <label>Terá meta individual?
+          <select name="meta_individual"><option value="">Selecione</option><option>Sim</option><option>Não</option><option>A confirmar</option></select>
+        </label>
+        <label>Terá meta da loja/equipe?
+          <select name="meta_loja"><option value="">Selecione</option><option>Sim</option><option>Não</option><option>A confirmar</option></select>
+        </label>
+      </div>
+      <div class="mini-title">Quais recursos deixam a gincana mais divertida?</div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" name="gamificacao" value="Artilheiro do dia" /> Artilheiro do dia</label>
+        <label class="check"><input type="checkbox" name="gamificacao" value="Craque da rodada" /> Craque da rodada</label>
+        <label class="check"><input type="checkbox" name="gamificacao" value="Camisa 10 da semana" /> Camisa 10 da semana</label>
+        <label class="check"><input type="checkbox" name="gamificacao" value="Hat-trick de vendas" /> Hat-trick de vendas</label>
+        <label class="check"><input type="checkbox" name="gamificacao" value="Desafio relâmpago" /> Desafio relâmpago</label>
+        <label class="check"><input type="checkbox" name="gamificacao" value="Álbum de figurinhas" /> Álbum de figurinhas</label>
+        <label class="check"><input type="checkbox" name="gamificacao" value="Painel de TV na loja" /> Painel de TV na loja</label>
+        <label class="check"><input type="checkbox" name="gamificacao" value="Ranking por seleções" /> Ranking por seleções</label>
+      </div>
+      <div class="grid" style="margin-top:14px">
+        <label class="full">O que deve aparecer no ranking?</label>
+        <textarea name="info_painel_ranking" placeholder="Ex.: posição, nome, figurinha, equipe/seleção, pontos, vendas aprovadas, meta, produtos vendidos, evolução diária..."></textarea>
+        <label class="full">Qual será o critério de desempate?</label>
+        <textarea name="criterios_desempate" placeholder="Ex.: maior valor vendido, maior número de produtos estratégicos, menor cancelamento, maior ticket médio, primeiro a bater meta..."></textarea>
+      </div>
+    </section>
 
-  <section class="card" data-title="9. Prêmios e comunicação">
-    <div class="section-head"><div class="number">9</div><div><h2>Prêmios, benefícios e comunicação</h2><p class="section-desc">Prêmio claro aumenta motivação e evita frustração.</p></div></div>
-    <div class="grid">
-      <label>Quantos vencedores serão premiados?
-        <input type="number" min="0" name="qtd_vencedores" placeholder="Ex.: 3" />
-      </label>
-      <label>Tipo de premiação
-        <select name="tipo_premiacao"><option value="">Selecione</option><option>Por posição no ranking</option><option>Por meta atingida</option><option>Por categoria de prêmio</option><option>Sorteio entre elegíveis</option><option>Modelo misto</option><option>A confirmar</option></select>
-      </label>
-      <label class="full">Prêmios/benefícios</label>
-      <textarea name="premios" placeholder="1º lugar, 2º lugar, 3º lugar, bônus por meta diária, folga, vale-compra, comissão extra..."></textarea>
-      <label class="full">Como a campanha será comunicada?</label>
-      <textarea name="comunicacao_vendedores" placeholder="Reunião de abertura, grupo de WhatsApp, cartaz na loja, painel de TV, comunicado impresso, termo de ciência..."></textarea>
-    </div>
-  </section>
+    <section class="card" id="premios" data-title="9. Prêmios e comunicação">
+      <div class="section-head"><div class="number">9</div><div><h2>Prêmios e comunicação</h2><p class="section-desc">Informe como os vencedores serão premiados e como a campanha será anunciada.</p></div></div>
+      <div class="grid">
+        <label><span class="required">Quantos vencedores serão premiados?</span>
+          <input type="number" min="0" name="qtd_vencedores" data-required="true" placeholder="Ex.: 3" />
+        </label>
+        <label>Tipo de premiação
+          <select name="tipo_premiacao"><option value="">Selecione</option><option>Por posição no ranking</option><option>Por meta atingida</option><option>Por categoria de prêmio</option><option>Sorteio entre elegíveis</option><option>Modelo misto</option><option>A confirmar</option></select>
+        </label>
+        <label class="full">Quais serão os prêmios ou benefícios?</label>
+        <textarea name="premios" placeholder="Ex.: 1º lugar, 2º lugar, 3º lugar, bônus por meta diária, folga, vale-compra, comissão extra..."></textarea>
+        <label class="full">Como a campanha será comunicada para os vendedores?</label>
+        <textarea name="comunicacao_vendedores" placeholder="Ex.: reunião de abertura, grupo de WhatsApp, cartaz na loja, painel de TV, comunicado impresso, termo de ciência..."></textarea>
+      </div>
+    </section>
 
-  <section class="card" data-title="10. Telas e MVP">
-    <div class="section-head"><div class="number">10</div><div><h2>Telas, funcionalidades e versão MVP</h2><p class="section-desc">Transforme a conversa em sistema, sem começar grande demais.</p></div></div>
-    <div class="mini-title">Telas sugeridas</div>
-    <div class="checks">
-      <label class="check"><input type="checkbox" name="telas" value="Login" /> Login</label>
-      <label class="check"><input type="checkbox" name="telas" value="Dashboard do gerente" /> Dashboard do gerente</label>
-      <label class="check"><input type="checkbox" name="telas" value="Cadastro de vendedores" /> Cadastro de vendedores</label>
-      <label class="check"><input type="checkbox" name="telas" value="Estúdio de figurinhas" /> Estúdio de figurinhas</label>
-      <label class="check"><input type="checkbox" name="telas" value="Cadastro de produtos/categorias" /> Cadastro de produtos/categorias</label>
-      <label class="check"><input type="checkbox" name="telas" value="Regras de pontuação" /> Regras de pontuação</label>
-      <label class="check"><input type="checkbox" name="telas" value="Lançamento de venda" /> Lançamento de venda</label>
-      <label class="check"><input type="checkbox" name="telas" value="Aprovação de venda" /> Aprovação de venda</label>
-      <label class="check"><input type="checkbox" name="telas" value="Ranking geral" /> Ranking geral</label>
-      <label class="check"><input type="checkbox" name="telas" value="Painel do vendedor" /> Painel do vendedor</label>
-      <label class="check"><input type="checkbox" name="telas" value="Relatórios/exportação" /> Relatórios/exportação</label>
-      <label class="check"><input type="checkbox" name="telas" value="Histórico/auditoria" /> Histórico/auditoria</label>
-    </div>
-    <div class="grid" style="margin-top:14px">
-      <label class="full">Funcionalidades obrigatórias da primeira versão</label>
-      <textarea name="funcionalidades_obrigatorias" placeholder="Login, cadastro de vendedor, lançamento, aprovação, ranking, exportação final, figurinhas..."></textarea>
-      <label class="full">Funcionalidades para evolução futura</label>
-      <textarea name="funcionalidades_futuras" placeholder="Integração com ERP, WhatsApp, painel TV, notificações automáticas, importação de planilha, app mobile..."></textarea>
-    </div>
-    <div class="levels">
-      <div class="level"><strong>Nível 1: Organização simples</strong><p>Briefing, regras fechadas, ranking manual, PDF e figurinhas para campanha.</p></div>
-      <div class="level"><strong>Nível 2: Controle profissional</strong><p>Login, lançamentos, aprovação, ranking e relatórios com histórico.</p></div>
-      <div class="level"><strong>Nível 3: Sistema sob medida</strong><p>Integrações, automações, painel de TV, notificações e gamificação avançada.</p></div>
-    </div>
-  </section>
+    <section class="card" id="sistema" data-title="10. Sistema desejado">
+      <div class="section-head"><div class="number">10</div><div><h2>Sistema desejado</h2><p class="section-desc">Marque as telas e funções que fazem sentido para a primeira versão.</p></div></div>
+      <div class="mini-title">Quais telas você quer no sistema?</div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" name="telas" value="Login" /> Login</label>
+        <label class="check"><input type="checkbox" name="telas" value="Dashboard do gerente" /> Dashboard do gerente</label>
+        <label class="check"><input type="checkbox" name="telas" value="Cadastro de vendedores" /> Cadastro de vendedores</label>
+        <label class="check"><input type="checkbox" name="telas" value="Estúdio de figurinhas" /> Estúdio de figurinhas</label>
+        <label class="check"><input type="checkbox" name="telas" value="Cadastro de produtos/categorias" /> Cadastro de produtos/categorias</label>
+        <label class="check"><input type="checkbox" name="telas" value="Regras de pontuação" /> Regras de pontuação</label>
+        <label class="check"><input type="checkbox" name="telas" value="Lançamento de venda" /> Lançamento de venda</label>
+        <label class="check"><input type="checkbox" name="telas" value="Aprovação de venda" /> Aprovação de venda</label>
+        <label class="check"><input type="checkbox" name="telas" value="Ranking geral" /> Ranking geral</label>
+        <label class="check"><input type="checkbox" name="telas" value="Painel do vendedor" /> Painel do vendedor</label>
+        <label class="check"><input type="checkbox" name="telas" value="Relatórios/exportação" /> Relatórios/exportação</label>
+        <label class="check"><input type="checkbox" name="telas" value="Histórico/auditoria" /> Histórico/auditoria</label>
+      </div>
+      <div class="grid" style="margin-top:14px">
+        <label class="full">O que é indispensável na primeira versão?</label>
+        <textarea name="funcionalidades_obrigatorias" placeholder="Ex.: login, cadastro de vendedor, lançamento, aprovação, ranking, exportação final, figurinhas..."></textarea>
+        <label class="full">O que pode ficar para uma próxima etapa?</label>
+        <textarea name="funcionalidades_futuras" placeholder="Ex.: integração com ERP, WhatsApp, painel TV, notificações automáticas, importação de planilha, app mobile..."></textarea>
+      </div>
+      <div class="levels">
+        <div class="level"><strong>Opção simples</strong><p>Formulário, PDF, regras, ranking básico e figurinhas para campanha.</p></div>
+        <div class="level"><strong>Opção profissional</strong><p>Login, lançamentos, aprovação, ranking, relatório e histórico.</p></div>
+        <div class="level"><strong>Opção sob medida</strong><p>Integrações, automações, painel de TV, notificações e gamificação avançada.</p></div>
+      </div>
+    </section>
 
-  <section class="card" data-title="11. Dados, relatórios e pendências">
-    <div class="section-head"><div class="number">11</div><div><h2>Dados, relatórios e decisões pendentes</h2><p class="section-desc">Base para banco de dados, relatório final e fechamento da proposta.</p></div></div>
-    <div class="grid">
-      <label class="full">Dados que o sistema precisa armazenar</label>
-      <textarea name="dados_sistema" placeholder="Usuários, vendedores, produtos, categorias, pontuações, vendas, aprovações, imagens das figurinhas, auditoria..."></textarea>
-      <label>Exportações necessárias</label>
-      <select name="exportacoes"><option value="">Selecione</option><option>PDF final</option><option>Excel/CSV</option><option>PDF + Excel/CSV</option><option>Nenhuma no MVP</option><option>A confirmar</option></select>
-      <label>Quem recebe o relatório final?</label>
-      <input name="quem_recebe_relatorio" placeholder="Saulo, franqueado, financeiro, matriz..." />
-      <label class="full">Informações do relatório final</label>
-      <textarea name="info_relatorio_final" placeholder="Ranking final, pontos, vendas aprovadas, prêmios, campeões por categoria, observações, pendências..."></textarea>
-      <label class="full">Decisões pendentes para fechar escopo</label>
-      <textarea name="decisoes_pendentes" placeholder="Pontos por produto, responsáveis por aprovação, datas, prêmios, critérios de desempate, telas obrigatórias..."></textarea>
-      <label class="full">Observações gerais da entrevista</label>
-      <textarea name="observacoes_gerais"></textarea>
-    </div>
-  </section>
-</form>
+    <section class="card" id="finalizacao" data-title="11. Finalização">
+      <div class="section-head"><div class="number">11</div><div><h2>Finalização</h2><p class="section-desc">Revise as respostas e informe qualquer detalhe que ajude a montar a proposta final.</p></div></div>
+      <div class="grid">
+        <label class="full">Quais dados o sistema precisa guardar?</label>
+        <textarea name="dados_sistema" placeholder="Ex.: usuários, vendedores, produtos, categorias, pontuações, vendas, aprovações, imagens das figurinhas, histórico de alterações..."></textarea>
+        <label>Qual exportação você precisa?</label>
+        <select name="exportacoes"><option value="">Selecione</option><option>PDF final</option><option>Excel/CSV</option><option>PDF + Excel/CSV</option><option>Nenhuma no primeiro momento</option><option>A confirmar</option></select>
+        <label>Quem deve receber o relatório final?</label>
+        <input name="quem_recebe_relatorio" placeholder="Ex.: Saulo, franqueado, financeiro, matriz..." />
+        <label class="full">O que precisa aparecer no relatório final?</label>
+        <textarea name="info_relatorio_final" placeholder="Ex.: ranking final, pontos, vendas aprovadas, prêmios, campeões por categoria, observações, pendências..."></textarea>
+        <label class="full">Existe algo que ainda está em dúvida?</label>
+        <textarea name="decisoes_pendentes" placeholder="Ex.: pontos por produto, responsáveis por aprovação, datas, prêmios, critérios de desempate, telas obrigatórias..."></textarea>
+        <label class="full">Observações finais</label>
+        <textarea name="observacoes_gerais" placeholder="Escreva aqui qualquer detalhe que não entrou nas perguntas anteriores."></textarea>
+      </div>
+
+      <div class="summary-box">
+        <strong>Antes de enviar:</strong>
+        <span>Confira se as informações principais foram preenchidas. Depois clique em “Gerar PDF para enviar”.</span>
+        <ul id="missingList"></ul>
+      </div>
+
+      <div class="toolbar">
+        <button type="button" class="btn-primary" onclick="generatePDF()">Gerar PDF para enviar</button>
+        <button type="button" class="btn-yellow" onclick="saveDraft(true)">Salvar agora</button>
+      </div>
+    </section>
+  </form>
+</div>
 
   </main>  <footer>
     thIAguinho Soluções — tecnologia sob medida.
   </footer>  <script>
-    const STORAGE_KEY = "briefing_gincana_copa_tenis_one_v1";
-    const STICKERS_KEY = "briefing_gincana_copa_tenis_one_stickers_v1";
+    const STORAGE_KEY = "formulario_gincana_copa_tenis_one_v2";
+    const STICKERS_KEY = "formulario_gincana_copa_tenis_one_stickers_v2";
     let stickerAlbum = [];
     let currentStickerData = null;
     let pendingPhotoData = null;
+    let autosaveTimer = null;
 
     const form = document.getElementById("briefingForm");
     const statusBox = document.getElementById("status");
@@ -664,7 +761,7 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
     function showStatus(message) {
       statusBox.textContent = message;
       statusBox.style.display = "block";
-      setTimeout(() => statusBox.style.display = "none", 4500);
+      setTimeout(() => statusBox.style.display = "none", 4200);
     }
 
     function todayISO() {
@@ -707,17 +804,23 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
         }
       });
       updateProgress();
+      updateMissingList();
     }
 
-    function saveDraft() {
+    function saveDraft(manual = false) {
       const data = collectFormData();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       try {
         localStorage.setItem(STICKERS_KEY, JSON.stringify(stickerAlbum));
-        showStatus("Local stage salvo neste navegador com briefing e figurinhas.");
+        if (manual) showStatus("Respostas salvas neste navegador.");
       } catch (err) {
-        showStatus("Briefing salvo, mas as figurinhas podem estar pesadas demais para o localStorage. Baixe as imagens em PNG para guardar.");
+        if (manual) showStatus("Respostas salvas, mas as figurinhas podem estar pesadas demais. Baixe as figurinhas em PNG para guardar.");
       }
+    }
+
+    function autoSave() {
+      clearTimeout(autosaveTimer);
+      autosaveTimer = setTimeout(() => saveDraft(false), 500);
     }
 
     function loadDraft(manual = false) {
@@ -730,7 +833,7 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
         renderStickerGallery();
       }
 
-      if (manual) showStatus(raw ? "Local stage carregado." : "Nenhum local stage encontrado neste navegador.");
+      if (manual) showStatus(raw ? "Respostas carregadas." : "Nenhuma resposta salva encontrada neste navegador.");
     }
 
     function clearAll() {
@@ -745,21 +848,58 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
       drawStickerPlaceholder();
       renderStickerGallery();
       updateProgress();
-      showStatus("Formulário e local stage limpos.");
+      updateMissingList();
+      showStatus("Formulário limpo.");
     }
 
     function downloadJSON() {
       const payload = {
-        briefing: collectFormData(),
-        stickers: stickerAlbum.map(s => ({ nome: s.nome, equipe: s.equipe, titulo: s.titulo, imagem_base64: s.dataUrl }))
+        respostas: collectFormData(),
+        figurinhas: stickerAlbum.map(s => ({ nome: s.nome, equipe: s.equipe, titulo: s.titulo, imagem_base64: s.dataUrl }))
       };
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "briefing-gincana-copa-tenis-one.json";
+      a.download = "respostas-gincana-copa-tenis-one.json";
       a.click();
       URL.revokeObjectURL(url);
+    }
+
+    function requiredFields() {
+      return Array.from(form.querySelectorAll("[data-required='true']"));
+    }
+
+    function fieldLabel(el) {
+      const label = el.closest("label")?.innerText || el.name;
+      return label.replace("*", "").split("\n")[0].trim();
+    }
+
+    function missingRequired() {
+      return requiredFields().filter(el => !(el.value || "").trim()).map(fieldLabel);
+    }
+
+    function updateMissingList() {
+      const ul = document.getElementById("missingList");
+      const missing = missingRequired();
+      ul.innerHTML = "";
+      if (!missing.length) {
+        const li = document.createElement("li");
+        li.textContent = "Os campos principais foram preenchidos.";
+        li.style.color = "#14532d";
+        ul.appendChild(li);
+        return;
+      }
+      missing.slice(0, 8).forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        ul.appendChild(li);
+      });
+      if (missing.length > 8) {
+        const li = document.createElement("li");
+        li.textContent = `Mais ${missing.length - 8} campo(s) principal(is) pendente(s).`;
+        ul.appendChild(li);
+      }
     }
 
     function updateProgress() {
@@ -850,9 +990,9 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const grad = ctx.createLinearGradient(0, 0, 800, 1000);
-      grad.addColorStop(0, "#096b3d");
+      grad.addColorStop(0, "#08643a");
       grad.addColorStop(.52, "#0e8f56");
-      grad.addColorStop(1, "#153e90");
+      grad.addColorStop(1, "#143f91");
       ctx.fillStyle = grad;
       roundedRect(0, 0, 800, 1000, 42);
       ctx.fill();
@@ -879,7 +1019,7 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
       } else {
         ctx.fillStyle = "#eaf7ee";
         ctx.fillRect(70, 150, 660, 520);
-        ctx.fillStyle = "#096b3d";
+        ctx.fillStyle = "#08643a";
         ctx.font = "900 115px Arial";
         ctx.textAlign = "center";
         ctx.fillText("⚽", 400, 400);
@@ -898,22 +1038,22 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
       roundedRect(70, 700, 660, 230, 30);
       ctx.fill();
 
-      ctx.fillStyle = "#096b3d";
+      ctx.fillStyle = "#08643a";
       ctx.font = "900 56px Arial";
       ctx.fillText(fitText(name.toUpperCase(), 16), 104, 774);
-      ctx.fillStyle = "#153e90";
+      ctx.fillStyle = "#143f91";
       ctx.font = "800 27px Arial";
       ctx.fillText(fitText(nickname, 34), 106, 820);
 
       ctx.fillStyle = "#102018";
       ctx.font = "700 22px Arial";
       ctx.fillText("Seleção:", 106, 865);
-      ctx.fillStyle = "#096b3d";
+      ctx.fillStyle = "#08643a";
       ctx.fillText(fitText(team, 24), 205, 865);
 
       ctx.fillStyle = "#102018";
-      ctx.fillText("Posição:", 106, 902);
-      ctx.fillStyle = "#153e90";
+      ctx.fillText("Função:", 106, 902);
+      ctx.fillStyle = "#143f91";
       ctx.fillText(fitText(position, 26), 205, 902);
 
       ctx.fillStyle = "#6d5200";
@@ -922,7 +1062,7 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
 
       ctx.fillStyle = "#f5c542";
       ctx.beginPath(); ctx.arc(662, 827, 46, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = "#096b3d";
+      ctx.fillStyle = "#08643a";
       ctx.font = "900 38px Arial";
       ctx.textAlign = "center";
       ctx.fillText("10", 662, 841);
@@ -934,15 +1074,15 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
 
     async function previewSticker() {
       await buildSticker();
-      showStatus("Figurinha pré-visualizada.");
+      showStatus("Figurinha pronta para conferir.");
     }
 
     async function addStickerToAlbum() {
       const sticker = await buildSticker();
       stickerAlbum.push({ ...sticker, createdAt: new Date().toISOString() });
       renderStickerGallery();
-      saveDraft();
-      showStatus("Figurinha adicionada ao álbum e salva no local stage.");
+      saveDraft(false);
+      showStatus("Figurinha adicionada ao álbum.");
     }
 
     function downloadCurrentSticker() {
@@ -968,7 +1108,7 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
     function removeSticker(index) {
       stickerAlbum.splice(index, 1);
       renderStickerGallery();
-      saveDraft();
+      saveDraft(false);
     }
 
     function renderStickerGallery() {
@@ -990,8 +1130,8 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
     function drawStickerPlaceholder() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const grad = ctx.createLinearGradient(0, 0, 800, 1000);
-      grad.addColorStop(0, "#096b3d");
-      grad.addColorStop(1, "#153e90");
+      grad.addColorStop(0, "#08643a");
+      grad.addColorStop(1, "#143f91");
       ctx.fillStyle = grad;
       roundedRect(0, 0, 800, 1000, 42);
       ctx.fill();
@@ -1002,7 +1142,7 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
       ctx.fillStyle = "rgba(255,255,255,.94)";
       roundedRect(70, 230, 660, 520, 34);
       ctx.fill();
-      ctx.fillStyle = "#096b3d";
+      ctx.fillStyle = "#08643a";
       ctx.font = "900 115px Arial";
       ctx.textAlign = "center";
       ctx.fillText("⚽", 400, 490);
@@ -1019,64 +1159,64 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
 
     function labelFromName(name) {
       const labels = {
-        cliente_nome: "Nome do entrevistado",
-        cliente_cargo: "Cargo",
+        cliente_nome: "Seu nome",
+        cliente_cargo: "Seu cargo",
         empresa: "Franquia / empresa",
         unidade: "Unidade / shopping",
-        data_entrevista: "Data da entrevista",
-        responsavel_briefing: "Responsável pelo briefing",
-        aprovador_regra: "Quem aprova mudanças de regra",
-        como_registra_vendas: "Como as vendas são registradas hoje",
-        dor_principal: "Dor principal",
-        pontos_confusao: "Pontos de confusão",
-        resultado_ideal: "Resultado ideal",
+        data_entrevista: "Data do preenchimento",
+        aprovador_regra: "Quem mais decide sobre a campanha",
+        regras_franquia: "Regra da franquia a respeitar",
         nome_gincana: "Nome da gincana",
         data_inicio: "Data de início",
         data_fim: "Data de término",
-        tipo_competicao: "Formato da competição",
-        identidade_visual: "Identidade visual",
-        regras_dias_jogos: "Regras em dias de jogos",
-        slogan_campanha: "Slogan da campanha",
+        tipo_competicao: "Como será a disputa",
+        identidade_visual: "Estilo visual desejado",
+        objetivo_campanha: "Objetivo principal da gincana",
+        regras_dias_jogos: "Regra especial em dias de jogos",
+        slogan_campanha: "Frase ou slogan",
         qtd_vendedores: "Quantidade de vendedores",
         vendedor_temporario: "Vendedores temporários",
         tera_equipes: "Equipes/seleções",
-        lista_vendedores: "Lista inicial de vendedores",
-        regra_vendedor_diferente: "Regras diferentes por vendedor",
-        produtos_elegiveis: "Produtos elegíveis",
-        modelo_pontuacao: "Modelo de pontuação",
-        usa_bonus: "Bônus/multiplicador",
-        tabela_pontuacao: "Tabela de pontuação",
-        bonus_copa: "Bônus temáticos de Copa",
-        produtos_excluidos: "Produtos excluídos",
-        forma_lancamento: "Forma de lançamento",
-        precisa_comprovante: "Comprovante",
-        dados_venda: "Dados obrigatórios da venda",
-        validacao_venda: "Validação da venda",
-        cancelamento_troca_devolucao: "Cancelamento/troca/devolução",
+        lista_vendedores: "Lista dos vendedores participantes",
+        regra_vendedor_diferente: "Colaborador com regra diferente",
+        divisao_equipes: "Divisão das equipes/seleções",
+        usar_figurinhas: "Deseja usar figurinhas",
+        uso_figurinhas: "Onde as figurinhas serão usadas",
+        produtos_elegiveis: "Produtos que devem contar",
+        modelo_pontuacao: "Como calcular os pontos",
+        usa_bonus: "Bônus ou multiplicador",
+        tabela_pontuacao: "Pontuação desejada",
+        bonus_copa: "Bônus temáticos da Copa",
+        produtos_excluidos: "Produtos ou situações que não pontuam",
+        forma_lancamento: "Quem vai lançar as vendas",
+        precisa_comprovante: "Anexar comprovante",
+        dados_venda: "Informações de cada venda",
+        validacao_venda: "Quem confirma a venda",
+        cancelamento_troca_devolucao: "Cancelamento, troca ou devolução",
         qtd_administradores: "Quantidade de administradores",
-        quem_lanca_produtos: "Quem lança produtos",
-        quem_lanca_vendas: "Quem lança vendas/pontos",
-        permissoes: "Permissões",
-        obs_permissoes: "Observações de acesso",
-        ranking_publico: "Visibilidade do ranking",
+        quem_lanca_produtos: "Quem cadastra produtos",
+        quem_lanca_vendas: "Quem lança pontos/vendas",
+        permissoes: "Permissões necessárias",
+        obs_permissoes: "Observações sobre acesso",
+        ranking_publico: "Quem poderá ver o ranking",
         meta_individual: "Meta individual",
         meta_loja: "Meta loja/equipe",
-        gamificacao: "Gamificação",
-        info_painel_ranking: "Informações do ranking",
-        criterios_desempate: "Critérios de desempate",
+        gamificacao: "Recursos de gamificação",
+        info_painel_ranking: "O que deve aparecer no ranking",
+        criterios_desempate: "Critério de desempate",
         qtd_vencedores: "Quantidade de vencedores",
         tipo_premiacao: "Tipo de premiação",
-        premios: "Prêmios/benefícios",
-        comunicacao_vendedores: "Comunicação da campanha",
-        telas: "Telas sugeridas",
-        funcionalidades_obrigatorias: "Funcionalidades obrigatórias",
-        funcionalidades_futuras: "Funcionalidades futuras",
-        dados_sistema: "Dados do sistema",
-        exportacoes: "Exportações",
+        premios: "Prêmios ou benefícios",
+        comunicacao_vendedores: "Comunicação para vendedores",
+        telas: "Telas desejadas",
+        funcionalidades_obrigatorias: "Indispensável na primeira versão",
+        funcionalidades_futuras: "Próxima etapa",
+        dados_sistema: "Dados que o sistema precisa guardar",
+        exportacoes: "Exportação necessária",
         quem_recebe_relatorio: "Quem recebe relatório final",
         info_relatorio_final: "Informações do relatório final",
-        decisoes_pendentes: "Decisões pendentes",
-        observacoes_gerais: "Observações gerais"
+        decisoes_pendentes: "Dúvidas ou decisões pendentes",
+        observacoes_gerais: "Observações finais"
       };
       return labels[name] || name;
     }
@@ -1092,18 +1232,31 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
       return sections;
     }
 
+    function drawPdfHeader(pdf, titleText) {
+      pdf.setFillColor(8, 100, 58);
+      pdf.rect(0, 0, 210, 34, "F");
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(17);
+      pdf.text(titleText, 14, 14);
+      pdf.setFontSize(10);
+      pdf.text("thIAguinho Soluções — tecnologia sob medida", 14, 23);
+    }
+
     async function generatePDF() {
+      saveDraft(false);
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ unit: "mm", format: "a4" });
       const data = collectFormData();
       const left = 14;
       const maxWidth = 182;
-      let y = 16;
+      let y = 44;
 
       function pageCheck(extra = 12) {
         if (y + extra > 282) {
           pdf.addPage();
-          y = 16;
+          drawPdfHeader(pdf, "Formulário — Gincana da Copa Tênis One");
+          y = 44;
         }
       }
 
@@ -1111,7 +1264,7 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
         pageCheck(16);
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(14);
-        pdf.setTextColor(9, 107, 61);
+        pdf.setTextColor(8, 100, 58);
         pdf.text(text, left, y);
         y += 8;
       }
@@ -1128,44 +1281,46 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
         y += lines.length * 5 + 2;
       }
 
-      pdf.setFillColor(9, 107, 61);
-      pdf.rect(0, 0, 210, 34, "F");
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(18);
-      pdf.text("Briefing — Gincana da Copa Tênis One", left, 14);
-      pdf.setFontSize(10);
-      pdf.text("thIAguinho Soluções — tecnologia sob medida", left, 23);
-      y = 44;
+      drawPdfHeader(pdf, "Formulário — Gincana da Copa Tênis One");
 
-      title("Resumo executivo");
-      line("Cliente", data.cliente_nome);
+      title("Resumo principal");
+      line("Responsável", data.cliente_nome);
       line("Empresa", data.empresa);
       line("Unidade", data.unidade);
-      line("Nome da gincana", data.nome_gincana);
+      line("Campanha", data.nome_gincana);
       line("Período", `${data.data_inicio || "Não informado"} a ${data.data_fim || "Não informado"}`);
-      line("Dor principal", data.dor_principal);
-      line("Solução sugerida", "Sistema de gincana de vendas com regras de pontuação, ranking, aprovação de vendas, relatórios e figurinhas dos vendedores.");
+      line("Formato da disputa", data.tipo_competicao);
+      line("Objetivo da gincana", data.objetivo_campanha);
+      line("Quantidade de vendedores", data.qtd_vendedores);
+      line("Modelo de pontuação", data.modelo_pontuacao);
+      line("Quem lança as vendas", data.forma_lancamento);
+      line("Quem vê o ranking", data.ranking_publico);
+      line("Vencedores premiados", data.qtd_vencedores);
+
+      const missing = missingRequired();
+      title("Campos principais pendentes");
+      line("Pendências", missing.length ? missing.join(", ") : "Nenhum campo principal pendente.");
 
       groupedFieldsBySection().forEach(section => {
         title(section.title);
         section.names.forEach(name => line(labelFromName(name), data[name]));
       });
 
-      title("Leitura de escopo em 3 níveis");
-      line("Nível 1 — Organização simples", "Briefing, regras fechadas, ranking manual, PDF e figurinhas da campanha.");
-      line("Nível 2 — Controle profissional", "Login, lançamentos, aprovação, ranking, relatórios e histórico.");
-      line("Nível 3 — Sistema sob medida", "Integrações, automações, painel de TV, notificações e gamificação avançada.");
+      title("Leitura sugerida para a primeira versão");
+      line("Opção simples", "Formulário, PDF, regras da campanha, ranking básico e figurinhas.");
+      line("Opção profissional", "Login, lançamentos de vendas, aprovação, ranking, relatórios e histórico.");
+      line("Opção sob medida", "Integrações, automações, painel de TV, notificações e gamificação avançada.");
 
       if (stickerAlbum.length) {
         pdf.addPage();
-        y = 16;
-        title("Álbum de figurinhas dos vendedores");
+        drawPdfHeader(pdf, "Álbum de Figurinhas — Tênis One");
+        y = 44;
+        title("Figurinhas criadas");
         let x = left;
         let col = 0;
         for (let i = 0; i < stickerAlbum.length; i++) {
           const sticker = stickerAlbum[i];
-          if (y + 82 > 282) { pdf.addPage(); y = 16; x = left; col = 0; }
+          if (y + 82 > 282) { pdf.addPage(); drawPdfHeader(pdf, "Álbum de Figurinhas — Tênis One"); y = 44; x = left; col = 0; }
           try {
             pdf.addImage(sticker.dataUrl, "JPEG", x, y, 48, 60);
           } catch (e) {
@@ -1181,17 +1336,19 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 28px; }
         }
       }
 
-      pdf.save("briefing-gincana-copa-tenis-one.pdf");
-      showStatus("PDF gerado com o briefing da gincana.");
+      const safeName = (data.nome_gincana || "gincana-copa-tenis-one").toLowerCase().replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "");
+      pdf.save(`${safeName || "gincana-copa-tenis-one"}-respostas.pdf`);
+      showStatus("PDF gerado. Envie esse arquivo para a thIAguinho Soluções.");
     }
 
-    form.addEventListener("input", updateProgress);
-    form.addEventListener("change", updateProgress);
+    form.addEventListener("input", () => { updateProgress(); updateMissingList(); autoSave(); });
+    form.addEventListener("change", () => { updateProgress(); updateMissingList(); autoSave(); });
     window.addEventListener("load", () => {
       setDefaultDate();
       loadDraft(false);
       drawStickerPlaceholder();
       updateProgress();
+      updateMissingList();
     });
   </script></body>
 </html>
